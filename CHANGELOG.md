@@ -6,7 +6,7 @@ Pop PHP Framework Changelog
 As of May 7, 2014
 
 * PHP 5.4+ Only
-* Utilize Composer
+* Composer Support
 * PSR-4
 * Revised
      - File
