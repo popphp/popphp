@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Project
+ * @package    Pop_Application
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,19 +13,19 @@
 /**
  * @namespace
  */
-namespace Pop\Project;
+namespace Pop\Application;
 
 use Pop\I18n\I18n;
 
 /**
- * Project install class
+ * Application install class
  *
  * @category   Pop
- * @package    Pop_Project
+ * @package    Pop_Application
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.0
+ * @version    2.0.0a
  */
 class Install
 {
@@ -70,7 +70,7 @@ class Install
 
         // Check if a project folder already exists.
         if (file_exists($install->project->name)) {
-            echo wordwrap(I18n::factory()->__('Project folder exists. This may overwrite any project files you may already have under that project folder.'), 70, PHP_EOL) . PHP_EOL;
+            echo wordwrap(I18n::factory()->__('Application folder exists. This may overwrite any project files you may already have under that project folder.'), 70, PHP_EOL) . PHP_EOL;
             $input = self::cliInput();
         } else {
             $input = 'y';
@@ -110,14 +110,14 @@ class Install
                         echo I18n::factory()->__('The database type and database name must be set for the database ') . '\'' . $dbname . '\'.' . PHP_EOL . PHP_EOL;
                         exit(0);
                     }
-                    $check = Install\Dbs::check($db);
+                    $check = Build\Dbs::check($db);
                     if (null !== $check) {
                         echo $check . PHP_EOL . PHP_EOL;
                         exit(0);
                     } else {
                         echo I18n::factory()->__('Database') . ' \'' . $dbname . '\' passed.' . PHP_EOL;
                         echo I18n::factory()->__('Installing database') .' \'' . $dbname . '\'...' . PHP_EOL;
-                        $tables = Install\Dbs::install($dbname, $db, $installDir, $install);
+                        $tables = Build\Dbs::install($dbname, $db, $installDir, $install);
                         if (count($tables) > 0) {
                             $dbTables = array_merge($dbTables, $tables);
                         }
@@ -128,35 +128,35 @@ class Install
             }
 
             // Install base folder and file structure
-            Install\Base::install($install);
+            Build\Base::install($install);
 
             // Install project files
-            Install\Projects::install($install, $installDir);
+            Build\Applications::install($install, $installDir);
 
             // Install table class files
             if (count($dbTables) > 0) {
-                Install\Tables::install($install, $dbTables);
+                Build\Tables::install($install, $dbTables);
             }
 
             // Install controller class files
             if (isset($install->controllers)) {
-                Install\Controllers::install($install, $installDir);
+                Build\Controllers::install($install, $installDir);
             }
 
             // Install form class files
             if (isset($install->forms)) {
-                Install\Forms::install($install);
+                Build\Forms::install($install);
             }
 
             // Install model class files
             if (isset($install->models)) {
-                Install\Models::install($install);
+                Build\Models::install($install);
             }
 
             // Create 'bootstrap.php' file
-            Install\Bootstrap::install($install);
+            Build\Bootstrap::install($install);
 
-            echo I18n::factory()->__('Project install complete.') . PHP_EOL . PHP_EOL;
+            echo I18n::factory()->__('Application install complete.') . PHP_EOL . PHP_EOL;
         }
 
     }

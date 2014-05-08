@@ -23,7 +23,7 @@ namespace Pop\Web;
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.0
+ * @version    2.0.0a
  */
 class Browser
 {
@@ -110,11 +110,15 @@ class Browser
     public function __construct()
     {
         // Set the user agent and object properties.
-        $this->ip     = $_SERVER['REMOTE_ADDR'];
-        $this->subnet = substr($_SERVER['REMOTE_ADDR'], 0, strrpos($_SERVER['REMOTE_ADDR'], '.'));
-        $this->ua     = $_SERVER['HTTP_USER_AGENT'];
+        if (isset($_SERVER['REMOTE_ADDR'])) {
+            $this->ip     = $_SERVER['REMOTE_ADDR'];
+            $this->subnet = substr($_SERVER['REMOTE_ADDR'], 0, strrpos($_SERVER['REMOTE_ADDR'], '.'));
+        }
 
-        $this->detect();
+        if (isset($_SERVER['HTTP_USER_AGENT'])) {
+            $this->ua = $_SERVER['HTTP_USER_AGENT'];
+            $this->detect();
+        }
     }
 
     /**

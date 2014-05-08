@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Project
+ * @package    Pop_Application
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Project\Install;
+namespace Pop\Application\Build;
 
 use Pop\Code\Generator;
 use Pop\Code\Generator\MethodGenerator;
@@ -23,17 +23,17 @@ use Pop\Code\Generator\NamespaceGenerator;
  * Form install class
  *
  * @category   Pop
- * @package    Pop_Project
+ * @package    Pop_Application
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.0
+ * @version    2.0.0a
  */
 class Forms
 {
 
     /**
-     * Install the form class files
+     * Build the form class files
      *
      * @param \Pop\Config $install
      * @return void

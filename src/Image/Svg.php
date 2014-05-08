@@ -26,7 +26,7 @@ use Pop\Color\Space\Rgb;
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.0
+ * @version    2.0.0a
  */
 class Svg extends \Pop\File\File
 {

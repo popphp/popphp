@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Project
+ * @package    Pop_Application
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,62 +13,62 @@
 /**
  * @namespace
  */
-namespace Pop\Project;
+namespace Pop\Application;
 
 use Pop\Config,
     Pop\Mvc\Router;
 
 /**
- * Project class
+ * Application class
  *
  * @category   Pop
- * @package    Pop_Project
+ * @package    Pop_Application
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.0
+ * @version    2.0.0a
  */
-class Project
+class Application
 {
 
     /**
-     * Project config
+     * Application config
      * @var \Pop\Config
      */
     protected $config = null;
 
     /**
-     * Project module configs
+     * Application module configs
      * @var array
      */
     protected $modules = array();
 
     /**
-     * Project router
+     * Application router
      * @var \Pop\Mvc\Router
      */
     protected $router = null;
 
     /**
-     * Project events
+     * Application events
      * @var \Pop\Event\Manager
      */
     protected $events = null;
 
     /**
-     * Project services
+     * Application services
      * @var \Pop\Service\Locator
      */
     protected $services = null;
 
     /**
-     * Project logger
+     * Application logger
      * @var \Pop\Log\Logger
      */
     protected $logger = null;
 
     /**
-     * Project start timestamp
+     * Application start timestamp
      * @var int
      */
     protected $start = null;
@@ -81,7 +81,7 @@ class Project
      * @param  mixed           $config
      * @param  array           $module
      * @param  \Pop\Mvc\Router $router
-     * @return \Pop\Project\Project
+     * @return \Pop\Application\Application
      */
     public function __construct($config = null, array $module = null, Router $router = null)
     {
@@ -121,7 +121,7 @@ class Project
      * @param  mixed           $config
      * @param  array           $module
      * @param  \Pop\Mvc\Router $router
-     * @return \Pop\Project\Project
+     * @return \Pop\Application\Application
      */
     public static function factory($config = null, array $module = null, Router $router = null)
     {
@@ -216,7 +216,7 @@ class Project
      *
      * @param  mixed $config
      * @throws Exception
-     * @return \Pop\Project\Project
+     * @return \Pop\Application\Application
      */
     public function loadConfig($config)
     {
@@ -242,7 +242,7 @@ class Project
      *
      * @param  array $module
      * @throws Exception
-     * @return \Pop\Project\Project
+     * @return \Pop\Application\Application
      */
     public function loadModule(array $module)
     {
@@ -263,7 +263,7 @@ class Project
      * Load a router
      *
      * @param  \Pop\Mvc\Router $router
-     * @return \Pop\Project\Project
+     * @return \Pop\Application\Application
      */
     public function loadRouter(Router $router)
     {
@@ -288,7 +288,7 @@ class Project
      * @param  string $name
      * @param  mixed  $action
      * @param  int    $priority
-     * @return \Pop\Project\Project
+     * @return \Pop\Application\Application
      */
     public function attachEvent($name, $action, $priority = 0)
     {
@@ -312,7 +312,7 @@ class Project
      *
      * @param  string $name
      * @param  mixed  $action
-     * @return \Pop\Project\Project
+     * @return \Pop\Application\Application
      */
     public function detachEvent($name, $action)
     {
@@ -336,7 +336,7 @@ class Project
      * @param  string $name
      * @param  mixed  $call
      * @param  mixed  $params
-     * @return \Pop\Project\Project
+     * @return \Pop\Application\Application
      */
     public function setService($name, $call, $params = null)
     {

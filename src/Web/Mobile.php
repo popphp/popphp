@@ -23,7 +23,7 @@ namespace Pop\Web;
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.0
+ * @version    2.0.0a
  */
 class Mobile
 {
@@ -172,8 +172,7 @@ class Mobile
      */
     public static function isDesktopDevice()
     {
-        $mob = new static();
-        return $mob->isDesktop();
+        return (new static())->isDesktop();
     }
 
     /**
@@ -183,8 +182,7 @@ class Mobile
      */
     public static function isTabletDevice()
     {
-        $mob = new static();
-        return $mob->isTablet();
+        return (new static())->isTablet();
     }
 
     /**
@@ -194,8 +192,7 @@ class Mobile
      */
     public static function isMobileDevice()
     {
-        $mob = new static();
-        return $mob->isMobile();
+        return (new static())->isMobile();
     }
 
     /**
@@ -205,8 +202,7 @@ class Mobile
      */
     public static function getDevice()
     {
-        $mob = new static();
-        return $mob->getDeviceName();
+        return (new static())->getDeviceName();
     }
 
     /**

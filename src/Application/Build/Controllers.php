@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Project
+ * @package    Pop_Application
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Project\Install;
+namespace Pop\Application\Build;
 
 use Pop\Code\Generator;
 use Pop\Code\Generator\MethodGenerator;
@@ -23,17 +23,17 @@ use Pop\Code\Generator\NamespaceGenerator;
  * Controllers install class
  *
  * @category   Pop
- * @package    Pop_Project
+ * @package    Pop_Application
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.0
+ * @version    2.0.0a
  */
 class Controllers
 {
 
     /**
-     * Install the controller class files
+     * Build the controller class files
      *
      * @param \Pop\Config $install
      * @param string     $installDir
@@ -136,7 +136,7 @@ class Controllers
                         'Pop\Http\Request',
                         array('Pop\Mvc\Controller', 'C'),
                         'Pop\Mvc\View',
-                        'Pop\Project\Project'
+                        'Pop\Application\Application'
                     ));
 
                     // Create the constructor
@@ -145,7 +145,7 @@ class Controllers
                     $construct->addArguments(array(
                         array('name' => 'request', 'value' => 'null', 'type' => 'Request'),
                         array('name' => 'response', 'value' => 'null', 'type' => 'Response'),
-                        array('name' => 'project', 'value' => 'null', 'type' => 'Project'),
+                        array('name' => 'project', 'value' => 'null', 'type' => 'Application'),
                         array('name' => 'viewPath', 'value' => 'null', 'type' => 'string')
                     ));
 

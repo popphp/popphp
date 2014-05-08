@@ -1,8 +1,9 @@
 COMPONENTS
 ----------
+ - Application
  - Archive
  - Auth
- - Cache [DONE]
+ - Cache [DONE - review Sqlite adapter]
  - Code
  - Color [DONE]
  - Crypt [DONE]
@@ -29,7 +30,6 @@ COMPONENTS
  - Paginator
  - Payment [DONE -> w/ deps: Curl]
  - Pdf
- - Project
  - Service [DONE]
  - Shipping [DONE -> w/ deps: Dom, Curl]
  - Validator [DONE]
@@ -41,12 +41,18 @@ COMPONENTS
 REVISIONS
 ---------
  - PHP 5.4+ Only
+ - PSR-4
+ - Composer
+
+
+REVISED
+-------
+ - File
+     + Completely stripped down to only the upload and checkDuplicate static methods
+     + Trimmed Dir class, removed references to old File class
 
 
 REMOVED
 -------
  - Compress
  - Loader
- - File
-     + Completely stripped down to only the upload and checkDuplicate static methods
-     + Trimmed Dir class, removed references to old File class

@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Project
+ * @package    Pop_Application
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,23 +13,23 @@
 /**
  * @namespace
  */
-namespace Pop\Project\Install;
+namespace Pop\Application\Build;
 
 /**
  * Base install class
  *
  * @category   Pop
- * @package    Pop_Project
+ * @package    Pop_Application
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.0
+ * @version    2.0.0a
  */
 class Base
 {
 
     /**
-     * Install the base folder and file structure
+     * Build the base folder and file structure
      *
      * @param \Pop\Config $install
      * @return void
