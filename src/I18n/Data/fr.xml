@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE language [
+    <!ELEMENT language ANY>
+    <!ELEMENT locale ANY>
+    <!ELEMENT text (source,output)>
+    <!ELEMENT source ANY>
+    <!ELEMENT output ANY>
+    <!ATTLIST language
+        src       CDATA    #REQUIRED
+        output    CDATA    #REQUIRED
+        name      CDATA    #REQUIRED
+        native    CDATA    #REQUIRED
+    >
+    <!ATTLIST locale
+        region    CDATA    #REQUIRED
+        name      CDATA    #REQUIRED
+        native    CDATA    #REQUIRED
+    >
+]>
+<language src="en" output="fr" name="French" native="Française">
+    <locale region="FR" name="France" native="France">
+        <text>
+            <source>This field is required.</source>
+            <output>Ce champ est obligatoire.</output>
+        </text>
+        <text>
+            <source>January</source>
+            <output>Janvier</output>
+        </text>
+        <text>
+            <source>February</source>
+            <output>Février</output>
+        </text>
+        <text>
+            <source>March</source>
+            <output>Mars</output>
+        </text>
+        <text>
+            <source>April</source>
+            <output>Avril</output>
+        </text>
+        <text>
+            <source>May</source>
+            <output>Mai</output>
+        </text>
+        <text>
+            <source>June</source>
+            <output>Juin</output>
+        </text>
+        <text>
+            <source>July</source>
+            <output>Juillet</output>
+        </text>
+        <text>
+            <source>August</source>
+            <output>Août</output>
+        </text>
+        <text>
+            <source>September</source>
+            <output>Septembre</output>
+        </text>
+        <text>
+            <source>October</source>
+            <output>Octobre</output>
+        </text>
+        <text>
+            <source>November</source>
+            <output>Novembre</output>
+        </text>
+        <text>
+            <source>December</source>
+            <output>Décembre</output>
+        </text>
+        <text>
+            <source>Sunday</source>
+            <output>Dimanche</output>
+        </text>
+        <text>
+            <source>Monday</source>
+            <output>Lundi</output>
+        </text>
+        <text>
+            <source>Tuesday</source>
+            <output>Mardi</output>
+        </text>
+        <text>
+            <source>Wednesday</source>
+            <output>Mercredi</output>
+        </text>
+        <text>
+            <source>Thursday</source>
+            <output>Jeudi</output>
+        </text>
+        <text>
+            <source>Friday</source>
+            <output>Vendredi</output>
+        </text>
+        <text>
+            <source>Saturday</source>
+            <output>Samedi</output>
+        </text>
+        <text>
+            <source>The value length must be between or equal to %1 and %2.</source>
+            <output>La longueur doit être comprise entre une valeur ou égale à %1 et %2.</output>
+        </text>
+        <text>
+            <source>The value length must not be between or equal to %1 and %2.</source>
+            <output>La longueur de valeur ne doit pas être entre ou égale à %1 et %2.</output>
+        </text>
+        <text>
+            <source>The value must be a valid IPv6 address.</source>
+            <output>La valeur doit être une adresse IPv6 valide.</output>
+        </text>
+        <text>
+            <source>The value must not be a valid IPv6 address.</source>
+            <output>La valeur ne doit pas être une adresse IPv6 valide.</output>
+        </text>
+        <text>
+            <source>The value must be a valid credit card number.</source>
+            <output>La valeur doit être une carte de crédit valide.</output>
+        </text>
+        <text>
+            <source>The value must not be a valid credit card number.</source>
+            <output>La valeur ne doit pas être un numéro de carte de crédit valide.</output>
+        </text>
+        <text>
+            <source>The value must be included.</source>
+            <output>La valeur doit être incluse.</output>
+        </text>
+        <text>
+            <source>The value must not be included.</source>
+            <output>La valeur ne doit pas être inclus.</output>
+        </text>
+        <text>
+            <source>The value must be between or equal to %1 and %2.</source>
+            <output>La valeur doit être comprise entre ou égale à %1 et %2.</output>
+        </text>
+        <text>
+            <source>The value must not be between or equal to %1 and %2.</source>
+            <output>La valeur ne doit pas être compris entre ou égale à %1 et %2.</output>
+        </text>
+        <text>
+            <source>The value must be part of the subnet %1.</source>
+            <output>La valeur doit être une partie du %1 de sous-réseau.</output>
+        </text>
+        <text>
+            <source>The value must not be part of the subnet %1.</source>
+            <output>La valeur ne doit pas faire partie du %1 de sous-réseau.</output>
+        </text>
+        <text>
+            <source>The value must be greater than or equal to %1.</source>
+            <output>La valeur doit être supérieure ou égale à %1.</output>
+        </text>
+        <text>
+            <source>The value must not be greater than or equal to %1.</source>
+            <output>La valeur ne doit pas être supérieur ou égal à %1.</output>
+        </text>
+        <text>
+            <source>The value length must be greater than %1.</source>
+            <output>La longueur de valeur doit être supérieure à %1.</output>
+        </text>
+        <text>
+            <source>The value length must not be greater than %1.</source>
+            <output>La longueur de valeur ne doit pas être supérieure à %1.</output>
+        </text>
+        <text>
+            <source>The value must only contain alphanumeric characters.</source>
+            <output>La valeur ne doit contenir que des caractères alphanumériques.</output>
+        </text>
+        <text>
+            <source>The value must contain non-alphanumeric characters.</source>
+            <output>La valeur doit contenir des caractères non alphanumériques.</output>
+        </text>
+        <text>
+            <source>The value length must be equal to %1.</source>
+            <output>La longueur doit être de valeur égale à %1.</output>
+        </text>
+        <text>
+            <source>The value length must not be equal to %1.</source>
+            <output>La longueur de valeur ne doit pas être égal à %1.</output>
+        </text>
+        <text>
+            <source>The value length must be greater than or equal to %1.</source>
+            <output>La longueur de valeur doit être supérieure ou égale à %1.</output>
+        </text>
+        <text>
+            <source>The value length must not be greater than or equal to %1.</source>
+            <output>La longueur de valeur ne doit pas être supérieur ou égal à %1.</output>
+        </text>
+        <text>
+            <source>The value must be less than or equal to %1.</source>
+            <output>La valeur doit être inférieure ou égale à %1.</output>
+        </text>
+        <text>
+            <source>The value must not be less than or equal to %1.</source>
+            <output>La valeur ne doit pas être inférieure ou égale à %1.</output>
+        </text>
+        <text>
+            <source>The value must be between %1 and %2.</source>
+            <output>La valeur doit être comprise entre %1 et %2.</output>
+        </text>
+        <text>
+            <source>The value must not be between %1 and %2.</source>
+            <output>La valeur ne doit pas être compris entre %1 et %2.</output>
+        </text>
+        <text>
+            <source>The value must be greater than %1.</source>
+            <output>La valeur doit être supérieure à %1.</output>
+        </text>
+        <text>
+            <source>The value must not be greater than %1.</source>
+            <output>La valeur ne doit pas être supérieure à %1.</output>
+        </text>
+        <text>
+            <source>The value must be a valid IPv4 address.</source>
+            <output>La valeur doit être une adresse IPv4 valide.</output>
+        </text>
+        <text>
+            <source>The value must not be a valid IPv4 address.</source>
+            <output>La valeur ne doit pas être une adresse IPv4 valide.</output>
+        </text>
+        <text>
+            <source>The value must be a valid email format.</source>
+            <output>La valeur doit être un format de courriel valide.</output>
+        </text>
+        <text>
+            <source>The value must not be a valid email format.</source>
+            <output>La valeur ne doit pas être un format de courriel valide.</output>
+        </text>
+        <text>
+            <source>The value must be a valid IPv4 subnet.</source>
+            <output>La valeur doit être un sous-réseau IPv4 valide.</output>
+        </text>
+        <text>
+            <source>The value must not be a valid IPv4 subnet.</source>
+            <output>La valeur ne doit pas être un sous-réseau IPv4 valide.</output>
+        </text>
+        <text>
+            <source>The value format is not correct.</source>
+            <output>Le format de la valeur n'est pas correcte.</output>
+        </text>
+        <text>
+            <source>The value must be equal to %1.</source>
+            <output>La valeur doit être égale à %1.</output>
+        </text>
+        <text>
+            <source>The value must not be equal to %1.</source>
+            <output>La valeur ne doit pas être égal à %1.</output>
+        </text>
+        <text>
+            <source>The value must be less than %1.</source>
+            <output>La valeur doit être inférieure à %1.</output>
+        </text>
+        <text>
+            <source>The value must not be less than %1.</source>
+            <output>La valeur ne doit pas être inférieure à %1.</output>
+        </text>
+        <text>
+            <source>The value length must be between %1 and %2.</source>
+            <output>La longueur de valeur doit être comprise entre %1 et %2.</output>
+        </text>
+        <text>
+            <source>The value length must not be between %1 and %2.</source>
+            <output>La longueur de valeur ne doit pas être entre %1 et %2.</output>
+        </text>
+        <text>
+            <source>The value must be numeric.</source>
+            <output>La valeur doit être numérique.</output>
+        </text>
+        <text>
+            <source>The value must not be numeric.</source>
+            <output>La valeur ne doit pas être numérique.</output>
+        </text>
+        <text>
+            <source>The value must not be empty.</source>
+            <output>La valeur ne doit pas être vide.</output>
+        </text>
+        <text>
+            <source>The value must be empty.</source>
+            <output>La valeur doit être vide.</output>
+        </text>
+        <text>
+            <source>The value length must be less than %1.</source>
+            <output>La longueur de valeur doit être inférieure à %1.</output>
+        </text>
+        <text>
+            <source>The value length must not be less than %1.</source>
+            <output>La longueur de valeur ne doit pas être inférieure à %1.</output>
+        </text>
+        <text>
+            <source>The value must only contain characters in the alphabet.</source>
+            <output>La valeur doit contenir que des caractères de l'alphabet.</output>
+        </text>
+        <text>
+            <source>The value must only contain characters not in the alphabet.</source>
+            <output>La valeur ne doit contenir que des caractères non dans l'alphabet.</output>
+        </text>
+        <text>
+            <source>The value must be excluded.</source>
+            <output>La valeur doit être exclue.</output>
+        </text>
+        <text>
+            <source>The value must not be excluded.</source>
+            <output>La valeur ne doit pas être exclue.</output>
+        </text>
+        <text>
+            <source>The value length must be less than or equal to %1.</source>
+            <output>La longueur de valeur doit être inférieure ou égale à %1.</output>
+        </text>
+        <text>
+            <source>The value length must not be less than or equal to %1.</source>
+            <output>La longueur de valeur ne doit pas être inférieur ou égal à %1.</output>
+        </text>
+        <text>
+            <source>The value must not be equal to %1.</source>
+            <output>La valeur ne doit pas être égal à %1.</output>
+        </text>
+        <text>
+            <source>The value must be equal to %1.</source>
+            <output>La valeur doit être égale à %1.</output>
+        </text>
+        <text>
+            <source>Creating controller class files...</source>
+            <output>Création de fichiers de classe de contrôleur ...</output>
+        </text>
+        <text>
+            <source>Creating base folder and file structure...</source>
+            <output>Création du dossier de base et la structure des fichiers ...</output>
+        </text>
+        <text>
+            <source>Creating database table class files...</source>
+            <output>Création de fichiers base de données de table de classe ...</output>
+        </text>
+        <text>
+            <source>Creating form class files...</source>
+            <output>Création de fichiers de classe de formulaire ...</output>
+        </text>
+        <text>
+            <source>Creating model class files...</source>
+            <output>Création de fichiers de classe modèle ...</output>
+        </text>
+        <text>
+            <source>You will have to install your web server rewrite configuration manually.</source>
+            <output>Vous devrez installer votre configuration du serveur web réécrire manuellement.</output>
+        </text>
+        <text>
+            <source>Install index controller and web configuration files?</source>
+            <output>Installez le contrôleur index et les fichiers de configuration Web?</output>
+        </text>
+        <text>
+            <source>The user is valid.</source>
+            <output>L'utilisateur est valide.</output>
+        </text>
+        <text>
+            <source>The user was not found.</source>
+            <output>L'utilisateur n'a pas été trouvé.</output>
+        </text>
+        <text>
+            <source>The user is blocked.</source>
+            <output>L'utilisateur est bloqué.</output>
+        </text>
+        <text>
+            <source>The password was incorrect.</source>
+            <output>Le mot de passe est incorrect.</output>
+        </text>
+        <text>
+            <source>The allowed login attempts (%1) have been exceeded.</source>
+            <output>Les tentatives de connexion autorisé (% 1) ont été dépassés.</output>
+        </text>
+        <text>
+            <source>That IP address is blocked.</source>
+            <output>Cette adresse IP est bloquée.</output>
+        </text>
+        <text>
+            <source>That IP address is not allowed.</source>
+            <output>Cette adresse IP n'est pas autorisée.</output>
+        </text>
+        <text>
+            <source>The session has expired.</source>
+            <output>La session a expiré.</output>
+        </text>
+        <text>
+            <source>Aborted.</source>
+            <output>Aborted.</output>
+        </text>
+        <text>
+            <source>Project folder exists. This may overwrite any project files you may already have under that project folder.</source>
+            <output>Dossier de projet existe. Cela peut écraser les fichiers de projet, vous pouvez déjà avoir en vertu de ce dossier de projet.</output>
+        </text>
+        <text>
+            <source>Database credentials and schema detected.</source>
+            <output>Références de connexion et le schéma détecté.</output>
+        </text>
+        <text>
+            <source>Test and install the database(s)?</source>
+            <output>Tester et d'installer la base de données (s)?</output>
+        </text>
+        <text>
+            <source>Testing the database(s)...</source>
+            <output>Test de la base (s) ...</output>
+        </text>
+        <text>
+            <source>Testing</source>
+            <output>Test</output>
+        </text>
+        <text>
+            <source>The database type and database name must be set for the database</source>
+            <output>Le type de base de données et le nom de base de données doit être défini pour la base de données</output>
+        </text>
+        <text>
+            <source>Database</source>
+            <output>Base de données</output>
+        </text>
+        <text>
+            <source>Installing database</source>
+            <output>Installation de bases de données</output>
+        </text>
+        <text>
+            <source>Project install complete.</source>
+            <output>Projet d'installation complète.</output>
+        </text>
+        <text>
+            <source>The Pop autoloader class file was not found.</source>
+            <output>Le fichier autoloader Pop classe n'a pas été trouvé.</output>
+        </text>
+        <text>
+            <source>Pop PHP Framework found.</source>
+            <output>Pop PHP Framework trouvé.</output>
+        </text>
+        <text>
+            <source>Project reconfigured.</source>
+            <output>Projet reconfiguré.</output>
+        </text>
+        <text>
+            <source>This process will create and install the base foundation of your project under the folder specified in the install file. Minimally, the install file should return a Pop\Config object containing your project install settings, such as project name, folders, forms, controllers, views and any database credentials.</source>
+            <output>Ce processus permettra de créer et d'installer la fondation de base de votre projet dans le dossier spécifié dans le fichier d'installation. Au minimum, le fichier d'installation doit retourner un Pop \ \ objet Config contenant les paramètres de votre installation de projets, tels que le nom du projet, les dossiers, les formulaires, les contrôleurs, les vues et les informations d'identification base de données.</output>
+        </text>
+        <text>
+            <source>Besides creating the base folders and files for you, one of the main benefits is ability to test and install the database and the corresponding configuration and class files. You can take advantage of this by having the database SQL files in the same folder as your install file, like so:</source>
+            <output>Outre la création des dossiers de base et les fichiers pour vous, l'un des principaux avantages est la capacité de tester et d'installer la base de données et la configuration correspondante et les fichiers de classe. Vous pouvez profiter de cela en ayant les fichiers base de données SQL dans le même dossier que votre fichier d'installation, comme ceci:</output>
+        </text>
+        <text>
+            <source>Check the current configuration for required dependencies</source>
+            <output>Vérifiez la configuration actuelle de dépendances requises</output>
+        </text>
+        <text>
+            <source>Display this help</source>
+            <output>Afficher cette aide</output>
+        </text>
+        <text>
+            <source>Install a project based on the install file specified</source>
+            <output>Installez un projet basé sur le fichier d'installation spécifié</output>
+        </text>
+        <text>
+            <source>Set the default language for the project</source>
+            <output>Réglez la langue par défaut pour le projet</output>
+        </text>
+        <text>
+            <source>Create a class map file from the source folder and save to the output file</source>
+            <output>Créer un fichier de carte de classe à partir du dossier source et enregistrez le fichier de sortie</output>
+        </text>
+        <text>
+            <source>Reconfigure the project based on the new location of the project</source>
+            <output>Reconfigurer le projet basé sur le nouvel emplacement du projet</output>
+        </text>
+        <text>
+            <source>Show project install instructions</source>
+            <output>Montrer les instructions d'installation de projet</output>
+        </text>
+        <text>
+            <source>Display version of Pop PHP Framework and latest available</source>
+            <output>Affichage version de Pop PHP Framework et les dernières données disponibles</output>
+        </text>
+        <text>
+            <source>Run './pop -h' for help.</source>
+            <output>Run '. / Pop-h' pour vous aider.</output>
+        </text>
+        <text>
+            <source>Run '.\pop -h' for help.</source>
+            <output>Run '. \ Pop-h' pour vous aider.</output>
+        </text>
+        <text>
+            <source>Continue?</source>
+            <output>Continuer?</output>
+        </text>
+        <text>
+            <source>Enter the folder where the 'bootstrap.php' is located in relation to the current folder:</source>
+            <output>Entrez dans le dossier où le «bootstrap.php est situé par rapport au dossier en cours:</output>
+        </text>
+        <text>
+            <source>Bootstrap file not found. Try again.</source>
+            <output>Fichier d'amorçage introuvable. Essayez à nouveau.</output>
+        </text>
+        <text>
+            <source>Enter the folder where the 'vendor' folder is contained in relation to the current folder:</source>
+            <output>Entrez dans le dossier où le «vendeur» dossier est contenue par rapport au dossier en cours:</output>
+        </text>
+        <text>
+            <source>Pop PHP Framework not found. Try again.</source>
+            <output>Pop PHP Framework introuvable. Essayez à nouveau.</output>
+        </text>
+        <text>
+            <source>Enter the numeric code for the default language: </source>
+            <output>Entrez le code numérique pour la langue par défaut: </output>
+        </text>
+        <text>
+            <source>Unknown error.</source>
+            <output>Une erreur inconnue.</output>
+        </text>
+        <text>
+            <source>You must pass a source folder and a output file to generate a class map file.</source>
+            <output>Vous devez passer un dossier source et un fichier de sortie pour générer un fichier de carte de classe.</output>
+        </text>
+        <text>
+            <source>The source folder passed does not exist.</source>
+            <output>Le dossier source passé n'existe pas.</output>
+        </text>
+        <text>
+            <source>The output file passed must be a PHP file.</source>
+            <output>Le fichier de sortie doit être transmis dans un fichier PHP.</output>
+        </text>
+        <text>
+            <source>You must pass an install file to install the project.</source>
+            <output>Vous devez passer un fichier d'installation pour installer le projet.</output>
+        </text>
+        <text>
+            <source>Unknown option:</source>
+            <output>Unknown option:</output>
+        </text>
+        <text>
+            <source>You must pass at least one argument.</source>
+            <output>Vous devez passer au moins un argument.</output>
+        </text>
+        <text>
+            <source>That folder does not exist.</source>
+            <output>Ce dossier n'existe pas.</output>
+        </text>
+        <text>
+            <source>The folder argument is not a folder</source>
+            <output>L'argument le dossier n'est pas un dossier</output>
+        </text>
+        <text>
+            <source>A few seconds ago</source>
+            <output>Il ya quelques secondes</output>
+        </text>
+        <text>
+            <source>1 minute ago</source>
+            <output>Il ya 1 minute</output>
+        </text>
+        <text>
+            <source>1 hour ago</source>
+            <output>Il ya 1 heure</output>
+        </text>
+        <text>
+            <source>1 day ago</source>
+            <output>Il ya 1 jour</output>
+        </text>
+        <text>
+            <source>1 month ago</source>
+            <output>Il ya 1 mois</output>
+        </text>
+        <text>
+            <source>%1 minutes ago</source>
+            <output>Il ya %1 minutes</output>
+        </text>
+        <text>
+            <source>%1 hours ago</source>
+            <output>Il ya %1 heures</output>
+        </text>
+        <text>
+            <source>%1 days ago</source>
+            <output>Il ya %1 jours</output>
+        </text>
+        <text>
+            <source>%1 months ago</source>
+            <output>Il ya %1 mois</output>
+        </text>
+        <text>
+            <source>%1 years ago</source>
+            <output>Il ya %1 ans</output>
+        </text>
+        <text>
+            <source>The answer is incorrect.</source>
+            <output>La réponse est incorrecte.</output>
+        </text>
+        <text>
+            <source>The security token does not match.</source>
+            <output>Le jeton de sécurité ne correspond pas.</output>
+        </text>
+    </locale>
+</language>

@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE language [
+    <!ELEMENT language ANY>
+    <!ELEMENT locale ANY>
+    <!ELEMENT text (source,output)>
+    <!ELEMENT source ANY>
+    <!ELEMENT output ANY>
+    <!ATTLIST language
+        src       CDATA    #REQUIRED
+        output    CDATA    #REQUIRED
+        name      CDATA    #REQUIRED
+        native    CDATA    #REQUIRED
+    >
+    <!ATTLIST locale
+        region    CDATA    #REQUIRED
+        name      CDATA    #REQUIRED
+        native    CDATA    #REQUIRED
+    >
+]>
+<language src="en" output="ar" name="Arabic" native="العربية">
+    <locale region="EG" name="Egypt" native="مصر">
+        <text>
+            <source>This field is required.</source>
+            <output>هذا الحقل مطلوب.</output>
+        </text>
+        <text>
+            <source>January</source>
+            <output>يناير</output>
+        </text>
+        <text>
+            <source>February</source>
+            <output>فبراير</output>
+        </text>
+        <text>
+            <source>March</source>
+            <output>مسيرة</output>
+        </text>
+        <text>
+            <source>April</source>
+            <output>أبريل</output>
+        </text>
+        <text>
+            <source>May</source>
+            <output>قد</output>
+        </text>
+        <text>
+            <source>June</source>
+            <output>حزيران</output>
+        </text>
+        <text>
+            <source>July</source>
+            <output>تموز</output>
+        </text>
+        <text>
+            <source>August</source>
+            <output>أغسطس</output>
+        </text>
+        <text>
+            <source>September</source>
+            <output>سبتمبر</output>
+        </text>
+        <text>
+            <source>October</source>
+            <output>أكتوبر</output>
+        </text>
+        <text>
+            <source>November</source>
+            <output>تشرين الثاني</output>
+        </text>
+        <text>
+            <source>December</source>
+            <output>ديسمبر</output>
+        </text>
+        <text>
+            <source>Sunday</source>
+            <output>الأحد</output>
+        </text>
+        <text>
+            <source>Monday</source>
+            <output>يوم الاثنين</output>
+        </text>
+        <text>
+            <source>Tuesday</source>
+            <output>الثلاثاء</output>
+        </text>
+        <text>
+            <source>Wednesday</source>
+            <output>الأربعاء</output>
+        </text>
+        <text>
+            <source>Thursday</source>
+            <output>الخميس</output>
+        </text>
+        <text>
+            <source>Friday</source>
+            <output>الجمعة</output>
+        </text>
+        <text>
+            <source>Saturday</source>
+            <output>السبت</output>
+        </text>
+        <text>
+            <source>The value length must be between or equal to %1 and %2.</source>
+            <output>يجب أن تكون القيمة بين طول أو يساوي %1 و %2.</output>
+        </text>
+        <text>
+            <source>The value length must not be between or equal to %1 and %2.</source>
+            <output>يجب أن لا تكون قيمة طول بين أو يساوي %1 و %2.</output>
+        </text>
+        <text>
+            <source>The value must be a valid IPv6 address.</source>
+            <output>يجب أن تكون القيمة عنوان صالح ب IPv6.</output>
+        </text>
+        <text>
+            <source>The value must not be a valid IPv6 address.</source>
+            <output>يجب أن تكون قيمة لا يمكن أن يكون عنوان صالح ب IPv6.</output>
+        </text>
+        <text>
+            <source>The value must be a valid credit card number.</source>
+            <output>يجب أن تكون القيمة على بطاقة ائتمان سارية المفعول العدد.</output>
+        </text>
+        <text>
+            <source>The value must not be a valid credit card number.</source>
+            <output>يجب أن لا تكون قيمة بطاقة ائتمان سارية المفعول العدد.</output>
+        </text>
+        <text>
+            <source>The value must be included.</source>
+            <output>يجب أن تدرج القيمة .</output>
+        </text>
+        <text>
+            <source>The value must not be included.</source>
+            <output>يجب أن لا قيمة  إدراجها.</output>
+        </text>
+        <text>
+            <source>The value must be between or equal to %1 and %2.</source>
+            <output>يجب أن تكون القيمة بين أو يساوي %1 و %2.</output>
+        </text>
+        <text>
+            <source>The value must not be between or equal to %1 and %2.</source>
+            <output>يجب أن تكون قيمة لا يكون بين أو يساوي %1 و %2.</output>
+        </text>
+        <text>
+            <source>The value must be part of the subnet %1.</source>
+            <output>يجب أن تكون قيمة تكون جزءا من الشبكة الفرعية %1.</output>
+        </text>
+        <text>
+            <source>The value must not be part of the subnet %1.</source>
+            <output>يجب أن تكون قيمة لا تكون جزءا من الشبكة الفرعية %1.</output>
+        </text>
+        <text>
+            <source>The value must be greater than or equal to %1.</source>
+            <output>يجب أن تكون القيمة أكبر من أو يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value must not be greater than or equal to %1.</source>
+            <output>يجب أن لا تكون قيمة أكبر من أو يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value length must be greater than %1.</source>
+            <output>يجب أن تكون القيمة طول أكبر من %1.</output>
+        </text>
+        <text>
+            <source>The value length must not be greater than %1.</source>
+            <output>يجب أن لا يكون طول قيمة أكبر من %1.</output>
+        </text>
+        <text>
+            <source>The value must only contain alphanumeric characters.</source>
+            <output>يجب أن تكون قيمة تحتوي فقط على الأحرف الأبجدية الرقمية.</output>
+        </text>
+        <text>
+            <source>The value must contain non-alphanumeric characters.</source>
+            <output>يجب أن تكون قيمة تحتوي على أحرف غير الأبجدية الرقمية.</output>
+        </text>
+        <text>
+            <source>The value length must be equal to %1.</source>
+            <output>يجب أن تكون القيمة طول يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value length must not be equal to %1.</source>
+            <output>يجب أن لا تكون قيمة طول يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value length must be greater than or equal to %1.</source>
+            <output>يجب أن تكون القيمة مدة أكبر من أو يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value length must not be greater than or equal to %1.</source>
+            <output>يجب أن لا يكون طول قيمة أكبر من أو يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value must be less than or equal to %1.</source>
+            <output>يجب أن تكون القيمة أقل من أو يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value must not be less than or equal to %1.</source>
+            <output>يجب أن لا تكون قيمة أقل من أو يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value must be between %1 and %2.</source>
+            <output>يجب أن تكون القيمة بين %1 و %2.</output>
+        </text>
+        <text>
+            <source>The value must not be between %1 and %2.</source>
+            <output>يجب أن لا تكون قيمة ما بين %1 و %2.</output>
+        </text>
+        <text>
+            <source>The value must be greater than %1.</source>
+            <output>يجب أن تكون القيمة أكبر من %1.</output>
+        </text>
+        <text>
+            <source>The value must not be greater than %1.</source>
+            <output>يجب أن تكون قيمة لا تكون أكبر من %1.</output>
+        </text>
+        <text>
+            <source>The value must be a valid IPv4 address.</source>
+            <output>يجب أن تكون القيمة عنوان IPv4 صالح.</output>
+        </text>
+        <text>
+            <source>The value must not be a valid IPv4 address.</source>
+            <output>يجب أن تكون قيمة لا يمكن أن تكون صالحة عنوان IPv4.</output>
+        </text>
+        <text>
+            <source>The value must be a valid email format.</source>
+            <output>يجب أن تكون القيمة شكل بريد إلكتروني صحيح.</output>
+        </text>
+        <text>
+            <source>The value must not be a valid email format.</source>
+            <output>يجب أن تكون قيمة لا يمكن أن يكون شكل بريد إلكتروني صحيح.</output>
+        </text>
+        <text>
+            <source>The value must be a valid IPv4 subnet.</source>
+            <output>يجب أن تكون القيمة صالح عناوين IPv4 الشبكة الفرعية.</output>
+        </text>
+        <text>
+            <source>The value must not be a valid IPv4 subnet.</source>
+            <output>يجب أن تكون قيمة لا يمكن أن تكون صالحة عناوين IPv4 الشبكة الفرعية.</output>
+        </text>
+        <text>
+            <source>The value format is not correct.</source>
+            <output>تنسيق القيمة غير صحيحة.</output>
+        </text>
+        <text>
+            <source>The value must be equal to %1.</source>
+            <output>يجب أن تكون القيمة تساوي %1.</output>
+        </text>
+        <text>
+            <source>The value must not be equal to %1.</source>
+            <output>يجب أن تكون قيمة لا يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value must be less than %1.</source>
+            <output>يجب أن تكون القيمة أقل من %1.</output>
+        </text>
+        <text>
+            <source>The value must not be less than %1.</source>
+            <output>يجب أن تكون قيمة لا تقل عن %1.</output>
+        </text>
+        <text>
+            <source>The value length must be between %1 and %2.</source>
+            <output>يجب أن تكون القيمة بين طول %1 و %2.</output>
+        </text>
+        <text>
+            <source>The value length must not be between %1 and %2.</source>
+            <output>يجب أن لا يكون طول قيمة بين %1 و %2.</output>
+        </text>
+        <text>
+            <source>The value must be numeric.</source>
+            <output>يجب أن تكون القيمة الرقمية.</output>
+        </text>
+        <text>
+            <source>The value must not be numeric.</source>
+            <output>يجب أن لا تكون قيمة رقمية.</output>
+        </text>
+        <text>
+            <source>The value must not be empty.</source>
+            <output>يجب أن تكون قيمة لا يكون فارغا.</output>
+        </text>
+        <text>
+            <source>The value must be empty.</source>
+            <output>يجب أن تكون القيمة فارغة.</output>
+        </text>
+        <text>
+            <source>The value length must be less than %1.</source>
+            <output>يجب أن تكون القيمة طول أقل من %1.</output>
+        </text>
+        <text>
+            <source>The value length must not be less than %1.</source>
+            <output>يجب أن يكون طول قيمة لا تقل عن %1.</output>
+        </text>
+        <text>
+            <source>The value must only contain characters in the alphabet.</source>
+            <output>يجب أن تكون قيمة فقط تحتوي على أحرف في الأبجدية.</output>
+        </text>
+        <text>
+            <source>The value must only contain characters not in the alphabet.</source>
+            <output>يجب أن تكون قيمة فقط لا تحتوي على أحرف في الأبجدية.</output>
+        </text>
+        <text>
+            <source>The value must be excluded.</source>
+            <output>يجب استبعاد قيمة.</output>
+        </text>
+        <text>
+            <source>The value must not be excluded.</source>
+            <output>يجب أن لا قيمة  يمكن استبعاده.</output>
+        </text>
+        <text>
+            <source>The value length must be less than or equal to %1.</source>
+            <output>يجب أن تكون القيمة طول أقل من أو يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value length must not be less than or equal to %1.</source>
+            <output>يجب أن لا يكون طول قيمة أقل من أو يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value must not be equal to %1.</source>
+            <output>يجب أن تكون قيمة لا يساوي %1.</output>
+        </text>
+        <text>
+            <source>The value must be equal to %1.</source>
+            <output>يجب أن تكون القيمة تساوي %1.</output>
+        </text>
+        <text>
+            <source>Creating controller class files...</source>
+            <output>إنشاء ملفات فئة تحكم...</output>
+        </text>
+        <text>
+            <source>Creating base folder and file structure...</source>
+            <output>إنشاء مجلد قاعدة وبنية الملف...</output>
+        </text>
+        <text>
+            <source>Creating database table class files...</source>
+            <output>إنشاء ملفات قاعدة بيانات الجدول الدرجة...</output>
+        </text>
+        <text>
+            <source>Creating form class files...</source>
+            <output>إنشاء ملفات فئة النموذج...</output>
+        </text>
+        <text>
+            <source>Creating model class files...</source>
+            <output>إنشاء ملفات فئة النموذج...</output>
+        </text>
+        <text>
+            <source>You will have to install your web server rewrite configuration manually.</source>
+            <output>سيكون لديك لتثبيت التكوين الخاص كتابة خادم الويب يدويا.</output>
+        </text>
+        <text>
+            <source>Install index controller and web configuration files?</source>
+            <output>تثبيت وحدة تحكم المؤشر وملفات التكوين على شبكة الإنترنت؟</output>
+        </text>
+        <text>
+            <source>The user is valid.</source>
+            <output>المستخدم هو صالح.</output>
+        </text>
+        <text>
+            <source>The user was not found.</source>
+            <output>لم يتم العثور على المستخدم.</output>
+        </text>
+        <text>
+            <source>The user is blocked.</source>
+            <output>يتم حظر المستخدم.</output>
+        </text>
+        <text>
+            <source>The password was incorrect.</source>
+            <output>كانت كلمة السر غير صحيحة.</output>
+        </text>
+        <text>
+            <source>The allowed login attempts (%1) have been exceeded.</source>
+            <output>لقد تم تجاوز محاولات الدخول المسموح بها (٪ 1).</output>
+        </text>
+        <text>
+            <source>That IP address is blocked.</source>
+            <output>أن يتم حظر عنوان IP.</output>
+        </text>
+        <text>
+            <source>That IP address is not allowed.</source>
+            <output>لا يجوز أن عنوان IP.</output>
+        </text>
+        <text>
+            <source>The session has expired.</source>
+            <output>انتهت الدورة.</output>
+        </text>
+        <text>
+            <source>Aborted.</source>
+            <output>إحباط.</output>
+        </text>
+        <text>
+            <source>Project folder exists. This may overwrite any project files you may already have under that project folder.</source>
+            <output>مجلد المشروع موجودا. هذا قد الكتابة فوق أية ملفات المشروع الذي قد يكون بالفعل في إطار هذا المجلد المشروع.</output>
+        </text>
+        <text>
+            <source>Database credentials and schema detected.</source>
+            <output>الكشف عن أوراق اعتماد قاعدة البيانات والمخطط.</output>
+        </text>
+        <text>
+            <source>Test and install the database(s)?</source>
+            <output>اختبار وتثبيت قاعدة البيانات (ق)؟</output>
+        </text>
+        <text>
+            <source>Testing the database(s)...</source>
+            <output>اختبار قاعدة البيانات (ق)...</output>
+        </text>
+        <text>
+            <source>Testing</source>
+            <output>الاختبار</output>
+        </text>
+        <text>
+            <source>The database type and database name must be set for the database</source>
+            <output>يجب تعيين نوع قاعدة البيانات واسم قاعدة البيانات لقاعدة البيانات</output>
+        </text>
+        <text>
+            <source>Database</source>
+            <output>قاعدة بيانات</output>
+        </text>
+        <text>
+            <source>Installing database</source>
+            <output>تثبيت قاعدة البيانات</output>
+        </text>
+        <text>
+            <source>Project install complete.</source>
+            <output>مشروع تثبيت كاملة.</output>
+        </text>
+        <text>
+            <source>The Pop autoloader class file was not found.</source>
+            <output>لم يتم العثور على الملقم الآلي فئة البوب ​​الملف.</output>
+        </text>
+        <text>
+            <source>Pop PHP Framework found.</source>
+            <output>العثور البوب ​​PHP الإطار.</output>
+        </text>
+        <text>
+            <source>Project reconfigured.</source>
+            <output>مشروع إعادة تشكيلها.</output>
+        </text>
+        <text>
+            <source>This process will create and install the base foundation of your project under the folder specified in the install file. Minimally, the install file should return a Pop\Config object containing your project install settings, such as project name, folders, forms, controllers, views and any database credentials.</source>
+            <output>هذه العملية سوف تخلق وتثبيت قاعدة الأساس للمشروع ضمن المجلد المحدد في ملف تثبيت. الحد الأدنى ، يجب أن يكون ملف تثبيت إرجاع البوب ​​\ \ تكوين كائن يحتوي على إعدادات تثبيت مشروع ، مثل اسم المشروع ، والمجلدات والنماذج وحدات التحكم والآراء وأية بيانات اعتماد قاعدة البيانات.</output>
+        </text>
+        <text>
+            <source>Besides creating the base folders and files for you, one of the main benefits is ability to test and install the database and the corresponding configuration and class files. You can take advantage of this by having the database SQL files in the same folder as your install file, like so:</source>
+            <output>إلى جانب خلق قاعدة المجلدات والملفات بالنسبة لك ، واحدة من الفوائد الرئيسية هي القدرة على اختبار وتثبيت قاعدة البيانات والملفات وتكوين الطبقة المقابلة. يمكنك الاستفادة من هذا عن طريق الحصول على ملفات قاعدة البيانات SQL في نفس المجلد مثل ملف تثبيت الخاص ، كما يلي :</output>
+        </text>
+        <text>
+            <source>Check the current configuration for required dependencies</source>
+            <output>تحقق من التكوين الحالي للتبعيات المطلوبة</output>
+        </text>
+        <text>
+            <source>Display this help</source>
+            <output>عرض هذا يساعد</output>
+        </text>
+        <text>
+            <source>Install a project based on the install file specified</source>
+            <output>تثبيت المشروع الذي يقوم على تثبيت الملف المحدد</output>
+        </text>
+        <text>
+            <source>Set the default language for the project</source>
+            <output>تعيين اللغة الافتراضية للمشروع</output>
+        </text>
+        <text>
+            <source>Create a class map file from the source folder and save to the output file</source>
+            <output>إنشاء ملف مخطط فئة من المجلد المصدر وحفظ إلى ملف الإخراج</output>
+        </text>
+        <text>
+            <source>Reconfigure the project based on the new location of the project</source>
+            <output>إعادة تكوين المشروع على أساس الموقع الجديد للمشروع</output>
+        </text>
+        <text>
+            <source>Show project install instructions</source>
+            <output>تظهر تعليمات تثبيت المشروع</output>
+        </text>
+        <text>
+            <source>Display version of Pop PHP Framework and latest available</source>
+            <output>عرض نسخة من الإطار PHP البوب ​​وتتوفر أحدث</output>
+        </text>
+        <text>
+            <source>Run './pop -h' for help.</source>
+            <output>تشغيل '/ المنبثقة ح' للمساعدة.</output>
+        </text>
+        <text>
+            <source>Run '.\pop -h' for help.</source>
+            <output>تشغيل '\ المنبثقة ح' للمساعدة.</output>
+        </text>
+        <text>
+            <source>Continue?</source>
+            <output>الاستمرار؟</output>
+        </text>
+        <text>
+            <source>Enter the folder where the 'bootstrap.php' is located in relation to the current folder:</source>
+            <output>أدخل المجلد حيث يقع "bootstrap.php" في ما يتعلق المجلد الحالي :</output>
+        </text>
+        <text>
+            <source>Bootstrap file not found. Try again.</source>
+            <output>الملف لم يتم العثور على التمهيد. حاول مرة أخرى.</output>
+        </text>
+        <text>
+            <source>Enter the folder where the 'vendor' folder is contained in relation to the current folder:</source>
+            <output>أدخل المجلد حيث يرد "بائع" في ما يتعلق المجلد المجلد الحالي :</output>
+        </text>
+        <text>
+            <source>Pop PHP Framework not found. Try again.</source>
+            <output>البوب ​​PHP إطار غير موجود. حاول مرة أخرى.</output>
+        </text>
+        <text>
+            <source>Enter the numeric code for the default language: </source>
+            <output> أدخل رمز رقمي للغة الافتراضية:</output>
+        </text>
+        <text>
+            <source>Unknown error.</source>
+            <output>خطأ غير معروف.</output>
+        </text>
+        <text>
+            <source>You must pass a source folder and a output file to generate a class map file.</source>
+            <output>يجب أن يمر مجلد المصدر وملف إخراج لإنشاء ملف الخريطة الطبقية.</output>
+        </text>
+        <text>
+            <source>The source folder passed does not exist.</source>
+            <output>المجلد المصدر مرت لا وجود لها.</output>
+        </text>
+        <text>
+            <source>The output file passed must be a PHP file.</source>
+            <output>يجب أن يكون ملف الإخراج تمرير ملف PHP.</output>
+        </text>
+        <text>
+            <source>You must pass an install file to install the project.</source>
+            <output>يجب أن يمر ملف تثبيت لتثبيت المشروع.</output>
+        </text>
+        <text>
+            <source>Unknown option:</source>
+            <output>الخيار غير معروف :</output>
+        </text>
+        <text>
+            <source>You must pass at least one argument.</source>
+            <output>يجب أن يمر على الأقل وسيطة واحدة.</output>
+        </text>
+        <text>
+            <source>That folder does not exist.</source>
+            <output>هذا المجلد غير موجود.</output>
+        </text>
+        <text>
+            <source>The folder argument is not a folder</source>
+            <output>الوسيطة المجلد غير مجلد</output>
+        </text>
+        <text>
+            <source>A few seconds ago</source>
+            <output>بعد ثوان قليلة</output>
+        </text>
+        <text>
+            <source>1 minute ago</source>
+            <output>منذ %1 دقيقة</output>
+        </text>
+        <text>
+            <source>1 hour ago</source>
+            <output>%1 منذ ساعة</output>
+        </text>
+        <text>
+            <source>1 day ago</source>
+            <output>%1 منذ يوم</output>
+        </text>
+        <text>
+            <source>1 month ago</source>
+            <output>%1 قبل شهر</output>
+        </text>
+        <text>
+            <source>%1 minutes ago</source>
+            <output>منذ %1 دقيقة</output>
+        </text>
+        <text>
+            <source>%1 hours ago</source>
+            <output>منذ %1 ساعات</output>
+        </text>
+        <text>
+            <source>%1 days ago</source>
+            <output>%1 منذ أيام</output>
+        </text>
+        <text>
+            <source>%1 months ago</source>
+            <output>%1 منذ أشهر</output>
+        </text>
+        <text>
+            <source>The answer is incorrect.</source>
+            <output>الجواب غير صحيح. </output>
+        </text>
+        <text>
+            <source>The security token does not match.</source>
+            <output>لا يطابق رمز الأمان.</output>
+        </text>
+    </locale>
+</language>

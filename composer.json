@@ -1,0 +1,15 @@
+{
+    "name": "popphp/popphp2",
+    "description": "Pop PHP 2",
+    "keywords": [
+        "framework",
+        "pop",
+        "pop php",
+        "pop php 2"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Pop\\": "src/"
+        }
+    }
+}

@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE language [
+    <!ELEMENT language ANY>
+    <!ELEMENT locale ANY>
+    <!ELEMENT text (source,output)>
+    <!ELEMENT source ANY>
+    <!ELEMENT output ANY>
+    <!ATTLIST language
+        src       CDATA    #REQUIRED
+        output    CDATA    #REQUIRED
+        name      CDATA    #REQUIRED
+        native    CDATA    #REQUIRED
+    >
+    <!ATTLIST locale
+        region    CDATA    #REQUIRED
+        name      CDATA    #REQUIRED
+        native    CDATA    #REQUIRED
+    >
+]>
+<language src="en" output="" name="" native="">
+    <locale region="" name="" native="">
+        <text>
+            <source>This field is required.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>January</source>
+            <output></output>
+        </text>
+        <text>
+            <source>February</source>
+            <output></output>
+        </text>
+        <text>
+            <source>March</source>
+            <output></output>
+        </text>
+        <text>
+            <source>April</source>
+            <output></output>
+        </text>
+        <text>
+            <source>May</source>
+            <output></output>
+        </text>
+        <text>
+            <source>June</source>
+            <output></output>
+        </text>
+        <text>
+            <source>July</source>
+            <output></output>
+        </text>
+        <text>
+            <source>August</source>
+            <output></output>
+        </text>
+        <text>
+            <source>September</source>
+            <output></output>
+        </text>
+        <text>
+            <source>October</source>
+            <output></output>
+        </text>
+        <text>
+            <source>November</source>
+            <output></output>
+        </text>
+        <text>
+            <source>December</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Sunday</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Monday</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Tuesday</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Wednesday</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Thursday</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Friday</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Saturday</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must be between or equal to %1 and %2.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must not be between or equal to %1 and %2.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be a valid IPv6 address.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be a valid IPv6 address.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be a valid credit card number.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be a valid credit card number.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be included.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value %1 must not be included.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be between or equal to %1 and %2.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be between or equal to %1 and %2.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be part of the subnet %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be part of the subnet %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be greater than or equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be greater than or equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must be greater than %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must not be greater than %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must only contain alphanumeric characters.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must contain non-alphanumeric characters.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must be equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must not be equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must be greater than or equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must not be greater than or equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be less than or equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be less than or equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be between %1 and %2.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be between %1 and %2.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be greater than %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be greater than %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be a valid IPv4 address.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be a valid IPv4 address.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be a valid email format.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be a valid email format.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be a valid IPv4 subnet.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be a valid IPv4 subnet.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value format is not correct.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be less than %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be less than %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must be between %1 and %2.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must not be between %1 and %2.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be numeric.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be numeric.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be empty.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be empty.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must be less than %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must not be less than %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must only contain characters in the alphabet.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must only contain characters not in the alphabet.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be excluded.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be excluded.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must be less than or equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value length must not be less than or equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must not be equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The value must be equal to %1.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Creating controller class files...</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Creating base folder and file structure...</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Creating database table class files...</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Creating form class files...</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Creating model class files...</source>
+            <output></output>
+        </text>
+        <text>
+            <source>You will have to install your web server rewrite configuration manually.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Install index controller and web configuration files?</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The user is valid.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The user was not found.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The user is blocked.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The password was incorrect.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The allowed login attempts (%1) have been exceeded.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>That IP address is blocked.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>That IP address is not allowed.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The session has expired.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Aborted.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Project folder exists. This may overwrite any project files you may already have under that project folder.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Database credentials and schema detected.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Test and install the database(s)?</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Testing the database(s)...</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Testing</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The database type and database name must be set for the database</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Database</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Installing database</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Project install complete.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The Pop autoloader class file was not found.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Pop PHP Framework found.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Project reconfigured.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>This process will create and install the base foundation of your project under the folder specified in the install file. Minimally, the install file should return a Pop\Config object containing your project install settings, such as project name, folders, forms, controllers, views and any database credentials.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Besides creating the base folders and files for you, one of the main benefits is ability to test and install the database and the corresponding configuration and class files. You can take advantage of this by having the database SQL files in the same folder as your install file, like so:</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Check the current configuration for required dependencies</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Display this help</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Install a project based on the install file specified</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Set the default language for the project</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Create a class map file from the source folder and save to the output file</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Reconfigure the project based on the new location of the project</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Show project install instructions</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Display version of Pop PHP Framework and latest available</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Run './pop -h' for help.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Run '.\pop -h' for help.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Continue?</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Enter the folder where the 'bootstrap.php' is located in relation to the current folder:</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Bootstrap file not found. Try again.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Enter the folder where the 'vendor' folder is contained in relation to the current folder:</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Pop PHP Framework not found. Try again.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Enter the two-letter code for the default language:</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Unknown error.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>You must pass a source folder and a output file to generate a class map file.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The source folder passed does not exist.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The output file passed must be a PHP file.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>You must pass an install file to install the project.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>Unknown option:</source>
+            <output></output>
+        </text>
+        <text>
+            <source>You must pass at least one argument.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>That folder does not exist.</source>
+            <output></output>
+        </text>
+        <text>
+            <source>The folder argument is not a folder</source>
+            <output></output>
+        </text>
+        <text>
+            <source>A few seconds ago</source>
+            <output></output>
+        </text>
+        <text>
+            <source>1 minute ago</source>
+            <output></output>
+        </text>
+        <text>
+            <source>1 hour ago</source>
+            <output></output>
+        </text>
+        <text>
+            <source>1 day ago</source>
+            <output></output>
+        </text>
+        <text>
+            <source>1 month ago</source>
+            <output></output>
+        </text>
+        <text>
+            <source>%1 minutes ago</source>
+            <output></output>
+        </text>
+        <text>
+            <source>%1 hours ago</source>
+            <output></output>
+        </text>
+        <text>
+            <source>%1 days ago</source>
+            <output></output>
+        </text>
+        <text>
+            <source>%1 months ago</source>
+            <output></output>
+        </text>
+        <text>
+            <source>%1 years ago</source>
+            <output></output>
+        </text>
+    </locale>
+</language>
