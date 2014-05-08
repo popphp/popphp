@@ -7,6 +7,9 @@
         "pop php",
         "pop php 2"
     ],
+    "require": {
+        "php": ">=5.4.0"
+    },
     "autoload": {
         "psr-4": {
             "Pop\\": "src/"
