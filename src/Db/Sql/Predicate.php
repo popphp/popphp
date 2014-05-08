@@ -42,9 +42,9 @@ class Predicate
 
     /**
      * Nested predicates
-     * @var \Pop\Db\Sql\Predicate
+     * @var array
      */
-    protected $nested = null;
+    protected $nested = array();
 
     /**
      * Constructor
@@ -66,11 +66,30 @@ class Predicate
      */
     public function nest()
     {
-        if (null === $this->nested) {
-            $this->nested = new Predicate($this->sql);
-        }
+        $this->nested[] = new Predicate($this->sql);
+        return $this->nested[count($this->nested) - 1];
+    }
 
-        return $this->nested;
+    /**
+     * Determine if it has a nested predicate branch
+     *
+     * @param  int $i
+     * @return boolean
+     */
+    public function hasNest($i = null)
+    {
+        return (null === $i) ? (count($this->nested) > 0) : (isset($this->nested[$i]));
+    }
+
+    /**
+     * Get a nested predicate
+     *
+     * @param  int $i
+     * @return mixed
+     */
+    public function getNest($i)
+    {
+        return (isset($this->nested[$i])) ? $this->nested[$i] : null;
     }
 
     /**
@@ -336,8 +355,11 @@ class Predicate
         $where = null;
 
         // Build any nested predicates
-        if (null !== $this->nested) {
-            $where = '(' . $this->nested . ')';
+        //if (null !== $this->nested) {
+        //    $where = '(' . $this->nested . ')';
+        //}
+        if (count($this->nested) > 0) {
+            $where = '(' . implode(') AND (', $this->nested) . ')';
         }
 
         // Loop through and format the predicates
