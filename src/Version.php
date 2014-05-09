@@ -36,9 +36,20 @@ class Version
     /**
      * Returns the latest version available.
      *
+     * @param  string $version
      * @return mixed
      */
-    public static function latest()
+    public static function compareVersion($version)
+    {
+        return version_compare($version, self::VERSION);
+    }
+
+    /**
+     * Returns the latest version available.
+     *
+     * @return mixed
+     */
+    public static function getLatest()
     {
         $latest = null;
 
@@ -49,6 +60,16 @@ class Version
         }
 
         return $latest;
+    }
+
+    /**
+     * Returns whether or not this is the latest version.
+     *
+     * @return mixed
+     */
+    public static function isLatest()
+    {
+        return (self::compareVersion(self::getLatest()) < 1);
     }
 
     /**

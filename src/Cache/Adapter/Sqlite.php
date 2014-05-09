@@ -41,16 +41,22 @@ class Sqlite implements AdapterInterface
     protected $table = null;
 
     /**
-     * PDO object
-     * @var \Pdo
-     */
-    protected $pdo = null;
-
-    /**
-     * SQLite3 object
-     * @var \Sqlite3
+     * Sqlite DB object (either a PDO or Sqlite3 object)
+     * @var mixed
      */
     protected $sqlite = null;
+
+    /**
+     * Sqlite DB statement object (either a PDOStatement or SQLite3Stmt object)
+     * @var mixed
+     */
+    protected $statement = null;
+
+    /**
+     * Database results
+     * @var resource
+     */
+    protected $result;
 
     /**
      * PDO flag
@@ -72,7 +78,7 @@ class Sqlite implements AdapterInterface
     public function __construct($db, $table = 'pop_cache', $pdo = false)
     {
         $this->db    = $db;
-        $this->table = $table;
+        $this->table = addslashes($table);
         $dir         = dirname($this->db);
 
         // If the database file doesn't exist, create it.
@@ -92,18 +98,22 @@ class Sqlite implements AdapterInterface
             throw new Exception('Error: That cache db file and/or directory is not writable.');
         }
 
-        $pdoDrivers = (class_exists('Pdo')) ? \PDO::getAvailableDrivers() : [];
-        if (!class_exists('Sqlite3') && !in_array('sqlite', $pdoDrivers)) {
+        if (!class_exists('Sqlite3', false) && !class_exists('Pdo', false)) {
+            throw new Exception('Error: Neither SQLite3 or PDO are available.');
+        }
+
+        $pdoDrivers = (class_exists('Pdo', false)) ? \PDO::getAvailableDrivers() : [];
+        if (!class_exists('Sqlite3', false) && !in_array('sqlite', $pdoDrivers)) {
             throw new Exception('Error: SQLite is not available.');
         } else if (($pdo) && !in_array('sqlite', $pdoDrivers)) {
             $pdo = false;
-        } else if ((!$pdo) && !class_exists('Sqlite3')) {
+        } else if ((!$pdo) && !class_exists('Sqlite3', false)) {
             $pdo = true;
         }
 
         if ($pdo) {
-            $this->pdo   = new \PDO('sqlite:' . $this->db);
-            $this->isPdo = true;
+            $this->sqlite = new \PDO('sqlite:' . $this->db);
+            $this->isPdo  = true;
         } else {
             $this->sqlite = new \SQLite3($this->db);
         }
@@ -139,7 +149,7 @@ class Sqlite implements AdapterInterface
      */
     public function setTable($table = 'pop_cache')
     {
-        return $this->table = $table;
+        return $this->table = addslashes($table);
     }
 
     /**
@@ -154,41 +164,30 @@ class Sqlite implements AdapterInterface
     {
         $timestamp = ($time != 0) ? time() + (int)$time : 0;
 
-        // Determine if the value already exists.
-        $rows = [];
-        $sql  = "SELECT * FROM " . addslashes($this->table) . " WHERE id = '" . sha1(addslashes($id)) . "'";
-
-        if ($this->isPdo) {
-            $sth = $this->pdo->prepare($sql);
-            $sth->execute();
-            $result = $sth;
-            while (($row = $result->fetchAll(\PDO::FETCH_ASSOC)) != false) {
-                $rows[] = $row;
-            }
+        // If the value doesn't exist, save the new value.
+        if (!$this->load($id, $time)) {
+            $sql = "INSERT INTO " . $this->table .
+                " (id, value, time) VALUES (:id, :value, :time)";
+            $params = [
+                'id'    => sha1($id),
+                'value' => serialize($value),
+                'time'  => $timestamp
+            ];
+        // Else, update it.
         } else {
-            $result = $this->sqlite->query($sql);
-            while (($row = $result->fetchArray(SQLITE3_ASSOC)) != false) {
-                $rows[] = $row;
-            }
+            $sql = "UPDATE " . $this->table .
+                " SET value = :value, time = :time WHERE id = :id";
+            $params = [
+                'value' => serialize($value),
+                'time'  => $timestamp,
+                'id'    => sha1($id)
+            ];
         }
 
-        // If the value exists, update it.
-        if (count($rows) > 0) {
-            $sql = "UPDATE " . addslashes($this->table) .
-                " SET value = '" . addslashes(serialize($value)) . "', time = '" . $timestamp .
-                "' WHERE id = '" . sha1(addslashes($id)) . "'";
-        // Else, save the new value.
-        } else {
-            $sql = "INSERT INTO " . addslashes($this->table) .
-                " (id, value, time) VALUES ('" . sha1(addslashes($id)) . "', '" . addslashes(serialize($value)) . "', '" . $timestamp . "')";
-        }
-
-        if ($this->isPdo) {
-            $sth = $this->pdo->prepare($sql);
-            $sth->execute();
-        } else {
-            $this->sqlite->query($sql);
-        }
+        // Save value
+        $this->prepare($sql)
+             ->bindParams($params)
+             ->execute();
     }
 
     /**
@@ -204,25 +203,24 @@ class Sqlite implements AdapterInterface
 
         // Determine if the value already exists.
         $rows = [];
-        $sql  = "SELECT * FROM " . addslashes($this->table) . " WHERE id = '" . sha1(addslashes($id)) . "'";
+
+        $this->prepare("SELECT * FROM " . $this->table . " WHERE id = :id")
+             ->bindParams(['id' => sha1($id)])
+             ->execute();
 
         if ($this->isPdo) {
-            $sth = $this->pdo->prepare($sql);
-            $sth->execute();
-            $result = $sth;
-            while (($row = $result->fetchAll(\PDO::FETCH_ASSOC)) != false) {
+            while (($row = $this->result->fetchAll(\PDO::FETCH_ASSOC)) != false) {
                 $rows[] = $row;
             }
         } else {
-            $result = $this->sqlite->query($sql);
-            while (($row = $result->fetchArray(SQLITE3_ASSOC)) != false) {
+            while (($row = $this->result->fetchArray(SQLITE3_ASSOC)) != false) {
                 $rows[] = $row;
             }
         }
 
         // If the value is found, check expiration and return.
         if (count($rows) > 0) {
-            $data      = stripslashes($rows[0]['value']);
+            $data      = $rows[0]['value'];
             $timestamp = $rows[0]['time'];
             if (($timestamp == 0) || ((time() - $timestamp) <= $time)) {
                 $value = unserialize($data);
@@ -240,13 +238,9 @@ class Sqlite implements AdapterInterface
      */
     public function remove($id)
     {
-        $sql = "DELETE FROM " . addslashes($this->table) . " WHERE id = '" . sha1(addslashes($id)) . "'";
-        if ($this->isPdo) {
-            $sth = $this->pdo->prepare($sql);
-            $sth->execute();
-        } else {
-            $this->sqlite->query($sql);
-        }
+        $this->prepare("DELETE FROM " . $this->table . " WHERE id = :id")
+             ->bindParams(['id' => sha1($id)])
+             ->execute();
     }
 
     /**
@@ -256,13 +250,7 @@ class Sqlite implements AdapterInterface
      */
     public function clear()
     {
-        $sql = "DELETE FROM " . addslashes($this->table);
-        if ($this->isPdo) {
-            $sth = $this->pdo->prepare($sql);
-            $sth->execute();
-        } else {
-            $this->sqlite->query($sql);
-        }
+        $this->query("DELETE FROM " . $this->table);
     }
 
     /**
@@ -278,6 +266,73 @@ class Sqlite implements AdapterInterface
     }
 
     /**
+     * Prepare a SQL query.
+     *
+     * @param  string $sql
+     * @return \Pop\Cache\Adapter\Sqlite
+     */
+    protected function prepare($sql)
+    {
+        $this->statement = $this->sqlite->prepare($sql);
+        return $this;
+    }
+
+    /**
+     * Bind parameters to for a prepared SQL query.
+     *
+     * @param  array  $params
+     * @return \Pop\Cache\Adapter\Sqlite
+     */
+    protected function bindParams($params)
+    {
+        foreach ($params as $dbColumnName => $dbColumnValue) {
+            ${$dbColumnName} = $dbColumnValue;
+            $this->statement->bindParam(':' . $dbColumnName, ${$dbColumnName});
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute the prepared SQL query.
+     *
+     * @throws Exception
+     * @return void
+     */
+    protected function execute()
+    {
+        if (null === $this->statement) {
+            throw new Exception('Error: The database statement resource is not currently set.');
+        }
+
+        $this->result = $this->statement->execute();
+    }
+
+    /**
+     * Execute the SQL query.
+     *
+     * @param  string $sql
+     * @throws Exception
+     * @return void
+     */
+    public function query($sql)
+    {
+        if ($this->isPdo) {
+            $sth = $this->sqlite->prepare($sql);
+
+            if (!($sth->execute())) {
+                throw new Exception($sth->errorCode() . ': ' .  $sth->errorInfo());
+            } else {
+                $this->result = $sth;
+            }
+        } else {
+            if (!($this->result = $this->sqlite->query($sql))) {
+                throw new Exception('Error: ' . $this->sqlite->lastErrorCode() . ': ' . $this->sqlite->lastErrorMsg() . '.');
+            }
+        }
+    }
+
+    /**
      * Method to check if cache table exists
      *
      * @return void
@@ -288,7 +343,7 @@ class Sqlite implements AdapterInterface
         $sql    = "SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%' UNION ALL SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view') ORDER BY 1";
 
         if ($this->isPdo) {
-            $sth = $this->pdo->prepare($sql);
+            $sth = $this->sqlite->prepare($sql);
             $sth->execute();
             $result = $sth;
             while (($row = $result->fetch(\PDO::FETCH_ASSOC)) != false) {
@@ -304,10 +359,10 @@ class Sqlite implements AdapterInterface
         // If the cache table doesn't exist, create it.
         if (!in_array($this->table, $tables)) {
             $sql = 'CREATE TABLE IF NOT EXISTS "' .
-                addslashes($this->table) . '" ("id" VARCHAR PRIMARY KEY NOT NULL UNIQUE, "value" BLOB, "time" INTEGER)';
+                $this->table . '" ("id" VARCHAR PRIMARY KEY NOT NULL UNIQUE, "value" BLOB, "time" INTEGER)';
 
             if ($this->isPdo) {
-                 $sth = $this->pdo->prepare($sql);
+                $sth = $this->sqlite->prepare($sql);
                 $sth->execute();
             } else {
                 $this->sqlite->query($sql);

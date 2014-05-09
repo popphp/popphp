@@ -3,7 +3,7 @@ COMPONENTS
  - Application
  - Archive
  - Auth
- - Cache [DONE - review Sqlite adapter]
+ - Cache [DONE]
  - Code
  - Color [DONE]
  - Crypt [DONE]

@@ -568,9 +568,9 @@ class Response
      */
     public function setSslHeaders()
     {
-        $this->headers['Expires'] = 0;
+        $this->headers['Expires']       = 0;
         $this->headers['Cache-Control'] = 'private, must-revalidate';
-        $this->headers['Pragma'] = 'cache';
+        $this->headers['Pragma']        = 'cache';
 
         return $this;
     }
