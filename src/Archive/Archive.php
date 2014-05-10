@@ -93,6 +93,7 @@ class Archive
      * @param  string $archive
      * @param  string $password
      * @param  string $prefix
+     * @throws Exception
      * @return \Pop\Archive\Archive
      */
     public function __construct($archive, $password = null, $prefix = 'Pop\\Archive\\Adapter\\')
@@ -103,9 +104,16 @@ class Archive
         $this->size      = filesize($archive);
         $this->basename  = $parts['basename'];
         $this->filename  = $parts['filename'];
-        $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? '.' . $parts['extension'] : null;
-        $this->mime      = (isset(self::$allowed[$this->extension])) ? self::$allowed[$this->extension] : null;
+        $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
 
+        if (null === $this->extension) {
+            throw new Exception('Error: Unable able to detect archive extension or mime type.');
+        }
+        if (!isset(self::$allowed[$this->extension])) {
+            throw new Exception('Error: That archive type is not allowed.');
+        }
+
+        $this->mime = self::$allowed[$this->extension];
         $this->setAdapter($password, $prefix);
     }
 

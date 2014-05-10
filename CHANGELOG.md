@@ -14,4 +14,5 @@ As of May 7, 2014
          + Trimmed Dir class, removed references to old File class
 * Removed
     - Compress
+    - Db\Adapter\Mysql
     - Loader
