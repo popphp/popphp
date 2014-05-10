@@ -15,8 +15,6 @@
  */
 namespace Pop\Archive\Adapter;
 
-use Pop\File\Dir;
-
 /**
  * Zip archive adapter class
  *
@@ -110,7 +108,7 @@ class Zip implements ArchiveInterface
                 $files[$key] = realpath($value);
             }
         } else {
-            $files = array(realpath($files));
+            $files = [realpath($files)];
         }
 
         $result = (!file_exists($this->path)) ?
@@ -140,8 +138,9 @@ class Zip implements ArchiveInterface
     public function addDir($branch, $level = null, $orig = null)
     {
         if (!is_array($branch)) {
-            $dir = new Dir($branch);
-            $branch = $dir->getTree();
+            $dir    = $branch;
+            $branch = [];
+            $branch[realpath($dir)] = $this->buildTree(new \DirectoryIterator($dir));
         }
 
         foreach ($branch as $leaf => $node) {
@@ -168,8 +167,8 @@ class Zip implements ArchiveInterface
      */
     public function listFiles($full = false)
     {
-        $files = array();
-        $list  = array();
+        $files = [];
+        $list  = [];
 
         if ($this->archive->open($this->path) === true) {
             $i = 0;
@@ -197,7 +196,7 @@ class Zip implements ArchiveInterface
      */
     public function getDirs()
     {
-        $dirs = array();
+        $dirs = [];
 
         $list = $this->listFiles(true);
 
@@ -208,6 +207,34 @@ class Zip implements ArchiveInterface
         }
 
         return $dirs;
+    }
+
+    /**
+     * Build the directory tree
+     *
+     * @param  \DirectoryIterator $it
+     * @return array
+     */
+    protected function buildTree(\DirectoryIterator $it)
+    {
+        $result = [];
+
+        foreach ($it as $key => $child) {
+            if ($child->isDot()) {
+                continue;
+            }
+
+            $name = $child->getBasename();
+
+            if ($child->isDir()) {
+                $subdir = new \DirectoryIterator($child->getPathname());
+                $result[DIRECTORY_SEPARATOR . $name] = $this->buildTree($subdir);
+            } else {
+                $result[] = $name;
+            }
+        }
+
+        return $result;
     }
 
 }

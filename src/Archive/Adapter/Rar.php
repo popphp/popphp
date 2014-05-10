@@ -112,7 +112,7 @@ class Rar implements ArchiveInterface
      */
     public function listFiles($full = false)
     {
-        $list = array();
+        $list = [];
         $entries = $this->archive->getEntries();
 
         if (!empty($entries)) {
@@ -120,7 +120,7 @@ class Rar implements ArchiveInterface
                 if (!$full) {
                     $list[] = $entry->getName();
                 } else {
-                    $list[] = array(
+                    $list[] = [
                         'name'          => $entry->getName(),
                         'unpacked_size' => $entry->getUnpackedSize(),
                         'packed_size'   => $entry->getPackedSize(),
@@ -130,7 +130,7 @@ class Rar implements ArchiveInterface
                         'attr'          => $entry->getAttr(),
                         'version'       => $entry->getVersion(),
                         'method'        => $entry->getMethod()
-                    );
+                    ];
                 }
             }
         }

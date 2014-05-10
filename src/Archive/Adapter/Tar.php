@@ -15,9 +15,6 @@
  */
 namespace Pop\Archive\Adapter;
 
-use Pop\Compress;
-use Pop\File\Dir;
-
 /**
  * Tar archive adapter class
  *
@@ -103,15 +100,14 @@ class Tar implements ArchiveInterface
     public function addFiles($files)
     {
         if (!is_array($files)) {
-            $files = array($files);
+            $files = [$files];
         }
 
         foreach ($files as $file) {
             // If file is a directory, loop through and add the files.
             if (file_exists($file) && is_dir($file)) {
                 $realpath = realpath($file);
-                $dir = new Dir($file, true, true);
-                $dirFiles = $dir->getFiles();
+                $dirFiles = $this->getFiles($file);
                 foreach ($dirFiles as $fle) {
                     if (file_exists($fle) && !is_dir($fle)) {
                         $fle = $file . DIRECTORY_SEPARATOR . str_replace($realpath . DIRECTORY_SEPARATOR, '', $fle);
@@ -133,7 +129,7 @@ class Tar implements ArchiveInterface
      */
     public function listFiles($full = false)
     {
-        $files = array();
+        $files = [];
         $list = $this->archive->listContent();
 
         if (!$full) {
@@ -142,6 +138,32 @@ class Tar implements ArchiveInterface
             }
         } else {
             $files = $list;
+        }
+
+        return $files;
+    }
+
+    /**
+     * Method to get files from the directory
+     *
+     * @param  string $dir
+     * @return array
+     */
+    protected function getFiles($dir)
+    {
+        $files   = [];
+        $objects = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($objects as $fileInfo) {
+            if (($fileInfo->getFilename() != '.') && ($fileInfo->getFilename() != '..')) {
+                $f = null;
+                if (!$fileInfo->isDir()) {
+                    $f = realpath($fileInfo->getPathname());
+                }
+                if (null !== $f) {
+                    $files[] = $f;
+                }
+            }
         }
 
         return $files;

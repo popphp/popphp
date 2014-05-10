@@ -32,7 +32,7 @@ class Archive
      * Array of allowed file types.
      * @var array
      */
-    protected $allowed = array(
+    protected $allowed = [
         'bz2'  => 'application/bzip2',
         'gz'   => 'application/x-gzip',
         'rar'  => 'application/x-rar-compressed',
@@ -41,7 +41,7 @@ class Archive
         'tbz2' => 'application/bzip2',
         'tgz'  => 'application/x-gzip',
         'zip'  => 'application/x-zip'
-    );
+    ];
 
     /**
      * Archive adapter
@@ -98,10 +98,11 @@ class Archive
      */
     public function __construct($archive, $password = null, $prefix = 'Pop\\Archive\\Adapter\\')
     {
-        $this->allowed   = self::formats();
+
+        $this->allowed   = self::getFormats();
         $this->fullpath  = $archive;
         $parts           = pathinfo($archive);
-        $this->size      = filesize($archive);
+        $this->size      = (file_exists($archive)) ? filesize($archive) : 0;
         $this->basename  = $parts['basename'];
         $this->filename  = $parts['filename'];
         $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
@@ -109,11 +110,11 @@ class Archive
         if (null === $this->extension) {
             throw new Exception('Error: Unable able to detect archive extension or mime type.');
         }
-        if (!isset(self::$allowed[$this->extension])) {
+        if (!isset($this->allowed[$this->extension])) {
             throw new Exception('Error: That archive type is not allowed.');
         }
 
-        $this->mime = self::$allowed[$this->extension];
+        $this->mime = $this->allowed[$this->extension];
         $this->setAdapter($password, $prefix);
     }
 
@@ -122,9 +123,9 @@ class Archive
      *
      * @return array
      */
-    public static function formats()
+    public static function getFormats()
     {
-        $allowed = array(
+        $allowed = [
             'bz2'  => 'application/bzip2',
             'gz'   => 'application/x-gzip',
             'rar'  => 'application/x-rar-compressed',
@@ -133,7 +134,7 @@ class Archive
             'tbz2' => 'application/bzip2',
             'tgz'  => 'application/x-gzip',
             'zip'  => 'application/x-zip'
-        );
+        ];
 
         // Check if Bzip2 is available.
         if (!function_exists('bzcompress')) {
@@ -155,6 +156,7 @@ class Archive
         $includePath = explode(PATH_SEPARATOR, get_include_path());
         foreach ($includePath as $path) {
             if (file_exists($path . DIRECTORY_SEPARATOR . 'Archive' . DIRECTORY_SEPARATOR . 'Tar.php')) {
+                include $path . DIRECTORY_SEPARATOR . 'Archive' . DIRECTORY_SEPARATOR . 'Tar.php';
                 $tar = true;
             }
         }
@@ -262,10 +264,19 @@ class Archive
      * Method to extract an archived and/or compressed file
      *
      * @param  string $to
+     * @throws Exception
      * @return \Pop\Archive\Archive
      */
     public function extract($to = null)
     {
+        if (null === $to) {
+            $to = getcwd();
+        }
+
+        if (!is_writable($to)) {
+            throw new Exception('Error: Extract directory is not writable.');
+        }
+
         $this->adapter->extract($to);
         return $this;
     }
@@ -279,7 +290,7 @@ class Archive
     public function addFiles($files)
     {
         $this->adapter->addFiles($files);
-        self::__construct($this->fullpath);
+        $this->size = filesize($this->fullpath);
         return $this;
     }
 
@@ -335,7 +346,15 @@ class Archive
             unlink($this->fullpath);
         }
 
-        self::__construct($newArchive);
+        // Reset values for newly compressed archive file.
+        $this->fullpath  = $newArchive;
+        $parts           = pathinfo($newArchive);
+        $this->size      = (file_exists($newArchive)) ? filesize($newArchive) : 0;
+        $this->basename  = $parts['basename'];
+        $this->filename  = $parts['filename'];
+        $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
+        $this->mime      = $this->allowed[$this->extension];
+
         return $this;
     }
 

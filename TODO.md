@@ -1,7 +1,7 @@
 COMPONENTS
 ----------
  - Application
- - Archive
+ - Archive [DONE]
  - Auth
  - Cache [DONE]
  - Code
