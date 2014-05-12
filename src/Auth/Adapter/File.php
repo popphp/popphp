@@ -15,8 +15,6 @@
  */
 namespace Pop\Auth\Adapter;
 
-use Pop\Auth\Auth;
-
 /**
  * File auth adapter class
  *
@@ -27,39 +25,181 @@ use Pop\Auth\Auth;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class File extends AbstractAdapter
+class File implements AdapterInterface
 {
 
     /**
-     * Field delimiter
+     * Auth file
      * @var string
      */
-    protected $delimiter = null;
+    protected $filename = null;
 
     /**
-     * Users
-     * @var array
+     * Auth file type
+     * @var string
      */
-    protected $users = array();
+    protected $type = 'Digest';
+
+    /**
+     * Auth file encryption
+     * @var string
+     */
+    protected $encryption = 'md5';
+
+    /**
+     * Auth realm
+     * @var string
+     */
+    protected $realm = null;
+
+    /**
+     * Auth file delimiter
+     * @var string
+     */
+    protected $delimiter = ':';
 
     /**
      * Constructor
      *
-     * Instantiate the File object
+     * Instantiate the File auth adapter object
      *
      * @param string $filename
-     * @param string $delimiter
+     * @param array  $options
+     * @return \Pop\Auth\Adapter\File
+     */
+    public function __construct($filename, array $options = null)
+    {
+        $this->setFilename($filename);
+
+        if (null !== $options) {
+            if (isset($options['type'])) {
+                $this->type = $options['type'];
+            }
+            if (isset($options['encryption'])) {
+                $this->encryption = $options['encryption'];
+            }
+            if (isset($options['realm'])) {
+                $this->realm = $options['realm'];
+            }
+            if (isset($options['delimiter'])) {
+                $this->delimiter = $options['delimiter'];
+            }
+        }
+    }
+
+    /**
+     * Method to get the auth filename
+     *
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+    /**
+     * Method to get the auth type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Method to get the auth encryption
+     *
+     * @return string
+     */
+    public function getEncryption()
+    {
+        return $this->encryption;
+    }
+
+    /**
+     * Method to get the auth realm
+     *
+     * @return string
+     */
+    public function getRealm()
+    {
+        return $this->realm;
+    }
+
+    /**
+     * Method to get the auth file delimiter
+     *
+     * @return string
+     */
+    public function getDelimiter()
+    {
+        return $this->delimiter;
+    }
+
+    /**
+     * Method to set the auth filename
+     *
+     * @param string $filename
      * @throws Exception
      * @return \Pop\Auth\Adapter\File
      */
-    public function __construct($filename, $delimiter = '|')
+    public function setFilename($filename)
     {
         if (!file_exists($filename)) {
             throw new Exception('The access file does not exist.');
         }
 
+        $this->filename = $filename;
+        return $this;
+    }
+
+    /**
+     * Method to set the auth type
+     *
+     * @param string $type
+     * @return \Pop\Auth\Adapter\File
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * Method to set the auth encryption
+     *
+     * @param string $encryption
+     * @return \Pop\Auth\Adapter\File
+     */
+    public function setEncryption($encryption)
+    {
+        $this->encryption = $encryption;
+        return $this;
+    }
+
+    /**
+     * Method to set the auth realm
+     *
+     * @param string $realm
+     * @return \Pop\Auth\Adapter\File
+     */
+    public function setRealm($realm)
+    {
+        $this->realm = $realm;
+        return $this;
+    }
+
+    /**
+     * Method to set the auth file delimiter
+     *
+     * @param string $delimiter
+     * @return \Pop\Auth\Adapter\File
+     */
+    public function setDelimiter($delimiter)
+    {
         $this->delimiter = $delimiter;
-        $this->parse($filename);
+        return $this;
     }
 
     /**
@@ -67,50 +207,11 @@ class File extends AbstractAdapter
      *
      * @param  string $username
      * @param  string $password
-     * @param  int    $encryption
-     * @param  array  $options
      * @return int
      */
-    public function authenticate($username, $password, $encryption, $options)
+    public function authenticate($username, $password)
     {
-        if (!array_key_exists($username, $this->users)) {
-            return Auth::USER_NOT_FOUND;
-        }
 
-        if (!$this->verifyPassword($this->users[$username]['password'], $password, $encryption, $options)) {
-            return Auth::PASSWORD_INCORRECT;
-        }
-
-        if ((strtolower($this->users[$username]['access']) == 'blocked') ||
-            (null === $this->users[$username]['access']) ||
-            (is_numeric($this->users[$username]['access']) && ($this->users[$username]['access'] == 0))) {
-            return Auth::USER_IS_BLOCKED;
-        } else {
-            $this->user = $this->users[$username];
-            return Auth::USER_IS_VALID;
-        }
     }
 
-    /**
-     * Method to parse the source file.
-     *
-     * @param  string $filename
-     * @return void
-     */
-    protected function parse($filename)
-    {
-        $entries = explode("\n", trim(file_get_contents($filename)));
-
-        foreach ($entries as $entry) {
-            $ent = trim($entry);
-            $entAry = explode($this->delimiter , $ent);
-            if (isset($entAry[0]) && isset($entAry[1])) {
-                $this->users[$entAry[0]] = array(
-                    'username' => $entAry[0],
-                    'password' => $entAry[1],
-                    'access'   => (isset($entAry[2]) ? $entAry[2] : null)
-                );
-            }
-        }
-    }
 }

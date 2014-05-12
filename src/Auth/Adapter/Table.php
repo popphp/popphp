@@ -15,8 +15,6 @@
  */
 namespace Pop\Auth\Adapter;
 
-use Pop\Auth\Auth;
-
 /**
  * Table auth adapter class
  *
@@ -27,7 +25,7 @@ use Pop\Auth\Auth;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Table extends AbstractAdapter
+class Table implements AdapterInterface
 {
 
     /**
@@ -49,28 +47,86 @@ class Table extends AbstractAdapter
     protected $passwordField = null;
 
     /**
-     * Access field
-     * @var string
-     */
-    protected $accessField = null;
-
-    /**
      * Constructor
      *
-     * Instantiate the DbTable object
+     * Instantiate the Table auth adapter object
      *
      * @param string $tableName
      * @param string $usernameField
      * @param string $passwordField
-     * @param string $accessField
      * @return \Pop\Auth\Adapter\Table
      */
-    public function __construct($tableName, $usernameField = 'username', $passwordField = 'password', $accessField = null)
+    public function __construct($tableName, $usernameField = 'username', $passwordField = 'password')
+    {
+        $this->setTableName($tableName);
+        $this->setUsernameField($usernameField);
+        $this->setPasswordField($passwordField);
+    }
+
+    /**
+     * Method to get the table name
+     *
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->tableName;
+    }
+
+    /**
+     * Method to get the username field
+     *
+     * @return string
+     */
+    public function getUsernameField()
+    {
+        return $this->usernameField;
+    }
+
+    /**
+     * Method to get the password field
+     *
+     * @return string
+     */
+    public function getPasswordField()
+    {
+        return $this->passwordField;
+    }
+
+    /**
+     * Method to set the table name
+     *
+     * @param string $tableName
+     * @return \Pop\Auth\Adapter\Table
+     */
+    public function setTableName($tableName)
     {
         $this->tableName = $tableName;
+        return $this;
+    }
+
+    /**
+     * Method to set the username field
+     *
+     * @param string $usernameField
+     * @return \Pop\Auth\Adapter\Table
+     */
+    public function setUsernameField($usernameField)
+    {
         $this->usernameField = $usernameField;
+        return $this;
+    }
+
+    /**
+     * Method to set the password field
+     *
+     * @param string $passwordField
+     * @return \Pop\Auth\Adapter\Table
+     */
+    public function setPasswordField($passwordField)
+    {
         $this->passwordField = $passwordField;
-        $this->accessField = $accessField;
+        return $this;
     }
 
     /**
@@ -78,37 +134,18 @@ class Table extends AbstractAdapter
      *
      * @param  string $username
      * @param  string $password
-     * @param  int    $encryption
-     * @param  array  $options
      * @return int
      */
-    public function authenticate($username, $password, $encryption, $options)
+    public function authenticate($username, $password)
     {
-        $access = null;
-
         $table = $this->tableName;
-        $usernameField = $this->usernameField;
-        $passwordField = $this->passwordField;
-        $accessField = $this->accessField;
 
-        $user = $table::findBy(array($this->usernameField => $username));
+        $user = $table::findBy([
+            $this->usernameField => $username,
+            $this->passwordField => $password
+        ]);
 
-        if (!isset($user->$usernameField)) {
-            return Auth::USER_NOT_FOUND;
-        }
-
-        if (!$this->verifyPassword($user->$passwordField, $password, $encryption, $options)) {
-            return Auth::PASSWORD_INCORRECT;
-        }
-
-        if ((null !== $accessField) && ((strtolower($user->$accessField) == 'blocked') ||
-            (null === $user->$accessField) ||
-            (is_numeric($user->$accessField) && ($user->$accessField == 0)))) {
-            return Auth::USER_IS_BLOCKED;
-        } else {
-            $this->user = $user->getValues();
-            return Auth::USER_IS_VALID;
-        }
+        return (int)(isset($user->$usernameField));
     }
 
 }
