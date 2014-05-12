@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Auth
+ * @package    Pop_Acl
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,14 +13,14 @@
 /**
  * @namespace
  */
-namespace Pop\Auth;
+namespace Pop\Acl;
 
 
 /**
  * ACL class
  *
  * @category   Pop
- * @package    Pop_Auth
+ * @package    Pop_Acl
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -33,25 +33,25 @@ class Acl
      * Array of roles
      * @var array
      */
-    protected $roles = array();
+    protected $roles = [];
 
     /**
      * Array of resources
      * @var array
      */
-    protected $resources = array();
+    protected $resources = [];
 
     /**
      * Array of allowed roles, resources and permissions
      * @var array
      */
-    protected $allowed = array();
+    protected $allowed = [];
 
     /**
      * Array of denied roles, resources and permissions
      * @var array
      */
-    protected $denied = array();
+    protected $denied = [];
 
     /**
      * Constructor
@@ -60,7 +60,7 @@ class Acl
      *
      * @param  mixed $roles
      * @param  mixed $resources
-     * @return \Pop\Auth\Acl
+     * @return \Pop\Acl\Acl
      */
     public function __construct($roles = null, $resources = null)
     {
@@ -74,23 +74,10 @@ class Acl
     }
 
     /**
-     * Static method to instantiate the ACL object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  mixed $roles
-     * @param  mixed $resources
-     * @return \Pop\Auth\Acl
-     */
-    public static function factory($roles = null, $resources = null)
-    {
-        return new self($roles, $resources);
-    }
-
-    /**
      * Method to get a role
      *
      * @param  string $role
-     * @return \Pop\Auth\Role
+     * @return \Pop\Acl\Role
      */
     public function getRole($role)
     {
@@ -112,7 +99,7 @@ class Acl
      * Method to add a role
      *
      * @param  mixed $role
-     * @return \Pop\Auth\Acl
+     * @return \Pop\Acl\Acl
      */
     public function addRole($role)
     {
@@ -124,7 +111,7 @@ class Acl
      * Method to add roles
      *
      * @param  mixed $roles
-     * @return \Pop\Auth\Acl
+     * @return \Pop\Acl\Acl
      */
     public function addRoles($roles)
     {
@@ -133,13 +120,13 @@ class Acl
                 if ($r instanceof Role) {
                     $this->roles[$r->getName()] = $r;
                 } else {
-                    $this->roles[$r] = Role::factory($r);
+                    $this->roles[$r] = new Role($r);
                 }
             }
         } else if ($roles instanceof Role) {
             $this->roles[$roles->getName()] = $roles;
         } else {
-            $this->roles[$roles] = Role::factory($roles);
+            $this->roles[$roles] = new Role($roles);
         }
 
         return $this;
@@ -149,7 +136,7 @@ class Acl
      * Method to get a resource
      *
      * @param  string $resource
-     * @return \Pop\Auth\Resource
+     * @return \Pop\Acl\Resource
      */
     public function getResource($resource)
     {
@@ -171,7 +158,7 @@ class Acl
      * Method to add a resource
      *
      * @param  mixed $resource
-     * @return \Pop\Auth\Acl
+     * @return \Pop\Acl\Acl
      */
     public function addResource($resource)
     {
@@ -183,7 +170,7 @@ class Acl
      * Method to add a resource
      *
      * @param  mixed $resources
-     * @return \Pop\Auth\Acl
+     * @return \Pop\Acl\Acl
      */
     public function addResources($resources)
     {
@@ -192,13 +179,13 @@ class Acl
                 if ($r instanceof Resource) {
                     $this->resources[$r->getName()] = $r;
                 } else {
-                    $this->resources[$r] = Resource::factory($r);
+                    $this->resources[$r] = new Resource($r);
                 }
             }
         } else if ($resources instanceof Resource) {
             $this->resources[$resources->getName()] = $resources;
         } else {
-            $this->resources[$resources] = Resource::factory($resources);
+            $this->resources[$resources] = new Resource($resources);
         }
 
         return $this;
@@ -210,13 +197,13 @@ class Acl
      * @param  mixed  $roles
      * @param  mixed  $resources
      * @param  mixed  $permissions
-     * @throws \Pop\Auth\Exception
-     * @return \Pop\Auth\Acl
+     * @throws \Pop\Acl\Exception
+     * @return \Pop\Acl\Acl
      */
     public function allow($roles, $resources = null, $permissions = null)
     {
         if (!is_array($roles)) {
-            $roles = array($roles);
+            $roles = [$roles];
         }
 
         // Check if the roles has been added
@@ -226,22 +213,22 @@ class Acl
             }
 
             if (!isset($this->allowed[$role])) {
-                $this->allowed[$role] = array();
+                $this->allowed[$role] = [];
             }
 
             // Check if the resource(s) have been added
             if (null !== $resources) {
                 if (!is_array($resources)) {
-                    $resources = array($resources);
+                    $resources = [$resources];
                 }
                 foreach ($resources as $resource) {
                     if (!isset($this->resources[$resource])) {
                         $this->addResource($resource);
                     }
-                    $this->allowed[$role][$resource] = array();
+                    $this->allowed[$role][$resource] = [];
                     if (null != $permissions) {
                         if (!is_array($permissions)) {
-                            $permissions = array($permissions);
+                            $permissions = [$permissions];
                         }
                         foreach ($permissions as $permission) {
                             if (!$this->roles[$role]->hasPermission($permission)) {
@@ -263,13 +250,13 @@ class Acl
      * @param  mixed  $roles
      * @param  mixed  $resources
      * @param  mixed  $permissions
-     * @throws \Pop\Auth\Exception
-     * @return \Pop\Auth\Acl
+     * @throws \Pop\Acl\Exception
+     * @return \Pop\Acl\Acl
      */
     public function removeAllow($roles, $resources = null, $permissions = null)
     {
         if (!is_array($roles)) {
-            $roles = array($roles);
+            $roles = [$roles];
         }
 
         // Check if the roles has been added
@@ -285,7 +272,7 @@ class Acl
             // Check if the resource(s) have been added
             if (null !== $resources) {
                 if (!is_array($resources)) {
-                    $resources = array($resources);
+                    $resources = [$resources];
                 }
                 foreach ($resources as $resource) {
                     if (!isset($this->resources[$resource])) {
@@ -294,7 +281,7 @@ class Acl
                     if (isset($this->allowed[$role][$resource])) {
                         if (null != $permissions) {
                             if (!is_array($permissions)) {
-                                $permissions = array($permissions);
+                                $permissions = [$permissions];
                             }
                             foreach ($permissions as $permission) {
                                 if (in_array($permission, $this->allowed[$role][$resource])) {
@@ -321,13 +308,13 @@ class Acl
      * @param  mixed $roles
      * @param  mixed $resources
      * @param  mixed $permissions
-     * @throws \Pop\Auth\Exception
-     * @return \Pop\Auth\Acl
+     * @throws \Pop\Acl\Exception
+     * @return \Pop\Acl\Acl
      */
     public function deny($roles, $resources = null, $permissions = null)
     {
         if (!is_array($roles)) {
-            $roles = array($roles);
+            $roles = [$roles];
         }
 
         // Check if the roles has been added
@@ -337,22 +324,22 @@ class Acl
             }
 
             if (!isset($this->denied[$role])) {
-                $this->denied[$role] = array();
+                $this->denied[$role] = [];
             }
 
             // Check if the resource(s) have been added
             if (null !== $resources) {
                 if (!is_array($resources)) {
-                    $resources = array($resources);
+                    $resources = [$resources];
                 }
                 foreach ($resources as $resource) {
                     if (!isset($this->resources[$resource])) {
                         $this->addResource($resource);
                     }
-                    $this->denied[$role][$resource] = array();
+                    $this->denied[$role][$resource] = [];
                     if (null != $permissions) {
                         if (!is_array($permissions)) {
-                            $permissions = array($permissions);
+                            $permissions = [$permissions];
                         }
                         foreach ($permissions as $permission) {
                             if (!$this->roles[$role]->hasPermission($permission)) {
@@ -374,13 +361,13 @@ class Acl
      * @param  mixed $roles
      * @param  mixed $resources
      * @param  mixed $permissions
-     * @throws \Pop\Auth\Exception
-     * @return \Pop\Auth\Acl
+     * @throws \Pop\Acl\Exception
+     * @return \Pop\Acl\Acl
      */
     public function removeDeny($roles, $resources = null, $permissions = null)
     {
         if (!is_array($roles)) {
-            $roles = array($roles);
+            $roles = [$roles];
         }
 
         // Check if the roles has been added
@@ -396,7 +383,7 @@ class Acl
             // Check if the resource(s) have been added
             if (null !== $resources) {
                 if (!is_array($resources)) {
-                    $resources = array($resources);
+                    $resources = [$resources];
                 }
                 foreach ($resources as $resource) {
                     if (!isset($this->resources[$resource])) {
@@ -405,7 +392,7 @@ class Acl
                     if (isset($this->denied[$role][$resource])) {
                         if (null != $permissions) {
                             if (!is_array($permissions)) {
-                                $permissions = array($permissions);
+                                $permissions = [$permissions];
                             }
                             foreach ($permissions as $permission) {
                                 if (in_array($permission, $this->denied[$role][$resource])) {
@@ -429,13 +416,13 @@ class Acl
     /**
      * Method to determine if the user is allowed
      *
-     * @param  \Pop\Auth\Role $user
+     * @param  \Pop\Acl\Role $user
      * @param  string         $resource
      * @param  string         $permission
-     * @throws \Pop\Auth\Exception
+     * @throws \Pop\Acl\Exception
      * @return boolean
      */
-    public function isAllowed(\Pop\Auth\Role $user, $resource = null, $permission = null)
+    public function isAllowed(\Pop\Acl\Role $user, $resource = null, $permission = null)
     {
         $result = false;
 
@@ -481,13 +468,13 @@ class Acl
     /**
      * Method to determine if the user is denied
      *
-     * @param  \Pop\Auth\Role $user
+     * @param  \Pop\Acl\Role $user
      * @param  string         $resource
      * @param  string         $permission
-     * @throws \Pop\Auth\Exception
+     * @throws \Pop\Acl\Exception
      * @return boolean
      */
-    public function isDenied(\Pop\Auth\Role $user, $resource = null, $permission = null)
+    public function isDenied(\Pop\Acl\Role $user, $resource = null, $permission = null)
     {
         $result = false;
 

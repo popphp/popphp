@@ -27,30 +27,18 @@ use Pop\Auth\Auth;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class File extends AbstractAdapter
+class Digest extends AbstractAdapter
 {
-
-    /**
-     * Field delimiter
-     * @var string
-     */
-    protected $delimiter = null;
-
-    /**
-     * Users
-     * @var array
-     */
-    protected $users = array();
 
     /**
      * Constructor
      *
-     * Instantiate the File object
+     * Instantiate the AuthFile object
      *
      * @param string $filename
      * @param string $delimiter
      * @throws Exception
-     * @return \Pop\Auth\Adapter\File
+     * @return \Pop\Auth\Adapter\Digest
      */
     public function __construct($filename, $delimiter = '|')
     {

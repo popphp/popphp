@@ -27,39 +27,24 @@ use Pop\Auth\Auth;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class File extends AbstractAdapter
+class Http extends AbstractAdapter
 {
-
-    /**
-     * Field delimiter
-     * @var string
-     */
-    protected $delimiter = null;
-
-    /**
-     * Users
-     * @var array
-     */
-    protected $users = array();
 
     /**
      * Constructor
      *
-     * Instantiate the File object
+     * Instantiate the AuthFile object
      *
      * @param string $filename
      * @param string $delimiter
      * @throws Exception
-     * @return \Pop\Auth\Adapter\File
+     * @return \Pop\Auth\Adapter\Http
      */
     public function __construct($filename, $delimiter = '|')
     {
         if (!file_exists($filename)) {
             throw new Exception('The access file does not exist.');
         }
-
-        $this->delimiter = $delimiter;
-        $this->parse($filename);
     }
 
     /**
@@ -91,26 +76,4 @@ class File extends AbstractAdapter
         }
     }
 
-    /**
-     * Method to parse the source file.
-     *
-     * @param  string $filename
-     * @return void
-     */
-    protected function parse($filename)
-    {
-        $entries = explode("\n", trim(file_get_contents($filename)));
-
-        foreach ($entries as $entry) {
-            $ent = trim($entry);
-            $entAry = explode($this->delimiter , $ent);
-            if (isset($entAry[0]) && isset($entAry[1])) {
-                $this->users[$entAry[0]] = array(
-                    'username' => $entAry[0],
-                    'password' => $entAry[1],
-                    'access'   => (isset($entAry[2]) ? $entAry[2] : null)
-                );
-            }
-        }
-    }
 }

@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Auth
+ * @package    Pop_Acl
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,13 +13,13 @@
 /**
  * @namespace
  */
-namespace Pop\Auth;
+namespace Pop\Acl;
 
 /**
- * Auth role class
+ * Acl role class
  *
  * @category   Pop
- * @package    Pop_Auth
+ * @package    Pop_Acl
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -38,17 +38,17 @@ class Role
      * Role permissions
      * @var array
      */
-    protected $permissions = array();
+    protected $permissions = [];
 
     /**
      * Role children
      * @var array
      */
-    protected $children = array();
+    protected $children = [];
 
     /**
      * Role parent
-     * @var \Pop\Auth\Role
+     * @var \Pop\Acl\Role
      */
     protected $parent = null;
 
@@ -58,23 +58,11 @@ class Role
      * Instantiate the role object
      *
      * @param  string $name
-     * @return \Pop\Auth\Role
+     * @return \Pop\Acl\Role
      */
     public function __construct($name)
     {
         $this->name = $name;
-    }
-
-    /**
-     * Static method to instantiate the role object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string $name
-     * @return \Pop\Auth\Role
-     */
-    public static function factory($name)
-    {
-        return new self($name);
     }
 
     /**
@@ -91,7 +79,7 @@ class Role
      * Method to add a permission to the role
      *
      * @param  string $name
-     * @return \Pop\Auth\Role
+     * @return \Pop\Acl\Role
      */
     public function addPermission($name)
     {
@@ -125,7 +113,7 @@ class Role
      * Method to add a child role
      *
      * @param  mixed $role
-     * @return \Pop\Auth\Role
+     * @return \Pop\Acl\Role
      */
     public function addChild($role)
     {
@@ -138,8 +126,8 @@ class Role
     /**
      * Method to set the role parent
      *
-     * @param  \Pop\Auth\Role $parent
-     * @return \Pop\Auth\Role
+     * @param  \Pop\Acl\Role $parent
+     * @return \Pop\Acl\Role
      */
     public function setParent($parent)
     {
@@ -149,7 +137,7 @@ class Role
     /**
      * Method to get the role parent
      *
-     * @return \Pop\Auth\Role
+     * @return \Pop\Acl\Role
      */
     public function getParent()
     {
@@ -159,7 +147,7 @@ class Role
     /**
      * Method to see if the role has a parent
      *
-     * @return \Pop\Auth\Role
+     * @return \Pop\Acl\Role
      */
     public function hasParent()
     {

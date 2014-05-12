@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Auth
+ * @package    Pop_Acl
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,13 +13,13 @@
 /**
  * @namespace
  */
-namespace Pop\Auth;
+namespace Pop\Acl;
 
 /**
- * Auth resource class
+ * Acl resource class
  *
  * @category   Pop
- * @package    Pop_Auth
+ * @package    Pop_Acl
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -40,23 +40,11 @@ class Resource
      * Instantiate the resource object
      *
      * @param  string $name
-     * @return \Pop\Auth\Resource
+     * @return \Pop\Acl\Resource
      */
     public function __construct($name)
     {
         $this->name = $name;
-    }
-
-    /**
-     * Static method to instantiate the resource object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string $name
-     * @return \Pop\Auth\Resource
-     */
-    public static function factory($name)
-    {
-        return new self($name);
     }
 
     /**
