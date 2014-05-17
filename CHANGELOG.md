@@ -14,7 +14,7 @@ As of May 17, 2014
 * Revised
      - Auth
          + Separated the Acl component and moved to its own folder
-         + Added
+         + Added support for Http auth
      - File
          + Completely stripped down to only the upload and checkDuplicate static methods
          + Trimmed Dir class, removed references to old File class
