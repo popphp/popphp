@@ -153,7 +153,7 @@ class Archive
         }
 
         // Check if Tar is available.
-        if (!class_exists('Archive_Tar', false)) {
+        if (!class_exists('Archive_Tar')) {
             unset($allowed['bz']);
             unset($allowed['bz2']);
             unset($allowed['gz']);

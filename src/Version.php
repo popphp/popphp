@@ -99,7 +99,7 @@ class Version
             'environment' => [
                 'apc'     => (function_exists('apc_add')),
                 'archive' => [
-                    'tar'  => (class_exists('Archive_Tar', false)),
+                    'tar'  => (class_exists('Archive_Tar')),
                     'rar'  => (class_exists('RarArchive', false)),
                     'zip'  => (class_exists('ZipArchive', false)),
                     'bz2'  => (function_exists('bzcompress')),
