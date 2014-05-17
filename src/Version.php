@@ -81,7 +81,7 @@ class Version
     {
         $pdoDrivers  = (class_exists('Pdo', false)) ? \PDO::getAvailableDrivers() : [];
         $includePath = explode(PATH_SEPARATOR, get_include_path());
-        $latest      = self::latest();
+        $latest      = self::getLatest();
 
         // Define initial system environment
         $system = [
