@@ -82,13 +82,6 @@ class Version
         $pdoDrivers  = (class_exists('Pdo', false)) ? \PDO::getAvailableDrivers() : [];
         $includePath = explode(PATH_SEPARATOR, get_include_path());
         $latest      = self::latest();
-        $tar         = false;
-
-        foreach ($includePath as $path) {
-            if (file_exists($path . DIRECTORY_SEPARATOR . 'Archive' . DIRECTORY_SEPARATOR . 'Tar.php')) {
-                $tar = true;
-            }
-        }
 
         // Define initial system environment
         $system = [
@@ -106,7 +99,7 @@ class Version
             'environment' => [
                 'apc'     => (function_exists('apc_add')),
                 'archive' => [
-                    'tar'  => $tar,
+                    'tar'  => (class_exists('Archive_Tar', false)),
                     'rar'  => (class_exists('RarArchive', false)),
                     'zip'  => (class_exists('ZipArchive', false)),
                     'bz2'  => (function_exists('bzcompress')),

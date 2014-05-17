@@ -152,17 +152,8 @@ class Archive
             unset($allowed['rar']);
         }
 
-        $tar = false;
-        $includePath = explode(PATH_SEPARATOR, get_include_path());
-        foreach ($includePath as $path) {
-            if (file_exists($path . DIRECTORY_SEPARATOR . 'Archive' . DIRECTORY_SEPARATOR . 'Tar.php')) {
-                include $path . DIRECTORY_SEPARATOR . 'Archive' . DIRECTORY_SEPARATOR . 'Tar.php';
-                $tar = true;
-            }
-        }
-
         // Check if Tar is available.
-        if (!$tar) {
+        if (!class_exists('Archive_Tar', false)) {
             unset($allowed['bz']);
             unset($allowed['bz2']);
             unset($allowed['gz']);
