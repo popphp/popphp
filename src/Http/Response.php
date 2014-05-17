@@ -349,31 +349,31 @@ class Response
         $decoded = '';
 
         while($body != '') {
-            $lf_pos = strpos($body, "\012");
+            $lfPos = strpos($body, "\012");
 
-            if ($lf_pos === false) {
+            if ($lfPos === false) {
                 $decoded .= $body;
                 break;
             }
 
-            $chunk_hex = trim(substr($body, 0, $lf_pos));
-            $sc_pos = strpos($chunk_hex, ';');
+            $chunkHex = trim(substr($body, 0, $lfPos));
+            $scPos    = strpos($chunkHex, ';');
 
-            if ($sc_pos !== false) {
-                $chunk_hex = substr($chunk_hex, 0, $sc_pos);
+            if ($scPos !== false) {
+                $chunkHex = substr($chunkHex, 0, $scPos);
             }
 
-            if ($chunk_hex == '') {
-                $decoded .= substr($body, 0, $lf_pos);
-                $body = substr($body, $lf_pos + 1);
+            if ($chunkHex == '') {
+                $decoded .= substr($body, 0, $lfPos);
+                $body = substr($body, $lfPos + 1);
                 continue;
             }
 
-            $chunk_len = hexdec($chunk_hex);
+            $chunkLength = hexdec($chunkHex);
 
-            if ($chunk_len) {
-                $decoded .= substr($body, $lf_pos + 1, $chunk_len);
-                $body = substr($body, $lf_pos + 2 + $chunk_len);
+            if ($chunkLength) {
+                $decoded .= substr($body, $lfPos + 1, $chunkLength);
+                $body = substr($body, $lfPos + 2 + $chunkLength);
             } else {
                 $body = '';
             }
