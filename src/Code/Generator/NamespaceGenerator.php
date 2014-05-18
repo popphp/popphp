@@ -25,7 +25,7 @@ namespace Pop\Code\Generator;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class NamespaceGenerator
+class NamespaceGenerator implements GeneratorInterface
 {
 
     /**
@@ -38,7 +38,7 @@ class NamespaceGenerator
      * Array of namespaces to use
      * @var array
      */
-    protected $use = array();
+    protected $use = [];
 
     /**
      * Docblock generator object
@@ -70,18 +70,6 @@ class NamespaceGenerator
     public function __construct($namespace)
     {
         $this->namespace = $namespace;
-    }
-
-    /**
-     * Static method to instantiate the property generator object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string $namespace
-     * @return \Pop\Code\Generator\NamespaceGenerator
-     */
-    public static function factory($namespace)
-    {
-        return new self($namespace);
     }
 
     /**
@@ -136,8 +124,9 @@ class NamespaceGenerator
         }
         return $this;
     }
-        /**
-     * Render property
+
+    /**
+     * Render namespace
      *
      * @param  boolean $ret
      * @return mixed

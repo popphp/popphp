@@ -5,7 +5,7 @@ COMPONENTS
  - Archive [DONE]
  - Auth [DONE]
  - Cache [DONE]
- - Code
+ - Code [DONE]
  - Color [DONE]
  - Crypt [DONE]
  - Curl [DONE]

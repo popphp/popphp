@@ -25,7 +25,7 @@ namespace Pop\Code\Generator;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class MethodGenerator
+class MethodGenerator implements GeneratorInterface
 {
 
     /**
@@ -38,7 +38,7 @@ class MethodGenerator
      * Method arguments
      * @var array
      */
-    protected $arguments = array();
+    protected $arguments = [];
 
     /**
      * Method name
@@ -106,23 +106,9 @@ class MethodGenerator
      */
     public function __construct($name, $visibility = 'public', $static = false)
     {
-        $this->name = $name;
+        $this->name       = $name;
         $this->visibility = $visibility;
-        $this->static = (boolean)$static;
-    }
-
-    /**
-     * Static method to instantiate the method generator object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string  $name
-     * @param  string  $visibility
-     * @param  boolean $static
-     * @return \Pop\Code\Generator\MethodGenerator
-     */
-    public static function factory($name, $visibility = 'public', $static = false)
-    {
-        return new self($name, $visibility, $static);
+        $this->static     = (boolean)$static;
     }
 
     /**
@@ -384,25 +370,28 @@ class MethodGenerator
      */
     public function addArgument($name, $value = null, $type = null)
     {
-        $typeHintsNotAllowed = array(
+        $typeHintsNotAllowed = [
             'int',
             'integer',
             'boolean',
             'float',
             'string',
             'mixed'
-        );
+        ];
         $argType = (!in_array($type, $typeHintsNotAllowed)) ? $type : null;
-        $this->arguments[$name] = array('value' => $value, 'type' => $argType);
+        $this->arguments[$name] = ['value' => $value, 'type' => $argType];
+
         if (null === $this->docblock) {
             $this->docblock = new DocblockGenerator(null, $this->indent);
         }
+
         if (null !== $type) {
             if (substr($name, 0, 1) != '$') {
                 $name = '$' . $name;
             }
             $this->docblock->setParam($type, $name);
         }
+
         return $this;
     }
 
@@ -416,14 +405,14 @@ class MethodGenerator
     {
         foreach ($args as $arg) {
             $value = (isset($arg['value'])) ? $arg['value'] : null;
-            $type = (isset($arg['type'])) ? $arg['type'] : null;
+            $type  = (isset($arg['type'])) ? $arg['type'] : null;
             $this->addArgument($arg['name'], $value, $type);
         }
         return $this;
     }
 
     /**
-     * Add a method argument (synonym method for convenience)
+     * Add a method argument (alias method for convenience)
      *
      * @param string  $name
      * @param mixed   $value
@@ -437,7 +426,7 @@ class MethodGenerator
     }
 
     /**
-     * Add method arguments (synonym method for convenience)
+     * Add method arguments (alias method for convenience)
      *
      * @param array $args
      * @return \Pop\Code\Generator\MethodGenerator
@@ -470,7 +459,7 @@ class MethodGenerator
     }
 
     /**
-     * Get a method argument (synonym method for convenience)
+     * Get a method argument (alias method for convenience)
      *
      * @param  string $name
      * @return array
@@ -481,7 +470,7 @@ class MethodGenerator
     }
 
     /**
-     * Get the method arguments (synonym method for convenience)
+     * Get the method arguments (alias method for convenience)
      *
      * @return array
      */
@@ -498,10 +487,10 @@ class MethodGenerator
      */
     public function render($ret = false)
     {
-        $final = ($this->final) ? 'final ' : null;
+        $final    = ($this->final) ? 'final ' : null;
         $abstract = ($this->abstract) ? 'abstract ' : null;
-        $static = ($this->static) ? ' static' : null;
-        $args = $this->formatArguments();
+        $static   = ($this->static) ? ' static' : null;
+        $args     = $this->formatArguments();
 
         $this->output = PHP_EOL . ((null !== $this->docblock) ? $this->docblock->render(true) : null);
         $this->output .= $this->indent . $final . $abstract . $this->visibility .

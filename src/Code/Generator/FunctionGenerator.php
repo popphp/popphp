@@ -25,7 +25,7 @@ namespace Pop\Code\Generator;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class FunctionGenerator
+class FunctionGenerator implements GeneratorInterface
 {
 
     /**
@@ -38,7 +38,7 @@ class FunctionGenerator
      * Function arguments
      * @var array
      */
-    protected $arguments = array();
+    protected $arguments = [];
 
     /**
      * Function name
@@ -85,19 +85,6 @@ class FunctionGenerator
         if (null !== $func) {
             $this->parseFunction($func);
         }
-    }
-
-    /**
-     * Static method to instantiate the function generator object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string  $name
-     * @param  mixed  $func
-     * @return \Pop\Code\Generator\FunctionGenerator
-     */
-    public static function factory($name, $func = null)
-    {
-        return new self($name, $func);
     }
 
     /**
@@ -271,16 +258,16 @@ class FunctionGenerator
      */
     public function addArgument($name, $value = null, $type = null)
     {
-        $typeHintsNotAllowed = array(
+        $typeHintsNotAllowed = [
             'int',
             'integer',
             'boolean',
             'float',
             'string',
             'mixed'
-        );
+        ];
         $argType = (!in_array($type, $typeHintsNotAllowed)) ? $type : null;
-        $this->arguments[$name] = array('value' => $value, 'type' => $argType);
+        $this->arguments[$name] = ['value' => $value, 'type' => $argType];
         if (null === $this->docblock) {
             $this->docblock = new DocblockGenerator(null, $this->indent);
         }
@@ -303,14 +290,14 @@ class FunctionGenerator
     {
         foreach ($args as $arg) {
             $value = (isset($arg['value'])) ? $arg['value'] : null;
-            $type = (isset($arg['type'])) ? $arg['type'] : null;
+            $type  = (isset($arg['type'])) ? $arg['type'] : null;
             $this->addArgument($arg['name'], $value, $type);
         }
         return $this;
     }
 
     /**
-     * Add a function argument (synonym method for convenience)
+     * Add a function argument (alias method for convenience)
      *
      * @param string  $name
      * @param mixed   $value
@@ -324,7 +311,7 @@ class FunctionGenerator
     }
 
     /**
-     * Add function arguments (synonym method for convenience)
+     * Add function arguments (alias method for convenience)
      *
      * @param array $args
      * @return \Pop\Code\Generator\FunctionGenerator
@@ -363,7 +350,7 @@ class FunctionGenerator
      */
     public function getArgumentNames()
     {
-        $names = array();
+        $names = [];
         foreach ($this->arguments as $key => $value) {
             $names[] = $key;
         }
@@ -371,7 +358,7 @@ class FunctionGenerator
     }
 
     /**
-     * Get a function argument (synonym method for convenience)
+     * Get a function argument (alias method for convenience)
      *
      * @param  string $name
      * @return array
@@ -382,7 +369,7 @@ class FunctionGenerator
     }
 
     /**
-     * Get the function arguments (synonym method for convenience)
+     * Get the function arguments (alias method for convenience)
      *
      * @return array
      */
@@ -392,7 +379,7 @@ class FunctionGenerator
     }
 
     /**
-     * Get the function arguments (synonym method for convenience)
+     * Get the function arguments (alias method for convenience)
      *
      * @return array
      */
@@ -402,7 +389,7 @@ class FunctionGenerator
     }
 
     /**
-     * Render method
+     * Render function
      *
      * @param  boolean $ret
      * @return mixed
@@ -477,7 +464,7 @@ class FunctionGenerator
     }
 
     /**
-     * Print method
+     * Print function
      *
      * @return string
      */

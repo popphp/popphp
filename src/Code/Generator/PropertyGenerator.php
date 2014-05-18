@@ -25,7 +25,7 @@ namespace Pop\Code\Generator;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class PropertyGenerator
+class PropertyGenerator implements GeneratorInterface
 {
 
     /**
@@ -89,25 +89,10 @@ class PropertyGenerator
      */
     public function __construct($name, $type, $value = null, $visibility = 'public')
     {
-        $this->type = $type;
-        $this->name = $name;
-        $this->value = $value;
+        $this->type       = $type;
+        $this->name       = $name;
+        $this->value      = $value;
         $this->visibility = $visibility;
-    }
-
-    /**
-     * Static method to instantiate the property generator object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string $name
-     * @param  string $type
-     * @param  mixed  $value
-     * @param  string $visibility
-     * @return \Pop\Code\Generator\PropertyGenerator
-     */
-    public static function factory($name, $type, $value = null, $visibility = 'public')
-    {
-        return new self($name, $type, $value, $visibility);
     }
 
     /**
@@ -321,7 +306,7 @@ class PropertyGenerator
 
         if (null !== $this->value) {
             if ($this->type == 'array') {
-                $val = (count($this->value) == 0) ? 'array()' : $this->formatArrayValues();
+                $val = (count($this->value) == 0) ? '[]' : $this->formatArrayValues();
                 $this->output .= ' = ' . $val . PHP_EOL;
             } else if (($this->type == 'integer') || ($this->type == 'int') || ($this->type == 'float')) {
                 $this->output .= ' = ' . $this->value . ';';
@@ -332,7 +317,7 @@ class PropertyGenerator
                 $this->output .= " = '" . $this->value . "';";
             }
         } else {
-            $val = ($this->type == 'array') ? 'array()' : 'null';
+            $val = ($this->type == 'array') ? '[]' : 'null';
             $this->output .= ' = ' . $val . ';';
         }
 
@@ -352,7 +337,8 @@ class PropertyGenerator
     {
         $ary = str_replace(PHP_EOL, PHP_EOL . $this->indent . '  ', var_export($this->value, true));
         $ary .= ';';
-        $ary = str_replace('  );', ');', $ary);
+        $ary = str_replace('array (', '[', $ary);
+        $ary = str_replace('  );', '];', $ary);
         $ary = str_replace('NULL', 'null', $ary);
 
         $keys = array_keys($this->value);

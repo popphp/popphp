@@ -25,7 +25,7 @@ namespace Pop\Code;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Generator extends \Pop\File\File
+class Generator
 {
 
     /**
@@ -45,6 +45,36 @@ class Generator extends \Pop\File\File
      * @var int
      */
     const CREATE_INTERFACE = 2;
+
+    /**
+     * Full path and name of the file, i.e. '/some/dir/file.ext'
+     * @var string
+     */
+    protected $fullpath = null;
+
+    /**
+     * Full basename of file, i.e. 'file.ext'
+     * @var string
+     */
+    protected $basename = null;
+
+    /**
+     * Full filename of file, i.e. 'file'
+     * @var string
+     */
+    protected $filename = null;
+
+    /**
+     * File extension, i.e. 'ext'
+     * @var string
+     */
+    protected $ext = null;
+
+    /**
+     * File output data.
+     * @var string
+     */
+    protected $output = null;
 
     /**
      * Code object
@@ -86,11 +116,11 @@ class Generator extends \Pop\File\File
      * Array of allowed file types.
      * @var array
      */
-    protected $allowed = array(
+    protected $allowed = [
         'php'    => 'text/plain',
         'php3'   => 'text/plain',
         'phtml'  => 'text/plain'
-    );
+    ];
 
     /**
      * Constructor
@@ -103,13 +133,19 @@ class Generator extends \Pop\File\File
      */
     public function __construct($file, $type = Generator::CREATE_NONE)
     {
-        parent::__construct($file);
+        $fileInfo = pathinfo($file);
+
+        $this->fullpath = $file;
+        $this->basename = $fileInfo['basename'];
+        $this->filename = $fileInfo['filename'];
+        $this->ext      = (isset($fileInfo['extension'])) ? $fileInfo['extension'] : null;
+
         if ($type == self::CREATE_CLASS) {
             $this->createClass();
         } else if ($type == self::CREATE_INTERFACE) {
             $this->createInterface();
         } else if (($type == self::CREATE_NONE) && file_exists($file)) {
-            $this->body = str_replace('<?php', '', $this->read());
+            $this->body = str_replace('<?php', '', file_get_contents($file));
             $this->body = trim(str_replace('?>', '', $this->body)) . PHP_EOL . PHP_EOL;
         }
     }
@@ -237,6 +273,7 @@ class Generator extends \Pop\File\File
         if ($newline) {
             $this->body .= PHP_EOL;
         }
+
         return $this;
     }
 
@@ -310,7 +347,22 @@ class Generator extends \Pop\File\File
     public function output($download = false)
     {
         $this->render(true);
-        parent::output($download);
+
+        // Determine if the force download argument has been passed.
+        $attach = ($download) ? 'attachment; ' : null;
+
+        header('Content-type: text/plain');
+        header('Content-disposition: ' . $attach . 'filename=' . $this->basename);
+
+        if (isset($_SERVER['SERVER_PORT']) && ($_SERVER['SERVER_PORT'] == 443)) {
+            header('Expires: 0');
+            header('Cache-Control: private, must-revalidate');
+            header('Pragma: cache');
+        }
+
+        echo $this->output;
+
+        return $this;
     }
 
     /**
@@ -318,12 +370,31 @@ class Generator extends \Pop\File\File
      *
      * @param  string $to
      * @param  boolean $append
-     * @return void
+     * @return \Pop\Code\Generator
      */
     public function save($to = null, $append = false)
     {
         $this->render(true);
-        parent::save($to, $append);
+
+        $file = (null === $to) ? $this->fullpath : $to;
+
+        if ($append) {
+            file_put_contents($file, $this->output, FILE_APPEND);
+        } else {
+            file_put_contents($file, $this->output);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Print code
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->render(true);
     }
 
 }

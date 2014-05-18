@@ -25,7 +25,7 @@ namespace Pop\Code\Generator;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class InterfaceGenerator
+class InterfaceGenerator implements GeneratorInterface
 {
 
     /**
@@ -56,7 +56,7 @@ class InterfaceGenerator
      * Array of method generator objects
      * @var array
      */
-    protected $methods = array();
+    protected $methods = [];
 
     /**
      * Class indent
@@ -81,20 +81,8 @@ class InterfaceGenerator
      */
     public function __construct($name, $parent = null)
     {
-        $this->name = $name;
+        $this->name   = $name;
         $this->parent = $parent;
-    }
-    /**
-     * Static method to instantiate the interface generator object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string  $name
-     * @param  string  $parent
-     * @return \Pop\Code\Generator\InterfaceGenerator
-     */
-    public static function factory($name, $parent = null)
-    {
-        return new self($name, $parent);
     }
 
     /**
@@ -247,7 +235,7 @@ class InterfaceGenerator
     }
 
     /**
-     * Render method
+     * Render interface
      *
      * @param  boolean $ret
      * @return mixed
@@ -291,7 +279,7 @@ class InterfaceGenerator
     }
 
     /**
-     * Print method
+     * Print interface
      *
      * @return string
      */

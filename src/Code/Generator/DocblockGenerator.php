@@ -25,7 +25,7 @@ namespace Pop\Code\Generator;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class DocblockGenerator
+class DocblockGenerator implements GeneratorInterface
 {
 
     /**
@@ -38,7 +38,7 @@ class DocblockGenerator
      * Docblock tags
      * @var array
      */
-    protected $tags = array('param' => array());
+    protected $tags = ['param' => []];
 
     /**
      * Docblock indent
@@ -63,21 +63,8 @@ class DocblockGenerator
      */
     public function __construct($desc = null, $indent = null)
     {
-        $this->desc = $desc;
+        $this->desc   = $desc;
         $this->indent = $indent;
-    }
-
-    /**
-     * Static method to instantiate the docblock object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string $desc
-     * @param  string $indent
-     * @return \Pop\Code\Generator\DocblockGenerator
-     */
-    public static function factory($desc = null, $indent = null)
-    {
-        return new self($desc, $indent);
     }
 
     /**
@@ -95,44 +82,46 @@ class DocblockGenerator
             throw new Exception('The docblock is not in the correct format.');
         }
 
-        $desc = null;
+        $desc          = null;
         $formattedDesc = null;
-        $indent = null;
-        $tags = null;
+        $indent        = null;
+        $tags          = null;
 
         // Parse the description, if any
         if (strpos($docblock, '@') !== false) {
-            $desc = substr($docblock, 0, strpos($docblock, '@'));
-            $desc = str_replace('/*', '', $desc);
-            $desc = str_replace('*/', '', $desc);
-            $desc = str_replace(PHP_EOL . ' * ', ' ', $desc);
-            $desc = trim(str_replace('*', '', $desc));
+            $desc    = substr($docblock, 0, strpos($docblock, '@'));
+            $desc    = str_replace('/*', '', $desc);
+            $desc    = str_replace('*/', '', $desc);
+            $desc    = str_replace(PHP_EOL . ' * ', ' ', $desc);
+            $desc    = trim(str_replace('*', '', $desc));
             $descAry = explode("\n", $desc);
+
             $formattedDesc = null;
             foreach ($descAry as $line) {
                 $formattedDesc .= ' ' . trim($line);
             }
+
             $formattedDesc = trim($formattedDesc);
         }
 
         // Get the indentation, if any, and create docblock object
-        $indent = (null === $forceIndent) ? substr($docblock, 0, strpos($docblock, '/')) : $forceIndent;
+        $indent      = (null === $forceIndent) ? substr($docblock, 0, strpos($docblock, '/')) : $forceIndent;
         $newDocblock = new self($formattedDesc, $indent);
 
         // Get the tags, if any
         if (strpos($docblock, '@') !== false) {
-            $tags = substr($docblock, strpos($docblock, '@'));
-            $tags = substr($tags, 0, strpos($tags, '*/'));
-            $tags = str_replace('*', '', $tags);
+            $tags    = substr($docblock, strpos($docblock, '@'));
+            $tags    = substr($tags, 0, strpos($tags, '*/'));
+            $tags    = str_replace('*', '', $tags);
             $tagsAry = explode("\n", $tags);
 
             foreach ($tagsAry as $key => $value) {
                 $value = trim(str_replace('@', '', $value));
                 // Param tags
                 if (stripos($value, 'param') !== false) {
-                    $paramtag = trim(str_replace('param', '', $value));
+                    $paramtag  = trim(str_replace('param', '', $value));
                     $paramtype = trim(substr($paramtag, 0, strpos($paramtag, ' ')));
-                    $varname = null;
+                    $varname   = null;
                     $paramdesc = null;
                     if (strpos($paramtag, ' ') !== false) {
                         $varname = trim(substr($paramtag, strpos($paramtag, ' ')));
@@ -262,7 +251,7 @@ class DocblockGenerator
      */
     public function setParam($type, $var = null, $desc = null)
     {
-        $this->tags['param'][] = array('type' => $type, 'var' => $var, 'desc' => $desc);
+        $this->tags['param'][] = ['type' => $type, 'var' => $var, 'desc' => $desc];
         return $this;
     }
 
@@ -274,7 +263,7 @@ class DocblockGenerator
      */
     public function setParams(array $params)
     {
-        $params = (isset($params[0]) && is_array($params[0])) ? $params : array($params);
+        $params = (isset($params[0]) && is_array($params[0])) ? $params : [$params];
         foreach ($params as $param) {
             $this->tags['param'][] = $param;
         }
@@ -301,7 +290,7 @@ class DocblockGenerator
      */
     public function setReturn($type, $desc = null)
     {
-        $this->tags['return'] = array('type' => $type, 'desc' => $desc);
+        $this->tags['return'] = ['type' => $type, 'desc' => $desc];
         return $this;
     }
 
@@ -355,7 +344,7 @@ class DocblockGenerator
      */
     protected function formatTags()
     {
-        $tags = null;
+        $tags      = null;
         $tagLength = $this->getTagLength();
 
         // Format basic tags

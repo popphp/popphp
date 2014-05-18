@@ -25,7 +25,7 @@ namespace Pop\Code\Generator;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class ClassGenerator
+class ClassGenerator implements GeneratorInterface
 {
 
     /**
@@ -68,13 +68,13 @@ class ClassGenerator
      * Array of property generator objects
      * @var array
      */
-    protected $properties = array();
+    protected $properties = [];
 
     /**
      * Array of method generator objects
      * @var array
      */
-    protected $methods = array();
+    protected $methods = [];
 
     /**
      * Class indent
@@ -101,25 +101,10 @@ class ClassGenerator
      */
     public function __construct($name, $parent = null, $interface = null, $abstract = false)
     {
-        $this->name = $name;
-        $this->parent = $parent;
+        $this->name      = $name;
+        $this->parent    = $parent;
         $this->interface = $interface;
-        $this->abstract = (boolean)$abstract;
-    }
-
-    /**
-     * Static method to instantiate the class generator object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string  $name
-     * @param  string  $parent
-     * @param  string  $interface
-     * @param  boolean $abstract
-     * @return \Pop\Code\Generator\ClassGenerator
-     */
-    public static function factory($name, $parent = null, $interface = null, $abstract = false)
-    {
-        return new self($name, $parent, $interface, $abstract);
+        $this->abstract  = (boolean)$abstract;
     }
 
     /**
@@ -375,7 +360,7 @@ class ClassGenerator
     }
 
     /**
-     * Render method
+     * Render class
      *
      * @param  boolean $ret
      * @return mixed
@@ -439,7 +424,7 @@ class ClassGenerator
     }
 
     /**
-     * Print method
+     * Print class
      *
      * @return string
      */

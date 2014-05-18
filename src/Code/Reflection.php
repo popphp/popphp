@@ -128,7 +128,7 @@ class Reflection extends \ReflectionClass
         if (!$this->isInterface()) {
             $interfaces = $this->getInterfaces();
             if ($interfaces !== false) {
-                $interfacesAry = array();
+                $interfacesAry = [];
                 foreach ($interfaces as $interface) {
                     if ($interface->inNamespace()) {
                         $this->generator->getNamespace()->setUse($interface->getNamespaceName() . '\\' . $interface->getShortName());
@@ -167,7 +167,7 @@ class Reflection extends \ReflectionClass
         if ($this->inNamespace()) {
             $this->generator->setNamespace(new Generator\NamespaceGenerator($this->getNamespaceName()));
             if (null !== $fileContents) {
-                $matches = array();
+                $matches = [];
                 preg_match('/^use(.*)/m', $fileContents, $matches, PREG_OFFSET_CAPTURE);
                 if (isset($matches[0][0])) {
                     $uses = substr($fileContents, $matches[0][1] + 4);
@@ -275,7 +275,7 @@ class Reflection extends \ReflectionClass
 
                 // Get the method parameters
                 if (stripos($methodExport, 'Parameter') !== false) {
-                    $matches = array();
+                    $matches = [];
                     preg_match_all('/Parameter \#(.*)\]/m', $methodExport, $matches);
                     if (isset($matches[0][0])) {
                         foreach ($matches[0] as $param) {
