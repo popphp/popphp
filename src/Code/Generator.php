@@ -68,7 +68,7 @@ class Generator
      * File extension, i.e. 'ext'
      * @var string
      */
-    protected $ext = null;
+    protected $extension = null;
 
     /**
      * File output data.
@@ -135,10 +135,10 @@ class Generator
     {
         $fileInfo = pathinfo($file);
 
-        $this->fullpath = $file;
-        $this->basename = $fileInfo['basename'];
-        $this->filename = $fileInfo['filename'];
-        $this->ext      = (isset($fileInfo['extension'])) ? $fileInfo['extension'] : null;
+        $this->fullpath  = $file;
+        $this->basename  = $fileInfo['basename'];
+        $this->filename  = $fileInfo['filename'];
+        $this->extension = (isset($fileInfo['extension'])) ? $fileInfo['extension'] : null;
 
         if ($type == self::CREATE_CLASS) {
             $this->createClass();
