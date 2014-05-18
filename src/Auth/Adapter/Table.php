@@ -25,42 +25,47 @@ namespace Pop\Auth\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Table implements AdapterInterface
+class Table extends AbstractAdapter
 {
 
     /**
      * DB table name / class name
      * @var string
      */
-    protected $tableName = null;
+    protected $table = null;
 
     /**
      * Username field
      * @var string
      */
-    protected $usernameField = null;
+    protected $usernameField = 'username';
 
     /**
      * Password field
      * @var string
      */
-    protected $passwordField = null;
+    protected $passwordField = 'password';
 
     /**
      * Constructor
      *
      * Instantiate the Table auth adapter object
      *
-     * @param string $tableName
-     * @param string $usernameField
-     * @param string $passwordField
+     * @param string $table
+     * @param array  $options
      * @return \Pop\Auth\Adapter\Table
      */
-    public function __construct($tableName, $usernameField = 'username', $passwordField = 'password')
+    public function __construct($table, array $options = null)
     {
-        $this->setTableName($tableName);
-        $this->setUsernameField($usernameField);
-        $this->setPasswordField($passwordField);
+        $this->setTable($table);
+        if (null !== $options) {
+            if (isset($options['usernameField'])) {
+                $this->setUsernameField($options['usernameField']);
+            }
+            if (isset($options['passwordField'])) {
+                $this->setPasswordField($options['passwordField']);
+            }
+        }
     }
 
     /**
@@ -68,9 +73,9 @@ class Table implements AdapterInterface
      *
      * @return string
      */
-    public function getTableName()
+    public function getTable()
     {
-        return $this->tableName;
+        return $this->table;
     }
 
     /**
@@ -96,12 +101,12 @@ class Table implements AdapterInterface
     /**
      * Method to set the table name
      *
-     * @param string $tableName
+     * @param string $table
      * @return \Pop\Auth\Adapter\Table
      */
-    public function setTableName($tableName)
+    public function setTable($table)
     {
-        $this->tableName = $tableName;
+        $this->table = $table;
         return $this;
     }
 
@@ -132,20 +137,18 @@ class Table implements AdapterInterface
     /**
      * Method to authenticate the user
      *
-     * @param  string $username
-     * @param  string $password
      * @return int
      */
-    public function authenticate($username, $password)
+    public function authenticate()
     {
-        $table = $this->tableName;
+        $table = $this->table;
 
         $user = $table::findBy([
-            $this->usernameField => $username,
-            $this->passwordField => $password
+            $this->usernameField => $this->username,
+            $this->passwordField => $this->password
         ]);
 
-        return (int)(isset($user->$usernameField));
+        return (int)(isset($user->{$usernameField}));
     }
 
 }

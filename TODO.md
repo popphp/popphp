@@ -3,7 +3,7 @@ COMPONENTS
  - Acl [DONE]
  - Application
  - Archive [DONE]
- - Auth
+ - Auth [DONE]
  - Cache [DONE]
  - Code
  - Color [DONE]

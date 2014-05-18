@@ -26,7 +26,7 @@ namespace Pop\Auth\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Http implements AdapterInterface
+class Http extends AbstractAdapter
 {
 
     /**
@@ -200,11 +200,9 @@ class Http implements AdapterInterface
     /**
      * Method to authenticate the user
      *
-     * @param  string $username
-     * @param  string $password
      * @return int
      */
-    public function authenticate($username, $password)
+    public function authenticate()
     {
         $this->generateRequest();
 
@@ -216,15 +214,15 @@ class Http implements AdapterInterface
         ];
 
         switch ($this->type) {
-            case 'basic':
-                $context['http']['header'] = 'Authorization: Basic ' . base64_encode($username . ':' . $password);
+            case 'Basic':
+                $context['http']['header'] = 'Authorization: Basic ' . base64_encode($this->username . ':' . $this->password);
                 break;
 
-            case 'digest':
-                $a1 = md5($username . ':' . $this->scheme['realm'] . ':' . $password);
+            case 'Digest':
+                $a1 = md5($this->username . ':' . $this->scheme['realm'] . ':' . $this->password);
                 $a2 = md5($this->method . ':' . $this->relativeUri);
                 $r  = md5($a1 . ':' . $this->scheme['nonce'] . ':' . $a2);
-                $context['http']['header'] = 'Authorization: Digest username="' . $username .
+                $context['http']['header'] = 'Authorization: Digest username="' . $this->username .
                     '", realm="' . $this->scheme['realm'] . '", nonce="' . $this->scheme['nonce'] .
                     '", uri="' . $this->relativeUri . '", response="' . $r . '"';
                 break;
@@ -264,7 +262,7 @@ class Http implements AdapterInterface
      */
     protected function parseScheme($wwwAuth)
     {
-        $this->type = strtolower(substr($wwwAuth, 0, strpos($wwwAuth, ' ')));
+        $this->type = substr($wwwAuth, 0, strpos($wwwAuth, ' '));
         $scheme     = explode(', ', substr($wwwAuth, (strpos($wwwAuth, ' ') + 1)));
 
         foreach ($scheme as $sch) {

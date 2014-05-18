@@ -48,7 +48,7 @@ class Auth
 
     /**
      * Auth adapter object
-     * @var Adapter\AdapterInterface
+     * @var Adapter\AbstractAdapter
      */
     protected $adapter = null;
 
@@ -57,10 +57,10 @@ class Auth
      *
      * Instantiate the auth object
      *
-     * @param Adapter\AdapterInterface $adapter
+     * @param Adapter\AbstractAdapter $adapter
      * @return \Pop\Auth\Auth
      */
-    public function __construct(Adapter\AdapterInterface $adapter)
+    public function __construct(Adapter\AbstractAdapter $adapter)
     {
         $this->adapter = $adapter;
     }
@@ -68,7 +68,7 @@ class Auth
     /**
      * Method to get the auth adapter
      *
-     * @return \Pop\Auth\Adapter\AdapterInterface
+     * @return \Pop\Auth\Adapter\AbstractAdapter
      */
     public function adapter()
     {
@@ -96,15 +96,37 @@ class Auth
     }
 
     /**
-     * Method to authenticate a user
+     * Method to set the username
      *
      * @param  string $username
+     * @return \Pop\Auth\Auth
+     */
+    public function setUsername($username)
+    {
+        $this->adapter->setUsername($username);
+        return $this;
+    }
+
+    /**
+     * Method to set the password
+     *
      * @param  string $password
      * @return \Pop\Auth\Auth
      */
-    public function authenticate($username, $password)
+    public function setPassword($password)
     {
-        $this->result = $this->adapter->authenticate($username, $password);
+        $this->adapter->setPassword($password);
+        return $this;
+    }
+
+    /**
+     * Method to authenticate
+     *
+     * @return \Pop\Auth\Auth
+     */
+    public function authenticate()
+    {
+        $this->result = $this->adapter->authenticate();
         return $this;
     }
 

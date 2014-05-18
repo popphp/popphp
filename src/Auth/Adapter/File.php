@@ -25,8 +25,26 @@ namespace Pop\Auth\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class File implements AdapterInterface
+class File extends AbstractAdapter
 {
+
+    /**
+     * Constant for MD5 encryption
+     * @var string
+     */
+    const ENCRYPT_MD5 = 'ENCRYPT_MD5';
+
+    /**
+     * Constant for MD5 encryption
+     * @var string
+     */
+    const ENCRYPT_SHA1 = 'ENCRYPT_SHA1';
+
+    /**
+     * Constant for no encryption
+     * @var string
+     */
+    const ENCRYPT_NONE = 'ENCRYPT_NONE';
 
     /**
      * Auth file
@@ -35,16 +53,10 @@ class File implements AdapterInterface
     protected $filename = null;
 
     /**
-     * Auth file type
-     * @var string
-     */
-    protected $type = 'Digest';
-
-    /**
      * Auth file encryption
      * @var string
      */
-    protected $encryption = 'md5';
+    protected $encryption = 'ENCRYPT_MD5';
 
     /**
      * Auth realm
@@ -72,17 +84,14 @@ class File implements AdapterInterface
         $this->setFilename($filename);
 
         if (null !== $options) {
-            if (isset($options['type'])) {
-                $this->type = $options['type'];
-            }
             if (isset($options['encryption'])) {
-                $this->encryption = $options['encryption'];
+                $this->setEncryption($options['encryption']);
             }
             if (isset($options['realm'])) {
-                $this->realm = $options['realm'];
+                $this->setRealm($options['realm']);
             }
             if (isset($options['delimiter'])) {
-                $this->delimiter = $options['delimiter'];
+                $this->setDelimiter($options['delimiter']);
             }
         }
     }
@@ -95,16 +104,6 @@ class File implements AdapterInterface
     public function getFilename()
     {
         return $this->filename;
-    }
-
-    /**
-     * Method to get the auth type
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
@@ -155,18 +154,6 @@ class File implements AdapterInterface
     }
 
     /**
-     * Method to set the auth type
-     *
-     * @param string $type
-     * @return \Pop\Auth\Adapter\File
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-        return $this;
-    }
-
-    /**
      * Method to set the auth encryption
      *
      * @param string $encryption
@@ -205,13 +192,41 @@ class File implements AdapterInterface
     /**
      * Method to authenticate the user
      *
-     * @param  string $username
-     * @param  string $password
      * @return int
      */
-    public function authenticate($username, $password)
+    public function authenticate()
     {
+        $string = $this->username . $this->delimiter;
+        $hash   = $this->username . $this->delimiter;
 
+        if (null !== $this->realm) {
+            $string .= $this->realm . $this->delimiter;
+            $hash   .= $this->realm . $this->delimiter;
+        }
+
+        $hash .= $this->password;
+
+        switch ($this->encryption) {
+            case self::ENCRYPT_MD5:
+                $hash = md5($hash);
+                break;
+
+            case self::ENCRYPT_SHA1:
+                $hash = sha1($hash);
+                break;
+        }
+
+        $string .= $hash;
+        $lines = file($this->filename);
+
+        $result = 0;
+        foreach ($lines as $line) {
+            if (trim($line) == $string) {
+                $result = 1;
+            }
+        }
+
+        return $result;
     }
 
 }

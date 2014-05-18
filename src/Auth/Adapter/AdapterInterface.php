@@ -29,12 +29,10 @@ interface AdapterInterface
 {
 
     /**
-     * Method to authenticate the user
+     * Method to authenticate
      *
-     * @param  string $username
-     * @param  string $password
-     * @return boolean
+     * @return int
      */
-    public function authenticate($username, $password);
+    public function authenticate();
 
 }
