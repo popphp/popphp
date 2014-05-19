@@ -32,7 +32,7 @@ abstract class AbstractSql
      * SQL columns
      * @var array
      */
-    protected $columns = array();
+    protected $columns = [];
 
     /**
      * SQL object
@@ -72,7 +72,7 @@ abstract class AbstractSql
         $this->sql = $sql;
         if (null !== $columns) {
             if (!is_array($columns)) {
-                $columns = array($columns);
+                $columns = [$columns];
             }
             $this->columns = $columns;
         }
@@ -90,14 +90,14 @@ abstract class AbstractSql
         $byColumns = null;
 
         if (is_array($by)) {
-            $quotedAry = array();
+            $quotedAry = [];
             foreach ($by as $value) {
                 $quotedAry[] = $this->sql->quoteId(trim($value));
             }
             $byColumns = implode(', ', $quotedAry);
         } else if (strpos($by, ',') !== false) {
             $ary = explode(',' , $by);
-            $quotedAry = array();
+            $quotedAry = [];
             foreach ($ary as $value) {
                 $quotedAry[] = $this->sql->quoteId(trim($value));
             }

@@ -47,12 +47,6 @@ class Pdo extends AbstractAdapter
     protected $dbtype = null;
 
     /**
-     * Prepared statement
-     * @var \PDOStatement
-     */
-    protected $statement = null;
-
-    /**
      * Statement placeholder
      * @var string
      */
@@ -374,7 +368,7 @@ class Pdo extends AbstractAdapter
      */
     protected function loadTables()
     {
-        $tables = array();
+        $tables = [];
 
         if (stripos($this->dsn, 'sqlite') !== false) {
             $sql = "SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%' UNION ALL SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view') ORDER BY 1";

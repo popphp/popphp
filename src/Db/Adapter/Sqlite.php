@@ -41,12 +41,6 @@ class Sqlite extends AbstractAdapter
     protected $lastSql = null;
 
     /**
-     * Prepared statement
-     * @var \SQLite3Stmt
-     */
-    protected $statement = null;
-
-    /**
      * Constructor
      *
      * Instantiate the SQLite database connection object.
@@ -123,7 +117,7 @@ class Sqlite extends AbstractAdapter
      */
     public function fetchResult()
     {
-        $rows = array();
+        $rows = [];
 
         while (($row = $this->fetch()) != false) {
             $rows[] = $row;
@@ -269,7 +263,7 @@ class Sqlite extends AbstractAdapter
      */
     protected function loadTables()
     {
-        $tables = array();
+        $tables = [];
         $sql = "SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%' UNION ALL SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view') ORDER BY 1";
 
         $this->query($sql);

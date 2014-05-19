@@ -29,12 +29,6 @@ class Mysqli extends AbstractAdapter
 {
 
     /**
-     * Prepared statement
-     * @var \MySQLi_STMT
-     */
-    protected $statement = null;
-
-    /**
      * Constructor
      *
      * Instantiate the MySQLi database connection object.
@@ -89,10 +83,10 @@ class Mysqli extends AbstractAdapter
      */
     public function bindParams($params)
     {
-        $bindParams = array('');
+        $bindParams = [''];
 
         foreach ($params as $dbColumnName => $dbColumnValue) {
-            $dbColumnValueAry = (!is_array($dbColumnValue)) ? array($dbColumnValue) : $dbColumnValue;
+            $dbColumnValueAry = (!is_array($dbColumnValue)) ? [$dbColumnValue] : $dbColumnValue;
 
             $i = 1;
             foreach ($dbColumnValueAry as $dbColumnValueAryValue) {
@@ -115,7 +109,7 @@ class Mysqli extends AbstractAdapter
             }
         }
 
-        call_user_func_array(array($this->statement, 'bind_param'), $bindParams);
+        call_user_func_array([$this->statement, 'bind_param'], $bindParams);
 
         return $this;
     }
@@ -127,9 +121,9 @@ class Mysqli extends AbstractAdapter
      */
     public function fetchResult()
     {
-        $params = array();
-        $bindParams = array();
-        $rows = array();
+        $params     = [];
+        $bindParams = [];
+        $rows       = [];
 
         $metaData = $this->statement->result_metadata();
         if ($metaData !== false) {
@@ -139,10 +133,10 @@ class Mysqli extends AbstractAdapter
                 $params[] = $col->name;
             }
 
-            call_user_func_array(array($this->statement, 'bind_result'), $bindParams);
+            call_user_func_array([$this->statement, 'bind_result'], $bindParams);
 
             while (($row = $this->statement->fetch()) != false) {
-                $ary = array();
+                $ary = [];
                 foreach ($bindParams as $dbColumnName => $dbColumnValue) {
                     $ary[$params[$dbColumnName]] = $dbColumnValue;
                 }
@@ -286,7 +280,7 @@ class Mysqli extends AbstractAdapter
      */
     protected function loadTables()
     {
-        $tables = array();
+        $tables = [];
 
         $this->query('SHOW TABLES');
         while (($row = $this->fetch()) != false) {

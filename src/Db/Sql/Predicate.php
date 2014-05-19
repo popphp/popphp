@@ -38,13 +38,13 @@ class Predicate
      * Predicates array
      * @var array
      */
-    protected $predicates = array();
+    protected $predicates = [];
 
     /**
      * Nested predicates
      * @var array
      */
-    protected $nested = array();
+    protected $nested = [];
 
     /**
      * Constructor
@@ -102,11 +102,11 @@ class Predicate
      */
     public function equalTo($column, $value, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 = %2',
-            'values' => array($column, $value),
+            'values' => [$column, $value],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -120,11 +120,11 @@ class Predicate
      */
     public function notEqualTo($column, $value, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 != %2',
-            'values' => array($column, $value),
+            'values' => [$column, $value],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -138,11 +138,11 @@ class Predicate
      */
     public function greaterThan($column, $value, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 > %2',
-            'values' => array($column, $value),
+            'values' => [$column, $value],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -156,11 +156,11 @@ class Predicate
      */
     public function greaterThanOrEqualTo($column, $value, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 >= %2',
-            'values' => array($column, $value),
+            'values' => [$column, $value],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -174,11 +174,11 @@ class Predicate
      */
     public function lessThan($column, $value, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 < %2',
-            'values' => array($column, $value),
+            'values' => [$column, $value],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -192,11 +192,11 @@ class Predicate
      */
     public function lessThanOrEqualTo($column, $value, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 <= %2',
-            'values' => array($column, $value),
+            'values' => [$column, $value],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -210,11 +210,11 @@ class Predicate
      */
     public function like($column, $value, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 LIKE %2',
-            'values' => array($column, $value),
+            'values' => [$column, $value],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -228,11 +228,11 @@ class Predicate
      */
     public function notLike($column, $value, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 NOT LIKE %2',
-            'values' => array($column, $value),
+            'values' => [$column, $value],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -247,11 +247,11 @@ class Predicate
      */
     public function between($column, $value1, $value2, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 BETWEEN %2 AND %3',
-            'values' => array($column, $value1, $value2),
+            'values' => [$column, $value1, $value2],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -266,11 +266,11 @@ class Predicate
      */
     public function notBetween($column, $value1, $value2, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 NOT BETWEEN %2 AND %3',
-            'values' => array($column, $value1, $value2),
+            'values' => [$column, $value1, $value2],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -284,11 +284,11 @@ class Predicate
      */
     public function in($column, $values, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 IN (%2)',
-            'values' => array($column, $values),
+            'values' => [$column, $values],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -302,11 +302,11 @@ class Predicate
      */
     public function notIn($column, $values, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 NOT IN (%2)',
-            'values' => array($column, $values),
+            'values' => [$column, $values],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -319,11 +319,11 @@ class Predicate
      */
     public function isNull($column, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 IS NULL',
-            'values' => array($column),
+            'values' => [$column],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 
@@ -336,11 +336,11 @@ class Predicate
      */
     public function isNotNull($column, $combine = 'AND')
     {
-        $this->predicates[] = array(
+        $this->predicates[] = [
             'format' => '%1 IS NOT NULL',
-            'values' => array($column),
+            'values' => [$column],
             'combine' => ($combine == 'OR') ? 'OR' : 'AND'
-        );
+        ];
         return $this;
     }
 

@@ -41,12 +41,6 @@ class Sqlsrv extends AbstractAdapter
     protected $sql = null;
 
     /**
-     * Prepared statement
-     * @var Resource
-     */
-    protected $statement = null;
-
-    /**
      * Constructor
      *
      * Instantiate the SQLSrv database connection object.

@@ -41,10 +41,16 @@ abstract class AbstractAdapter
     protected $connection;
 
     /**
+     * Prepared statement
+     * @var mixed
+     */
+    protected $statement = null;
+
+    /**
      * Database tables
      * @var array
      */
-    protected $tables = array();
+    protected $tables = [];
 
     /**
      * Constructor

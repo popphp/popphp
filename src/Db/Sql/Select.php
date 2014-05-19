@@ -30,21 +30,21 @@ class Select extends AbstractSql
 
     /**
      * SQL functions
-     * @var boolean
+     * @var array
      */
-    protected static $functions = array(
+    protected static $functions = [
         'AVG', 'COUNT', 'FIRST', 'LAST', 'MAX', 'MIN', 'SUM'
-    );
+    ];
 
     /**
      * Allowed JOIN keywords
-     * @var boolean
+     * @var array
      */
-    protected static $allowedJoins = array(
+    protected static $allowedJoins = [
         'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN',
         'OUTER JOIN', 'LEFT OUTER JOIN', 'RIGHT OUTER JOIN', 'FULL OUTER JOIN',
         'INNER JOIN', 'LEFT INNER JOIN', 'RIGHT INNER JOIN', 'FULL INNER JOIN'
-    );
+    ];
 
     /**
      * Distinct keyword
@@ -56,7 +56,7 @@ class Select extends AbstractSql
      * JOIN clauses
      * @var array
      */
-    protected $joins = array();
+    protected $joins = [];
 
     /**
      * WHERE predicate object
@@ -79,21 +79,22 @@ class Select extends AbstractSql
     /**
      * Set the JOIN clause
      *
-     * @param mixed  $tableToJoin
-     * @param mixed  $commonColumn
-     * @param string $typeOfJoin
+     * @param  mixed  $tableToJoin
+     * @param  mixed  $foreignColumn
+     * @param  mixed  $nativeColumn
+     * @param  string $typeOfJoin
      * @return \Pop\Db\Sql\Select
      */
-    public function join($tableToJoin, $commonColumn, $typeOfJoin = 'JOIN')
+    public function join($tableToJoin, $foreignColumn, $nativeColumn = null, $typeOfJoin = 'LEFT JOIN')
     {
         $join = (in_array(strtoupper($typeOfJoin), self::$allowedJoins)) ? strtoupper($typeOfJoin) : 'JOIN';
 
-        if (is_array($commonColumn)) {
-            $col1 = $this->sql->quoteId($commonColumn[0]);
-            $col2 = $this->sql->quoteId($commonColumn[1]);
+        if (null !== $nativeColumn) {
+            $col1 = $this->sql->quoteId($nativeColumn);
+            $col2 = $this->sql->quoteId($foreignColumn);
             $cols = array($col1, $col2);
         } else {
-            $cols = $this->sql->quoteId($commonColumn);
+            $cols = $this->sql->quoteId($foreignColumn);
         }
 
         if ($tableToJoin instanceof \Pop\Db\Sql) {
@@ -151,14 +152,14 @@ class Select extends AbstractSql
         $byColumns = null;
 
         if (is_array($by)) {
-            $quotedAry = array();
+            $quotedAry = [];
             foreach ($by as $value) {
                 $quotedAry[] = $this->sql->quoteId(trim($value));
             }
             $byColumns = implode(', ', $quotedAry);
         } else if (strpos($by, ',') !== false) {
             $ary = explode(',' , $by);
-            $quotedAry = array();
+            $quotedAry = [];
             foreach ($ary as $value) {
                 $quotedAry[] = $this->sql->quoteId(trim($value));
             }
@@ -197,7 +198,7 @@ class Select extends AbstractSql
         $sql = 'SELECT ' . (($this->distinct) ? 'DISTINCT ' : null);
 
         if (count($this->columns) > 0) {
-            $cols = array();
+            $cols = [];
             foreach ($this->columns as $as => $col) {
                 // If column is a SQL function, don't quote it
                 $c = ((strpos($col, '(') !== false) && (in_array(substr($col, 0, strpos($col, '(')), self::$functions))) ?
@@ -335,10 +336,10 @@ class Select extends AbstractSql
      */
     protected function getLimitAndOffset()
     {
-        $result = array(
+        $result = [
             'limit'  => null,
             'offset' => null
-        );
+        ];
 
         // Calculate the limit and/or offset
         if (null !== $this->offset) {

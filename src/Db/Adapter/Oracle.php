@@ -29,12 +29,6 @@ class Oracle extends AbstractAdapter
 {
 
     /**
-     * Prepared statement
-     * @var Resource
-     */
-    protected $statement = null;
-
-    /**
      * Constructor
      *
      * Instantiate the Oracle database connection object.
@@ -111,7 +105,7 @@ class Oracle extends AbstractAdapter
      */
     public function fetchResult()
     {
-        $rows = array();
+        $rows = [];
 
         while (($row = $this->fetch()) != false) {
             $rows[] = $row;
@@ -172,8 +166,8 @@ class Oracle extends AbstractAdapter
      */
     public function escape($value)
     {
-        $search = array('\\', "\n", "\r", "\x00", "\x1a", '\'', '"');
-        $replace = array('\\\\', "\\n", "\\r", "\\x00", "\\x1a", '\\\'', '\\"');
+        $search = ['\\', "\n", "\r", "\x00", "\x1a", '\'', '"'];
+        $replace = ['\\\\', "\\n", "\\r", "\\x00", "\\x1a", '\\\'', '\\"'];
 
         return str_replace($search, $replace, $value);
     }
@@ -247,7 +241,7 @@ class Oracle extends AbstractAdapter
      */
     protected function loadTables()
     {
-        $tables = array();
+        $tables = [];
 
         $this->query("SELECT TABLE_NAME FROM USER_TABLES");
         while (($row = $this->fetch()) != false) {

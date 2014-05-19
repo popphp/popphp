@@ -37,8 +37,8 @@ class Insert extends AbstractSql
     {
         // Start building the INSERT statement
         $sql = 'INSERT INTO ' . $this->sql->quoteId($this->sql->getTable()) . ' ';
-        $columns = array();
-        $values = array();
+        $columns = [];
+        $values = [];
 
         $paramCount = 1;
         $dbType = $this->sql->getDbType();

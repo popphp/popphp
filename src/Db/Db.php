@@ -64,23 +64,9 @@ class Db
     }
 
     /**
-     * Determine whether or not an instance of the DB object exists already,
-     * and instantiate the object if it doesn't exist.
-     *
-     * @param  string $type
-     * @param  array  $options
-     * @param  string $prefix
-     * @return \Pop\Db\Db
-     */
-    public static function factory($type, array $options, $prefix = 'Pop\Db\Adapter\\')
-    {
-        return new self($type, $options, $prefix);
-    }
-
-    /**
      * Get the database adapter.
      *
-     * @return mixed
+     * @return Adapter\AbstractAdapter
      */
     public function adapter()
     {

@@ -58,7 +58,7 @@ class Update extends AbstractSql
     {
         // Start building the UPDATE statement
         $sql = 'UPDATE ' . $this->sql->quoteId($this->sql->getTable()) . ' SET ';
-        $set = array();
+        $set = [];
 
         $paramCount = 1;
         $dbType = $this->sql->getDbType();

@@ -10,7 +10,7 @@ COMPONENTS
  - Crypt [DONE]
  - Curl [DONE]
  - Data [DONE]
- - Db
+ - Db [DONE -> revisit and revise the Record class some more]
  - Dom
  - Event [DONE]
  - Feed

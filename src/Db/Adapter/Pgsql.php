@@ -41,12 +41,6 @@ class Pgsql extends AbstractAdapter
     protected $statementName = null;
 
     /**
-     * Prepared statement
-     * @var resource
-     */
-    protected $statement = null;
-
-    /**
      * Prepared statement parameters
      * @var array
      */
@@ -115,9 +109,9 @@ class Pgsql extends AbstractAdapter
     public function bindParams($params)
     {
         if (!is_array($params)) {
-            $this->parameters = array($params);
+            $this->parameters = [$params];
         } else {
-            $this->parameters = array();
+            $this->parameters = [];
             foreach ($params as $param) {
                 if (is_array($param)) {
                     foreach ($param as $par) {
@@ -139,7 +133,7 @@ class Pgsql extends AbstractAdapter
      */
     public function fetchResult()
     {
-        $rows = array();
+        $rows = [];
 
         while (($row = $this->fetch()) != false) {
             $rows[] = $row;
@@ -280,7 +274,7 @@ class Pgsql extends AbstractAdapter
      */
     protected function loadTables()
     {
-        $tables = array();
+        $tables = [];
 
         $this->query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
         while (($row = $this->fetch()) != false) {
