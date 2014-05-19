@@ -87,7 +87,7 @@ class Select extends AbstractSql
      */
     public function join($tableToJoin, $foreignColumn, $nativeColumn = null, $typeOfJoin = 'LEFT JOIN')
     {
-        $join = (in_array(strtoupper($typeOfJoin), self::$allowedJoins)) ? strtoupper($typeOfJoin) : 'JOIN';
+        $join = (in_array(strtoupper($typeOfJoin), self::$allowedJoins)) ? strtoupper($typeOfJoin) : 'LEFT JOIN';
 
         if (null !== $nativeColumn) {
             $col1 = $this->sql->quoteId($nativeColumn);
