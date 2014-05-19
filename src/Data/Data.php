@@ -257,11 +257,18 @@ class Data
     /**
      * Output the data file directly.
      *
+     * @param  string $to
      * @param  boolean $download
      * @return \Pop\Data\Data
      */
-    public function output($download = false)
+    public function output($to, $download = false)
     {
+        $fileInfo        = pathinfo($to);
+        $this->fullpath  = $to;
+        $this->basename  = $fileInfo['basename'];
+        $this->filename  = $fileInfo['filename'];
+        $this->extension = (isset($fileInfo['extension'])) ? $fileInfo['extension'] : null;
+
         // Determine if the force download argument has been passed.
         $attach = ($download) ? 'attachment; ' : null;
 
@@ -286,14 +293,18 @@ class Data
      * @param  boolean $append
      * @return \Pop\Data\Data
      */
-    public function save($to = null, $append = false)
+    public function save($to, $append = false)
     {
-        $file = (null === $to) ? $this->fullpath : $to;
+        $fileInfo        = pathinfo($to);
+        $this->fullpath  = $to;
+        $this->basename  = $fileInfo['basename'];
+        $this->filename  = $fileInfo['filename'];
+        $this->extension = (isset($fileInfo['extension'])) ? $fileInfo['extension'] : null;
 
         if ($append) {
-            file_put_contents($file, $this->output, FILE_APPEND);
+            file_put_contents($to, $this->output, FILE_APPEND);
         } else {
-            file_put_contents($file, $this->output);
+            file_put_contents($to, $this->output);
         }
 
         return $this;
