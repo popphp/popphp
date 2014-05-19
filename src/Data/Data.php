@@ -29,16 +29,17 @@ class Data
 {
 
     /**
-     * Data file stream
-     * @var string
-     */
-    protected $file = null;
-
-    /**
      * Data file type
      * @var string
      */
     protected $type = null;
+
+
+    /**
+     * Data file output stream
+     * @var string
+     */
+    protected $output = null;
 
     /**
      * Data stream
@@ -65,6 +66,30 @@ class Data
     protected $pma = false;
 
     /**
+     * Full path and name of the file, i.e. '/some/dir/file.ext'
+     * @var string
+     */
+    protected $fullpath = null;
+
+    /**
+     * Full basename of file, i.e. 'file.ext'
+     * @var string
+     */
+    protected $basename = null;
+
+    /**
+     * Full filename of file, i.e. 'file'
+     * @var string
+     */
+    protected $filename = null;
+
+    /**
+     * File extension, i.e. 'ext'
+     * @var string
+     */
+    protected $extension = null;
+
+    /**
      * Constructor
      *
      * Instantiate the data object.
@@ -74,6 +99,7 @@ class Data
      */
     public function __construct($data)
     {
+        // If data is a file
         if ((is_string($data)) &&
             ((stripos($data, '.csv') !== false) ||
              (stripos($data, '.json') !== false) ||
@@ -82,24 +108,20 @@ class Data
              (stripos($data, '.yml') !== false) ||
              (stripos($data, '.yaml') !== false)) && file_exists($data)) {
 
-            $file = new \Pop\File\File($data);
-            $this->file = $file->read();
-            $this->type = (strtolower($file->getExt()) == 'yml') ? 'Yaml' : ucfirst(strtolower($file->getExt()));
+
+            $fileInfo = pathinfo($data);
+
+            $this->fullpath  = $data;
+            $this->basename  = $fileInfo['basename'];
+            $this->filename  = $fileInfo['filename'];
+            $this->extension = (isset($fileInfo['extension'])) ? $fileInfo['extension'] : null;
+
+            $this->output    = file_get_contents($data);
+            $this->type      = (strtolower($this->extension) == 'yml') ? 'Yaml' : ucfirst(strtolower($this->extension));
+        // Else, if it's just data
         } else {
             $this->data = $data;
         }
-    }
-
-    /**
-     * Static method to instantiate the data object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string $data
-     * @return \Pop\Data\Data
-     */
-    public static function factory($data)
-    {
-        return new self($data);
     }
 
     /**
@@ -107,9 +129,9 @@ class Data
      *
      * @return string
      */
-    public function getFile()
+    public function getOutput()
     {
-        return $this->file;
+        return $this->output;
     }
 
     /**
@@ -189,29 +211,29 @@ class Data
     }
 
     /**
-     * Parse the data file stream and return a PHP data object.
+     * Parse the data from the file.
      *
-     * @return mixed
+     * @return \Pop\Data\Data
      */
     public function parseFile()
     {
         $class = 'Pop\\Data\\Type\\' . $this->type;
-        $this->data = $class::decode($this->file);
-        return $this->data;
+        $this->data = $class::decode($this->output);
+        return $this;
     }
 
     /**
-     * Parse the data stream and return a file data stream.
+     * Parse the data.
      *
      * @param  string $to
      * @param  array  $options
      * @throws Exception
-     * @return mixed
+     * @return \Pop\Data\Data
      */
     public function parseData($to, array $options = null)
     {
         $to = strtolower($to);
-        $types = array('csv', 'html', 'json', 'sql', 'xml', 'yaml');
+        $types = ['csv', 'html', 'json', 'sql', 'xml', 'yaml'];
 
         if (!in_array($to, $types)) {
             throw new Exception('That data type is not supported.');
@@ -220,55 +242,58 @@ class Data
         $class = 'Pop\\Data\\Type\\' . ucfirst($to);
 
         if ($to == 'sql') {
-            $this->file = $class::encode($this->data, $this->table, $this->idQuote);
+            $this->output = $class::encode($this->data, $this->table, $this->idQuote);
         } else if ($to == 'xml') {
-            $this->file = $class::encode($this->data, $this->table, $this->pma);
+            $this->output = $class::encode($this->data, $this->table, $this->pma);
         } else if ($to == 'html') {
-            $this->file = $class::encode($this->data, $options);
+            $this->output = $class::encode($this->data, $options);
         } else {
-            $this->file = $class::encode($this->data);
+            $this->output = $class::encode($this->data);
         }
 
-        return $this->file;
+        return $this;
     }
 
     /**
-     * Write the data stream to a file and either save or output it
+     * Output the data file directly.
      *
-     * @param  string  $toFile
-     * @param  boolean $output
      * @param  boolean $download
-     * @throws Exception
      * @return \Pop\Data\Data
      */
-    public function writeData($toFile, $output = false, $download = false)
+    public function output($download = false)
     {
-        $file = new \Pop\File\File($toFile);
+        // Determine if the force download argument has been passed.
+        $attach = ($download) ? 'attachment; ' : null;
 
-        $to = (strtolower($file->getExt()) == 'yml') ? 'yaml' : strtolower($file->getExt());
-        $types = array('csv', 'json', 'sql', 'xml', 'yaml');
+        header('Content-type: text/plain');
+        header('Content-disposition: ' . $attach . 'filename=' . $this->basename);
 
-        if (!in_array($to, $types)) {
-            throw new Exception('That data type is not supported.');
+        if (isset($_SERVER['SERVER_PORT']) && ($_SERVER['SERVER_PORT'] == 443)) {
+            header('Expires: 0');
+            header('Cache-Control: private, must-revalidate');
+            header('Pragma: cache');
         }
 
-        $class = 'Pop\\Data\\Type\\' . ucfirst($to);
+        echo $this->output;
 
-        if ($to == 'sql') {
-            $this->file = $class::encode($this->data, $this->table, $this->idQuote);
-        } else if ($to == 'xml') {
-            $this->file = $class::encode($this->data, $this->table, $this->pma);
+        return $this;
+    }
+
+    /**
+     * Save the data file to disk.
+     *
+     * @param  string $to
+     * @param  boolean $append
+     * @return \Pop\Data\Data
+     */
+    public function save($to = null, $append = false)
+    {
+        $file = (null === $to) ? $this->fullpath : $to;
+
+        if ($append) {
+            file_put_contents($file, $this->output, FILE_APPEND);
         } else {
-            $this->file = $class::encode($this->data);
-        }
-
-        $file->write($this->file);
-
-        // Output or save file
-        if ($output) {
-            $file->output($download);
-        } else {
-            $file->save();
+            file_put_contents($file, $this->output);
         }
 
         return $this;

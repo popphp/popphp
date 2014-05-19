@@ -25,7 +25,7 @@ namespace Pop\Data\Type;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Csv
+class Csv implements TypeInterface
 {
 
     /**
@@ -41,14 +41,14 @@ class Csv
         // Read the file data, separating by new lines.
         $lines = explode("\n", $data);
 
-        $linesOfData = array();
-        $newLinesOfData = array();
+        $linesOfData = [];
+        $newLinesOfData = [];
 
         // Loop through the line data, parsing any quoted or escaped data.
         foreach ($lines as $data) {
             if ($data != '') {
                 if (strpos($data, $esc) !== false) {
-                    $matches = array();
+                    $matches = [];
                     preg_match_all('/"([^"]*)"/', $data, $matches);
                     if (isset($matches[0])) {
                         foreach ($matches[0] as $value) {
@@ -68,7 +68,7 @@ class Csv
 
         // Create a corresponding associative array by converting the array keys to the header names.
         for ($i = 1; $i < count($linesOfData); $i++) {
-            $newLinesOfData['row_' . $i] = array();
+            $newLinesOfData['row_' . $i] = [];
 
             foreach ($linesOfData[$i] as $key => $value) {
                 $newKey = trim($linesOfData[0][$key]);
@@ -93,13 +93,13 @@ class Csv
     public static function encode($data, $omit = null, $delim = ',', $esc = '"', $dt = null)
     {
         $output = '';
-        $tempAry = array();
-        $headerAry = array();
+        $tempAry = [];
+        $headerAry = [];
 
         if (null === $omit) {
-            $omit = array();
+            $omit = [];
         } else if (!is_array($omit)) {
-            $omit = array($omit);
+            $omit = [$omit];
         }
 
         // Initialize and clean the header fields.
@@ -125,7 +125,7 @@ class Csv
 
         // Initialize and clean the field values.
         foreach ($data as $value) {
-            $rowAry = array();
+            $rowAry = [];
             foreach ($value as $key => $val) {
                 if (!in_array($key, $omit)) {
                     if (null !== $dt) {

@@ -25,7 +25,7 @@ namespace Pop\Data\Type;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Sql
+class Sql implements TypeInterface
 {
 
     /**
@@ -40,13 +40,13 @@ class Sql
 
         $fields = substr($data, (strpos($data, '(') + 1));
         $fields = substr($fields, 0, strpos($fields, ')'));
-        $search = array(', ', '`', '"', "'", '[', ']');
-        $replace = array(',', '', '', "", '', '');
+        $search = [', ', '`', '"', "'", '[', ']'];
+        $replace = [',', '', '', "", '', ''];
         $fields = str_replace($search, $replace, $fields);
 
         $fieldsAry = explode(',', $fields);
 
-        $valuesAry = array();
+        $valuesAry = [];
         $values = substr($data, (strpos($data, "\n") + 1));
         $insertAry = explode('INSERT', $values);
         foreach ($insertAry as $value) {
@@ -56,7 +56,7 @@ class Sql
             }
             $valuesAry = array_merge($valuesAry, explode($eol, $value));
         }
-        $valAry = array();
+        $valAry = [];
 
         foreach ($valuesAry as $value) {
             if (substr($value, 0, 1) == '(') {
@@ -69,11 +69,11 @@ class Sql
             $valAry[] = $value;
         }
 
-        $newAry = array();
+        $newAry = [];
         $j = 1;
 
         foreach ($valAry as $val) {
-            $ary = array();
+            $ary = [];
 
             for ($i = 0; $i < count($fieldsAry); $i++) {
                 if (substr($val, 0, 1) == "'") {
@@ -122,7 +122,7 @@ class Sql
      */
     public static function encode($data, $table = null, $idQuote = null, $divide = 100)
     {
-        $fields = array();
+        $fields = [];
         foreach ($data as $ary) {
             $fields = array_keys((array)$ary);
         }

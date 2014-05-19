@@ -16,7 +16,7 @@
 namespace Pop\Data\Type;
 
 /**
- * JSON data type class
+ * Data type interface
  *
  * @category   Pop
  * @package    Pop_Data
@@ -25,7 +25,7 @@ namespace Pop\Data\Type;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Json implements TypeInterface
+interface TypeInterface
 {
 
     /**
@@ -34,10 +34,7 @@ class Json implements TypeInterface
      * @param  string $data
      * @return mixed
      */
-    public static function decode($data)
-    {
-        return json_decode($data);
-    }
+    public static function decode($data);
 
     /**
      * Encode the data into its native format.
@@ -45,9 +42,6 @@ class Json implements TypeInterface
      * @param  mixed  $data
      * @return string
      */
-    public static function encode($data)
-    {
-        return json_encode($data);
-    }
+    public static function encode($data);
 
 }

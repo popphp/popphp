@@ -25,7 +25,7 @@ namespace Pop\Data\Type;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Yaml
+class Yaml implements TypeInterface
 {
 
     /**
@@ -40,12 +40,12 @@ class Yaml
         $yaml = substr($data, (strpos($data, $eol) + strlen($eol)));
         $yamlAry = explode($eol, $yaml);
 
-        $nodes = array();
+        $nodes = [];
         $i = 1;
 
         foreach ($yamlAry as $value) {
             $objs = explode("\n", trim($value));
-            $ob = array();
+            $ob = [];
             foreach ($objs as $v) {
                 $vAry = explode(':', $v);
                 $val = trim($vAry[1]);

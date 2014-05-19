@@ -15,8 +15,6 @@
  */
 namespace Pop\Data\Type;
 
-use Pop\Paginator\Paginator;
-
 /**
  * Html data type class
  *
@@ -27,46 +25,78 @@ use Pop\Paginator\Paginator;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Html
+class Html implements TypeInterface
 {
+
+    /**
+     * Decode the data into PHP.
+     *
+     * @param  string  $data
+     * @param  boolean $preserve
+     * @return mixed
+     */
+    public static function decode($data, $preserve = false)
+    {
+        $nodes = [];
+
+        if ($preserve) {
+            $matches = [];
+            preg_match_all('/<!\[cdata\[(.*?)\]\]>/is', $data, $matches);
+
+            foreach ($matches[0] as $match) {
+                $strip = str_replace(
+                    ['<![CDATA[', ']]>', '<', '>'],
+                    ['', '', '&lt;', '&gt;'],
+                    $match
+                );
+                $data = str_replace($match, $strip, $data);
+            }
+
+            $nodes = json_decode(json_encode((array) simplexml_load_string($data)), true);
+        } else {
+            $xml = new \SimpleXMLElement($data);
+            $i = 1;
+
+            foreach ($xml as $key => $node) {
+                $objs = [];
+                foreach ($node as $k => $v) {
+                    $j = 1;
+                    if (array_key_exists((string)$k, $objs)) {
+                        while (array_key_exists($k . '_' . $j, $objs)) {
+                            $j++;
+                        }
+                        $newKey = (string)$k . '_' . $j;
+                    } else {
+                        $newKey = (string)$k;
+                    }
+                    $objs[$newKey] = trim((string)$v);
+                }
+                $nodes[$key . '_' . $i] = $objs;
+                $i++;
+            }
+        }
+
+        return $nodes;
+    }
 
     /**
      * Encode the data into its native format.
      *
      * @param  mixed  $data
      * @param  array  $options
-     * @param  int    $perPage
-     * @param  int    $range
-     * @param  int    $total
      * @return string
      */
-    public static function encode($data, array $options = null, $perPage = 0, $range = 10, $total = null)
+    public static function encode($data, array $options = null)
     {
         $output  = '';
-        $header  = '';
-        $row     = '';
-        $footer  = '';
-        $sep     = (isset($options['separator'])) ? $options['separator'] : ' | ';
         $indent  = (isset($options['indent'])) ? $options['indent'] : '    ';
         $date    = (isset($options['date'])) ? $options['date'] : 'M j, Y';
-        $exclude = (isset($options['exclude'])) ? $options['exclude'] : array();
+        $exclude = (isset($options['exclude'])) ? $options['exclude'] : [];
         $process = null;
         $submit  = null;
 
         if (!is_array($exclude)) {
-            $exclude = array($exclude);
-        }
-
-        if (isset($options['form']) && is_array($options['form'])) {
-            $process = (isset($options['form']['process'])) ? $options['form']['process'] : null;
-            $submit = (isset($options['form']['submit'])) ? $options['form']['submit'] : null;
-            $output .= $indent . '<form';
-            foreach ($options['form'] as $attrib => $value) {
-                if (($attrib != 'process') && ($attrib != 'submit')) {
-                    $output .= ' ' . $attrib . '="' . $value . '"';
-                }
-            }
-            $output .= '>' . PHP_EOL;
+            $exclude = [$exclude];
         }
 
         $output .= $indent . '    <table';
@@ -84,8 +114,8 @@ class Html
             $tempAry = array_keys((array)$ary);
         }
 
-        $headerAry = array();
-        $headerKeysAry = array();
+        $headerAry = [];
+        $headerKeysAry = [];
         foreach ($tempAry as $value) {
             if (!in_array($value, $exclude)) {
                 $headerKeysAry[] = $value;
@@ -96,32 +126,17 @@ class Html
                 }
             }
         }
-        if (isset($options['form'])) {
-            if (isset($options['table']) && isset($options['table']['headers']) && is_array($options['table']['headers']) && isset($options['table']['headers']['process'])) {
-                $headerAry[] = $options['table']['headers']['process'];
-                $headerKeysAry[] = 'process';
-            } else {
-                $headerAry[] = ((null !== $submit) && is_array($submit) && isset($submit['value'])) ? $submit['value'] : '&nbsp;';
-                $headerKeysAry[] = 'process';
-            }
-        }
 
         // Set header output.
-        $output .= $indent . '        <tr><th class="first-th">' . implode('</th><th>', $headerAry) . '</th></tr>' . PHP_EOL;
+        $output .= $indent . '        <tr><th>' . implode('</th><th>', $headerAry) . '</th></tr>' . PHP_EOL;
         $pos = strrpos($output, '<th') + 3;
-        $output = substr($output, 0, $pos) . ' class="last-th"' . substr($output, $pos);
+        $output = substr($output, 0, $pos) . substr($output, $pos);
 
-        // Set header and row templates
-        $header = $indent . '<div class="page-links">[{page_links}]</div>' . PHP_EOL . $output;
-        $row = $indent . '        <tr><td class="first-td">[{' . implode('}]</td><td>[{', $headerKeysAry) . '}]</td></tr>' . PHP_EOL;
-        $pos = strrpos($row, '<td') + 3;
-        $row = substr($row, 0, $pos) . ' class="last-td"' . substr($row, $pos);
-
-        $rowValuesAry = array();
+        $rowValuesAry = [];
         // Initialize and clean the field values.
         $i = 1;
         foreach ($data as $value) {
-            $rowAry = array();
+            $rowAry = [];
             foreach ($value as $key => $val) {
                 if (!in_array($key, $exclude)) {
                     if ((strtotime((string)$val) !== false) && ((stripos($key, 'date') !== false) || (stripos($key, 'time') !== false))) {
@@ -144,23 +159,6 @@ class Html
                     $rowAry[] = $v;
                 }
             }
-            if (isset($options['form'])) {
-                if (null !== $process) {
-                    $tmpl = str_replace('[{i}]', $i, $process);
-                    foreach ($value as $ky => $vl) {
-                        $tmpl = str_replace('[{' . $ky . '}]', $vl, $tmpl);
-                    }
-                    if (isset($exclude['process'])) {
-                        $keys = array_keys($exclude['process']);
-                        if (isset($keys[0]) && ($exclude['process'][$keys[0]] == $value[$keys[0]])) {
-                            $tmpl = '&nbsp;';
-                        }
-                    }
-                } else {
-                    $tmpl = '&nbsp;';
-                }
-                $rowAry[] = $tmpl;
-            }
             $i++;
 
             foreach ($rowAry as $k => $r) {
@@ -171,47 +169,12 @@ class Html
             $rowValuesAry[] = $rowAry;
 
             // Set field output.
-            $output .= $indent . '        <tr><td class="first-td">' . implode('</td><td>', $rowAry) . '</td></tr>' . PHP_EOL;
+            $output .= $indent . '        <tr><td>' . implode('</td><td>', $rowAry) . '</td></tr>' . PHP_EOL;
             $pos = strrpos($output, '<td') + 3;
-            $output = substr($output, 0, $pos) . ' class="last-td"' . substr($output, $pos);
+            $output = substr($output, 0, $pos) . substr($output, $pos);
         }
 
-        if (isset($options['form'])) {
-            if ((null !== $submit) && is_array($submit)) {
-                $submitBtn = '<input type="submit" name="submit"';
-                if (!isset($submit['id'])) {
-                    $submitBtn .= ' id="submit"';
-                }
-                foreach ($submit as $attrib => $value) {
-                    $submitBtn .= ' ' . $attrib . '="' . $value . '"';
-                }
-                $submitBtn .= ' />';
-            } else {
-                $submitBtn = '<input type="submit" name="submit" id="submit" value="Submit" />';
-            }
-
-            $output .= $indent . '        <tr class="table-bottom-row"><td colspan="' . count($headerAry) . '" class="table-bottom-row">' . $submitBtn . '</td></tr>' . PHP_EOL;
-            $output .= $indent . '    </table>' . PHP_EOL;
-            $output .= $indent . '</form>' . PHP_EOL;
-
-            $footer = $indent . '        <tr class="table-bottom-row"><td colspan="' . count($headerAry) . '" class="table-bottom-row">' . $submitBtn . '<div class="page-links">[{page_links}]</div></td></tr>' . PHP_EOL;
-            $footer .= $indent . '    </table>' . PHP_EOL;
-            $footer .= $indent . '</form>' . PHP_EOL;
-        } else {
-            $output .= $indent . '    </table>' . PHP_EOL;
-            $footer = $indent . '    </table>' . PHP_EOL;
-            $footer .= $indent . '<div class="page-links">[{page_links}]</div>' . PHP_EOL;
-        }
-
-        if ($perPage > 0) {
-            $pages = new Paginator($rowValuesAry, $perPage, $range, $total);
-            $pages->setHeader($header)
-                  ->setRowTemplate($row)
-                  ->setFooter($footer)
-                  ->setSeparator($sep);
-
-            $output = (string)$pages;
-        }
+        $output .= $indent . '    </table>' . PHP_EOL;
 
         return $output;
     }

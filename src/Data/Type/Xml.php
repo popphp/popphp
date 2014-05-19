@@ -25,7 +25,7 @@ namespace Pop\Data\Type;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Xml
+class Xml implements TypeInterface
 {
 
     /**
@@ -37,16 +37,16 @@ class Xml
      */
     public static function decode($data, $preserve = false)
     {
-        $nodes = array();
+        $nodes = [];
 
         if ($preserve) {
-            $matches = array();
+            $matches = [];
             preg_match_all('/<!\[cdata\[(.*?)\]\]>/is', $data, $matches);
 
             foreach ($matches[0] as $match) {
                 $strip = str_replace(
-                    array('<![CDATA[', ']]>', '<', '>'),
-                    array('', '', '&lt;', '&gt;'),
+                    ['<![CDATA[', ']]>', '<', '>'],
+                    ['', '', '&lt;', '&gt;'],
                     $match
                 );
                 $data = str_replace($match, $strip, $data);
@@ -58,7 +58,7 @@ class Xml
             $i = 1;
 
             foreach ($xml as $key => $node) {
-                $objs = array();
+                $objs = [];
                 foreach ($node as $k => $v) {
                     $j = 1;
                     if (array_key_exists((string)$k, $objs)) {
