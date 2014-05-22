@@ -79,30 +79,30 @@ class Select extends AbstractSql
     /**
      * Set the JOIN clause
      *
-     * @param  mixed  $tableToJoin
+     * @param  mixed  $foreignTable
      * @param  mixed  $foreignColumn
-     * @param  mixed  $nativeColumn
+     * @param  mixed  $localColumn
      * @param  string $typeOfJoin
      * @return \Pop\Db\Sql\Select
      */
-    public function join($tableToJoin, $foreignColumn, $nativeColumn = null, $typeOfJoin = 'LEFT JOIN')
+    public function join($foreignTable, $foreignColumn, $localColumn = null, $typeOfJoin = 'LEFT JOIN')
     {
         $join = (in_array(strtoupper($typeOfJoin), self::$allowedJoins)) ? strtoupper($typeOfJoin) : 'LEFT JOIN';
 
-        if (null !== $nativeColumn) {
-            $col1 = $this->sql->quoteId($nativeColumn);
+        if (null !== $localColumn) {
+            $col1 = $this->sql->quoteId($localColumn);
             $col2 = $this->sql->quoteId($foreignColumn);
             $cols = array($col1, $col2);
         } else {
             $cols = $this->sql->quoteId($foreignColumn);
         }
 
-        if ($tableToJoin instanceof \Pop\Db\Sql) {
-            $subSelectAlias = ($tableToJoin->hasAlias()) ? $tableToJoin->getAlias() : $tableToJoin->getTable();
-            $table = '(' . $tableToJoin . ') AS ' . $this->sql->quoteId($subSelectAlias);
+        if ($foreignTable instanceof \Pop\Db\Sql) {
+            $subSelectAlias = ($foreignTable->hasAlias()) ? $foreignTable->getAlias() : $foreignTable->getTable();
+            $table = '(' . $foreignTable . ') AS ' . $this->sql->quoteId($subSelectAlias);
         } else {
             $subSelectAlias = null;
-            $table = $this->sql->quoteId($tableToJoin);
+            $table = $this->sql->quoteId($foreignTable);
         }
 
         $this->joins[] = array(
