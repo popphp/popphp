@@ -108,7 +108,6 @@ class Version
                 ],
                 'curl' => (function_exists('curl_init')),
                 'db'   => [
-                    'mysql'  => (function_exists('mysql_connect')),
                     'mysqli' => (class_exists('mysqli', false)),
                     'oracle' => (function_exists('oci_connect')),
                     'pdo'    => [

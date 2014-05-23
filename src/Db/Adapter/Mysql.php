@@ -16,7 +16,7 @@
 namespace Pop\Db\Adapter;
 
 /**
- * MySQLi Db adapter class
+ * Mysql Db adapter class
  *
  * @category   Pop
  * @package    Pop_Db
@@ -25,17 +25,17 @@ namespace Pop\Db\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Mysqli extends AbstractAdapter
+class Mysql extends AbstractAdapter
 {
 
     /**
      * Constructor
      *
-     * Instantiate the MySQLi database connection object.
+     * Instantiate the Mysql database connection object using mysqli
      *
      * @param  array $options
      * @throws \Pop\Db\Adapter\Exception
-     * @return \Pop\Db\Adapter\Mysqli
+     * @return \Pop\Db\Adapter\Mysql
      */
     public function __construct(array $options)
     {
@@ -65,7 +65,7 @@ class Mysqli extends AbstractAdapter
      * Prepare a SQL query.
      *
      * @param  string $sql
-     * @return \Pop\Db\Adapter\Mysqli
+     * @return \Pop\Db\Adapter\Mysql
      */
     public function prepare($sql)
     {
@@ -79,7 +79,7 @@ class Mysqli extends AbstractAdapter
      * Bind parameters to a prepared SQL query.
      *
      * @param  array  $params
-     * @return \Pop\Db\Adapter\Mysqli
+     * @return \Pop\Db\Adapter\Mysql
      */
     public function bindParams($params)
     {

@@ -60,6 +60,10 @@ class Db
             throw new Exception('Error: That database adapter class does not exist.');
         }
 
+        if (!isset($options['host'])) {
+            $options['host'] = 'localhost';
+        }
+
         $this->adapter = new $class($options);
     }
 

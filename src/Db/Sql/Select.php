@@ -79,37 +79,34 @@ class Select extends AbstractSql
     /**
      * Set the JOIN clause
      *
-     * @param  mixed  $foreignTable
-     * @param  mixed  $foreignColumn
-     * @param  mixed  $localColumn
+     * @param  mixed  $foreignTables
+     * @param  array  $columns
      * @param  string $typeOfJoin
      * @return \Pop\Db\Sql\Select
      */
-    public function join($foreignTable, $foreignColumn, $localColumn = null, $typeOfJoin = 'LEFT JOIN')
+    public function join($foreignTables, array $columns, $typeOfJoin = 'LEFT JOIN')
     {
         $join = (in_array(strtoupper($typeOfJoin), self::$allowedJoins)) ? strtoupper($typeOfJoin) : 'LEFT JOIN';
 
-        if (null !== $localColumn) {
-            $col1 = $this->sql->quoteId($localColumn);
-            $col2 = $this->sql->quoteId($foreignColumn);
-            $cols = array($col1, $col2);
+        if ($foreignTables instanceof \Pop\Db\Sql) {
+            $subSelectAlias = ($foreignTables->hasAlias()) ? $foreignTables->getAlias() : $foreignTables->getTable();
+            $table = '(' . $foreignTables . ') AS ' . $this->sql->quoteId($subSelectAlias);
         } else {
-            $cols = $this->sql->quoteId($foreignColumn);
-        }
-
-        if ($foreignTable instanceof \Pop\Db\Sql) {
-            $subSelectAlias = ($foreignTable->hasAlias()) ? $foreignTable->getAlias() : $foreignTable->getTable();
-            $table = '(' . $foreignTable . ') AS ' . $this->sql->quoteId($subSelectAlias);
-        } else {
-            $subSelectAlias = null;
-            $table = $this->sql->quoteId($foreignTable);
+            if (is_array($foreignTables)) {
+                $tables = [];
+                foreach ($foreignTables as $foreignTable) {
+                    $tables[] = $this->sql->quoteId($foreignTable);
+                }
+                $table = implode(', ', $tables);
+            } else {
+                $table = $this->sql->quoteId($foreignTables);
+            }
         }
 
         $this->joins[] = array(
-            'tableToJoin'  => $table,
-            'commonColumn' => $cols,
-            'typeOfJoin'   => $join,
-            'alias'        => $subSelectAlias
+            'foreignTables' => $table,
+            'columns'       => $columns,
+            'typeOfJoin'    => $join
         );
 
         return $this;
@@ -270,20 +267,30 @@ class Select extends AbstractSql
         // Build any JOIN clauses
         if (count($this->joins) > 0) {
             foreach ($this->joins as $join) {
-                if (is_array($join['commonColumn'])) {
-                    $col1 = $join['commonColumn'][0];
-                    $col2 = $join['commonColumn'][1];
+                $cols = [];
+                foreach ($join['columns'] as $col1 => $col2) {
+                    if (is_array($col2)) {
+                        foreach ($col2 as $c) {
+                            $cols[] = ((strpos($col1, '.') !== false) ? $this->sql->quoteId($col1) : $col1) . ' = ' .
+                                ((strpos($c, '.') !== false) ? $this->sql->quoteId($c) : $c);
+                        }
+                    } else {
+                        $cols[] = ((strpos($col1, '.') !== false) ? $this->sql->quoteId($col1) : $col1) . ' = ' .
+                            ((strpos($col2, '.') !== false) ? $this->sql->quoteId($col2) : $col2);
+                    }
+                }
+
+                $foreignTables = [];
+                if (is_array($join['foreignTables'])) {
+                    foreach ($join['foreignTables'] as $foreignTable) {
+                        $foreignTables[] = (string)$foreignTable;
+                    }
                 } else {
-                    $col1 = $join['commonColumn'];
-                    $col2 = $join['commonColumn'];
+                    $foreignTables[] = (string)$join['foreignTables'];
                 }
-                if (strpos($col1, '.') === false) {
-                    $col1 = $this->sql->quoteId($this->sql->getTable()) . '.' . $col1;
-                }
-                $sql .= ' ' . $join['typeOfJoin'] . ' ' .
-                    $join['tableToJoin'] . ' ON ' .
-                    $col1 . ' = ' .
-                        (isset($join['alias']) ? $this->sql->quoteId($join['alias']) : $join['tableToJoin']) . '.' . $col2;
+
+                $sql .= ' ' . $join['typeOfJoin'] . ' (' .
+                    implode(', ', $foreignTables) . ') ON (' . implode(' AND ', $cols) . ')';
             }
         }
 
