@@ -22,7 +22,7 @@ COMPONENTS
  - Geo [DONE]
  - Graph
  - Http [DONE]
- - I18n [DONE]
+ - I18n [DONE - work on format classes]
  - Image
  - Log
  - Mail
