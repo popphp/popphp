@@ -15,14 +15,14 @@ COMPONENTS
  - Event [DONE]
  - Feed
  - File [DONE]
- - Filter
+ - Filter [DONE]
  - Font
  - Form
  - Ftp [DONE]
  - Geo [DONE]
  - Graph
  - Http [DONE]
- - I18n
+ - I18n [DONE]
  - Image
  - Log
  - Mail

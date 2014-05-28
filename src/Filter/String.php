@@ -29,81 +29,54 @@ class String
 {
 
     /**
-     * Constant for alpha-numeric + special characters
-     * @var int
-     */
-    const ALL = 1;
-
-    /**
-     * Constant for alpha-numeric
-     * @var int
-     */
-    const ALPHANUM = 2;
-
-    /**
-     * Constant for alpha
-     * @var int
-     */
-    const ALPHA = 3;
-
-    /**
-     * Constant for mixed case
-     * @var int
-     */
-    const MIXED = 4;
-
-    /**
-     * Constant for lower case only
-     * @var int
-     */
-    const LOWER = 5;
-
-    /**
-     * Constant for upper case only
-     * @var int
-     */
-    const UPPER = 6;
-
-    /**
      * Method to generate a random alphanumeric string of a predefined length.
      *
-     * @param  int  $length
-     * @param  int  $type
-     * @param  int  $case
+     * @param  int   $length
+     * @param  array $options
      * @return string
      */
-    public static function random($length, $type = String::ALL, $case = String::MIXED)
+    public static function random($length, array $options = [])
     {
-        $str = null;
+        $type = null; // 'alpha', 'alphanum'
+        $case = null; // 'lower', 'upper
 
-        $chars = array(
+        if (isset($options['type'])) {
+            $type = strtolower($options['type']);
+        }
+
+        if (isset($options['case'])) {
+            $case = strtolower($options['case']);
+        }
+
+        $chars = [
             0 => str_split('abcdefghjkmnpqrstuvwxyz'),
             1 => str_split('ABCDEFGHJKLMNPQRSTUVWXYZ'),
             2 => str_split('23456789'),
             3 => str_split('!#$%&()*+-,.:;=?@[]^_{|}')
-        );
-
-        $indices = array(0, 1, 2, 3);
+        ];
 
         switch ($type) {
-            case self::ALPHANUM:
-                $indices = array(0, 1, 2);
+            case 'alpha':
+                $indices = [0, 1];
                 break;
-            case self::ALPHA:
-                $indices = array(0, 1);
+            case 'alphanum':
+                $indices = [0, 1, 2];
                 break;
+            default:
+                $indices = [0, 1, 2, 3];
         }
 
         switch ($case) {
-            case self::LOWER:
+            case 'lower':
                 unset($indices[1]);
                 break;
-            case self::UPPER:
+            case 'upper':
                 unset($indices[0]);
                 break;
         }
 
         $indices = array_values($indices);
+        $str     = '';
 
         for ($i = 0; $i < $length; $i++) {
             $index = $indices[rand(0, (count($indices) - 1))];
@@ -130,59 +103,6 @@ class String
         $string = substr($string, $startPos);
         $string = (strpos($string, $end) !== false)
             ? substr($string, 0, (strpos($string, $end))) : $string;
-
-        return $string;
-    }
-
-    /**
-     * Method to simulate escaping a string for DB entry, much like
-     * mysql_real_escape_string(), but without requiring a DB connection.
-     *
-     * The parameter $all is boolean flag that, when set to true, causes the
-     * '%' and '_' characters to be escaped as well.
-     *
-     * @param  string $string
-     * @param  boolean $all
-     * @return string
-     */
-    public static function escape($string, $all = false)
-    {
-        $search = array('\\', "\n", "\r", "\x00", "\x1a", '\'', '"');
-        $replace = array('\\\\', "\\n", "\\r", "\\x00", "\\x1a", '\\\'', '\\"');
-
-        $str = str_replace($search, $replace, $string);
-
-        if ($all) {
-            $str = str_replace('%', '\%', $str);
-            $str = str_replace('_', '\_', $str);
-        }
-
-        return $str;
-    }
-
-    /**
-     * Method to clean the string of any of the standard MS Word based
-     * characters and return the newly edited string
-     *
-     * @param  string $string
-     * @param  boolean $html
-     * @return string
-     */
-    public static function clean($string, $html = false)
-    {
-        if ($html) {
-            $apos = "&#39;";
-            $quot = "&#34;";
-        } else {
-            $apos = "'";
-            $quot = '"';
-        }
-
-        $string = str_replace(chr(146), $apos, $string);
-        $string = str_replace(chr(147), $quot, $string);
-        $string = str_replace(chr(148), $quot, $string);
-        $string = str_replace(chr(150), "&#150;", $string);
-        $string = str_replace(chr(133), "...", $string);
 
         return $string;
     }
@@ -221,7 +141,7 @@ class String
         if (strlen($string) > 0) {
             if (null !== $sep) {
                 $strAry = explode($sep, $string);
-                $tmpStrAry = array();
+                $tmpStrAry = [];
 
                 foreach ($strAry as $value) {
                     $str = strtolower($value);
@@ -266,18 +186,18 @@ class String
         $string = preg_replace('/\s[\w]+[a-zA-Z0-9\.\-\_]+(\.[a-zA-Z]{2,4})/', ' <a href="http://$0">$0</a>', $string);
         $string = preg_replace('/[a-zA-Z0-9\.\-\_+%]+@[a-zA-Z0-9\-\_\.]+\.[a-zA-Z]{2,4}/', '<a href="mailto:$0">$0</a>', $string);
         $string = str_replace(
-            array(
+            [
                 'href="http:// ',
                 'href="https:// ',
                 '"> ',
                 '<a '
-            ),
-            array(
+            ],
+            [
                 'href="http://',
                 'href="https://',
                 '">',
                 '<a ' . $target
-            ),
+            ],
             $string
         );
 

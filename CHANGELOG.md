@@ -3,7 +3,7 @@ Pop PHP Framework Changelog
 
 2.0.0a
 ------
-As of May 17, 2014
+As of May 27, 2014
 
 * PHP 5.4+ Only
 * Composer Support
@@ -22,8 +22,13 @@ As of May 17, 2014
     - File
         + Completely stripped down to only the upload and checkDuplicate static methods
         + Trimmed Dir class, removed references to old File class
+    - Filter
+        + Removed unused functionality from Filter\String
+    - I18n
+        + Added support for JSON language files
 * Removed
     - Compress
     - Db\Adapter\Mysql
+    - Filter\Search
     - Loader
     - Project

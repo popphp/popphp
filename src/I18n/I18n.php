@@ -29,6 +29,12 @@ class I18n
 {
 
     /**
+     * Directory with language files in it
+     * @var string
+     */
+    protected $directory = null;
+
+    /**
      * Default system language
      * @var string
      */
@@ -44,10 +50,10 @@ class I18n
      * Language content
      * @var array
      */
-    protected $content = array(
-        'source' => array(),
-        'output' => array()
-    );
+    protected $content = [
+        'source' => [],
+        'output' => []
+    ];
 
     /**
      * Constructor
@@ -55,35 +61,28 @@ class I18n
      * Instantiate the I18n object.
      *
      * @param  string $lang
+     * @param  string $dir
      * @return \Pop\I18n\I18n
      */
-    public function __construct($lang = null)
+    public function __construct($lang = null, $dir = null)
     {
         if (null === $lang) {
             $lang = (defined('POP_LANG')) ? POP_LANG : 'en_US';
         }
 
         if (strpos($lang, '_') !== false) {
-            $ary  = explode('_', $lang);
+            $ary = explode('_', $lang);
             $this->language = $ary[0];
-            $this->locale = $ary[1];
+            $this->locale   = $ary[1];
         } else {
             $this->language = $lang;
-            $this->locale = strtoupper($lang);
+            $this->locale   = strtoupper($lang);
         }
 
-        $this->loadCurrentLanguage();
-    }
+        $this->directory = ((null !== $dir) && file_exists($dir)) ? realpath($dir) . DIRECTORY_SEPARATOR
+            : __DIR__ . DIRECTORY_SEPARATOR . 'Data' . DIRECTORY_SEPARATOR;
 
-    /**
-     * Static method to load the I18n object.
-     *
-     * @param  string $lang
-     * @return \Pop\I18n\I18n
-     */
-    public static function factory($lang = null)
-    {
-        return new self($lang);
+        $this->loadCurrentLanguage();
     }
 
     /**
@@ -115,9 +114,10 @@ class I18n
      */
     public function loadFile($langFile)
     {
-        if (file_exists($langFile)) {
+        // If an XML file
+        if (file_exists($langFile) && (stripos($langFile, '.xml') !== false)) {
             if (($xml =@ new \SimpleXMLElement($langFile, LIBXML_NOWARNING, true)) !== false) {
-                $key = 0;
+                $key    = 0;
                 $length = count($xml->locale);
 
                 // Find the locale node key
@@ -139,8 +139,30 @@ class I18n
             } else {
                 throw new Exception('Error: There was an error processing that XML file.');
             }
+        // Else if a JSON file
+        } else if (file_exists($langFile) && (stripos($langFile, '.json') !== false)) {
+            $json = json_decode(file_get_contents($langFile), true);
+
+            $key    = 0;
+            $length = count($json['language']['locale']);
+
+            // Find the locale node key
+            for ($i = 0; $i < $length; $i++) {
+                if ($this->locale == $json['language']['locale'][$i]['region']) {
+                    $key = $i;
+                }
+            }
+
+            if ($this->locale == $json['language']['locale'][$key]['region']) {
+                foreach ($json['language']['locale'][$key]['text'] as $text) {
+                    if (isset($text['source']) && isset($text['output'])) {
+                        $this->content['source'][] = (string)$text['source'];
+                        $this->content['output'][] = (string)$text['output'];
+                    }
+                }
+            }
         } else {
-            throw new Exception('Error: The language file ' . $langFile . ' does not exist.');
+            throw new Exception('Error: The language file ' . $langFile . ' does not exist or is not valid.');
         }
     }
 
@@ -149,7 +171,7 @@ class I18n
      *
      * @param  string $str
      * @param  string|array $params
-     * @return $str
+     * @return string
      */
     public function __($str, $params = null)
     {
@@ -174,19 +196,18 @@ class I18n
      * @param  string $dir
      * @return array
      */
-    public static function getLanguages($dir = null)
+    public static function getLanguages($dir)
     {
-        $langsAry = array();
-        $langDirectory = (null !== $dir) ? $dir : __DIR__ . '/Data';
+        $langsAry      = [];
+        $langDirectory = $dir;
 
         if (file_exists($langDirectory)) {
-            $langDir = new \Pop\File\Dir($langDirectory);
-            $files = $langDir->getFiles();
+            $files = scandir($langDirectory);
             foreach ($files as $file) {
-                if ($file != '__.xml') {
-                    if (($xml =@ new \SimpleXMLElement($langDirectory . '/' . $file, LIBXML_NOWARNING, true)) !== false) {
-                        $lang = (string)$xml->attributes()->output;
-                        $langName = (string)$xml->attributes()->name;
+                if (stripos($file, '.xml')) {
+                    if (($xml =@ new \SimpleXMLElement($langDirectory . DIRECTORY_SEPARATOR . $file, LIBXML_NOWARNING, true)) !== false) {
+                        $lang       = (string)$xml->attributes()->output;
+                        $langName   = (string)$xml->attributes()->name;
                         $langNative = (string)$xml->attributes()->native;
 
                         foreach ($xml->locale as $locale) {
@@ -196,6 +217,19 @@ class I18n
                             $native .= ' (' . $langName . ', ' . $name . ')';
                             $langsAry[$lang . '_' . $region] = $langNative . ', ' . $native;
                         }
+                    }
+                } else if (stripos($file, '.json')) {
+                    $json = json_decode(file_get_contents($langDirectory . DIRECTORY_SEPARATOR . $file), true);
+                    $lang       = $json['language']['output'];
+                    $langName   = $json['language']['name'];
+                    $langNative = $json['language']['native'];
+
+                    foreach ($json['language']['locale'] as $locale) {
+                        $region = $locale['region'];
+                        $name   = $locale['name'];
+                        $native = $locale['native'];
+                        $native .= ' (' . $langName . ', ' . $name . ')';
+                        $langsAry[$lang . '_' . $region] = $langNative . ', ' . $native;
                     }
                 }
             }
@@ -209,26 +243,26 @@ class I18n
      * Create an XML language file from an array of data.
      * The format of the parameters should be as follows:
      *
-     * $lang = array(
+     * $lang = [
      *     'src'    => 'en',
      *     'output' => 'de',
      *     'name'   => 'German',
      *     'native' => 'Deutsch'
-     * );
+     * ];
      *
-     * $locales = array(
-     *     array(
+     * $locales = [
+     *     [
      *         'region' => 'DE',
      *         'name'   => 'Germany',
      *         'native' => 'Deutschland',
-     *         'text' => array(
-     *             array(
+     *         'text' => [
+     *             [
      *                 'source' => 'This field is required.',
      *                 'output' => 'Dieses Feld ist erforderlich.'
-     *             ), ...
-     *         )
-     *     ), ...
-     * );
+     *             ], ...
+     *         ]
+     *     ], ...
+     * ];
      *
      * @param  array  $lang
      * @param  array  $locales
@@ -236,7 +270,7 @@ class I18n
      * @throws Exception
      * @return void
      */
-    public static function createXmlFile(array $lang, array $locales, $file)
+    public static function createLanguageFile(array $lang, array $locales, $file)
     {
         // Validate the $lang parameter
         if (!isset($lang['src']) || !isset($lang['output'])) {
@@ -257,47 +291,54 @@ class I18n
         }
 
         // Get the XML file header
-        $xmlHeader = file_get_contents(__DIR__ . '/Data/__.xml');
-        $xmlHeader = substr($xmlHeader, 0, (strpos($xmlHeader, 'native="">') + 10));
-        $xmlHeader = str_replace(
-            array('src="en"', 'output=""'),
-            array('src="' . $lang['src'] . '"', 'output="' . $lang['output'] . '"'),
-            $xmlHeader
-        );
+        if (stripos($file, '.xml') !== false) {
+            $xmlHeader = file_get_contents(__DIR__ . '/Data/__.xml');
+            $xmlHeader = substr($xmlHeader, 0, (strpos($xmlHeader, 'native="">') + 10));
+            $xmlHeader = str_replace(
+                ['src=""', 'output=""'],
+                ['src="' . $lang['src'] . '"', 'output="' . $lang['output'] . '"'],
+                $xmlHeader
+            );
 
-        if (isset($lang['name'])) {
-            $xmlHeader = str_replace('name=""', 'name="' . $lang['name'] . '"', $xmlHeader);
-        }
-
-        if (isset($lang['native'])) {
-            $xmlHeader = str_replace('native=""', 'native="' . $lang['native'] . '"', $xmlHeader);
-        }
-
-        // Format the Locales
-        $xmlLocales = null;
-
-        foreach ($locales as $locale) {
-            $name = (isset($locale['name'])) ? $locale['name'] : null;
-            $native = (isset($locale['native'])) ? $locale['native'] : null;
-            $xmlLocales .= '    <locale region="' . $locale['region'] . '" name="' . $name . '" native="' . $native . '">' . PHP_EOL;
-            foreach ($locale['text'] as $text) {
-                if (!isset($text['source']) || !isset($text['output'])) {
-                    throw new Exception("Error: The 'source' and 'output' keys must be defined in each 'text' array.");
-                }
-                $xmlLocales .= '        <text>' . PHP_EOL;
-                $xmlLocales .= '            <source>' . $text['source'] . '</source>' . PHP_EOL;
-                $xmlLocales .= '            <output>' . $text['output'] . '</output>' . PHP_EOL;
-                $xmlLocales .= '        </text>' . PHP_EOL;
+            if (isset($lang['name'])) {
+                $xmlHeader = str_replace('name=""', 'name="' . $lang['name'] . '"', $xmlHeader);
             }
-            $xmlLocales .= '    </locale>' . PHP_EOL;
-        }
 
-        // Save XML file
-        file_put_contents($file, $xmlHeader . PHP_EOL . $xmlLocales . '</language>');
+            if (isset($lang['native'])) {
+                $xmlHeader = str_replace('native=""', 'native="' . $lang['native'] . '"', $xmlHeader);
+            }
+
+            // Format the Locales
+            $xmlLocales = null;
+
+            foreach ($locales as $locale) {
+                $name = (isset($locale['name'])) ? $locale['name'] : null;
+                $native = (isset($locale['native'])) ? $locale['native'] : null;
+                $xmlLocales .= '    <locale region="' . $locale['region'] . '" name="' . $name . '" native="' . $native . '">' . PHP_EOL;
+                foreach ($locale['text'] as $text) {
+                    if (!isset($text['source']) || !isset($text['output'])) {
+                        throw new Exception("Error: The 'source' and 'output' keys must be defined in each 'text' array.");
+                    }
+                    $xmlLocales .= '        <text>' . PHP_EOL;
+                    $xmlLocales .= '            <source>' . $text['source'] . '</source>' . PHP_EOL;
+                    $xmlLocales .= '            <output>' . $text['output'] . '</output>' . PHP_EOL;
+                    $xmlLocales .= '        </text>' . PHP_EOL;
+                }
+                $xmlLocales .= '    </locale>' . PHP_EOL;
+            }
+
+            // Save XML file
+            file_put_contents($file, $xmlHeader . PHP_EOL . $xmlLocales . '</language>');
+        } else if (stripos($file, '.json') !== false) {
+            $lang['locale'] = $locales;
+
+            // Save JSON file
+            file_put_contents($file, json_encode(['language' => $lang], JSON_PRETTY_PRINT));
+        }
     }
 
     /**
-     * Create an XML document fragment from a source file and an output file,
+     * Create an language file fragment from a source file and an output file,
      * each entry separated by a new line
      *
      * @param  string $source
@@ -306,7 +347,7 @@ class I18n
      * @throws Exception
      * @return void
      */
-    public static function createXmlFromText($source, $output, $target = null)
+    public static function createFromText($source, $output, $target = null)
     {
         if (!file_exists($source)) {
             throw new Exception('Error: The source file does not exist.');
@@ -334,16 +375,23 @@ class I18n
             $lang = substr($output, 0, strpos($output, '.'));
         }
 
-        $xml = null;
+        $xml  = null;
+        $json = '            "text"   : [' . PHP_EOL;
 
         foreach ($outputLines as $key => $value) {
             if (!empty($value) && !empty($sourceLines[$key])) {
                 $xml .= '        <text>' . PHP_EOL . '            <source>' . $sourceLines[$key] . '</source>' . PHP_EOL .
                     '            <output>' . $value . '</output>' . PHP_EOL .
                     '        </text>' . PHP_EOL;
+
+                $json .= '                {' . PHP_EOL . '                    "source" : "' . $sourceLines[$key] . '",' . PHP_EOL .
+                    '                    "output" : "' . $value . '"' . PHP_EOL . '                },' . PHP_EOL;
             }
         }
 
+        $json .= '            ]' . PHP_EOL;
+
+        file_put_contents($targetDir . DIRECTORY_SEPARATOR . $lang . '.json', $json);
         file_put_contents($targetDir . DIRECTORY_SEPARATOR . $lang . '.xml', $xml);
     }
 
@@ -352,11 +400,11 @@ class I18n
      *
      * @param  string $str
      * @param  string|array $params
-     * @return mixed
+     * @return string
      */
     protected function translate($str, $params = null)
     {
-        $key = array_search($str, $this->content['source']);
+        $key   = array_search($str, $this->content['source']);
         $trans = ($key !== false) ? $this->content['output'][$key] : $str;
 
         if (null !== $params) {
@@ -379,7 +427,11 @@ class I18n
      */
     protected function loadCurrentLanguage()
     {
-        $this->loadFile(__DIR__ . '/Data/' . $this->language . '.xml');
+        if (file_exists($this->directory . $this->language . '.xml')) {
+            $this->loadFile($this->directory . $this->language . '.xml');
+        } else if (file_exists($this->directory . $this->language . '.json')) {
+            $this->loadFile($this->directory . $this->language . '.json');
+        }
     }
 
 }

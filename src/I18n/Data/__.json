@@ -1,0 +1,19 @@
+{
+    "language"  : {
+        "src"    : "",
+        "output" : "",
+        "name"   : "",
+        "native" : "",
+        "locale" : [{
+            "region" : "",
+            "name"   : "",
+            "native" : "",
+            "text"   : [
+                {
+                    "source" : "",
+                    "output" : ""
+                }
+            ]
+        }]
+    }
+}
