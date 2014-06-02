@@ -32,59 +32,59 @@ class Sql
      * Constant for MYSQL database type
      * @var int
      */
-    const MYSQL = 1;
+    const MYSQL = 'MYSQL';
 
     /**
      * Constant for Oracle database type
      * @var int
      */
-    const ORACLE = 2;
+    const ORACLE = 'ORACLE';
 
     /**
      * Constant for PGSQL database type
      * @var int
      */
-    const PGSQL = 3;
+    const PGSQL = 'PGSQL';
 
     /**
      * Constant for SQLITE database type
      * @var int
      */
-    const SQLITE = 4;
+    const SQLITE = 'SQLITE';
 
     /**
      * Constant for SQLSRV database type
      * @var int
      */
-    const SQLSRV = 5;
+    const SQLSRV = 'SQLSRV';
 
     /**
      * Constant for backtick quote id type
      * @var int
      */
-    const BACKTICK = 6;
+    const BACKTICK = 'BACKTICK';
 
     /**
      * Constant for bracket quote id type
-     * @var int
+     * @var string
      */
-    const BRACKET = 7;
+    const BRACKET = 'BRACKET';
 
     /**
      * Constant for double quote id type
-     * @var int
+     * @var string
      */
-    const DOUBLE_QUOTE = 8;
+    const DOUBLE_QUOTE = 'DOUBLE_QUOTE';
 
     /**
      * Constant for double quote id type
-     * @var int
+     * @var string
      */
-    const NO_QUOTE = 0;
+    const NO_QUOTE = 'NO_QUOTE';
 
     /**
      * Database object
-     * @var \Pop\Db\Db
+     * @var \Pop\Db\Adapter\AdapterInterface
      */
     protected $db = null;
 
@@ -96,9 +96,9 @@ class Sql
 
     /**
      * ID quote type
-     * @var int
+     * @var string
      */
-    protected $quoteIdType = 0;
+    protected $quoteIdType = 'NO_QUOTE';
 
     /**
      * Current table
@@ -114,7 +114,7 @@ class Sql
 
     /**
      * SQL clause object
-     * @var mixed
+     * @var \Pop\Db\Sql\AbstractSql
      */
     protected $clause = null;
 
@@ -129,12 +129,12 @@ class Sql
      *
      * Instantiate the SQL object.
      *
-     * @param  \Pop\Db\Db $db
-     * @param  mixed      $table
-     * @param  string     $alias
+     * @param  \Pop\Db\Adapter\AdapterInterface $db
+     * @param  mixed                            $table
+     * @param  string                           $alias
      * @return \Pop\Db\Sql
      */
-    public function __construct(Db $db, $table = null, $alias = null)
+    public function __construct(Adapter\AdapterInterface $db, $table = null, $alias = null)
     {
         $this->setDb($db);
         $this->setTable($table);
@@ -142,45 +142,30 @@ class Sql
     }
 
     /**
-     * Static method to instantiate the SQL object and return itself
-     * to facilitate chaining methods together.
+     * Set the database adapter object
      *
-     * @param  \Pop\Db\Db $db
-     * @param  mixed      $table
-     * @param  string     $alias
+     * @param  \Pop\Db\Adapter\AdapterInterface $db
      * @return \Pop\Db\Sql
      */
-    public static function factory(Db $db, $table = null, $alias = null)
-    {
-        return new self($db, $table, $alias);
-    }
-
-    /**
-     * Set the database object
-     *
-     * @param  \Pop\Db\Db $db
-     * @return \Pop\Db\Sql
-     */
-    public function setDb(Db $db)
+    public function setDb(Adapter\AdapterInterface $db)
     {
         $this->db = $db;
-
-        $adapter = strtolower($this->db->getAdapterType());
+        $adapter  = strtolower(get_class($db));
 
         if (strpos($adapter, 'mysql') !== false) {
-            $this->dbType = self::MYSQL;
+            $this->dbType      = self::MYSQL;
             $this->quoteIdType = self::BACKTICK;
         } else if (strpos($adapter, 'oracle') !== false) {
-            $this->dbType = self::ORACLE;
+            $this->dbType      = self::ORACLE;
             $this->quoteIdType = self::DOUBLE_QUOTE;
         } else if (strpos($adapter, 'pgsql') !== false) {
-            $this->dbType = self::PGSQL;
+            $this->dbType      = self::PGSQL;
             $this->quoteIdType = self::DOUBLE_QUOTE;
         } else if (strpos($adapter, 'sqlite') !== false) {
-            $this->dbType = self::SQLITE;
+            $this->dbType      = self::SQLITE;
             $this->quoteIdType = self::DOUBLE_QUOTE;
         } else if (strpos($adapter, 'sqlsrv') !== false) {
-            $this->dbType = self::SQLSRV;
+            $this->dbType      = self::SQLSRV;
             $this->quoteIdType = self::BRACKET;
         }
 
@@ -190,12 +175,12 @@ class Sql
     /**
      * Set the quote ID type
      *
-     * @param  int $type
+     * @param  string $type
      * @return \Pop\Db\Sql
      */
     public function setQuoteId($type = \Pop\Db\Sql::NO_QUOTE)
     {
-        $this->quoteIdType = (int)$type;
+        $this->quoteIdType = $type;
         return $this;
     }
 
@@ -244,9 +229,9 @@ class Sql
     }
 
     /**
-     * Get the current database object.
+     * Get the current database adapter object.
      *
-     * @return \Pop\Db\Db
+     * @return \Pop\Db\Adapter\AdapterInterface
      */
     public function getDb()
     {
@@ -254,13 +239,13 @@ class Sql
     }
 
     /**
-     * Get the current database object's adapter.
+     * Get the current database adapter object (alias method.)
      *
-     * @return \Pop\Db\Adapter\AbstractAdapter
+     * @return \Pop\Db\Adapter\AdapterInterface
      */
-    public function adapter()
+    public function db()
     {
-        return $this->db->adapter();
+        return $this->db;
     }
 
     /**
@@ -316,41 +301,41 @@ class Sql
     /**
      * Quote the value with the quoted identifier
      *
-     * @param  string $id
+     * @param  string $value
      * @return string
      */
-    public function quoteId($id)
+    public function quoteId($value)
     {
-        $quotedId = null;
-        $startQuote = null;
-        $endQuote = null;
+        $quotedValue = null;
+        $startQuote  = null;
+        $endQuote    = null;
 
         switch ($this->quoteIdType) {
             case self::BACKTICK:
                 $startQuote = '`';
-                $endQuote = '`';
+                $endQuote   = '`';
                 break;
             case self::BRACKET:
                 $startQuote = '[';
-                $endQuote = ']';
+                $endQuote   = ']';
                 break;
             case self::DOUBLE_QUOTE:
                 $startQuote = '"';
-                $endQuote = '"';
+                $endQuote   = '"';
                 break;
         }
 
-        if (strpos($id, '.') !== false) {
-            $idAry = explode('.', $id);
-            foreach ($idAry as $key => $value) {
-                $idAry[$key] = $startQuote . $value . $endQuote;
+        if (strpos($value, '.') !== false) {
+            $valueAry = explode('.', $value);
+            foreach ($valueAry as $key => $val) {
+                $valueAry[$key] = $startQuote . $val . $endQuote;
             }
-            $quotedId = implode('.', $idAry);
+            $quotedValue = implode('.', $valueAry);
         } else {
-            $quotedId = $startQuote . $id . $endQuote;
+            $quotedValue = $startQuote . $value . $endQuote;
         }
 
-        return $quotedId;
+        return $quotedValue;
     }
 
     /**
@@ -361,8 +346,9 @@ class Sql
      */
     public function quote($value)
     {
-        if (($value != '?') && (substr($value, 0, 1) != ':') && (preg_match('/^\$\d*\d$/', $value) == 0) && (!is_int($value)) && (!is_float($value))) {
-            $value = "'" . $this->db->adapter()->escape($value) . "'";
+        if (($value != '?') && (substr($value, 0, 1) != ':') &&
+            (preg_match('/^\$\d*\d$/', $value) == 0) && (!is_int($value)) && (!is_float($value))) {
+            $value = "'" . $this->db->escape($value) . "'";
         }
         return $value;
     }

@@ -103,11 +103,11 @@ class Select extends AbstractSql
             }
         }
 
-        $this->joins[] = array(
+        $this->joins[] = [
             'foreignTables' => $table,
             'columns'       => $columns,
             'typeOfJoin'    => $join
-        );
+        ];
 
         return $this;
     }

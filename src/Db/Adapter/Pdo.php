@@ -63,6 +63,11 @@ class Pdo extends AbstractAdapter
      */
     public function __construct(array $options)
     {
+        // Default to localhost
+        if (!isset($options['host'])) {
+            $options['host'] = 'localhost';
+        }
+
         if (!isset($options['type']) || !isset($options['database'])) {
             throw new Exception('Error: The proper database credentials were not passed.');
         }
@@ -315,7 +320,7 @@ class Pdo extends AbstractAdapter
      * @throws Exception
      * @return int
      */
-    public function numRows()
+    public function numberOfRows()
     {
         if (!isset($this->result)) {
             throw new Exception('Error: The database result resource is not currently set.');
@@ -330,7 +335,7 @@ class Pdo extends AbstractAdapter
      * @throws Exception
      * @return int
      */
-    public function numFields()
+    public function numberOfFields()
     {
         if (!isset($this->result)) {
             throw new Exception('Error: The database result resource is not currently set.');
@@ -381,7 +386,7 @@ class Pdo extends AbstractAdapter
             if (stripos($this->dsn, 'pgsql') !== false) {
                 $sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'";
             } else if (stripos($this->dsn, 'sqlsrv') !== false) {
-                $sql = "SELECT name FROM " . $this->database . "..sysobjects WHERE xtype = 'U'";
+                $sql = "SELECT name FROM " . $this->database . ".sysobjects WHERE xtype = 'U'";
             } else {
                 $sql = 'SHOW TABLES';
             }

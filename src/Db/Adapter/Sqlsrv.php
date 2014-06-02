@@ -51,18 +51,23 @@ class Sqlsrv extends AbstractAdapter
      */
     public function __construct(array $options)
     {
+        // Default to localhost
+        if (!isset($options['host'])) {
+            $options['host'] = 'localhost';
+        }
+
         if (!isset($options['database']) || !isset($options['host']) || !isset($options['username']) || !isset($options['password'])) {
             throw new Exception('Error: The proper database credentials were not passed.');
         }
 
         $this->connection = sqlsrv_connect(
             $options['host'],
-            array(
+            [
                 'Database'             => $options['database'],
                 'UID'                  => $options['username'],
                 'PWD'                  => $options['password'],
                 'ReturnDatesAsStrings' => (isset($options['ReturnDatesAsStrings'])) ? $options['ReturnDatesAsStrings'] : true
-            )
+            ]
         );
 
         if ($this->connection == false) {
@@ -109,9 +114,9 @@ class Sqlsrv extends AbstractAdapter
      */
     public function bindParams($params, $options = null)
     {
-        $bindParams = array();
+        $bindParams = [];
         foreach ($params as $dbColumnName => $dbColumnValue) {
-            $dbColumnValueAry = (!is_array($dbColumnValue)) ? array($dbColumnValue) : $dbColumnValue;
+            $dbColumnValueAry = (!is_array($dbColumnValue)) ? [$dbColumnValue] : $dbColumnValue;
             $i = 1;
             foreach ($dbColumnValueAry as $dbColumnValueAryValue) {
                 ${$dbColumnName . $i} = $dbColumnValueAryValue;
@@ -151,7 +156,7 @@ class Sqlsrv extends AbstractAdapter
      */
     public function fetchResult()
     {
-        $rows = array();
+        $rows = [];
 
         while (($row = $this->fetch()) != false) {
             $rows[] = $row;
@@ -215,8 +220,8 @@ class Sqlsrv extends AbstractAdapter
      */
     public function escape($value)
     {
-        $search = array('\\', "\n", "\r", "\x00", "\x1a", '\'', '"');
-        $replace = array('\\\\', "\\n", "\\r", "\\x00", "\\x1a", '\\\'', '\\"');
+        $search = ['\\', "\n", "\r", "\x00", "\x1a", '\'', '"'];
+        $replace = ['\\\\', "\\n", "\\r", "\\x00", "\\x1a", '\\\'', '\\"'];
 
         return str_replace($search, $replace, $value);
     }
@@ -240,7 +245,7 @@ class Sqlsrv extends AbstractAdapter
      * @throws \Pop\Db\Adapter\Exception
      * @return int
      */
-    public function numRows()
+    public function numberOfRows()
     {
         if (isset($this->statement)) {
             return sqlsrv_num_rows($this->statement);
@@ -257,7 +262,7 @@ class Sqlsrv extends AbstractAdapter
      * @throws \Pop\Db\Adapter\Exception
      * @return int
      */
-    public function numFields()
+    public function numberOfFields()
     {
         if (isset($this->statement)) {
             return sqlsrv_num_fields($this->statement);
@@ -298,9 +303,9 @@ class Sqlsrv extends AbstractAdapter
      */
     protected function loadTables()
     {
-        $tables = array();
+        $tables = [];
 
-        $this->query("SELECT name FROM " . $this->database . "..sysobjects WHERE xtype = 'U'");
+        $this->query("SELECT name FROM " . $this->database . ".sysobjects WHERE xtype = 'U'");
         while (($row = $this->fetch()) != false) {
             foreach($row as $value) {
                 $tables[] = $value;

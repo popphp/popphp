@@ -201,7 +201,7 @@ class Sqlite extends AbstractAdapter
      *
      * @return int
      */
-    public function numRows()
+    public function numberOfRows()
     {
         if (null === $this->lastSql) {
             return $this->connection->changes();
@@ -224,7 +224,7 @@ class Sqlite extends AbstractAdapter
      * @throws \Pop\Db\Adapter\Exception
      * @return int
      */
-    public function numFields()
+    public function numberOfFields()
     {
         if (!isset($this->result)) {
             throw new Exception('Error: The database result resource is not currently set.');

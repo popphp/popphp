@@ -36,12 +36,12 @@ class Insert extends AbstractSql
     public function render()
     {
         // Start building the INSERT statement
-        $sql = 'INSERT INTO ' . $this->sql->quoteId($this->sql->getTable()) . ' ';
+        $sql     = 'INSERT INTO ' . $this->sql->quoteId($this->sql->getTable()) . ' ';
         $columns = [];
-        $values = [];
+        $values  = [];
 
         $paramCount = 1;
-        $dbType = $this->sql->getDbType();
+        $dbType     = $this->sql->getDbType();
 
         foreach ($this->columns as $column => $value) {
             $colValue = (strpos($column, '.') !== false) ?
@@ -59,7 +59,7 @@ class Insert extends AbstractSql
                 }
             }
             $columns[] = $this->sql->quoteId($column);
-            $values[] = (null === $value) ? 'NULL' : $this->sql->quote($value);
+            $values[]  = (null === $value) ? 'NULL' : $this->sql->quote($value);
         }
 
         $sql .= '(' . implode(', ', $columns) . ') VALUES ';

@@ -39,6 +39,11 @@ class Mysql extends AbstractAdapter
      */
     public function __construct(array $options)
     {
+        // Default to localhost
+        if (!isset($options['host'])) {
+            $options['host'] = 'localhost';
+        }
+
         if (!isset($options['database']) || !isset($options['host']) || !isset($options['username']) || !isset($options['password'])) {
             throw new Exception('Error: The proper database credentials were not passed.');
         }
@@ -130,7 +135,7 @@ class Mysql extends AbstractAdapter
             foreach ($metaData->fetch_fields() as $col) {
                 ${$col->name} = null;
                 $bindParams[] = &${$col->name};
-                $params[] = $col->name;
+                $params[]     = $col->name;
             }
 
             call_user_func_array([$this->statement, 'bind_result'], $bindParams);
@@ -221,7 +226,7 @@ class Mysql extends AbstractAdapter
      * @throws \Pop\Db\Adapter\Exception
      * @return int
      */
-    public function numRows()
+    public function numberOfRows()
     {
         if (isset($this->statement)) {
             $this->statement->store_result();
@@ -239,7 +244,7 @@ class Mysql extends AbstractAdapter
      * @throws \Pop\Db\Adapter\Exception
      * @return int
      */
-    public function numFields()
+    public function numberOfFields()
     {
         if (isset($this->statement)) {
             $this->statement->store_result();

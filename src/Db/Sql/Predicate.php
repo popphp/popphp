@@ -354,10 +354,6 @@ class Predicate
     {
         $where = null;
 
-        // Build any nested predicates
-        //if (null !== $this->nested) {
-        //    $where = '(' . $this->nested . ')';
-        //}
         if (count($this->nested) > 0) {
             $where = '(' . implode(') AND (', $this->nested) . ')';
         }

@@ -39,6 +39,11 @@ class Oracle extends AbstractAdapter
      */
     public function __construct(array $options)
     {
+        // Default to localhost
+        if (!isset($options['host'])) {
+            $options['host'] = 'localhost';
+        }
+
         if (!isset($options['database']) || !isset($options['host']) || !isset($options['username']) || !isset($options['password'])) {
             throw new Exception('Error: The proper database credentials were not passed.');
         }
@@ -188,7 +193,7 @@ class Oracle extends AbstractAdapter
      * @throws \Pop\Db\Adapter\Exception
      * @return int
      */
-    public function numRows()
+    public function numberOfRows()
     {
         if (isset($this->statement)) {
             return oci_num_rows($this->statement);
@@ -203,7 +208,7 @@ class Oracle extends AbstractAdapter
      * @throws \Pop\Db\Adapter\Exception
      * @return int
      */
-    public function numFields()
+    public function numberOfFields()
     {
         if (isset($this->statement)) {
             return oci_num_fields($this->statement);
