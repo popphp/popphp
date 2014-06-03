@@ -125,6 +125,12 @@ class Sql
     protected $sql = null;
 
     /**
+     * SQL placeholder
+     * @var string
+     */
+    protected $placeholder = '?';
+
+    /**
      * Constructor
      *
      * Instantiate the SQL object.
@@ -155,18 +161,27 @@ class Sql
         if (strpos($adapter, 'mysql') !== false) {
             $this->dbType      = self::MYSQL;
             $this->quoteIdType = self::BACKTICK;
+            $this->placeholder = '?';
         } else if (strpos($adapter, 'oracle') !== false) {
             $this->dbType      = self::ORACLE;
             $this->quoteIdType = self::DOUBLE_QUOTE;
+            $this->placeholder = '?';
         } else if (strpos($adapter, 'pgsql') !== false) {
             $this->dbType      = self::PGSQL;
             $this->quoteIdType = self::DOUBLE_QUOTE;
+            $this->placeholder = '$';
         } else if (strpos($adapter, 'sqlite') !== false) {
             $this->dbType      = self::SQLITE;
             $this->quoteIdType = self::DOUBLE_QUOTE;
+            $this->placeholder = ':';
         } else if (strpos($adapter, 'sqlsrv') !== false) {
             $this->dbType      = self::SQLSRV;
             $this->quoteIdType = self::BRACKET;
+            $this->placeholder = '?';
+        }
+
+        if ($this->db->isPdo()) {
+            $this->placeholder = ':';
         }
 
         return $this;
@@ -296,6 +311,16 @@ class Sql
     public function getSql()
     {
         return $this->sql;
+    }
+
+    /**
+     * Get the SQL placeholder.
+     *
+     * @return string
+     */
+    public function getPlaceholder()
+    {
+        return $this->placeholder;
     }
 
     /**
