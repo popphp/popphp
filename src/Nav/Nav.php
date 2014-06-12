@@ -375,7 +375,12 @@ class Nav
         // Create overriding top level parent, if set
         if (($depth == 1) && isset($this->config['top'])) {
             $parent = (isset($this->config['top']) && isset($this->config['top']['node'])) ? $this->config['top']['node'] : 'ul';
-            $child = (isset($this->config['child']) && isset($this->config['child']['node'])) ? $this->config['child']['node'] : 'li';
+            $child  = null;
+            if (isset($this->config['child']) && isset($this->config['child']['node'])) {
+                $child = $this->config['child']['node'];
+            } else if ($parent == 'ul') {
+                $child = 'li';
+            }
 
             // Create parent node
             $nav = new Child($parent);
@@ -395,7 +400,12 @@ class Nav
         } else {
             // Set up parent/child node names
             $parent = (isset($this->config['parent']) && isset($this->config['parent']['node'])) ? $this->config['parent']['node'] : 'ul';
-            $child = (isset($this->config['child']) && isset($this->config['child']['node'])) ? $this->config['child']['node'] : 'li';
+            $child  = null;
+            if (isset($this->config['child']) && isset($this->config['child']['node'])) {
+                $child = $this->config['child']['node'];
+            } else if ($parent == 'ul') {
+                $child = 'li';
+            }
 
             // Create parent node
             $nav = new Child($parent);
@@ -476,54 +486,58 @@ class Nav
                     $a->setAttributes('class', $linkClass);
                 }
 
-                $navChild = new Child($child);
+                if (null !== $child) {
+                    $navChild = new Child($child);
 
-                // Set child attributes if they exist
-                if (isset($this->config['child']) && isset($this->config['child']['id'])) {
-                    $navChild->setAttributes('id', $this->config['child']['id'] . '-' . $this->childLevel);
-                }
-                if (isset($this->config['child']) && isset($this->config['child']['class'])) {
-                    $navChild->setAttributes('class', $this->config['child']['class'] . '-' . ($depth - 1));
-                }
-                if (isset($this->config['child']['attributes'])) {
-                    foreach ($this->config['child']['attributes'] as $attrib => $value) {
-                        $navChild->setAttributes($attrib, $value);
+                    // Set child attributes if they exist
+                    if (isset($this->config['child']) && isset($this->config['child']['id'])) {
+                        $navChild->setAttributes('id', $this->config['child']['id'] . '-' . $this->childLevel);
                     }
-                }
-
-                // Add link node
-                $navChild->addChild($a);
-                $this->childLevel++;
-
-                // If there are children, loop through and add them
-                if (isset($node['children']) && is_array($node['children']) && (count($node['children']) > 0)) {
-                    $childrenAllowed = true;
-                    // Check if the children are allowed
-                    if (isset($node['acl'])) {
-                        $i = 0;
-                        foreach ($node['children'] as $nodeChild) {
-                            if (null === $this->acl) {
-                                throw new Exception('The access control object is not set.');
-                            }
-                            if (null === $this->role) {
-                                throw new Exception('The current role is not set.');
-                            }
-                            $resource = (isset($nodeChild['acl']['resource'])) ? $nodeChild['acl']['resource'] : null;
-                            $permission = (isset($nodeChild['acl']['permission'])) ? $nodeChild['acl']['permission'] : null;
-                            if (!($this->acl->isAllowed($this->role, $resource, $permission))) {
-                                $i++;
-                            }
-                        }
-                        if ($i == count($node['children'])) {
-                            $childrenAllowed = false;
+                    if (isset($this->config['child']) && isset($this->config['child']['class'])) {
+                        $navChild->setAttributes('class', $this->config['child']['class'] . '-' . ($depth - 1));
+                    }
+                    if (isset($this->config['child']['attributes'])) {
+                        foreach ($this->config['child']['attributes'] as $attrib => $value) {
+                            $navChild->setAttributes($attrib, $value);
                         }
                     }
-                    if ($childrenAllowed) {
-                        $navChild->addChild($this->traverse($node['children'], $depth, $href));
+
+                    // Add link node
+                    $navChild->addChild($a);
+                    $this->childLevel++;
+
+                    // If there are children, loop through and add them
+                    if (isset($node['children']) && is_array($node['children']) && (count($node['children']) > 0)) {
+                        $childrenAllowed = true;
+                        // Check if the children are allowed
+                        if (isset($node['acl'])) {
+                            $i = 0;
+                            foreach ($node['children'] as $nodeChild) {
+                                if (null === $this->acl) {
+                                    throw new Exception('The access control object is not set.');
+                                }
+                                if (null === $this->role) {
+                                    throw new Exception('The current role is not set.');
+                                }
+                                $resource = (isset($nodeChild['acl']['resource'])) ? $nodeChild['acl']['resource'] : null;
+                                $permission = (isset($nodeChild['acl']['permission'])) ? $nodeChild['acl']['permission'] : null;
+                                if (!($this->acl->isAllowed($this->role, $resource, $permission))) {
+                                    $i++;
+                                }
+                            }
+                            if ($i == count($node['children'])) {
+                                $childrenAllowed = false;
+                            }
+                        }
+                        if ($childrenAllowed) {
+                            $navChild->addChild($this->traverse($node['children'], $depth, $href));
+                        }
                     }
+                    // Add child node
+                    $nav->addChild($navChild);
+                } else {
+                    $nav->addChild($a);
                 }
-                // Add child node
-                $nav->addChild($navChild);
             }
         }
 
