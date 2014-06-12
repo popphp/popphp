@@ -37,10 +37,14 @@ class Delete extends AbstractSql
     /**
      * Set the WHERE clause
      *
+     * @param  Predicate $where
      * @return \Pop\Db\Sql\Predicate
      */
-    public function where()
+    public function where($where = null)
     {
+        if (null !== $where) {
+            $this->where = $where;
+        }
         if (null === $this->where) {
             $this->where = new Predicate($this->sql);
         }

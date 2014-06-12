@@ -126,12 +126,15 @@ class Select extends AbstractSql
     /**
      * Set the WHERE clause
      *
-     * @param  boolean $reset
+     * @param  Predicate $where
      * @return \Pop\Db\Sql\Predicate
      */
-    public function where($reset = false)
+    public function where($where = null)
     {
-        if ((null === $this->where) || ($reset)) {
+        if (null !== $where) {
+            $this->where = $where;
+        }
+        if (null === $this->where) {
             $this->where = new Predicate($this->sql);
         }
 

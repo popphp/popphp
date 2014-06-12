@@ -84,6 +84,26 @@ class Gateway
     }
 
     /**
+     * Get the SQL object (alias method)
+     *
+     * @return \Pop\Db\Sql
+     */
+    public function sql()
+    {
+        return $this->sql;
+    }
+
+    /**
+     * Get the table name
+     *
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->sql->getTable();
+    }
+
+    /**
      * Get the columns
      *
      * @return array

@@ -35,6 +35,12 @@ class Gateway
     protected $sql = null;
 
     /**
+     * Result rows
+     * @var array
+     */
+    protected $rows = [];
+
+    /**
      * Constructor
      *
      * Instantiate the Row\Gateway object.
@@ -62,12 +68,66 @@ class Gateway
     }
 
     /**
+     * Get the SQL object (alias method)
+     *
+     * @return \Pop\Db\Sql
+     */
+    public function sql()
+    {
+        return $this->sql;
+    }
+
+    /**
+     * Get the table name
+     *
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->sql->getTable();
+    }
+
+    /**
+     * Get the number of result rows
+     *
+     * @return int
+     */
+    public function getNumberOfRows()
+    {
+        return count($this->rows);
+    }
+
+    /**
+     * Get the result rows
+     *
+     * @return array
+     */
+    public function getRows()
+    {
+        return $this->rows;
+    }
+
+    /**
+     * Get the result rows (alias method)
+     *
+     * @return \Pop\Db\Sql
+     */
+    public function rows()
+    {
+        return $this->rows;
+    }
+
+    /**
      * Select rows from the table
      *
+     * @param  mixed $set
+     * @param  mixed $where
      * @return \Pop\Db\Table\Gateway
      */
-    public function select()
+    public function select($set = null, $where = null)
     {
+        $this->sql->select($set)->where($where);
+        echo $this->sql;
         return $this;
     }
 
