@@ -29,6 +29,12 @@ class Gateway
 {
 
     /**
+     * Table
+     * @var string
+     */
+    protected $table = null;
+
+    /**
      * Primary keys
      * @var array
      */
@@ -59,16 +65,17 @@ class Gateway
      *
      * @param  \Pop\Db\Sql $sql
      * @param  mixed       $keys
+     * @param  string      $table
      * @throws Exception
      * @return \Pop\Db\Row\Gateway
      */
-    public function __construct(\Pop\Db\Sql $sql, $keys = null)
+    public function __construct(\Pop\Db\Sql $sql, $keys = null, $table = null)
     {
-        if (null === $sql->getTable()) {
-            throw new Exception('Error: The SQL object must have a table name set in it.');
-        }
         if (null !== $keys) {
             $this->setPrimaryKeys($keys);
+        }
+        if (null !== $table) {
+            $this->table = $table;
         }
         $this->sql = $sql;
     }
@@ -100,7 +107,7 @@ class Gateway
      */
     public function getTable()
     {
-        return $this->sql->getTable();
+        return $this->table;
     }
 
     /**
@@ -111,6 +118,18 @@ class Gateway
     public function getColumns()
     {
         return $this->columns;
+    }
+
+    /**
+     * Set the table
+     *
+     * @param  string $table
+     * @return \Pop\Db\Row\Gateway
+     */
+    public function setTable($table)
+    {
+        $this->table = $table;
+        return $this;
     }
 
     /**
@@ -156,7 +175,11 @@ class Gateway
             throw new Exception('Error: The number of primary key(s) and primary value(s) do not match.');
         }
 
-        $this->sql->select();
+        if (null === $this->table) {
+            throw new Exception('Error: The table has not been set');
+        }
+
+        $this->sql->from($this->table)->select();
         $params = [];
 
         foreach ($this->primaryKeys as $i => $primaryKey) {
@@ -167,8 +190,8 @@ class Gateway
             } else if ($placeholder == '$') {
                 $placeholder .= ($i + 1);
             }
-            $this->sql->select()->where()->equalTo($primaryKey, $placeholder);
-            $params[$primaryKey] = $this->primaryValues[$i];
+            $this->sql->select()->where->equalTo($primaryKey, $placeholder);
+            $params[] = $this->primaryValues[$i];
         }
 
         $this->sql->select()->limit(1);
@@ -187,10 +210,15 @@ class Gateway
     /**
      * Save (insert new or update existing) row in the table
      *
+     * @throws Exception
      * @return \Pop\Db\Row\Gateway
      */
     public function save()
     {
+        if (null === $this->table) {
+            throw new Exception('Error: The table has not been set');
+        }
+
         $columns = [];
         $params  = [];
 
@@ -207,12 +235,12 @@ class Gateway
                         $placeholder .= ($i + 1);
                     }
                     $columns[$column] = $placeholder;
-                    $params[$column]  = $value;
+                    $params[]         = $value;
                     $i++;
                 }
             }
 
-            $this->sql->update($columns);
+            $this->sql->from($this->table)->update($columns);
 
             foreach ($this->primaryKeys as $key => $primaryKey) {
                 $placeholder = $this->sql->getPlaceholder();
@@ -222,8 +250,8 @@ class Gateway
                 } else if ($placeholder == '$') {
                     $placeholder .= $i;
                 }
-                $this->sql->update()->where()->equalTo($primaryKey, $placeholder);
-                $params[$primaryKey] = $this->primaryValues[$key];
+                $this->sql->update()->where->equalTo($primaryKey, $placeholder);
+                $params[] = $this->primaryValues[$key];
                 $i++;
             }
 
@@ -242,10 +270,10 @@ class Gateway
                     $placeholder .= $i;
                 }
                 $columns[$column] = $placeholder;
-                $params[$column]  = $value;
+                $params[]         = $value;
                 $i++;
             }
-            $this->sql->insert($columns);
+            $this->sql->from($this->table)->insert($columns);
 
             $this->sql->db()->prepare((string)$this->sql)
                             ->bindParams($params)
@@ -275,7 +303,11 @@ class Gateway
             throw new Exception('Error: The number of primary key(s) and primary value(s) do not match.');
         }
 
-        $this->sql->delete();
+        if (null === $this->table) {
+            throw new Exception('Error: The table has not been set');
+        }
+
+        $this->sql->from($this->table)->delete();
         $params = [];
 
         foreach ($this->primaryKeys as $i => $primaryKey) {
@@ -286,8 +318,8 @@ class Gateway
             } else if ($placeholder == '$') {
                 $placeholder .= ($i + 1);
             }
-            $this->sql->delete()->where()->equalTo($primaryKey, $placeholder);
-            $params[$primaryKey] = $this->primaryValues[$i];
+            $this->sql->delete()->where->equalTo($primaryKey, $placeholder);
+            $params[] = $this->primaryValues[$i];
         }
 
         $this->sql->delete()->limit(1);

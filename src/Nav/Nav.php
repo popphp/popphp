@@ -34,23 +34,23 @@ class Nav
      * Nav tree
      * @var array
      */
-    protected $tree = array();
+    protected $tree = [];
 
     /**
      * Nav config
      * @var array
      */
-    protected $config = array();
+    protected $config = [];
 
     /**
      * Acl object
-     * @var \Pop\Auth\Acl
+     * @var \Pop\Acl\Acl
      */
     protected $acl = null;
 
     /**
      * Role object
-     * @var \Pop\Auth\Role
+     * @var \Pop\Acl\Role
      */
     protected $role = null;
 
@@ -94,19 +94,6 @@ class Nav
     }
 
     /**
-     * Static method to instantiate the nav object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  array $tree
-     * @param  array $config
-     * @return self
-     */
-    public static function factory(array $tree = null, array $config = array())
-    {
-        return new self($tree, $config);
-    }
-
-    /**
      * Set the return false flag
      *
      * @param  boolean $return
@@ -126,7 +113,7 @@ class Nav
      */
     public function setTree(array $tree = null)
     {
-        $this->tree = (null !== $tree) ? $tree : array();
+        $this->tree = (null !== $tree) ? $tree : [];
         return $this;
     }
 
@@ -140,7 +127,7 @@ class Nav
     public function addBranch(array $branch, $prepend = false)
     {
         if (isset($branch['name'])) {
-            $branch = array($branch);
+            $branch = [$branch];
         }
         $this->tree = ($prepend) ? array_merge($branch, $this->tree) : array_merge($this->tree, $branch);
         return $this;
@@ -159,7 +146,7 @@ class Nav
     {
         $this->tree = $this->traverseTree($this->tree, $branch, $leaf, $pos, $prepend);
         $this->parentLevel = 1;
-        $this->childLevel = 1;
+        $this->childLevel  = 1;
         return $this;
     }
 
@@ -172,14 +159,14 @@ class Nav
     public function setConfig(array $config = null)
     {
         if (null === $config) {
-            $this->config = array(
-                'parent' => array(
+            $this->config = [
+                'parent' => [
                     'node'  => 'ul'
-                ),
-                'child' => array(
+                ],
+                'child' => [
                     'node'  => 'li'
-                )
-            );
+                ]
+            ];
         } else {
             $this->config = $config;
         }
@@ -190,10 +177,10 @@ class Nav
     /**
      * Set the Acl object
      *
-     * @param  \Pop\Auth\Acl $acl
+     * @param  \Pop\Acl\Acl $acl
      * @return \Pop\Nav\Nav
      */
-    public function setAcl(\Pop\Auth\Acl $acl = null)
+    public function setAcl(\Pop\Acl\Acl $acl = null)
     {
         $this->acl = $acl;
         return $this;
@@ -202,10 +189,10 @@ class Nav
     /**
      * Set the Role object
      *
-     * @param  \Pop\Auth\Role $role
+     * @param  \Pop\Acl\Role $role
      * @return \Pop\Nav\Nav
      */
-    public function setRole(\Pop\Auth\Role $role = null)
+    public function setRole(\Pop\Acl\Role $role = null)
     {
         $this->role = $role;
         return $this;
@@ -244,7 +231,7 @@ class Nav
     /**
      * Get the Acl object
      *
-     * @return \Pop\Auth\Acl
+     * @return \Pop\Acl\Acl
      */
     public function getAcl()
     {
@@ -254,7 +241,7 @@ class Nav
     /**
      * Get the Role object
      *
-     * @return \Pop\Auth\Role
+     * @return \Pop\Acl\Role
      */
     public function getRole()
     {
@@ -282,7 +269,7 @@ class Nav
     public function rebuild()
     {
         $this->parentLevel = 1;
-        $this->childLevel = 1;
+        $this->childLevel  = 1;
         $this->nav = $this->traverse($this->tree);
         return $this;
     }
@@ -342,14 +329,14 @@ class Nav
      */
     protected function traverseTree($tree, $branch, $newLeaf, $pos = null, $prepend = false, $depth = 0)
     {
-        $t = array();
+        $t = [];
         foreach ($tree as $leaf) {
             if (((null === $pos) || ($pos == $depth)) && ($leaf['name'] == $branch)) {
                 if (isset($leaf['children'])) {
                     $leaf['children'] = ($prepend) ?
-                        array_merge(array($newLeaf), $leaf['children']) : array_merge($leaf['children'], array($newLeaf));
+                        array_merge([$newLeaf], $leaf['children']) : array_merge($leaf['children'], [$newLeaf]);
                 } else {
-                    $leaf['children'] = array($newLeaf);
+                    $leaf['children'] = [$newLeaf];
                 }
             }
             if (isset($leaf['children'])) {

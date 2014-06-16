@@ -47,6 +47,16 @@ class Predicate
     protected $nested = [];
 
     /**
+     * Allowed operators
+     * @var array
+     */
+    protected $operators = [
+        '>=', '<=', '!=', '=', '>', '<',
+        'NOT LIKE', 'LIKE', 'NOT BETWEEN', 'BETWEEN',
+        'NOT IN', 'IN', 'IS NOT NULL', 'IS NULL'
+    ];
+
+    /**
      * Constructor
      *
      * Instantiate the predicate collection object.
@@ -57,6 +67,93 @@ class Predicate
     public function __construct(\Pop\Db\Sql $sql)
     {
         $this->sql = $sql;
+    }
+
+    /**
+     * Add a predicate from a string
+     *
+     * @param  mixed $predicate
+     * @return \Pop\Db\Sql\Predicate
+     */
+    public function add($predicate)
+    {
+        $predicates = [];
+
+        // If the predicate is a string
+        if (is_string($predicate)) {
+            $predicates = [$this->parse($predicate)];
+        // If the predicate is an array of strings
+        } else if (is_array($predicate) && isset($predicate[0]) && is_string($predicate[0])) {
+            foreach ($predicate as $pred) {
+                $predicates[] = $this->parse($pred);
+            }
+        // If the predicate is an array of associative array values, i.e., [['id' => 1], ...]
+        } else if (is_array($predicate) && isset($predicate[0]) && is_array($predicate[0])) {
+            foreach ($predicate as $pred) {
+                $key = current(array_keys($pred));
+                if (is_string($key) && !is_numeric($key)) {
+                    $predicates[] = [$key, '=', $pred[$key]];
+                }
+            }
+        // If the predicate is a single associative array, i.e., ['id' => 1]
+        } else {
+            $key = current(array_keys($predicate));
+            if (is_string($key) && !is_numeric($key)) {
+                $predicates[] = [$key, '=', $predicate[$key]];
+            }
+        }
+
+        // Loop through and add the predicates
+        foreach ($predicates as $predicate) {
+            if (count($predicate) >= 2) {
+                switch ($predicate[1]) {
+                    case '>=':
+                        $this->greaterThanOrEqualTo($predicate[0], $predicate[2]);
+                        break;
+                    case '<=':
+                        $this->lessThanOrEqualTo($predicate[0], $predicate[2]);
+                        break;
+                    case '!=':
+                        $this->notEqualTo($predicate[0], $predicate[2]);
+                        break;
+                    case '=':
+                        $this->equalTo($predicate[0], $predicate[2]);
+                        break;
+                    case '>':
+                        $this->greaterThan($predicate[0], $predicate[2]);
+                        break;
+                    case '<':
+                        $this->lessThan($predicate[0], $predicate[2]);
+                        break;
+                    case 'NOT LIKE':
+                        $this->notLike($predicate[0], $predicate[2]);
+                        break;
+                    case 'LIKE':
+                        $this->like($predicate[0], $predicate[2]);
+                        break;
+                    case 'NOT BETWEEN':
+                        $this->notBetween($predicate[0], $predicate[2][0], $predicate[2][1]);
+                        break;
+                    case 'BETWEEN':
+                        $this->between($predicate[0], $predicate[2][0], $predicate[2][1]);
+                        break;
+                    case 'NOT IN':
+                        $this->notIn($predicate[0], $predicate[2]);
+                        break;
+                    case 'IN':
+                        $this->in($predicate[0], $predicate[2]);
+                        break;
+                    case 'IS NOT NULL':
+                        $this->isNotNull($predicate[0]);
+                        break;
+                    case 'IS NULL':
+                        $this->isNull($predicate[0]);
+                        break;
+                }
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -369,7 +466,7 @@ class Predicate
 
             foreach ($this->predicates as $key => $predicate) {
                 $format = $predicate['format'];
-                $curWhere = '(';
+                $curPredicate = '(';
                 for ($i = 0; $i < count($predicate['values']); $i++) {
                     if ($i == 0) {
                         $format = str_replace('%1', $this->sql->quoteId($predicate['values'][$i]), $format);
@@ -420,17 +517,91 @@ class Predicate
                         }
                     }
                 }
-                $curWhere .= $format . ')';
+                $curPredicate .= $format . ')';
 
                 if ($key == 0) {
-                    $where .= $curWhere;
+                    $where .= $curPredicate;
                 } else {
-                    $where .= ' ' . $predicate['combine'] . ' ' . $curWhere;
+                    $where .= ' ' . $predicate['combine'] . ' ' . $curPredicate;
                 }
             }
         }
 
         return $where;
+    }
+
+    /**
+     * Method to parse a predicate string
+     *
+     * @param  string $predicate
+     * @return array
+     */
+    protected function parse($predicate)
+    {
+        $pred = [];
+
+        foreach ($this->operators as $op) {
+            if (strpos($predicate, $op) !== false) {
+                if (($op == 'IS NULL') || ($op == 'IS NOT NULL')) {
+                    $value  = null;
+                    $column = trim(substr($predicate, strpos($predicate, ' ')));
+                    // Remove any quotes from the column
+                    if (((substr($column, 0, 1) == '"') && (substr($column, -1) == '"')) ||
+                        ((substr($column, 0, 1) == "'") && (substr($column, -1) == "'")) ||
+                        ((substr($column, 0, 1) == '`') && (substr($column, -1) == '`'))) {
+                        $column = substr($column, 1);
+                        $column = substr($column, 0, -1);
+                    }
+                } else {
+                    $ary    = explode($op, $predicate);
+                    $column = trim($ary[0]);
+                    $value  = trim($ary[1]);
+
+                    // Remove any quotes from the column
+                    if (((substr($column, 0, 1) == '"') && (substr($column, -1) == '"')) ||
+                        ((substr($column, 0, 1) == "'") && (substr($column, -1) == "'")) ||
+                        ((substr($column, 0, 1) == '`') && (substr($column, -1) == '`'))) {
+                        $column = substr($column, 1);
+                        $column = substr($column, 0, -1);
+                    }
+
+                    // Remove any quotes from the value
+                    if (((substr($value, 0, 1) == '"') && (substr($value, -1) == '"')) ||
+                        ((substr($value, 0, 1) == "'") && (substr($value, -1) == "'")) ||
+                        ((substr($column, 0, 1) == '`') && (substr($column, -1) == '`'))) {
+                        $value = substr($value, 1);
+                        $value = substr($value, 0, -1);
+                    // Else, create array of values if the value is a comma-separated list
+                    } else if ((substr($value, 0, 1) == '(') && (substr($value, -1) == ')') && (strpos($value, ',') !== false)) {
+                        $value = substr($value, 1);
+                        $value = substr($value, 0, -1);
+                        $value = str_replace(', ', ',', $value);
+                        $value = explode(',', $value);
+                    }
+                }
+
+                if (is_numeric($value)) {
+                    if (strpos($value, '.') !== false) {
+                        $value = (float)$value;
+                    } else {
+                        $value = (int)$value;
+                    }
+                } else if (is_array($value)) {
+                    foreach ($value as $k => $v) {
+                        if (is_numeric($v)) {
+                            if (strpos($v, '.') !== false) {
+                                $value[$k] = (float)$v;
+                            } else {
+                                $value[$k] = (int)$v;
+                            }
+                        }
+                    }
+                }
+                $pred = [$column, $op, $value];
+            }
+        }
+
+        return $pred;
     }
 
     /**

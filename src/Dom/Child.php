@@ -192,7 +192,7 @@ class Child extends AbstractDom
      * @param  boolean $ret
      * @param  int $depth
      * @param  string $indent
-     * @return void
+     * @return mixed
      */
     public function render($ret = false, $depth = 0, $indent = null)
     {

@@ -60,7 +60,7 @@ class Select extends AbstractSql
 
     /**
      * WHERE predicate object
-     * @var \Pop\Db\Sql\Predicate
+     * @var \Pop\Db\Sql\Where
      */
     protected $where = null;
 
@@ -72,7 +72,7 @@ class Select extends AbstractSql
 
     /**
      * HAVING predicate object
-     * @var \Pop\Db\Sql\Predicate
+     * @var \Pop\Db\Sql\Having
      */
     protected $having = null;
 
@@ -126,19 +126,27 @@ class Select extends AbstractSql
     /**
      * Set the WHERE clause
      *
-     * @param  Predicate $where
-     * @return \Pop\Db\Sql\Predicate
+     * @param  mixed $where
+     * @return \Pop\Db\Sql\Select
      */
     public function where($where = null)
     {
         if (null !== $where) {
-            $this->where = $where;
+            if ($where instanceof Where) {
+                $this->where = $where;
+            } else {
+                if (null === $this->where) {
+                    $this->where = (new Where($this->sql))->add($where);
+                } else {
+                    $this->where->add($where);
+                }
+            }
         }
         if (null === $this->where) {
-            $this->where = new Predicate($this->sql);
+            $this->where = new Where($this->sql);
         }
 
-        return $this->where;
+        return $this;
     }
 
     /**
@@ -175,15 +183,27 @@ class Select extends AbstractSql
     /**
      * Set the HAVING clause
      *
-     * @return \Pop\Db\Sql\Predicate
+     * @param  mixed $having
+     * @return \Pop\Db\Sql\Having
      */
-    public function having()
+    public function having($having = null)
     {
+        if (null !== $having) {
+            if ($having instanceof Having) {
+                $this->having = $having;
+            } else {
+                if (null === $this->having) {
+                    $this->having = (new Having($this->sql))->add($having);
+                } else {
+                    $this->having->add($having);
+                }
+            }
+        }
         if (null === $this->having) {
-            $this->having = new Predicate($this->sql);
+            $this->having = new Having($this->sql);
         }
 
-        return $this->having;
+        return $this;
     }
 
     /**
@@ -337,6 +357,33 @@ class Select extends AbstractSql
         }
 
         return $sql;
+    }
+
+    /**
+     * Magic method to access $where and $having properties
+     *
+     * @param  string $name
+     * @throws Exception
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        switch (strtolower($name)) {
+            case 'where':
+                if (null === $this->where) {
+                    $this->where = new Where($this->sql);
+                }
+                return $this->where;
+                break;
+            case 'having':
+                if (null === $this->having) {
+                    $this->having = new Having($this->sql);
+                }
+                return $this->having;
+                break;
+            default:
+                throw new Exception('Not a valid property for this object.');
+        }
     }
 
     /**

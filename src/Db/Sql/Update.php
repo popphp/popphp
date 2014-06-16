@@ -30,26 +30,34 @@ class Update extends AbstractSql
 
     /**
      * WHERE predicate object
-     * @var \Pop\Db\Sql\Predicate
+     * @var \Pop\Db\Sql\Where
      */
     protected $where = null;
 
     /**
      * Set the WHERE clause
      *
-     * @param  Predicate $where
-     * @return \Pop\Db\Sql\Predicate
+     * @param  mixed $where
+     * @return \Pop\Db\Sql\Update
      */
     public function where($where = null)
     {
         if (null !== $where) {
-            $this->where = $where;
+            if ($where instanceof Where) {
+                $this->where = $where;
+            } else {
+                if (null === $this->where) {
+                    $this->where = (new Where($this->sql))->add($where);
+                } else {
+                    $this->where->add($where);
+                }
+            }
         }
         if (null === $this->where) {
-            $this->where = new Predicate($this->sql);
+            $this->where = new Where($this->sql);
         }
 
-        return $this->where;
+        return $this;
     }
 
     /**
@@ -103,6 +111,27 @@ class Update extends AbstractSql
         }
 
         return $sql;
+    }
+
+    /**
+     * Magic method to access $where property
+     *
+     * @param  string $name
+     * @throws Exception
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        switch (strtolower($name)) {
+            case 'where':
+                if (null === $this->where) {
+                    $this->where = new Where($this->sql);
+                }
+                return $this->where;
+                break;
+            default:
+                throw new Exception('Not a valid property for this object.');
+        }
     }
 
 }

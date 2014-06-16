@@ -212,6 +212,30 @@ class Sql
     }
 
     /**
+     * Set current table to operate on. (alias for setTable)
+     *
+     * @param  mixed $table
+     * @return \Pop\Db\Sql
+     */
+    public function from($table = null)
+    {
+        $this->table = $table;
+        return $this;
+    }
+
+    /**
+     * Set current table to operate on. (alias for setTable)
+     *
+     * @param  mixed $table
+     * @return \Pop\Db\Sql
+     */
+    public function into($table = null)
+    {
+        $this->table = $table;
+        return $this;
+    }
+
+    /**
      * Set alias name
      *
      * @param  string $alias

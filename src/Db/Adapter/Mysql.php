@@ -145,7 +145,7 @@ class Mysql extends AbstractAdapter
                 foreach ($bindParams as $dbColumnName => $dbColumnValue) {
                     $ary[$params[$dbColumnName]] = $dbColumnValue;
                 }
-                $rows[] = $ary;
+                $rows[] = new \ArrayObject($ary, \ArrayObject::ARRAY_AS_PROPS);
             }
         }
 
@@ -195,7 +195,7 @@ class Mysql extends AbstractAdapter
                 throw new Exception('Error: The database result resource is not currently set.');
             }
 
-            return $this->result->fetch_array(MYSQLI_ASSOC);
+            return new \ArrayObject($this->result->fetch_array(MYSQLI_ASSOC), \ArrayObject::ARRAY_AS_PROPS);
         }
     }
 
