@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Db\Row;
+namespace Pop\Db\Gateway;
 
 /**
- * Row gateway exception class
+ * Gateway exception class
  *
  * @category   Pop
  * @package    Pop_Db

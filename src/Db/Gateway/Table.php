@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Db\Table;
+namespace Pop\Db\Gateway;
 
 /**
  * Table gateway class
@@ -25,73 +25,14 @@ namespace Pop\Db\Table;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Gateway
+class Table extends AbstractGateway
 {
-
-    /**
-     * Table
-     * @var string
-     */
-    protected $table = null;
-
-    /**
-     * Sql object
-     * @var \Pop\Db\Sql
-     */
-    protected $sql = null;
 
     /**
      * Result rows
      * @var array
      */
     protected $rows = [];
-
-    /**
-     * Constructor
-     *
-     * Instantiate the Row\Gateway object.
-     *
-     * @param  \Pop\Db\Sql $sql
-     * @param  string      $table
-     * @return \Pop\Db\Table\Gateway
-     */
-    public function __construct(\Pop\Db\Sql $sql, $table = null)
-    {
-        if (null !== $table) {
-            $this->table = $table;
-        }
-        $this->sql = $sql;
-    }
-
-    /**
-     * Get the SQL object
-     *
-     * @return \Pop\Db\Sql
-     */
-    public function getSql()
-    {
-        return $this->sql;
-    }
-
-    /**
-     * Get the SQL object (alias method)
-     *
-     * @return \Pop\Db\Sql
-     */
-    public function sql()
-    {
-        return $this->sql;
-    }
-
-    /**
-     * Get the table name
-     *
-     * @return string
-     */
-    public function getTable()
-    {
-        return $this->table;
-    }
 
     /**
      * Get the number of result rows
@@ -114,18 +55,6 @@ class Gateway
     }
 
     /**
-     * Set the table
-     *
-     * @param  string $table
-     * @return \Pop\Db\Row\Gateway
-     */
-    public function setTable($table)
-    {
-        $this->table = $table;
-        return $this;
-    }
-
-    /**
      * Get the result rows (alias method)
      *
      * @return \Pop\Db\Sql
@@ -143,7 +72,7 @@ class Gateway
      * @param  array $params
      * @param  array $options
      * @throws Exception
-     * @return \Pop\Db\Table\Gateway
+     * @return \Pop\Db\Gateway\Table
      */
     public function select($set = null, $where = null, array $params = null, array $options = [])
     {
@@ -171,7 +100,7 @@ class Gateway
         }
 
         $this->sql->db()->prepare((string)$this->sql);
-        if (null !== $params) {
+        if ((null !== $params) && (count($params) > 0)) {
             $this->sql->db()->bindParams($params);
         }
         $this->sql->db()->execute();
@@ -186,7 +115,7 @@ class Gateway
      *
      * @param  array $set
      * @throws Exception
-     * @return \Pop\Db\Table\Gateway
+     * @return \Pop\Db\Gateway\Table
      */
     public function insert(array $set)
     {
@@ -231,7 +160,7 @@ class Gateway
      * @param  mixed $where
      * @param  array $pars
      * @throws Exception
-     * @return \Pop\Db\Table\Gateway
+     * @return \Pop\Db\Gateway\Table
      */
     public function update(array $set, $where = null, array $pars = [])
     {
@@ -281,7 +210,7 @@ class Gateway
      * @param  mixed $where
      * @param  array $pars
      * @throws Exception
-     * @return \Pop\Db\Table\Gateway
+     * @return \Pop\Db\Gateway\Table
      */
     public function delete($where = null, array $pars = [])
     {
@@ -310,40 +239,6 @@ class Gateway
         $this->sql->db()->execute();
 
         return $this;
-    }
-
-
-    /**
-     * Get the order by values
-     *
-     * @param  string $order
-     * @return array
-     */
-    protected function getOrder($order)
-    {
-        $by  = null;
-        $ord = null;
-
-        if (stripos($order, 'ASC') !== false) {
-            $by  = trim(str_replace('ASC', '', $order));
-            $ord = 'ASC';
-        } else if (stripos($order, 'DESC') !== false) {
-            $by  = trim(str_replace('DESC', '', $order));
-            $ord = 'DESC';
-        } else if (stripos($order, 'RAND()') !== false) {
-            $by  = trim(str_replace('RAND()', '', $order));
-            $ord = 'RAND()';
-        } else {
-            $by  = $order;
-            $ord = null;
-        }
-
-        if (strpos($by, ',') !== false) {
-            $by = str_replace(', ', ',', $by);
-            $by = explode(',', $by);
-        }
-
-        return ['by' => $by, 'order' => $ord];
     }
 
 }

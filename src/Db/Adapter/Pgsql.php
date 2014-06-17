@@ -141,7 +141,7 @@ class Pgsql extends AbstractAdapter
         $rows = [];
 
         while (($row = $this->fetch()) != false) {
-            $rows[] = new \ArrayObject($row, \ArrayObject::ARRAY_AS_PROPS);
+            $rows[] = $row;
         }
 
         return $rows;
@@ -192,7 +192,7 @@ class Pgsql extends AbstractAdapter
             throw new Exception('Error: The database result resource is not currently set.');
         }
 
-        return new \ArrayObject(pg_fetch_array($this->result, null, PGSQL_ASSOC), \ArrayObject::ARRAY_AS_PROPS);
+        return pg_fetch_array($this->result, null, PGSQL_ASSOC);
     }
 
     /**

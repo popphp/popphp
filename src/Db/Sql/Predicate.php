@@ -541,45 +541,44 @@ class Predicate
         $pred = [];
 
         foreach ($this->operators as $op) {
-            if (strpos($predicate, $op) !== false) {
-                if (($op == 'IS NULL') || ($op == 'IS NOT NULL')) {
-                    $value  = null;
-                    $column = trim(substr($predicate, strpos($predicate, ' ')));
-                    // Remove any quotes from the column
-                    if (((substr($column, 0, 1) == '"') && (substr($column, -1) == '"')) ||
-                        ((substr($column, 0, 1) == "'") && (substr($column, -1) == "'")) ||
-                        ((substr($column, 0, 1) == '`') && (substr($column, -1) == '`'))) {
-                        $column = substr($column, 1);
-                        $column = substr($column, 0, -1);
-                    }
-                } else {
-                    $ary    = explode($op, $predicate);
-                    $column = trim($ary[0]);
-                    $value  = trim($ary[1]);
+            // If operator IS NULL or IS NOT NULL
+            if ((strpos($op, 'NULL') !== false) && (strpos($predicate, $op) !== false)) {
+                $value  = null;
+                $column = trim(substr($predicate, 0, strpos($predicate, ' ')));
+                // Remove any quotes from the column
+                if (((substr($column, 0, 1) == '"') && (substr($column, -1) == '"')) ||
+                    ((substr($column, 0, 1) == "'") && (substr($column, -1) == "'")) ||
+                    ((substr($column, 0, 1) == '`') && (substr($column, -1) == '`'))) {
+                    $column = substr($column, 1);
+                    $column = substr($column, 0, -1);
+                }
+                $pred = [$column, $op, $value];
+            } else if ((strpos($predicate, ' ' . $op . ' ') !== false) && ((strpos($predicate, ' NOT ' . $op . ' ') === false))) {
+                $ary    = explode($op, $predicate);
+                $column = trim($ary[0]);
+                $value  = trim($ary[1]);
 
-                    // Remove any quotes from the column
-                    if (((substr($column, 0, 1) == '"') && (substr($column, -1) == '"')) ||
-                        ((substr($column, 0, 1) == "'") && (substr($column, -1) == "'")) ||
-                        ((substr($column, 0, 1) == '`') && (substr($column, -1) == '`'))) {
-                        $column = substr($column, 1);
-                        $column = substr($column, 0, -1);
-                    }
-
-                    // Remove any quotes from the value
-                    if (((substr($value, 0, 1) == '"') && (substr($value, -1) == '"')) ||
-                        ((substr($value, 0, 1) == "'") && (substr($value, -1) == "'")) ||
-                        ((substr($column, 0, 1) == '`') && (substr($column, -1) == '`'))) {
-                        $value = substr($value, 1);
-                        $value = substr($value, 0, -1);
-                    // Else, create array of values if the value is a comma-separated list
-                    } else if ((substr($value, 0, 1) == '(') && (substr($value, -1) == ')') && (strpos($value, ',') !== false)) {
-                        $value = substr($value, 1);
-                        $value = substr($value, 0, -1);
-                        $value = str_replace(', ', ',', $value);
-                        $value = explode(',', $value);
-                    }
+                // Remove any quotes from the column
+                if (((substr($column, 0, 1) == '"') && (substr($column, -1) == '"')) ||
+                    ((substr($column, 0, 1) == "'") && (substr($column, -1) == "'")) ||
+                    ((substr($column, 0, 1) == '`') && (substr($column, -1) == '`'))) {
+                    $column = substr($column, 1);
+                    $column = substr($column, 0, -1);
                 }
 
+                // Remove any quotes from the value
+                if (((substr($value, 0, 1) == '"') && (substr($value, -1) == '"')) ||
+                    ((substr($value, 0, 1) == "'") && (substr($value, -1) == "'")) ||
+                    ((substr($column, 0, 1) == '`') && (substr($column, -1) == '`'))) {
+                    $value = substr($value, 1);
+                    $value = substr($value, 0, -1);
+                // Else, create array of values if the value is a comma-separated list
+                } else if ((substr($value, 0, 1) == '(') && (substr($value, -1) == ')') && (strpos($value, ',') !== false)) {
+                    $value = substr($value, 1);
+                    $value = substr($value, 0, -1);
+                    $value = str_replace(', ', ',', $value);
+                    $value = explode(',', $value);
+                }
                 if (is_numeric($value)) {
                     if (strpos($value, '.') !== false) {
                         $value = (float)$value;
@@ -599,6 +598,7 @@ class Predicate
                 }
                 $pred = [$column, $op, $value];
             }
+
         }
 
         return $pred;

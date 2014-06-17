@@ -22,6 +22,7 @@ As of June 16, 2014
         + Removed Escaped adapter and support for non-prepared queries
         + Revised the join() method to be more clear in the Sql\Select class
         + Upgraded and Improved the Db\Sql component
+        + Refactored the Record class to utilize the new Table Gateway and Row Gateway
     - File
         + Completely stripped down to only the upload and checkDuplicate static methods
         + Trimmed Dir class, removed references to old File class

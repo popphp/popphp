@@ -120,7 +120,7 @@ class Sqlite extends AbstractAdapter
         $rows = [];
 
         while (($row = $this->fetch()) != false) {
-            $rows[] = new \ArrayObject($row, \ArrayObject::ARRAY_AS_PROPS);
+            $rows[] = $row;
         }
 
         return $rows;
@@ -172,7 +172,7 @@ class Sqlite extends AbstractAdapter
             throw new Exception('Error: The database result resource is not currently set.');
         }
 
-        return new \ArrayObject($this->result->fetchArray(SQLITE3_ASSOC), \ArrayObject::ARRAY_AS_PROPS);
+        return $this->result->fetchArray(SQLITE3_ASSOC);
     }
 
     /**

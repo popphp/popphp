@@ -71,6 +71,30 @@ abstract class AbstractAdapter implements AdapterInterface
     abstract public function showError();
 
     /**
+     * Prepare a SQL query.
+     *
+     * @param  string $sql
+     * @return AbstractAdapter
+     */
+    abstract public function prepare($sql);
+
+    /**
+     * Bind parameters to a prepared SQL query.
+     *
+     * @param  array $params
+     * @return AbstractAdapter
+     */
+    abstract public function bindParams($params);
+
+    /**
+     * Execute the prepared SQL query.
+     *
+     * @throws \Pop\Db\Adapter\Exception
+     * @return void
+     */
+    abstract public function execute();
+
+    /**
      * Execute the SQL query and create a result resource, or display the SQL error.
      *
      * @param  string $sql

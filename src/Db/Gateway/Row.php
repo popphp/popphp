@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Db\Row;
+namespace Pop\Db\Gateway;
 
 /**
  * Row gateway class
@@ -25,32 +25,14 @@ namespace Pop\Db\Row;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Gateway
+class Row extends AbstractGateway
 {
-
-    /**
-     * Table
-     * @var string
-     */
-    protected $table = null;
-
-    /**
-     * Primary keys
-     * @var array
-     */
-    protected $primaryKeys = [];
 
     /**
      * Primary values
      * @var array
      */
     protected $primaryValues = [];
-
-    /**
-     * Sql object
-     * @var \Pop\Db\Sql
-     */
-    protected $sql = null;
 
     /**
      * Row column values
@@ -61,53 +43,20 @@ class Gateway
     /**
      * Constructor
      *
-     * Instantiate the Row\Gateway object.
+     * Instantiate the Gateway\Row object.
      *
      * @param  \Pop\Db\Sql $sql
      * @param  mixed       $keys
      * @param  string      $table
      * @throws Exception
-     * @return \Pop\Db\Row\Gateway
+     * @return \Pop\Db\Gateway\Row
      */
     public function __construct(\Pop\Db\Sql $sql, $keys = null, $table = null)
     {
         if (null !== $keys) {
             $this->setPrimaryKeys($keys);
         }
-        if (null !== $table) {
-            $this->table = $table;
-        }
-        $this->sql = $sql;
-    }
-
-    /**
-     * Get the SQL object
-     *
-     * @return \Pop\Db\Sql
-     */
-    public function getSql()
-    {
-        return $this->sql;
-    }
-
-    /**
-     * Get the SQL object (alias method)
-     *
-     * @return \Pop\Db\Sql
-     */
-    public function sql()
-    {
-        return $this->sql;
-    }
-
-    /**
-     * Get the table name
-     *
-     * @return string
-     */
-    public function getTable()
-    {
-        return $this->table;
+        parent::__construct($sql, $table);
     }
 
     /**
@@ -121,34 +70,10 @@ class Gateway
     }
 
     /**
-     * Set the table
-     *
-     * @param  string $table
-     * @return \Pop\Db\Row\Gateway
-     */
-    public function setTable($table)
-    {
-        $this->table = $table;
-        return $this;
-    }
-
-    /**
-     * Set the primary keys
-     *
-     * @param  mixed $keys
-     * @return \Pop\Db\Row\Gateway
-     */
-    public function setPrimaryKeys($keys)
-    {
-        $this->primaryKeys = (is_array($keys)) ? $keys : [$keys];
-        return $this;
-    }
-
-    /**
      * Set the columns
      *
      * @param  array $columns
-     * @return \Pop\Db\Row\Gateway
+     * @return \Pop\Db\Gateway\Row
      */
     public function setColumns(array $columns = [])
     {
@@ -211,7 +136,7 @@ class Gateway
      * Save (insert new or update existing) row in the table
      *
      * @throws Exception
-     * @return \Pop\Db\Row\Gateway
+     * @return \Pop\Db\Gateway\Row
      */
     public function save()
     {
@@ -291,7 +216,7 @@ class Gateway
      * Delete row from the table
      *
      * @throws Exception
-     * @return \Pop\Db\Row\Gateway
+     * @return \Pop\Db\Gateway\Row
      */
     public function delete()
     {

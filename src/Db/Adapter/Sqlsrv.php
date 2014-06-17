@@ -159,7 +159,7 @@ class Sqlsrv extends AbstractAdapter
         $rows = [];
 
         while (($row = $this->fetch()) != false) {
-            $rows[] = new \ArrayObject($row, \ArrayObject::ARRAY_AS_PROPS);
+            $rows[] = $row;
         }
 
         return $rows;
@@ -202,13 +202,13 @@ class Sqlsrv extends AbstractAdapter
     public function fetch()
     {
         if (null !== $this->statement) {
-            return new \ArrayObject(sqlsrv_fetch_array($this->statement, SQLSRV_FETCH_ASSOC), \ArrayObject::ARRAY_AS_PROPS);
+            return sqlsrv_fetch_array($this->statement, SQLSRV_FETCH_ASSOC);
         } else {
             if (!isset($this->result)) {
                 throw new Exception('Error: The database result resource is not currently set.');
             }
 
-            return new \ArrayObject(sqlsrv_fetch_array($this->result, SQLSRV_FETCH_ASSOC), \ArrayObject::ARRAY_AS_PROPS);
+            return new sqlsrv_fetch_array($this->result, SQLSRV_FETCH_ASSOC);
         }
     }
 

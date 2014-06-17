@@ -224,7 +224,7 @@ class Pdo extends AbstractAdapter
      */
     public function fetchResult()
     {
-        return new \ArrayObject($this->statement->fetchAll(\PDO::FETCH_ASSOC), \ArrayObject::ARRAY_AS_PROPS);
+        return $this->statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -271,7 +271,7 @@ class Pdo extends AbstractAdapter
             throw new Exception('Error: The database result resource is not currently set.');
         }
 
-        return new \ArrayObject($this->result->fetch(\PDO::FETCH_ASSOC), \ArrayObject::ARRAY_AS_PROPS);
+        return $this->result->fetch(\PDO::FETCH_ASSOC);
     }
 
     /**
