@@ -83,12 +83,6 @@ class Record
     protected $primaryKeys = [];
 
     /**
-     * Primary values
-     * @var array
-     */
-    protected $primaryValues = [];
-
-    /**
      * Constructor
      *
      * Instantiate the database record object.
@@ -405,16 +399,6 @@ class Record
     public function getPrimaryKeys()
     {
         return $this->primaryKeys;
-    }
-
-    /**
-     * Get the primary values
-     *
-     * @return array
-     */
-    public function getPrimaryValues()
-    {
-        return $this->primaryValues;
     }
 
     /**
