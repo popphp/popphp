@@ -106,8 +106,6 @@ class Record
             $this->setColumns($columns);
         }
 
-        static::parseTableName($class);
-
         $this->rowGateway   = new Gateway\Row(static::getSql(), $this->primaryKeys, static::$table);
         $this->tableGateway = new Gateway\Table(static::getSql(), static::$table);
     }
