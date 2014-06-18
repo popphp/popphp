@@ -430,6 +430,16 @@ class Record
     }
 
     /**
+     * Get the count of rows returned in the result
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->rows);
+    }
+
+    /**
      * Save the record
      *
      * @param  array $columns
@@ -574,7 +584,8 @@ class Record
                     $where[] = $column . ' IN (' . implode(', ', $value) . ')';
                 }
             // BETWEEN or NOT BETWEEN
-            } else if ((substr($value, 0, 1) == '(') && (substr($value, -1) == ')') && (strpos($value, ',') !== false)) {
+            } else if ((substr($value, 0, 1) == '(') && (substr($value, -1) == ')') &&
+                (strpos($value, ',') !== false)) {
                 if (substr($column, -1) == '-') {
                     $column  = substr($column, 0, -1);
                     $where[] = $column . ' NOT BETWEEN ' . $value;
