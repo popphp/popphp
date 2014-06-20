@@ -25,7 +25,7 @@ namespace Pop\Dom;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Dom extends AbstractDom
+class Dom extends AbstractNode
 {
 
     /**
@@ -116,7 +116,7 @@ class Dom extends AbstractDom
      * Document doctypes
      * @var array
      */
-    protected static $doctypes = array(
+    protected static $doctypes = [
         "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n",
         "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n",
         "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\" \"http://www.w3.org/TR/html4/frameset.dtd\">\n",
@@ -128,7 +128,7 @@ class Dom extends AbstractDom
         "<!DOCTYPE html>\n",
         "<?xml version=\"1.0\" encoding=\"[{charset}]\"?>\n",
         "<?xml version=\"1.0\" encoding=\"[{charset}]\"?>\n"
-    );
+    ];
 
     /**
      * Constructor
@@ -145,7 +145,7 @@ class Dom extends AbstractDom
     {
         $this->setDoctype($doctype);
         $this->charset = $charset;
-        $this->indent = $indent;
+        $this->indent  = $indent;
 
         if (null !== $childNode) {
             $this->addChild($childNode);
@@ -219,12 +219,12 @@ class Dom extends AbstractDom
     /**
      * Method to set the document charset.
      *
-     * @param  string $chr
+     * @param  string $char
      * @return \Pop\Dom\Dom
      */
-    public function setCharset($chr)
+    public function setCharset($char)
     {
-        $this->charset = $chr;
+        $this->charset = $char;
         return $this;
     }
 

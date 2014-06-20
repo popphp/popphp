@@ -34,7 +34,7 @@ abstract class AbstractFormat
      * Feed URLs templates
      * @var array
      */
-    protected $urls = array();
+    protected $urls = [];
 
     /**
      * URL to parse
@@ -58,18 +58,18 @@ abstract class AbstractFormat
      * Feed content
      * @var array
      */
-    protected $feed = array();
+    protected $feed = [];
 
     /**
      * Context options
      * @var int
      */
-    protected $contextOptions = array(
-        'http' => array(
+    protected $contextOptions = [
+        'http' => [
             'method'     => 'GET',
             'user_agent' => 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:16.0) Gecko/20100101 Firefox/16.0'
-        )
-    );
+        ]
+    ];
 
     /**
      * Stream context
@@ -150,32 +150,24 @@ abstract class AbstractFormat
         $timeDiff = time() - strtotime($time);
         $timePhrase = null;
 
+        // If less than a minute
+        if ($timeDiff < 60) {
+            $timePhrase = $timeDiff . 'S';
         // If less than an hour.
-        if ($timeDiff < 3600) {
-            $elapsedTime = round($timeDiff / 60);
-            if ($elapsedTime <= 0) {
-                $timePhrase = I18n::factory()->__('A few seconds ago');
-            } else if ($elapsedTime == 1) {
-                $timePhrase = I18n::factory()->__('1 minute ago');
-            } else {
-                $timePhrase = I18n::factory()->__('%1 minutes ago', $elapsedTime);
-            }
-            // If less than a day.
+        } else if ($timeDiff < 3600) {
+            $timePhrase = round($timeDiff / 60) . 'M';
+        // If less than a day.
         } else if (($timeDiff >= 3600) && ($timeDiff < 86400)) {
-            $elapsedTime = round(($timeDiff / 60) / 60);
-            $timePhrase = ($elapsedTime == 1) ? I18n::factory()->__('1 hour ago') : I18n::factory()->__('%1 hours ago', $elapsedTime);
-            // If less than a month.
+            $timePhrase = round(($timeDiff / 60) / 60) . 'H';
+        // If less than a month.
         } else if (($timeDiff >= 86400) && ($timeDiff < 2592000)) {
-            $elapsedTime = round(((($timeDiff / 60) / 60) / 24));
-            $timePhrase = ($elapsedTime == 1) ? I18n::factory()->__('1 day ago') : I18n::factory()->__('%1 days ago', $elapsedTime);
-            // If more than a month, less than 2 years
-        } else if (($timeDiff >= 2592000) && ($timeDiff < 63072000)) {
-            $elapsedTime = round((((($timeDiff / 60) / 60) / 24) / 30));
-            $timePhrase = ($elapsedTime == 1) ? I18n::factory()->__('1 month ago') : I18n::factory()->__('%1 months ago', $elapsedTime);
-            // If more than 2 years ago
+            $timePhrase = round(((($timeDiff / 60) / 60) / 24)) . 'D';
+        // If more than a month, less than 1 years
+        } else if (($timeDiff >= 2592000) && ($timeDiff < 31536000)) {
+            $timePhrase = round((((($timeDiff / 60) / 60) / 24) / 30)) . 'M';
+        // If more than 2 years ago
         } else {
-            $elapsedTime = round((((($timeDiff / 60) / 60) / 24 / 30) / 12));
-            $timePhrase = I18n::factory()->__('%1 years ago', $elapsedTime);
+            $timePhrase = round((((($timeDiff / 60) / 60) / 24 / 30) / 12)) . 'Y';
         }
 
         // Return the calculated elapsed time.
@@ -215,7 +207,7 @@ abstract class AbstractFormat
      * @param  array $feed
      * @return \Pop\Feed\Format\AbstractFormat
      */
-    public function setFeed(array $feed = array())
+    public function setFeed(array $feed = [])
     {
         $this->feed = $feed;
         return $this;

@@ -3,7 +3,7 @@ Pop PHP Framework Changelog
 
 2.0.0a
 ------
-As of June 16, 2014
+As of June 20, 2014
 
 * PHP 5.4+ Only
 * Composer Support
@@ -23,6 +23,8 @@ As of June 16, 2014
         + Revised the join() method to be more clear in the Sql\Select class
         + Upgraded and Improved the Db\Sql component
         + Refactored the Record class to utilize the new Table Gateway and Row Gateway
+    - Feed
+        + Specific services and formats have been removed (Facebook, Twitter, etc.)
     - File
         + Completely stripped down to only the upload and checkDuplicate static methods
         + Trimmed Dir class, removed references to old File class

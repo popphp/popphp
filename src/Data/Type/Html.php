@@ -89,8 +89,8 @@ class Html implements TypeInterface
     public static function encode($data, array $options = null)
     {
         $output  = '';
-        $indent  = (isset($options['indent'])) ? $options['indent'] : '    ';
-        $date    = (isset($options['date'])) ? $options['date'] : 'M j, Y';
+        $indent  = (isset($options['indent']))  ? $options['indent'] : '    ';
+        $date    = (isset($options['date']))    ? $options['date'] : 'M j, Y';
         $exclude = (isset($options['exclude'])) ? $options['exclude'] : [];
         $process = null;
         $submit  = null;

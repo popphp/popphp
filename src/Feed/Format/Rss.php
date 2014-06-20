@@ -57,7 +57,7 @@ class Rss extends AbstractFormat
         }
 
         // Get the main header info of the feed
-        $feed = array();
+        $feed = [];
 
         $feed['title']       = (isset($this->obj->channel->title)) ? (string)$this->obj->channel->title : null;
         $feed['url']         = (isset($this->obj->channel->link)) ? (string)(string)$this->obj->channel->link : null;
@@ -65,7 +65,7 @@ class Rss extends AbstractFormat
         $feed['date']        = $date;
         $feed['generator']   = (isset($this->obj->channel->generator)) ? (string)$this->obj->channel->generator : null;
         $feed['author']      = (isset($this->obj->channel->managingEditor)) ? (string)$this->obj->channel->managingEditor : null;
-        $feed['items']       = array();
+        $feed['items']       = [];
 
         $this->feed = new \ArrayObject($feed, \ArrayObject::ARRAY_AS_PROPS);
     }
@@ -77,7 +77,7 @@ class Rss extends AbstractFormat
      */
     public function parse()
     {
-        $items = array();
+        $items = [];
         $itemObjs = (isset($this->obj->channel->item)) ? $this->obj->channel->item : $this->obj->item;
         $count = count($itemObjs);
         $limit = (($this->limit > 0) && ($this->limit <= $count)) ? $this->limit : $count;
@@ -87,13 +87,13 @@ class Rss extends AbstractFormat
             if ($title == '') {
                 $title = (string)$itemObjs[$i]->link;
             }
-            $items[] = new \ArrayObject(array(
+            $items[] = new \ArrayObject([
                 'title'     => html_entity_decode($title, ENT_QUOTES, 'UTF-8'),
                 'content'   => html_entity_decode((string)$itemObjs[$i]->description, ENT_QUOTES, 'UTF-8'),
                 'link'      => (string)$itemObjs[$i]->link,
                 'published' => (string)$itemObjs[$i]->pubDate,
                 'time'      => self::calculateTime((string)$itemObjs[$i]->pubDate)
-            ), \ArrayObject::ARRAY_AS_PROPS);
+            ], \ArrayObject::ARRAY_AS_PROPS);
         }
 
         $this->feed->items = $items;

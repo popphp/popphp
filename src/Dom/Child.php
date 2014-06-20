@@ -25,7 +25,7 @@ namespace Pop\Dom;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Child extends AbstractDom
+class Child extends AbstractNode
 {
 
     /**
@@ -50,7 +50,7 @@ class Child extends AbstractDom
      * Child element attributes
      * @var array
      */
-    protected $attributes = array();
+    protected $attributes = [];
 
     /**
      * Constructor
@@ -66,8 +66,8 @@ class Child extends AbstractDom
      */
     public function __construct($name, $value = null, $childNode = null, $first = false, $indent = null)
     {
-        $this->nodeName = $name;
-        $this->nodeValue = $value;
+        $this->nodeName      = $name;
+        $this->nodeValue     = $value;
         $this->childrenFirst = $first;
 
         if (null !== $childNode) {
@@ -78,17 +78,17 @@ class Child extends AbstractDom
     }
 
     /**
-     * Static factory method to create child objects
+     * Static factory method to create a child object
      *
      * @param  array $c
      * @return \Pop\Dom\Child
      */
     public static function factory(array $c)
     {
-        $nodeName = $c['nodeName'];
-        $nodeValue = (isset($c['nodeValue']) ? $c['nodeValue'] : null);
+        $nodeName   = $c['nodeName'];
+        $nodeValue  = (isset($c['nodeValue']) ? $c['nodeValue'] : null);
         $childFirst = (isset($c['childrenFirst']) ? $c['childrenFirst'] : false);
-        $indent = (isset($c['indent']) ? $c['indent'] : null);
+        $indent     = (isset($c['indent']) ? $c['indent'] : null);
 
         $child = new static($nodeName, $nodeValue, null, $childFirst, $indent);
         if (isset($c['attributes'])) {
@@ -199,8 +199,8 @@ class Child extends AbstractDom
         // Initialize child object properties and variables.
         $this->output = '';
         $this->indent = (null === $this->indent) ? str_repeat('    ', $depth) : $this->indent;
-        $attribs = '';
-        $attribAry = array();
+        $attribs      = '';
+        $attribAry    = [];
 
         // Format child attributes, if applicable.
         if (count($this->attributes) > 0) {
@@ -214,7 +214,7 @@ class Child extends AbstractDom
         $this->output .= "{$indent}{$this->indent}<{$this->nodeName}{$attribs}";
 
         if ((null === $indent) && (null !== $this->indent)) {
-            $indent = $this->indent;
+            $indent     = $this->indent;
             $origIndent = $this->indent;
         } else {
             $origIndent = $indent . $this->indent;
@@ -223,21 +223,21 @@ class Child extends AbstractDom
         // If current child element has child nodes, format and render.
         if (count($this->childNodes) > 0) {
             $this->output .= ">\n";
-            $new_depth = $depth + 1;
+            $newDepth = $depth + 1;
 
             // Render node value before the child nodes.
             if (!$this->childrenFirst) {
-                $this->output .= (null !== $this->nodeValue) ? (str_repeat('    ', $new_depth) . "{$indent}{$this->nodeValue}\n") : '';
+                $this->output .= (null !== $this->nodeValue) ? (str_repeat('    ', $newDepth) . "{$indent}{$this->nodeValue}\n") : '';
                 foreach ($this->childNodes as $child) {
-                    $this->output .= $child->render(true, $new_depth, $indent);
+                    $this->output .= $child->render(true, $newDepth, $indent);
                 }
                 $this->output .= "{$origIndent}</{$this->nodeName}>\n";
             // Else, render child nodes first, then node value.
             } else {
                 foreach ($this->childNodes as $child) {
-                    $this->output .= $child->render(true, $new_depth, $indent);
+                    $this->output .= $child->render(true, $newDepth, $indent);
                 }
-                $this->output .= (null !== $this->nodeValue) ? (str_repeat('    ', $new_depth) . "{$indent}{$this->nodeValue}\n{$origIndent}</{$this->nodeName}>\n") : "{$origIndent}</{$this->nodeName}>\n";
+                $this->output .= (null !== $this->nodeValue) ? (str_repeat('    ', $newDepth) . "{$indent}{$this->nodeValue}\n{$origIndent}</{$this->nodeName}>\n") : "{$origIndent}</{$this->nodeName}>\n";
             }
 
             // Else, render the child node.

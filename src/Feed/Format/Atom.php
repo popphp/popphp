@@ -48,7 +48,7 @@ class Atom extends AbstractFormat
         }
 
         // Get the main header info of the feed
-        $feed = array();
+        $feed = [];
 
         $feed['title']       = (isset($this->obj->title)) ? (string)$this->obj->title : null;
         $feed['url']         = (isset($this->obj->link->attributes()->href)) ? (string)$this->obj->link->attributes()->href : null;
@@ -56,7 +56,7 @@ class Atom extends AbstractFormat
         $feed['date']        = (isset($this->obj->updated)) ? (string)$this->obj->updated : null;
         $feed['generator']   = (isset($this->obj->generator)) ? (string)$this->obj->generator : null;
         $feed['author']      = (isset($this->obj->author->name)) ? (string)$this->obj->author->name : null;
-        $feed['items']       = array();
+        $feed['items']       = [];
 
         $this->feed = new \ArrayObject($feed, \ArrayObject::ARRAY_AS_PROPS);
     }
@@ -68,7 +68,7 @@ class Atom extends AbstractFormat
      */
     public function parse()
     {
-        $items = array();
+        $items = [];
         $count = count($this->obj->entry);
         $limit = (($this->limit > 0) && ($this->limit <= $count)) ? $this->limit : $count;
 
@@ -86,13 +86,13 @@ class Atom extends AbstractFormat
                 $title = (string)$this->obj->entry[$i]->link->attributes()->href;
             }
 
-            $items[] = new \ArrayObject(array(
+            $items[] = new \ArrayObject([
                 'title'     => html_entity_decode($title, ENT_QUOTES, 'UTF-8'),
                 'content'   => html_entity_decode($content, ENT_QUOTES, 'UTF-8'),
                 'link'      => (string)$this->obj->entry[$i]->link->attributes()->href,
                 'published' => $date,
                 'time'      => self::calculateTime($date)
-            ), \ArrayObject::ARRAY_AS_PROPS);
+            ], \ArrayObject::ARRAY_AS_PROPS);
         }
 
         $this->feed->items = $items;

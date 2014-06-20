@@ -16,7 +16,7 @@
 namespace Pop\Dom;
 
 /**
- * Dom abstract class
+ * Abstract node class
  *
  * @category   Pop
  * @package    Pop_Dom
@@ -25,14 +25,14 @@ namespace Pop\Dom;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-abstract class AbstractDom
+abstract class AbstractNode
 {
 
     /**
      * Object child nodes
      * @var array
      */
-    protected $childNodes = array();
+    protected $childNodes = [];
 
     /**
      * Indentation for formatting purposes.
@@ -49,7 +49,7 @@ abstract class AbstractDom
     /**
      * Method to return the indent.
      *
-     * @return void
+     * @return string
      */
     public function getIndent()
     {
@@ -155,7 +155,7 @@ abstract class AbstractDom
      */
     public function removeChildren()
     {
-        $this->childNodes = array();
+        $this->childNodes = [];
     }
 
 }

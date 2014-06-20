@@ -11,9 +11,9 @@ COMPONENTS
  - Curl [DONE]
  - Data [DONE]
  - Db [DONE]
- - Dom
+ - Dom [DONE]
  - Event [DONE]
- - Feed
+ - Feed [DONE -> w/ deps: Dom]
  - File [DONE]
  - Filter [DONE]
  - Font
@@ -22,13 +22,13 @@ COMPONENTS
  - Geo [DONE]
  - Graph
  - Http [DONE]
- - I18n [DONE - work on format classes]
+ - I18n [DONE]
  - Image
  - Log
  - Mail
  - Mvc
- - Nav [STARTED - w/ deps: Acl, Dom]
- - Paginator
+ - Nav [Done - w/ deps: Acl, Dom]
+ - Paginator [DONE]
  - Payment [DONE -> w/ deps: Curl]
  - Pdf
  - Service [DONE]
