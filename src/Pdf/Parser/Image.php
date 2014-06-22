@@ -138,7 +138,7 @@ class Image
             'png'  => 'image/png'
         );
 
-        $this->img = (Imagick::isInstalled()) ? new Imagick($img, null, null, null, $allowed) : new Gd($img);
+        $this->img = new Gd($img);
 
         // If a scale value is passed, scale the image.
         if (null !== $scl) {
@@ -313,7 +313,7 @@ class Image
         $this->img->save($this->scaledImage);
 
         // Re-instantiate the newly scaled image object.
-        $this->img = (Imagick::isInstalled()) ? new Imagick($this->scaledImage) : new Gd($this->scaledImage);
+        $this->img = new Gd($this->scaledImage);
     }
 
     /**
@@ -330,7 +330,7 @@ class Image
         $this->img->convert('png')->save($this->convertedImage);
 
         // Re-instantiate the newly converted image object and re-read the image data.
-        $this->img = (Imagick::isInstalled()) ? new Imagick($this->convertedImage) : new Gd($this->convertedImage);
+        $this->img = new Gd($this->convertedImage);
         $this->imageData = $this->img->read();
     }
 
@@ -342,7 +342,8 @@ class Image
     protected function parseJpeg()
     {
         // Add the image to the _objects array.
-        $colorspace = ($this->img->getColorMode() == 'CMYK') ? "/DeviceCMYK\n    /Decode [1 0 1 0 1 0 1 0]" : "/Device" . $this->img->getColorMode();
+        $colorMode  = (strtolower($this->img->getColorMode()) == 'srgb') ? 'RGB' : $this->img->getColorMode();
+        $colorspace = ($this->img->getColorMode() == 'CMYK') ? "/DeviceCMYK\n    /Decode [1 0 1 0 1 0 1 0]" : "/Device" . $colorMode;
         $this->objects[$this->index] = new Object("{$this->index} 0 obj\n<<\n    /Type /XObject\n    /Subtype /Image\n    /Width " . $this->img->getWidth() . "\n    /Height " . $this->img->getHeight() . "\n    /ColorSpace {$colorspace}\n    /BitsPerComponent 8\n    /Filter /DCTDecode\n    /Length {$this->imageDataLength}\n>>\nstream\n{$this->imageData}\nendstream\nendobj\n");
     }
 

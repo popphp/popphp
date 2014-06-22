@@ -1403,9 +1403,8 @@ class Pdf extends \Pop\File\File
                 $imgWidth = $this->images[$image]['origW'];
                 $imgHeight = $this->images[$image]['origH'];
             }
-            $this->objects[$i] = new Object\Object($i);
-            $this->objects[$i]->setStream("\nq\n" . $imgWidth . " 0 0 " . $imgHeight. " {$x} {$y} cm\n/I{$co_index} Do\nQ\n");
-            $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->content[] = $i;
+            $this->objects[$this->objects[$this->pages[$this->curPage]]->curContent]->setStream("\nq\n" . $imgWidth . " 0 0 " . $imgHeight. " {$x} {$y} cm\n/I{$co_index} Do\nQ\n");
+            $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->xobjs[] = $this->images[$image]['xobj'];
         } else {
             // Create image parser object
             $i = $this->lastIndex($this->objects) + 1;
@@ -1426,7 +1425,8 @@ class Pdf extends \Pop\File\File
                 $this->images[$image] = array(
                     'index' => $i,
                     'origW' => $imageParser->getOrigW(),
-                    'origH' => $imageParser->getOrigH()
+                    'origH' => $imageParser->getOrigH(),
+                    'xobj'  => $imageParser->getXObject()
                 );
             }
         }
