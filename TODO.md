@@ -24,15 +24,15 @@ COMPONENTS
  - Http [DONE]
  - I18n [DONE]
  - Image
- - Log
- - Mail
+ - Log [DONE - w/ deps: Db, Mail]
+ - Mail [DONE]
  - Mvc
- - Nav [Done - w/ deps: Acl, Dom]
+ - Nav [DONE - w/ deps: Acl, Dom]
  - Paginator [DONE]
  - Payment [DONE -> w/ deps: Curl]
  - Pdf
  - Service [DONE]
- - Shipping [DONE -> w/ deps: Dom, Curl]
+ - Shipping [DONE -> w/ deps: Curl, Dom]
  - Validator [DONE]
  - Web [DONE]
  - Config [DONE]

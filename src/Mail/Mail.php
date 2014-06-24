@@ -50,7 +50,7 @@ class Mail
      * Mail headers
      * @var array
      */
-    protected $headers = array();
+    protected $headers = [];
 
     /**
      * Subject
@@ -74,7 +74,7 @@ class Mail
      * File attachments
      * @var array
      */
-    protected $attachments = array();
+    protected $attachments = [];
 
     /**
      * Send as group flag
@@ -94,7 +94,7 @@ class Mail
     public function __construct($subj = null, $rcpts = null)
     {
         $this->subject = $subj;
-        $this->queue = new Queue();
+        $this->queue   = new Queue();
         $this->message = new Message($this);
 
         if (null !== $rcpts) {
@@ -440,7 +440,7 @@ class Mail
      */
     public function sendAsGroup($group)
     {
-        $this->group = $group;
+        $this->group = (bool)$group;
         return $this;
     }
 
@@ -548,14 +548,14 @@ class Mail
             $emailFileName = (null !== $format) ? $format : $emailFileName = '0000000001-' . time() . '-popphpmail';
 
             // Save the email message.
-            file_put_contents($dir . DIRECTORY_SEPARATOR . $emailFileName, array(), $email);
+            file_put_contents($dir . DIRECTORY_SEPARATOR . $emailFileName, [], $email);
         } else {
             // Iterate through the queue and send the mail messages.
             $i = 1;
             foreach ($this->queue as $rcpt) {
                 $fileFormat = null;
-                $subject = $this->subject;
-                $message = $messageBody;
+                $subject    = $this->subject;
+                $message    = $messageBody;
 
                 // Set the recipient parameter.
                 $to = (isset($rcpt['name'])) ? $rcpt['name'] . " <" . $rcpt['email'] . ">" : $rcpt['email'];
@@ -635,7 +635,8 @@ class Mail
     {
         $headers = null;
         foreach ($this->headers as $key => $value) {
-            $headers .= (is_array($value)) ? $key . ": " . $value[0] . " <" . $value[1] . ">" . $this->message->getEol() : $key . ": " . $value . $this->message->getEol();
+            $headers .= (is_array($value)) ? $key . ": " . $value[0] . " <" . $value[1] . ">" .
+                $this->message->getEol() : $key . ": " . $value . $this->message->getEol();
         }
 
         return $headers;
@@ -651,12 +652,12 @@ class Mail
     protected function getEmailFromFile($filename)
     {
         $contents = file_get_contents($filename);
-        $email = array(
+        $email = [
             'to'      => null,
             'subject' => null,
             'headers' => null,
             'message' => null
-        );
+        ];
 
         $headers = substr($contents, 0, strpos($contents, $this->message->getEol() . $this->message->getEol()));
         $email['message'] = trim(str_replace($headers, '', $contents));

@@ -32,7 +32,7 @@ class Mail implements WriterInterface
      * Array of emails in which to send the log messages
      * @var array
      */
-    protected $emails = array();
+    protected $emails = [];
 
     /**
      * Constructor
@@ -51,14 +51,14 @@ class Mail implements WriterInterface
 
         foreach ($emails as $key => $value) {
             if (!is_numeric($key)) {
-                $this->emails[] = array(
+                $this->emails[] = [
                     'name'  => $key,
                     'email' => $value
-                );
+                ];
             } else {
-                $this->emails[] = array(
+                $this->emails[] = [
                     'email' => $value
-                );
+                ];
             }
         }
     }
@@ -70,7 +70,7 @@ class Mail implements WriterInterface
      * @param  array $options
      * @return \Pop\Log\Writer\Mail
      */
-    public function writeLog(array $logEntry, array $options = array())
+    public function writeLog(array $logEntry, array $options = [])
     {
         $subject = (isset($options['subject'])) ?
             $options['subject'] :

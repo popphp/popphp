@@ -57,13 +57,13 @@ class Queue extends \SplQueue
      */
     public function add($email, $name = null)
     {
-        $rcpt = array();
+        $rcpt = [];
         if (null !== $name) {
             $rcpt['name'] = $name;
         }
         $rcpt['email'] = $email;
 
-        return $this->addRecipients(array($rcpt));
+        return $this->addRecipients([$rcpt]);
     }
 
     /**
@@ -82,7 +82,7 @@ class Queue extends \SplQueue
             throw new Exception("Error: You must pass at least one valid email address.");
         // Else, if single and valid
         } else if (!is_array($rcpts)) {
-            $this[] = array('email' => $rcpts);
+            $this[] = ['email' => $rcpts];
         // Else if an associative array of scalar values
         } else if (is_array($rcpts) && isset($rcpts['email'])) {
             if (!preg_match($regEx, $rcpts['email'])) {
@@ -95,7 +95,7 @@ class Queue extends \SplQueue
                 if (!preg_match($regEx, $email)) {
                     throw new Exception("Error: The email address '" . $email . "' is not valid.");
                 }
-                $this[] = array('email' => $email);
+                $this[] = ['email' => $email];
             }
         // Else, if an array of arrays
         } else if (is_array($rcpts) && isset($rcpts[0]) && is_array($rcpts[0])) {
@@ -121,7 +121,7 @@ class Queue extends \SplQueue
      */
     public function __toString()
     {
-        $to = array();
+        $to = [];
         foreach ($this as $rcpt) {
             $to[] = (isset($rcpt['name'])) ? $rcpt['name'] . " <" . $rcpt['email'] . ">" : $rcpt['email'];
         }

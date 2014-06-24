@@ -35,6 +35,6 @@ interface WriterInterface
      * @param  array $options
      * @return void
      */
-    public function writeLog(array $logEntry, array $options = array());
+    public function writeLog(array $logEntry, array $options = []);
 
 }

@@ -56,13 +56,12 @@ class Attachment
             throw new Exception('Error: The file does not exist.');
         }
 
-        $fileParts = pathinfo($file);
-        $fileContents = file_get_contents($file);
-
         // Encode the file contents and set the file into the attachments array property.
-        $encoded = chunk_split(base64_encode($fileContents));
+        $fileParts      = pathinfo($file);
+        $fileContents   = file_get_contents($file);
+        $encoded        = chunk_split(base64_encode($fileContents));
         $this->basename = $fileParts['basename'];
-        $this->encoded = $encoded;
+        $this->encoded  = $encoded;
     }
 
     /**

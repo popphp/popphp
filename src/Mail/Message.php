@@ -32,11 +32,11 @@ class Message
      * Constants for message body types
      * @var int
      */
-    const TEXT = 1;
-    const HTML = 2;
-    const TEXT_HTML = 3;
-    const TEXT_FILE = 4;
-    const HTML_FILE = 5;
+    const TEXT           = 1;
+    const HTML           = 2;
+    const TEXT_HTML      = 3;
+    const TEXT_FILE      = 4;
+    const HTML_FILE      = 5;
     const TEXT_HTML_FILE = 6;
 
     /**
@@ -238,10 +238,10 @@ class Message
         switch ($msgType) {
             // If the message contains files, HTML and text.
             case self::TEXT_HTML_FILE:
-                $this->mail->setHeaders(array(
+                $this->mail->setHeaders([
                     'MIME-Version' => '1.0',
                     'Content-Type' => 'multipart/mixed; boundary="' . $this->getBoundary() . '"' . $this->eol . "This is a multi-part message in MIME format.",
-                ));
+                ]);
 
                 $attachments = $this->mail->getAttachments();
                 foreach ($attachments as $attachment) {
@@ -261,10 +261,10 @@ class Message
 
             // If the message contains files and HTML.
             case self::HTML_FILE:
-                $this->mail->setHeaders(array(
+                $this->mail->setHeaders([
                     'MIME-Version' => '1.0',
                     'Content-Type' => 'multipart/mixed; boundary="' . $this->getBoundary() . '"' . $this->eol . "This is a multi-part message in MIME format.",
-                ));
+                ]);
 
                 $attachments = $this->mail->getAttachments();
                 foreach ($attachments as $attachment) {
@@ -280,10 +280,10 @@ class Message
 
             // If the message contains files and text.
             case self::TEXT_FILE:
-                $this->mail->setHeaders(array(
+                $this->mail->setHeaders([
                     'MIME-Version' => '1.0',
                     'Content-Type' => 'multipart/mixed; boundary="' . $this->getBoundary() . '"' . $this->eol . "This is a multi-part message in MIME format.",
-                ));
+                ]);
 
                 $attachments = $this->mail->getAttachments();
                 foreach ($attachments as $attachment) {
@@ -299,10 +299,10 @@ class Message
 
             // If the message contains HTML and text.
             case self::TEXT_HTML:
-                $this->mail->setHeaders(array(
+                $this->mail->setHeaders([
                     'MIME-Version' => '1.0',
                     'Content-Type' => 'multipart/alternative; boundary="' . $this->getBoundary() . '"' . $this->eol . "This is a multi-part message in MIME format.",
-                ));
+                ]);
 
                 $this->message .= '--' . $this->getBoundary() . $this->eol .
                     'Content-type: text/plain; charset=' . $this->getCharset() .
@@ -316,10 +316,10 @@ class Message
 
             // If the message contains HTML.
             case self::HTML:
-                $this->mail->setHeaders(array(
+                $this->mail->setHeaders([
                     'MIME-Version' => '1.0',
                     'Content-Type' => 'multipart/alternative; boundary="' . $this->getBoundary() . '"' . $this->eol . "This is a multi-part message in MIME format.",
-                ));
+                ]);
 
                 $this->message .= '--' . $this->getBoundary() . $this->eol .
                     'Content-type: text/html; charset=' . $this->getCharset() .
@@ -330,9 +330,9 @@ class Message
 
             // If the message contains text.
             case self::TEXT:
-                $this->mail->setHeaders(array(
+                $this->mail->setHeaders([
                     'Content-Type' => 'text/plain; charset=' . $this->getCharset()
-                ));
+                ]);
 
                 $this->message = $this->text . $this->eol;
 

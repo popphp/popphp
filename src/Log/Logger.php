@@ -45,7 +45,7 @@ class Logger
      * Message priority short codes
      * @var array
      */
-    protected $priorities = array(
+    protected $priorities = [
         0 => 'EMERG',
         1 => 'ALERT',
         2 => 'CRIT',
@@ -54,13 +54,13 @@ class Logger
         5 => 'NOTICE',
         6 => 'INFO',
         7 => 'DEBUG',
-    );
+    ];
 
     /**
      * Log writers
      * @var array
      */
-    protected $writers = array();
+    protected $writers = [];
 
     /**
      * Log timestamp format
@@ -135,14 +135,14 @@ class Logger
      * @param  array $options
      * @return \Pop\Log\Logger
      */
-    public function log($priority, $message, array $options = array())
+    public function log($priority, $message, array $options = [])
     {
-        $logEntry = array(
+        $logEntry = [
             'timestamp' => date($this->timestamp),
             'priority'  => (int) $priority,
             'name'      => $this->priorities[$priority],
             'message'   => (string) $message
-        );
+        ];
 
         foreach ($this->writers as $writer) {
             $writer->writeLog($logEntry, $options);
@@ -158,7 +158,7 @@ class Logger
      * @param  array $options
      * @return \Pop\Log\Logger
      */
-    public function emerg($message, array $options = array())
+    public function emerg($message, array $options = [])
     {
         return $this->log(self::EMERG, $message, $options);
     }
@@ -170,7 +170,7 @@ class Logger
      * @param  array $options
      * @return \Pop\Log\Logger
      */
-    public function alert($message, array $options = array())
+    public function alert($message, array $options = [])
     {
         return $this->log(self::ALERT, $message, $options);
     }
@@ -182,7 +182,7 @@ class Logger
      * @param  array $options
      * @return \Pop\Log\Logger
      */
-    public function crit($message, array $options = array())
+    public function crit($message, array $options = [])
     {
         return $this->log(self::CRIT, $message, $options);
     }
@@ -194,7 +194,7 @@ class Logger
      * @param  array $options
      * @return \Pop\Log\Logger
      */
-    public function err($message, array $options = array())
+    public function err($message, array $options = [])
     {
         return $this->log(self::ERR, $message, $options);
     }
@@ -206,7 +206,7 @@ class Logger
      * @param  array $options
      * @return \Pop\Log\Logger
      */
-    public function warn($message, array $options = array())
+    public function warn($message, array $options = [])
     {
         return $this->log(self::WARN, $message, $options);
     }
@@ -218,7 +218,7 @@ class Logger
      * @param  array $options
      * @return \Pop\Log\Logger
      */
-    public function notice($message, array $options = array())
+    public function notice($message, array $options = [])
     {
         return $this->log(self::NOTICE, $message, $options);
     }
@@ -230,7 +230,7 @@ class Logger
      * @param  array $options
      * @return \Pop\Log\Logger
      */
-    public function info($message, array $options = array())
+    public function info($message, array $options = [])
     {
         return $this->log(self::INFO, $message, $options);
     }
@@ -242,7 +242,7 @@ class Logger
      * @param  array $options
      * @return \Pop\Log\Logger
      */
-    public function debug($message, array $options = array())
+    public function debug($message, array $options = [])
     {
         return $this->log(self::DEBUG, $message, $options);
     }
