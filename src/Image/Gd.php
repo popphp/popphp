@@ -15,8 +15,7 @@
  */
 namespace Pop\Image;
 
-use Pop\Color\Space\ColorInterface;
-use Pop\Color\Space\Rgb;
+use Pop\Color\Space;
 
 /**
  * GD image class
@@ -32,18 +31,6 @@ class Gd extends AbstractImage
 {
 
     /**
-     * Array of allowed file types.
-     * @var array
-     */
-    protected $allowed = array(
-        'gif'  => 'image/gif',
-        'jpe'  => 'image/jpeg',
-        'jpg'  => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'png'  => 'image/png'
-    );
-
-    /**
      * Image color opacity
      * @var int
      */
@@ -55,15 +42,15 @@ class Gd extends AbstractImage
      * Instantiate an image file object based on either a pre-existing
      * image file on disk, or a new image file.
      *
-     * @param  string                          $img
-     * @param  int|string                      $w
-     * @param  int|string                      $h
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @param  array                           $types
+     * @param  string               $img
+     * @param  int                  $w
+     * @param  int                  $h
+     * @param  Space\ColorInterface $color
+     * @param  array                $types
      * @throws Exception
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
-    public function __construct($img, $w = null, $h = null, ColorInterface $color = null, $types = null)
+    public function __construct($img, $w = null, $h = null, Space\ColorInterface $color = null, $types = null)
     {
         parent::__construct($img, $w, $h, $color, $types);
 
@@ -79,10 +66,10 @@ class Gd extends AbstractImage
             $imgSize = getimagesize($img);
 
             // Set image object properties.
-            $this->width = $imgSize[0];
-            $this->height = $imgSize[1];
+            $this->width    = $imgSize[0];
+            $this->height   = $imgSize[1];
             $this->channels = (isset($imgSize['channels'])) ? $imgSize['channels'] : null;
-            $this->depth = (isset($imgSize['bits'])) ? $imgSize['bits'] : null;
+            $this->depth    = (isset($imgSize['bits'])) ? $imgSize['bits'] : null;
             $this->setQuality(100);
 
             // If the image is a GIF
@@ -90,30 +77,30 @@ class Gd extends AbstractImage
                 $this->mode = 'Indexed';
             // Else if the image is a PNG
             } else if ($this->mime == 'image/png') {
-                $imgData = $this->read();
+                $imgData   = file_get_contents($this->fullpath);
                 $colorType = ord($imgData[25]);
                 switch ($colorType) {
                     case 0:
                         $this->channels = 1;
-                        $this->mode = 'Gray';
+                        $this->mode     = 'Gray';
                         break;
                     case 2:
                         $this->channels = 3;
-                        $this->mode = 'RGB';
+                        $this->mode     = 'RGB';
                         break;
                     case 3:
                         $this->channels = 3;
-                        $this->mode = 'Indexed';
+                        $this->mode     = 'Indexed';
                         break;
                     case 4:
                         $this->channels = 1;
-                        $this->mode = 'Gray';
-                        $this->alpha = true;
+                        $this->mode     = 'Gray';
+                        $this->alpha    = true;
                         break;
                     case 6:
                         $this->channels = 3;
-                        $this->mode = 'RGB';
-                        $this->alpha = true;
+                        $this->mode     = 'RGB';
+                        $this->alpha    = true;
                         break;
                 }
             // Else if the image is a JPEG.
@@ -132,18 +119,18 @@ class Gd extends AbstractImage
             }
 
             // Set image object properties.
-            $this->width = $w;
-            $this->height = $h;
+            $this->width    = $w;
+            $this->height   = $h;
             $this->channels = null;
 
             // Create a new image and allocate the background color.
             if ($this->mime == 'image/gif') {
                 $this->resource = imagecreate($w, $h);
-                $this->setBackgroundColor((null === $color) ? new Rgb(255, 255, 255) : $color);
+                $this->setBackgroundColor((null === $color) ? new Space\Rgb(255, 255, 255) : $color);
                 $clr = $this->setColor($this->backgroundColor);
             } else {
                 $this->resource = imagecreatetruecolor($w, $h);
-                $this->setBackgroundColor((null === $color) ? new Rgb(255, 255, 255) : $color);
+                $this->setBackgroundColor((null === $color) ? new Space\Rgb(255, 255, 255) : $color);
                 $clr = $this->setColor($this->backgroundColor);
                 imagefill($this->resource, 0, 0, $clr);
             }
@@ -166,17 +153,6 @@ class Gd extends AbstractImage
     }
 
     /**
-     * Get formats
-     *
-     * @return array
-     */
-    public static function formats()
-    {
-        $i = new static('i.jpg', 1, 1);
-        return $i->getFormats();
-    }
-
-    /**
      * Get the image resource to directly interact with it
      *
      * @return resource
@@ -190,7 +166,7 @@ class Gd extends AbstractImage
      * Set the image quality based on the type of image.
      *
      * @param  mixed $q
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function setQuality($q = null)
     {
@@ -213,7 +189,7 @@ class Gd extends AbstractImage
      * Alias to setQuality()
      *
      * @param  mixed $comp
-     * @return \Pop\Image\Imagick
+     * @return GD
      */
     public function setCompression($comp = null)
     {
@@ -224,8 +200,8 @@ class Gd extends AbstractImage
     /**
      * Set the opacity.
      *
-     * @param  int|string $opac
-     * @return \Pop\Image\Gd
+     * @param  int $opac
+     * @return Gd
      */
     public function setOpacity($opac)
     {
@@ -234,46 +210,10 @@ class Gd extends AbstractImage
     }
 
     /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int|string $filter
-     * @return \Pop\Image\Gd
-     */
-    public function setFilter($filter = null)
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int|string $blur
-     * @return \Pop\Image\Imagick
-     */
-    public function setBlur($blur = null)
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int|string $ovr
-     * @return \Pop\Image\Imagick
-     */
-    public function setOverlay($ovr = null)
-    {
-        return $this;
-    }
-
-    /**
      * Resize the image object to the width parameter passed.
      *
-     * @param  int|string $wid
-     * @return mixed
+     * @param  int $wid
+     * @return Gd
      */
     public function resizeToWidth($wid)
     {
@@ -293,8 +233,8 @@ class Gd extends AbstractImage
     /**
      * Resize the image object to the height parameter passed.
      *
-     * @param  int|string $hgt
-     * @return mixed
+     * @param  int $hgt
+     * @return Gd
      */
     public function resizeToHeight($hgt)
     {
@@ -314,8 +254,8 @@ class Gd extends AbstractImage
     /**
      * Resize the image object to the largest dimension
      *
-     * @param  int|string $px
-     * @return \Pop\Image\Gd
+     * @param  int $px
+     * @return Gd
      */
     public function resize($px)
     {
@@ -341,7 +281,7 @@ class Gd extends AbstractImage
      * Scale the image object
      *
      * @param  float|string $scl
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function scale($scl)
     {
@@ -363,11 +303,11 @@ class Gd extends AbstractImage
     /**
      * Crop the image object
      *
-     * @param  int|string $wid
-     * @param  int|string $hgt
-     * @param  int|string $x
-     * @param  int|string $y
-     * @return mixed
+     * @param  int $wid
+     * @param  int $hgt
+     * @param  int $x
+     * @param  int $y
+     * @return Gd
      */
     public function crop($wid, $hgt, $x = 0, $y = 0)
     {
@@ -384,10 +324,10 @@ class Gd extends AbstractImage
     /**
      * Crop the image object to a square image
      *
-     * @param  int|string $px
-     * @param  int|string $x
-     * @param  int|string $y
-     * @return \Pop\Image\Gd
+     * @param  int $px
+     * @param  int $x
+     * @param  int $y
+     * @return Gd
      */
     public function cropThumb($px, $x = 0, $y = 0)
     {
@@ -414,8 +354,8 @@ class Gd extends AbstractImage
      * Rotate the image object, using simple degrees, i.e. -90,
      * to rotate the image.
      *
-     * @param  int|string $deg
-     * @return \Pop\Image\Gd
+     * @param  int $deg
+     * @return Gd
      */
     public function rotate($deg)
     {
@@ -432,13 +372,13 @@ class Gd extends AbstractImage
      * Create text within the an image object
      *
      * @param  string     $str
-     * @param  int|string $size
-     * @param  int|string $x
-     * @param  int|string $y
+     * @param  int $size
+     * @param  int $x
+     * @param  int $y
      * @param  string     $font
-     * @param  int|string $rotate
+     * @param  int $rotate
      * @param  boolean    $stroke
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function text($str, $size, $x, $y, $font = null, $rotate = null, $stroke = false)
     {
@@ -479,7 +419,7 @@ class Gd extends AbstractImage
      * @param  int $y1
      * @param  int $x2
      * @param  int $y2
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function drawLine($x1, $y1, $x2, $y2)
     {
@@ -487,7 +427,7 @@ class Gd extends AbstractImage
         $this->createResource();
 
         $strokeWidth = (null === $this->strokeWidth) ? 1 : $this->strokeWidth;
-        $strokeColor = (null === $this->strokeColor) ? $this->setColor(new Rgb(0, 0, 0)) : $this->setColor($this->strokeColor);
+        $strokeColor = (null === $this->strokeColor) ? $this->setColor(new Space\Rgb(0, 0, 0)) : $this->setColor($this->strokeColor);
 
         // Draw the line.
         imagesetthickness($this->resource, $strokeWidth);
@@ -504,7 +444,7 @@ class Gd extends AbstractImage
      * @param  int $y
      * @param  int $w
      * @param  int $h
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function drawRectangle($x, $y, $w, $h = null)
     {
@@ -516,7 +456,7 @@ class Gd extends AbstractImage
 
         // Set fill color and create rectangle.
         if ((null === $this->fillColor) && (null === $this->backgroundColor)) {
-            $fill = $this->setColor(new Rgb(255, 255, 255));
+            $fill = $this->setColor(new Space\Rgb(255, 255, 255));
         } else if (null === $this->fillColor) {
             $fill = $this->setColor($this->backgroundColor);
         } else {
@@ -525,7 +465,7 @@ class Gd extends AbstractImage
 
         imagefilledrectangle($this->resource, $x, $y, $x2, $y2, $fill);
 
-            // Create stroke, if applicable.
+        // Create stroke, if applicable.
         if (null !== $this->strokeColor) {
             $stroke = $this->setColor($this->strokeColor);
             if (null === $this->strokeWidth) {
@@ -545,7 +485,7 @@ class Gd extends AbstractImage
      * @param  int     $x
      * @param  int     $y
      * @param  int     $w
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function drawSquare($x, $y, $w)
     {
@@ -560,7 +500,7 @@ class Gd extends AbstractImage
      * @param  int $y
      * @param  int $w
      * @param  int $h
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function drawEllipse($x, $y, $w, $h = null)
     {
@@ -581,7 +521,7 @@ class Gd extends AbstractImage
 
         // Set fill color and create ellipse.
         if ((null === $this->fillColor) && (null === $this->backgroundColor)) {
-            $fill = $this->setColor(new Rgb(255, 255, 255));
+            $fill = $this->setColor(new Space\Rgb(255, 255, 255));
         } else if (null === $this->fillColor) {
             $fill = $this->setColor($this->backgroundColor);
         } else {
@@ -601,13 +541,12 @@ class Gd extends AbstractImage
      * @param  int     $x
      * @param  int     $y
      * @param  int     $w
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function drawCircle($x, $y, $w)
     {
         $this->drawEllipse($x, $y, $w, $w);
-       return $this;
-
+        return $this;
     }
 
     /**
@@ -619,7 +558,7 @@ class Gd extends AbstractImage
      * @param  int $end
      * @param  int $w
      * @param  int $h
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function drawArc($x, $y, $start, $end, $w, $h = null)
     {
@@ -631,7 +570,7 @@ class Gd extends AbstractImage
 
         // Set fill color and create rectangle.
         if ((null === $this->fillColor) && (null === $this->backgroundColor)) {
-            $fill = $this->setColor(new Rgb(255, 255, 255));
+            $fill = $this->setColor(new Space\Rgb(255, 255, 255));
         } else if (null === $this->fillColor) {
             $fill = $this->setColor($this->backgroundColor);
         } else {
@@ -668,7 +607,7 @@ class Gd extends AbstractImage
      * Method to add a polygon to the image.
      *
      * @param  array $points
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function drawPolygon($points)
     {
@@ -685,7 +624,7 @@ class Gd extends AbstractImage
 
         // Set fill color and create rectangle.
         if ((null === $this->fillColor) && (null === $this->backgroundColor)) {
-            $fill = $this->setColor(new Rgb(255, 255, 255));
+            $fill = $this->setColor(new Space\Rgb(255, 255, 255));
         } else if (null === $this->fillColor) {
             $fill = $this->setColor($this->backgroundColor);
         } else {
@@ -710,34 +649,10 @@ class Gd extends AbstractImage
     }
 
     /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int $h
-     * @return \Pop\Image\Gd
-     */
-    public function hue($h)
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int $s
-     * @return \Pop\Image\Gd
-     */
-    public function saturation($s)
-    {
-        return $this;
-    }
-
-    /**
      * Method to adjust the brightness of the image.
      *
      * @param  int $b
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function brightness($b)
     {
@@ -750,38 +665,10 @@ class Gd extends AbstractImage
     }
 
     /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int $h
-     * @param  int $s
-     * @param  int $b
-     * @return \Pop\Image\Gd
-     */
-    public function hsb($h, $s, $b)
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int   $black
-     * @param  float $gamma
-     * @param  int   $white
-     * @return \Pop\Image\Gd
-     */
-    public function level($black, $gamma, $white)
-    {
-        return $this;
-    }
-
-    /**
      * Method to adjust the contrast of the image.
      *
      * @param  int $amount
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function contrast($amount)
     {
@@ -796,7 +683,7 @@ class Gd extends AbstractImage
     /**
      * Method to desaturate the image.
      *
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function desaturate()
     {
@@ -812,7 +699,7 @@ class Gd extends AbstractImage
      * Method to sharpen the image.
      *
      * @param  int $amount
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function sharpen($amount)
     {
@@ -828,7 +715,7 @@ class Gd extends AbstractImage
      *
      * @param  int $amount
      * @param  int $type
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function blur($amount, $type = Gd::GAUSSIAN_BLUR)
     {
@@ -851,7 +738,7 @@ class Gd extends AbstractImage
      * @param  int $w
      * @param  int $h
      * @param  int $type
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function border($w, $h = null, $type = Gd::INNER_BORDER)
     {
@@ -885,10 +772,10 @@ class Gd extends AbstractImage
      * Overlay an image onto the current image.
      *
      * @param  string     $ovr
-     * @param  int|string $x
-     * @param  int|string $y
+     * @param  int $x
+     * @param  int $y
      * @throws Exception
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function overlay($ovr, $x = 0, $y = 0)
     {
@@ -918,10 +805,10 @@ class Gd extends AbstractImage
     /**
      * Method to colorize the image with the color passed.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Image\Gd
+     * @param  Space\ColorInterface $color
+     * @return Gd
      */
-    public function colorize(ColorInterface $color)
+    public function colorize(Space\ColorInterface $color)
     {
         // Create an image resource.
         $this->createResource();
@@ -934,7 +821,7 @@ class Gd extends AbstractImage
     /**
      * Method to invert the image (create a negative.)
      *
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function invert()
     {
@@ -949,7 +836,7 @@ class Gd extends AbstractImage
     /**
      * Method to flip the image over the x-axis.
      *
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function flip()
     {
@@ -974,7 +861,7 @@ class Gd extends AbstractImage
     /**
      * Method to flip the image over the y-axis.
      *
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function flop()
     {
@@ -997,109 +884,10 @@ class Gd extends AbstractImage
     }
 
     /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @return \Pop\Image\Gd
-     */
-    public function flatten()
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int $radius
-     * @return \Pop\Image\Gd
-     */
-    public function paint($radius)
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int     $levels
-     * @param  boolean $dither
-     * @return \Pop\Image\Gd
-     */
-    public function posterize($levels, $dither = false)
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int $type
-     * @return \Pop\Image\Gd
-     */
-    public function noise($type = 0)
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int $radius
-     * @return \Pop\Image\Gd
-     */
-    public function diffuse($radius)
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @param  int                             $x
-     * @param  int                             $y
-     * @return \Pop\Image\Gd
-     */
-    public function skew(ColorInterface $color, $x, $y)
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int $degrees
-     * @return \Pop\Image\Gd
-     */
-    public function swirl($degrees)
-    {
-        return $this;
-    }
-
-    /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @param  int $amp
-     * @param  int $length
-     * @return \Pop\Image\Gd
-     */
-    public function wave($amp, $length)
-    {
-        return $this;
-    }
-
-    /**
      * Apply a mosiac pixelate effect to the image
      *
      * @param  int $px
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function pixelate($px)
     {
@@ -1114,7 +902,7 @@ class Gd extends AbstractImage
     /**
      * Apply a pencil/sketch effect to the image
      *
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function pencil()
     {
@@ -1150,7 +938,7 @@ class Gd extends AbstractImage
      * @param  int|string $format
      * @return array
      */
-    public function getColors($format = \Pop\Image\Gd::HEX)
+    public function getColors($format = Gd::HEX)
     {
         // Initialize the colors array and the image resource.
         $colors = array();
@@ -1191,7 +979,7 @@ class Gd extends AbstractImage
      *
      * @param  string $type
      * @throws Exception
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function convert($type)
     {
@@ -1201,7 +989,7 @@ class Gd extends AbstractImage
         if (!array_key_exists($type, $this->allowed)) {
             throw new Exception('Error: That image type is not supported. Only GIF, JPG and PNG image types are supported.');
         // Check if the image is already the requested image type.
-        } else if (strtolower($this->ext) == $type) {
+        } else if (strtolower($this->extension) == $type) {
             throw new Exception('Error: This image file is already a ' . strtoupper($type) . ' image file.');
         }
 
@@ -1214,11 +1002,11 @@ class Gd extends AbstractImage
 
             // Change the type of the image object to the new,
             // requested image type.
-            $this->ext = $type;
-            $this->mime = $this->allowed[$this->ext];
+            $this->extension = $type;
+            $this->mime      = $this->allowed[$this->extension];
 
             // Redefine the image object properties with the new values.
-            $this->fullpath = $this->dir . $this->filename . '.' . $this->ext;
+            $this->fullpath = $this->dir . $this->filename . '.' . $this->extension;
             $this->basename = basename($this->fullpath);
         // Else, open a new true color image.
         } else {
@@ -1227,11 +1015,11 @@ class Gd extends AbstractImage
 
                 // Change the type of the image object to the new,
                 // requested image type.
-                $this->ext = $type;
-                $this->mime = $this->allowed[$this->ext];
+                $this->extension = $type;
+                $this->mime = $this->allowed[$this->extension];
 
                 // Redefine the image object properties with the new values.
-                $this->fullpath = $this->dir . $this->filename . '.' . $this->ext;
+                $this->fullpath = $this->dir . $this->filename . '.' . $this->extension;
                 $this->basename = basename($this->fullpath);
             } else {
                 $new = imagecreatetruecolor($this->width, $this->height);
@@ -1241,11 +1029,11 @@ class Gd extends AbstractImage
 
                 // Change the type of the image object to the new,
                 // requested image type.
-                $this->ext = $type;
-                $this->mime = $this->allowed[$this->ext];
+                $this->extension = $type;
+                $this->mime      = $this->allowed[$this->extension];
 
                 // Redefine the image object properties with the new values.
-                $this->fullpath = $this->dir . $this->filename . '.' . $this->ext;
+                $this->fullpath = $this->dir . $this->filename . '.' . $this->extension;
                 $this->basename = basename($this->fullpath);
 
                 // Create and save the image in it's new, proper format.
@@ -1260,21 +1048,21 @@ class Gd extends AbstractImage
      * Output the image object directly.
      *
      * @param  boolean $download
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
     public function output($download = false)
     {
         // Determine if the force download argument has been passed.
         $attach = ($download) ? 'attachment; ' : null;
         $headers = array(
-            'Content-type' => $this->mime,
+            'Content-type'        => $this->mime,
             'Content-disposition' => $attach . 'filename=' . $this->basename
         );
 
-        $response = new \Pop\Http\Response(200, $headers);
-
         if ($_SERVER['SERVER_PORT'] == 443) {
-            $response->setSslHeaders();
+            $headers['Expires']       = 0;
+            $headers['Cache-Control'] = 'private, must-revalidate';
+            $headers['Pragma']        = 'cache';
         }
 
         if (null === $this->resource) {
@@ -1285,12 +1073,13 @@ class Gd extends AbstractImage
             $this->output = $this->resource;
         }
 
-        // Create the image resource and output it
-        $response->sendHeaders();
-        $this->createImage($this->output, null, $this->quality);
+        // Send the headers and output the image
+        header('HTTP/1.1 200 OK');
+        foreach ($headers as $name => $value) {
+            header($name . ": " . $value);
+        }
 
-        // Destroy the image resource.
-        $this->destroy();
+        $this->createImage($this->output, null, $this->quality);
 
         return $this;
     }
@@ -1299,10 +1088,9 @@ class Gd extends AbstractImage
      * Save the image object to disk.
      *
      * @param  string  $to
-     * @param  boolean $append
-     * @return \Pop\Image\Gd
+     * @return Gd
      */
-    public function save($to = null, $append = false)
+    public function save($to = null)
     {
         if (null === $this->resource) {
             $this->createResource();
@@ -1315,13 +1103,13 @@ class Gd extends AbstractImage
         $this->createImage($this->output, ((null === $to) ? $this->fullpath : $to), $this->quality);
         clearstatcache();
 
-        $this->setFile((null === $to) ? $this->fullpath : $to);
+        $this->setImage((null === $to) ? $this->fullpath : $to);
 
         $imgSize = getimagesize($this->fullpath);
 
         // Set image object properties.
-        $this->width = $imgSize[0];
-        $this->height = $imgSize[1];
+        $this->width    = $imgSize[0];
+        $this->height   = $imgSize[1];
         $this->channels = (isset($imgSize['channels'])) ? $imgSize['channels'] : null;
 
         return $this;
@@ -1330,10 +1118,10 @@ class Gd extends AbstractImage
     /**
      * Destroy the image object and the related image file directly.
      *
-     * @param  boolean $file
+     * @param  boolean $delete
      * @return void
      */
-    public function destroy($file = false)
+    public function destroy($delete = false)
     {
         // Destroy the image resource.
         if (null !== $this->resource) {
@@ -1353,25 +1141,14 @@ class Gd extends AbstractImage
         // Clear PHP's file status cache.
         clearstatcache();
 
-        // If the $file flag is passed, delete the image file.
-        if ($file) {
-            $this->delete();
+        // If the $delete flag is passed, delete the image file.
+        if (($delete) && file_exists($this->fullpath)) {
+            unlink($this->fullpath);
         }
     }
 
     /**
-     * Dummy method to match the Imagick API.
-     * This method doesn't do anything
-     *
-     * @return \Pop\Image\Gd
-     */
-    public function setFormats()
-    {
-        return $this;
-    }
-
-    /**
-     * Get the array of supported formats of Imagick.
+     * Get the array of supported formats with GD.
      *
      * @return array
      */
@@ -1381,7 +1158,7 @@ class Gd extends AbstractImage
     }
 
     /**
-     * Get the number of supported formats of Imagick.
+     * Get the number of supported formats with GD.
      *
      * @return int
      */
@@ -1399,16 +1176,6 @@ class Gd extends AbstractImage
     {
         $this->output();
         return '';
-    }
-
-    /**
-     * Destructor to destroy the image resource
-     *
-     * @return void
-     */
-    public function __destruct()
-    {
-        $this->destroy();
     }
 
     /**
@@ -1440,11 +1207,11 @@ class Gd extends AbstractImage
     /**
      * Set and return a color identifier.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
+     * @param  Space\ColorInterface $color
      * @throws Exception
      * @return mixed
      */
-    protected function setColor(ColorInterface $color = null)
+    protected function setColor(Space\ColorInterface $color = null)
     {
         if (null === $this->resource) {
             throw new Exception('Error: The image resource has not been created.');
@@ -1490,7 +1257,7 @@ class Gd extends AbstractImage
      *
      * @param  string $new
      * @param  string $img
-     * @param  int|string $q
+     * @param  int $q
      * @return void
      */
     protected function createImage($new, $img = null, $q = null)
@@ -1519,16 +1286,16 @@ class Gd extends AbstractImage
     /**
      * Copy the image resource to the image output resource with the set parameters.
      *
-     * @param  int|string $w
-     * @param  int|string $h
-     * @param  int|string $x
-     * @param  int|string $y
+     * @param  int $w
+     * @param  int $h
+     * @param  int $x
+     * @param  int $y
      * @return void
      */
     protected function copyImage($w, $h, $x = 0, $y = 0)
     {
         imagecopyresampled($this->output, $this->resource, 0, 0, $x, $y, $w, $h, $this->width, $this->height);
-        $this->width = imagesx($this->output);
+        $this->width  = imagesx($this->output);
         $this->height = imagesy($this->output);
     }
 

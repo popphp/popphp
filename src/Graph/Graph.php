@@ -15,8 +15,7 @@
  */
 namespace Pop\Graph;
 
-use Pop\Color\Space\ColorInterface;
-use Pop\Color\Space\Rgb;
+use Pop\Color\Space;
 use Pop\Pdf\Pdf;
 
 /**
@@ -59,7 +58,7 @@ class Graph
 
     /**
      * Graph graphic adapter interface
-     * @var mixed
+     * @var \Pop\Graph\Adapter\AbstractAdapter
      */
     protected $adapter = null;
 
@@ -67,7 +66,7 @@ class Graph
      * Available fonts
      * @var array
      */
-    protected $fonts = array();
+    protected $fonts = [];
 
     /**
      * Current font to use
@@ -164,10 +163,10 @@ class Graph
      *
      * Instantiate the graph object.
      *
-     * @param array   $options
-     * @param boolean $forceGd
+     * @param  array   $options
+     * @param  boolean $forceGd
      * @throws Exception
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function __construct($options, $forceGd = false)
     {
@@ -183,15 +182,15 @@ class Graph
         }
 
         if (isset($options['background']) && is_array($options['background']) && (count($options['background']) == 3)) {
-            $background = new Rgb($options['background'][0], $options['background'][1], $options['background'][2]);
+            $background = new Space\Rgb($options['background'][0], $options['background'][1], $options['background'][2]);
         } else {
             $background = null;
         }
 
-        $this->fontColor = new Rgb(0, 0, 0);
-        $this->axisColor = new Rgb(0, 0, 0);
-        $this->showXColor = new Rgb(200, 200, 200);
-        $this->showYColor = new Rgb(200, 200, 200);
+        $this->fontColor  = new Space\Rgb(0, 0, 0);
+        $this->axisColor  = new Space\Rgb(0, 0, 0);
+        $this->showXColor = new Space\Rgb(200, 200, 200);
+        $this->showYColor = new Space\Rgb(200, 200, 200);
 
         if (stripos($options['filename'], '.pdf') !== false) {
             $this->adapter = new Pdf($options['filename'], null, $this->width, $this->height);
@@ -210,7 +209,7 @@ class Graph
     /**
      * Get the graph graphic adapter
      *
-     * @return mixed
+     * @return \Pop\Graph\Adapter\AbstractAdapter
      */
     public function adapter()
     {
@@ -220,13 +219,13 @@ class Graph
     /**
      * Set the axis options
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @param  int                             $width
-     * @return \Pop\Graph\Graph
+     * @param  Space\ColorInterface $color
+     * @param  int                  $width
+     * @return Graph
      */
-    public function setAxisOptions(ColorInterface $color = null, $width = 2)
+    public function setAxisOptions(Space\ColorInterface $color = null, $width = 2)
     {
-        $this->axisColor = (null === $color) ? new Rgb(0, 0, 0) : $color;
+        $this->axisColor = (null === $color) ? new Space\Rgb(0, 0, 0) : $color;
         $this->axisWidth = (int)$width;
 
         return $this;
@@ -236,7 +235,7 @@ class Graph
      * Add a font to available fonts
      *
      * @param  string $font
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function addFont($font)
     {
@@ -264,7 +263,7 @@ class Graph
      *
      * @param  string $font
      * @throws Exception
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function setFont($font = null)
     {
@@ -281,7 +280,7 @@ class Graph
      * Set the font size
      *
      * @param  int $size
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function setFontSize($size)
     {
@@ -292,10 +291,10 @@ class Graph
     /**
      * Set the font color
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Graph\Graph
+     * @param  Space\ColorInterface $color
+     * @return Graph
      */
-    public function setFontColor(ColorInterface $color)
+    public function setFontColor(Space\ColorInterface $color)
     {
         $this->fontColor = $color;
         return $this;
@@ -304,10 +303,10 @@ class Graph
     /**
      * Set the reverse font color
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Graph\Graph
+     * @param  Space\ColorInterface $color
+     * @return Graph
      */
-    public function setReverseFontColor(ColorInterface $color)
+    public function setReverseFontColor(Space\ColorInterface $color)
     {
         $this->reverseFontColor = $color;
         return $this;
@@ -316,10 +315,10 @@ class Graph
     /**
      * Set the fill color
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Graph\Graph
+     * @param  Space\ColorInterface $color
+     * @return Graph
      */
-    public function setFillColor(ColorInterface $color)
+    public function setFillColor(Space\ColorInterface $color)
     {
         $this->fillColor = $color;
         return $this;
@@ -328,10 +327,10 @@ class Graph
     /**
      * Set the stroke color
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Graph\Graph
+     * @param  Space\ColorInterface $color
+     * @return Graph
      */
-    public function setStrokeColor(ColorInterface $color)
+    public function setStrokeColor(Space\ColorInterface $color)
     {
         $this->strokeColor = $color;
         return $this;
@@ -341,7 +340,7 @@ class Graph
      * Set the stroke width
      *
      * @param  int $width
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function setStrokeWidth($width = 1)
     {
@@ -353,7 +352,7 @@ class Graph
      * Set the graph canvas padding
      *
      * @param  int $pad
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function setPadding($pad)
     {
@@ -365,7 +364,7 @@ class Graph
      * Set the bar width
      *
      * @param  int $width
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function setBarWidth($width)
     {
@@ -377,7 +376,7 @@ class Graph
      * Set the 'show data text' flag
      *
      * @param  boolean $showText
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function showText($showText)
     {
@@ -389,13 +388,13 @@ class Graph
      * Set the 'show X-axis increment lines' flag
      *
      * @param  boolean                         $showX
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Graph\Graph
+     * @param  Space\ColorInterface $color
+     * @return Graph
      */
-    public function showX($showX, ColorInterface $color = null)
+    public function showX($showX, Space\ColorInterface $color = null)
     {
         $this->showX = (boolean)$showX;
-        $this->showXColor = (null === $color) ? new Rgb(200, 200, 200) : $color;
+        $this->showXColor = (null === $color) ? new Space\Rgb(200, 200, 200) : $color;
         return $this;
     }
 
@@ -403,13 +402,13 @@ class Graph
      * Set the 'show Y-axis increment lines' flag
      *
      * @param  boolean                         $showY
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Graph\Graph
+     * @param  Space\ColorInterface $color
+     * @return Graph
      */
-    public function showY($showY, ColorInterface $color = null)
+    public function showY($showY, Space\ColorInterface $color = null)
     {
         $this->showY = (boolean)$showY;
-        $this->showYColor = (null === $color) ? new Rgb(200, 200, 200) : $color;
+        $this->showYColor = (null === $color) ? new Space\Rgb(200, 200, 200) : $color;
         return $this;
     }
 
@@ -614,11 +613,11 @@ class Graph
      * @param  array $dataPoints
      * @param  array $xAxis
      * @param  array $yAxis
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function createLineGraph(array $dataPoints, array $xAxis, array $yAxis)
     {
-        $line = new Graph\Line($this);
+        $line = new Adapter\Line($this);
         $line->create($dataPoints, $xAxis, $yAxis);
 
         return $this;
@@ -630,11 +629,11 @@ class Graph
      * @param  array $dataPoints
      * @param  array $xAxis
      * @param  array $yAxis
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function createVBarGraph(array $dataPoints, array $xAxis, array $yAxis)
     {
-        $vbar = new Graph\VBar($this);
+        $vbar = new Adapter\VBar($this);
         $vbar->create($dataPoints, $xAxis, $yAxis);
 
         return $this;
@@ -646,11 +645,11 @@ class Graph
      * @param  array $dataPoints
      * @param  array $xAxis
      * @param  array $yAxis
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function createHBarGraph(array $dataPoints, array $xAxis, array $yAxis)
     {
-        $hbar = new Graph\HBar($this);
+        $hbar = new Adapter\HBar($this);
         $hbar->create($dataPoints, $xAxis, $yAxis);
 
         return $this;
@@ -662,11 +661,11 @@ class Graph
      * @param  array $pie
      * @param  array $percents
      * @param  int   $explode
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function createPieChart(array $pie, array $percents, $explode = 0)
     {
-        $piechart = new Graph\Pie($this);
+        $piechart = new Adapter\Pie($this);
         $piechart->create($pie, $percents, $explode);
 
         return $this;
@@ -688,7 +687,7 @@ class Graph
      *
      * @param  string $to
      * @param  boolean $append
-     * @return \Pop\Graph\Graph
+     * @return Graph
      */
     public function save($to = null, $append = false)
     {

@@ -13,7 +13,9 @@
 /**
  * @namespace
  */
-namespace Pop\Graph\Graph;
+namespace Pop\Graph\Adapter;
+
+use Pop\Color\Space;
 
 /**
  * Line graph class
@@ -25,7 +27,7 @@ namespace Pop\Graph\Graph;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Line extends AbstractGraph
+class Line extends AbstractAdapter
 {
 
     /**
@@ -34,7 +36,7 @@ class Line extends AbstractGraph
      * @param  array $dataPoints
      * @param  array $xAxis
      * @param  array $yAxis
-     * @return \Pop\Graph\Graph\Line
+     * @return \Pop\Graph\Adapter\Line
      */
     public function create(array $dataPoints, array $xAxis, array $yAxis)
     {
@@ -52,17 +54,17 @@ class Line extends AbstractGraph
 
         // If the first data point does not equal the graph origin point.
         if (((float)$dataPoints[0][0] != (float)$xAxis[0]) && ((float)$dataPoints[0][1] != (float)$yAxis[0])) {
-            $newData = array_merge(array(array((float)$xAxis[0], (float)$yAxis[0])), array(array((float)$dataPoints[0][0], (float)$yAxis[0])), $dataPoints);
+            $newData = array_merge([[(float)$xAxis[0], (float)$yAxis[0]]], [[(float)$dataPoints[0][0], (float)$yAxis[0]]], $dataPoints);
             $dataPoints = $newData;
             $skip = 2;
         // Else, if the first data point X equals the graph origin point X.
         } else if (((float)$dataPoints[0][0] != (float)$xAxis[0])) {
-            $newData = array_merge(array(array((float)$xAxis[0], (float)$yAxis[0])), array(array((float)$dataPoints[0][0], (float)$yAxis[0])), $dataPoints);
+            $newData = array_merge([[(float)$xAxis[0], (float)$yAxis[0]]], [[(float)$dataPoints[0][0], (float)$yAxis[0]]], $dataPoints);
             $dataPoints = $newData;
             $skip = 3;
         // Else, if the first data point Y equals the graph origin point Y.
         } else if (((float)$dataPoints[0][1] != (float)$yAxis[0])) {
-            $newData = array_merge(array(array((float)$xAxis[0], (float)$yAxis[0])), array(array((float)$xAxis[0], (float)$dataPoints[0][1])), $dataPoints);
+            $newData = array_merge([[(float)$xAxis[0], (float)$yAxis[0]]], [[(float)$xAxis[0], (float)$dataPoints[0][1]]], $dataPoints);
             $dataPoints = $newData;
             $skip = 3;
         }
@@ -72,18 +74,18 @@ class Line extends AbstractGraph
             $this->graph->adapter()->setFillColor($this->graph->getFillColor());
             $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : $this->graph->getFillColor());
             $this->graph->adapter()->setStrokeWidth($this->graph->getStrokeWidth());
-            $formattedPoints = array();
+            $formattedPoints = [];
             for ($i = 0; $i < count($dataPoints); $i++) {
                 $x = ((($dataPoints[$i][0] - $dataPoints[0][0]) / $points->xRange) * $points->xLength) + $points->zeroPoint['x'];
                 $y = $points->yOffset - ((($dataPoints[$i][1] - $dataPoints[0][1]) / $points->yRange) * $points->yLength);
-                $formattedPoints[] = array('x' => $x, 'y' => $y);
+                $formattedPoints[] = ['x' => $x, 'y' => $y];
                 $lastX = $x;
             }
-            $formattedPoints[] = array('x' => $lastX, 'y' => $points->zeroPoint['y']);
+            $formattedPoints[] = ['x' => $lastX, 'y' => $points->zeroPoint['y']];
             $this->graph->adapter()->drawPolygon($formattedPoints);
         } else {
             $this->graph->adapter()->setStrokeWidth($this->graph->getStrokeWidth());
-            $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : new Rgb(0, 0, 0));
+            $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : new Space\Rgb(0, 0, 0));
 
             for ($i = 1; $i < count($dataPoints); $i++) {
                 $x1 = ((($dataPoints[$i - 1][0] - $dataPoints[0][0]) / $points->xRange) * $points->xLength) + $points->zeroPoint['x'];

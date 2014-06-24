@@ -16,7 +16,6 @@
 namespace Pop\Pdf\Parser;
 
 use Pop\Image\Gd;
-use Pop\Image\Imagick;
 use Pop\Pdf\Object\Object;
 
 /**
@@ -134,21 +133,21 @@ class Image
         // If a scale value is passed, scale the image.
         if (null !== $scl) {
             if ($preserveRes) {
-                $dims = self::getScaledDimensions($scl, $this->img->getWidth(), $this->img->getHeight());
-                $imgWidth = $dims['w'];
+                $dims      = self::getScaledDimensions($scl, $this->img->getWidth(), $this->img->getHeight());
+                $imgWidth  = $dims['w'];
                 $imgHeight = $dims['h'];
             } else {
                 $this->scaleImage($scl);
-                $imgWidth = $this->img->getWidth();
+                $imgWidth  = $this->img->getWidth();
                 $imgHeight = $this->img->getHeight();
             }
         } else {
-            $imgWidth = $this->img->getWidth();
+            $imgWidth  = $this->img->getWidth();
             $imgHeight = $this->img->getHeight();
         }
 
         // Set the initial image data and data length.
-        $this->imageData = $this->img->read();
+        $this->imageData       = file_get_contents($this->img->getFullPath());
         $this->imageDataLength = strlen($this->imageData);
 
         // If a JPEG, parse the JPEG
@@ -171,7 +170,7 @@ class Image
 
         // Define the xobject object and stream.
         $this->xobject = "/I{$this->index} {$this->index} 0 R";
-        $this->stream = "\nq\n" . $imgWidth . " 0 0 " . $imgHeight. " {$this->x} {$this->y} cm\n/I{$this->index} Do\nQ\n";
+        $this->stream  = "\nq\n" . $imgWidth . " 0 0 " . $imgHeight. " {$this->x} {$this->y} cm\n/I{$this->index} Do\nQ\n";
 
         // Image clean-up.
         if ((null !== $this->scaledImage) && file_exists($this->scaledImage)) {
@@ -280,7 +279,7 @@ class Image
     protected function scaleImage($scl)
     {
         // Define the temp scaled image.
-        $this->scaledImage = \Pop\File\Dir::getUploadTemp() . DIRECTORY_SEPARATOR . $this->img->getFilename() . '_' . time() . '.' . $this->img->getExt();
+        $this->scaledImage = realpath(ini_get('upload_tmp_dir')) . DIRECTORY_SEPARATOR . $this->img->getFilename() . '_' . time() . '.' . $this->img->getExt();
 
         // Scale or resize the image
         if (is_array($scl) && (isset($scl['w']) || isset($scl['h']))) {
@@ -315,14 +314,14 @@ class Image
     protected function convertImage()
     {
         // Define the temp converted image.
-        $this->convertedImage = \Pop\File\Dir::getUploadTemp() . DIRECTORY_SEPARATOR . $this->img->getFilename() . '_' . time() . '.png';
+        $this->convertedImage = realpath(ini_get('upload_tmp_dir')) . DIRECTORY_SEPARATOR . $this->img->getFilename() . '_' . time() . '.png';
 
         // Convert the GIF to PNG, save and clear the output buffer.
         $this->img->convert('png')->save($this->convertedImage);
 
         // Re-instantiate the newly converted image object and re-read the image data.
-        $this->img = new Gd($this->convertedImage);
-        $this->imageData = $this->img->read();
+        $this->img       = new Gd($this->convertedImage);
+        $this->imageData = file_get_contents($this->img->getFullPath());
     }
 
     /**
@@ -347,10 +346,10 @@ class Image
     protected function parsePng()
     {
         // Define some PNG image-specific variables.
-        $PLTE = null;
-        $TRNS = null;
+        $PLTE      = null;
+        $TRNS      = null;
         $maskIndex = null;
-        $mask = null;
+        $mask      = null;
 
         // Determine the PNG colorspace.
         if ($this->img->getColorMode() == 'Gray') {
@@ -383,13 +382,13 @@ class Image
         }
 
         // Parse header data, bits and color type
-        $lenByte = substr($this->imageData, (strpos($this->imageData, "IHDR") - 4), 4);
-        $header = substr($this->imageData, (strpos($this->imageData, "IHDR") + 4), $this->readInt($lenByte));
-        $bits = ord(substr($header, 8, 1));
+        $lenByte   = substr($this->imageData, (strpos($this->imageData, "IHDR") - 4), 4);
+        $header    = substr($this->imageData, (strpos($this->imageData, "IHDR") + 4), $this->readInt($lenByte));
+        $bits      = ord(substr($header, 8, 1));
         $colorType = ord(substr($header, 9, 1));
 
         // Make sure the PNG does not contain a true alpha channel.
-        if (($colorType >= 4) && ((bits == 8) || ($bits == 16))) {
+        if (($colorType >= 4) && (($bits == 8) || ($bits == 16))) {
             throw new Exception('Error: PNG alpha channels are not supported. Only 8-bit transparent PNG images are supported.');
         }
 

@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Graph\Graph;
+namespace Pop\Graph\Adapter;
 
 /**
- * Graph abstract class
+ * Graph adapter abstract class
  *
  * @category   Pop
  * @package    Pop_Graph
@@ -25,7 +25,7 @@ namespace Pop\Graph\Graph;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-abstract class AbstractGraph
+abstract class AbstractAdapter
 {
     /**
      * Show X-axis color
@@ -38,8 +38,8 @@ abstract class AbstractGraph
      *
      * Instantiate the graph adapter object.
      *
-     * @param \Pop\Graph\Graph
-     * @return \Pop\Graph\Graph\AbstractGraph
+     * @param  \Pop\Graph\Graph
+     * @return AbstractAdapter
      */
     public function __construct(\Pop\Graph\Graph $graph)
     {
@@ -56,17 +56,17 @@ abstract class AbstractGraph
     protected function getPoints($xAxis, $yAxis)
     {
         if ($this->graph->adapter() instanceof \Pop\Pdf\Pdf) {
-            $zeroPoint = array('x' => $this->graph->getPadding(), 'y' => $this->graph->getPadding());
-            $endX = array('x' => ($this->graph->getWidth() - $this->graph->getPadding()), 'y' => $zeroPoint['y']);
-            $endY = array('x' => $zeroPoint['x'], 'y' => ($this->graph->getHeight() - $this->graph->getPadding()));
-            $xOffset = $this->graph->getPadding();
-            $yOffset = $this->graph->getPadding();
+            $zeroPoint = ['x' => $this->graph->getPadding(), 'y' => $this->graph->getPadding()];
+            $endX      = ['x' => ($this->graph->getWidth() - $this->graph->getPadding()), 'y' => $zeroPoint['y']];
+            $endY      = ['x' => $zeroPoint['x'], 'y' => ($this->graph->getHeight() - $this->graph->getPadding())];
+            $xOffset   = $this->graph->getPadding();
+            $yOffset   = $this->graph->getPadding();
         } else {
-            $zeroPoint = array('x' => $this->graph->getPadding(), 'y' => ($this->graph->getHeight() - $this->graph->getPadding()));
-            $endX = array('x' => ($this->graph->getWidth() - $this->graph->getPadding()), 'y' => $zeroPoint['y']);
-            $endY = array('x' => $zeroPoint['x'], 'y' => $this->graph->getPadding());
-            $xOffset = $this->graph->getPadding();
-            $yOffset = $this->graph->getHeight()- $this->graph->getPadding();
+            $zeroPoint = ['x' => $this->graph->getPadding(), 'y' => ($this->graph->getHeight() - $this->graph->getPadding())];
+            $endX      = ['x' => ($this->graph->getWidth() - $this->graph->getPadding()), 'y' => $zeroPoint['y']];
+            $endY      = ['x' => $zeroPoint['x'], 'y' => $this->graph->getPadding()];
+            $xOffset   = $this->graph->getPadding();
+            $yOffset   = $this->graph->getHeight()- $this->graph->getPadding();
         }
 
         $xLength = $endX['x'] - $zeroPoint['x'];
@@ -77,7 +77,7 @@ abstract class AbstractGraph
         $xDiv = $xLength / (count($xAxis) - 1);
         $yDiv = $yLength / (count($yAxis) - 1);
 
-        $points = new \ArrayObject(array(
+        $points = new \ArrayObject([
             'zeroPoint' => $zeroPoint,
             'endX'      => $endX,
             'endY'      => $endY,
@@ -89,7 +89,7 @@ abstract class AbstractGraph
             'yRange'    => $yRange,
             'xDiv'      => $xDiv,
             'yDiv'      => $yDiv
-        ), \ArrayObject::ARRAY_AS_PROPS);
+        ], \ArrayObject::ARRAY_AS_PROPS);
 
         return $points;
     }
@@ -112,10 +112,10 @@ abstract class AbstractGraph
         $i = 0;
 
         if ($offset != 0) {
-            $realXDiv = ($points->xLength - ($offset * 2)) / (count($xAxis) - 1);
+            $realXDiv  = ($points->xLength - ($offset * 2)) / (count($xAxis) - 1);
             $realZeroX = $points->zeroPoint['x'] + ($realXDiv / 2);
         } else {
-            $realXDiv = $points->xDiv;
+            $realXDiv  = $points->xDiv;
             $realZeroX = $points->zeroPoint['x'];
         }
 
@@ -147,14 +147,14 @@ abstract class AbstractGraph
 
         if ($offset != 0) {
             if ($this->graph->adapter() instanceof \Pop\Pdf\Pdf) {
-                $realYDiv = ($points->yLength + ($offset * 2)) / (count($yAxis) - 1);
+                $realYDiv  = ($points->yLength + ($offset * 2)) / (count($yAxis) - 1);
                 $realZeroY = $points->zeroPoint['y'] - ($realYDiv / 2);
             } else {
-                $realYDiv = ($points->yLength - ($offset * 2)) / (count($yAxis) - 1);
+                $realYDiv  = ($points->yLength - ($offset * 2)) / (count($yAxis) - 1);
                 $realZeroY = $points->zeroPoint['y'] - ($realYDiv / 2);
             }
         } else {
-            $realYDiv = $points->yDiv;
+            $realYDiv  = $points->yDiv;
             $realZeroY = $points->zeroPoint['y'];
         }
 
@@ -182,10 +182,10 @@ abstract class AbstractGraph
         $i = 0;
 
         if ($offset != 0) {
-            $realXDiv = ($points->xLength - ($offset * 2)) / (count($xAxis) - 1);
+            $realXDiv  = ($points->xLength - ($offset * 2)) / (count($xAxis) - 1);
             $realZeroX = $points->zeroPoint['x'] + ($realXDiv / 2);
         } else {
-            $realXDiv = $points->xDiv;
+            $realXDiv  = $points->xDiv;
             $realZeroX = $points->zeroPoint['x'];
         }
 
@@ -235,10 +235,10 @@ abstract class AbstractGraph
 
         if ($offset != 0) {
             if ($this->graph->adapter() instanceof \Pop\Pdf\Pdf) {
-                $realYDiv = ($points->yLength + ($offset * 2)) / (count($yAxis) - 1);
+                $realYDiv  = ($points->yLength + ($offset * 2)) / (count($yAxis) - 1);
                 $realZeroY = $points->zeroPoint['y'] - ($realYDiv / 2);
             } else {
-                $realYDiv = ($points->yLength - ($offset * 2)) / (count($yAxis) - 1);
+                $realYDiv  = ($points->yLength - ($offset * 2)) / (count($yAxis) - 1);
                 $realZeroY = $points->zeroPoint['y'] - ($realYDiv / 2);
             }
         } else {
@@ -281,11 +281,11 @@ abstract class AbstractGraph
      */
     protected function drawDataText($dataPoints, $xAxis, $yAxis, $type, $points = null, $skip = 1)
     {
-        $font = $this->graph->getFont();
-        $fontSize = $this->graph->getFontSize();
-        $fontColor = $this->graph->getFontColor();
+        $font             = $this->graph->getFont();
+        $fontSize         = $this->graph->getFontSize();
+        $fontColor        = $this->graph->getFontColor();
         $reverseFontColor = $this->graph->getReverseFontColor();
-        $fillColor = $this->graph->getFillColor();
+        $fillColor        = $this->graph->getFillColor();
 
         switch ($type) {
             // Draw data point text on a line graph.
@@ -410,7 +410,6 @@ abstract class AbstractGraph
 
             // Draw data point text on a pie chart.
             case 'pie':
-
                 for ($i = 0; $i < count($dataPoints); $i++) {
                     $newMidX = $xAxis[$i]['x'];
                     $newMidY = $xAxis[$i]['y'];
@@ -453,8 +452,6 @@ abstract class AbstractGraph
      */
     protected function getQuadrant($point, $center)
     {
-        $quad = 0;
-
         if ($this->graph->adapter() instanceof \Pop\Pdf\Pdf) {
             if ($point['x'] >= $center['x']) {
                 $quad = ($point['y'] >= $center['y']) ? 4 : 1;
@@ -482,10 +479,9 @@ abstract class AbstractGraph
      */
     protected function getTriangle($point, $center, $quad)
     {
-        $tri = array();
+        $tri = [];
 
         switch ($quad) {
-
             case 1:
                 $tri['side1'] = $point['x'] - $center['x'];
                 $tri['side2'] = abs($point['y'] - $center['y']);
@@ -505,10 +501,9 @@ abstract class AbstractGraph
                 $tri['side1'] = $point['x'] - $center['x'];
                 $tri['side2'] = abs($center['y'] - $point['y']);
                 break;
-
         }
 
-        $tri['hypot'] = round(hypot($tri['side1'], $tri['side2']));
+        $tri['hypot']  = round(hypot($tri['side1'], $tri['side2']));
         $tri['angle1'] = round(rad2deg(asin($tri['side2'] / $tri['hypot'])));
         $tri['angle2'] = round(rad2deg(asin($tri['side1'] / $tri['hypot'])));
 

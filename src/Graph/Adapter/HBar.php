@@ -13,10 +13,12 @@
 /**
  * @namespace
  */
-namespace Pop\Graph\Graph;
+namespace Pop\Graph\Adapter;
+
+use Pop\Color\Space;
 
 /**
- * Horizontal graph class
+ * Horizontal graph adapter class
  *
  * @category   Pop
  * @package    Pop_Graph
@@ -25,7 +27,7 @@ namespace Pop\Graph\Graph;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class HBar extends AbstractGraph
+class HBar extends AbstractAdapter
 {
 
     /**
@@ -34,7 +36,7 @@ class HBar extends AbstractGraph
      * @param  array $dataPoints
      * @param  array $xAxis
      * @param  array $yAxis
-     * @return \Pop\Graph\Graph\HBar
+     * @return \Pop\Graph\Adapter\HBar
      */
     public function create(array $dataPoints, array $xAxis, array $yAxis)
     {
@@ -82,7 +84,7 @@ class HBar extends AbstractGraph
             }
         } else {
             $this->graph->adapter()->setStrokeWidth($this->graph->getStrokeWidth());
-            $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : new Rgb(0, 0, 0));
+            $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : new Space\Rgb(0, 0, 0));
             for ($i = 0; $i < count($dataPoints); $i++) {
                 if ($this->graph->adapter() instanceof \Pop\Pdf\Pdf) {
                     $y = ($points->zeroPoint['y'] - ($realYDiv * $i)) + ($this->graph->getBarWidth() / 5);
@@ -101,7 +103,7 @@ class HBar extends AbstractGraph
         // Draw data point text.
         if ($this->graph->getShowText()) {
             if (is_array($dataPoints[0])) {
-                $dPts = array();
+                $dPts = [];
                 foreach ($dataPoints as $value) {
                     $dPts[] = $value[0];
                 }

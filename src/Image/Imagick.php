@@ -15,8 +15,7 @@
  */
 namespace Pop\Image;
 
-use Pop\Color\Space\ColorInterface;
-use Pop\Color\Space\Rgb;
+use Pop\Color\Space;
 
 /**
  * Imagick image class
@@ -130,30 +129,28 @@ class Imagick extends AbstractImage
      * Any variation in the versions of the required software may contribute to
      * the Pop\Image\Imagick component not functioning properly.
      *
-     * @param  string                          $img
-     * @param  int|string                      $w
-     * @param  int|string                      $h
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @param  array                           $types
+     * @param  string               $img
+     * @param  int                  $w
+     * @param  int                  $h
+     * @param  Space\ColorInterface $color
+     * @param  array                $types
      * @throws Exception
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
-    public function __construct($img, $w = null, $h = null, ColorInterface $color = null, $types = null)
+    public function __construct($img, $w = null, $h = null, Space\ColorInterface $color = null, $types = null)
     {
-        $imagickFile = null;
-        $imgFile = null;
-
         // If image passed is a paged image, like a PDF
         if (!file_exists($img) && (strpos($img, '[') !== false)) {
             $imgFile = trim(substr($img, 0, strpos($img, '[')));
             $imgFile .= substr($img, (strpos($img, ']') + 1));
-            $page = substr($img, strpos($img, '['));
-            $page = substr($page, 0, (strpos($page, ']') + 1));
-            $img = $imgFile;
+
+            $page        = substr($img, strpos($img, '['));
+            $page        = substr($page, 0, (strpos($page, ']') + 1));
+            $img         = $imgFile;
             $imagickFile = (file_exists($imgFile)) ? realpath($imgFile) . $page : $img;
         // Else, continue
         } else {
-            $imgFile = $img;
+            $imgFile     = $img;
             $imagickFile = realpath($img);
         }
 
@@ -183,11 +180,11 @@ class Imagick extends AbstractImage
             $this->height = $h;
             $this->channels = null;
 
-            $color = (null === $color) ? new Rgb(255, 255, 255) : $color;
+            $color = (null === $color) ? new Space\Rgb(255, 255, 255) : $color;
             $clr = $this->setColor($color);
 
             // Create a new image and allocate the background color.
-            $this->resource->newImage($w, $h, $clr, $this->ext);
+            $this->resource->newImage($w, $h, $clr, $this->extension);
 
             // Set the quality and create a new, blank image file.
             $this->setQuality(100);
@@ -207,17 +204,6 @@ class Imagick extends AbstractImage
     }
 
     /**
-     * Get formats
-     *
-     * @return array
-     */
-    public static function formats()
-    {
-        $i = new static('i.jpg', 1, 1);
-        return $i->getFormats();
-    }
-
-    /**
      * Get the image resource to directly interact with it
      *
      * @return \Imagick
@@ -231,7 +217,7 @@ class Imagick extends AbstractImage
      * Set the image quality.
      *
      * @param  int $q
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function setQuality($q = null)
     {
@@ -244,7 +230,7 @@ class Imagick extends AbstractImage
      * Imagick compression constant
      *
      * @param  int $comp
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function setCompression($comp = null)
     {
@@ -256,7 +242,7 @@ class Imagick extends AbstractImage
      * Set the opacity.
      *
      * @param  float $opac
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function setOpacity($opac)
     {
@@ -268,7 +254,7 @@ class Imagick extends AbstractImage
      * Set the image filter.
      *
      * @param  int|string $filter
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function setFilter($filter = null)
     {
@@ -280,7 +266,7 @@ class Imagick extends AbstractImage
      * Set the image blur.
      *
      * @param  int|string $blur
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function setBlur($blur = null)
     {
@@ -292,7 +278,7 @@ class Imagick extends AbstractImage
      * Set the image overlay.
      *
      * @param  int|string $ovr
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function setOverlay($ovr = null)
     {
@@ -304,7 +290,7 @@ class Imagick extends AbstractImage
      * Resize the image object to the width parameter passed.
      *
      * @param  int|string $wid
-     * @return mixed
+     * @return Imagick
      */
     public function resizeToWidth($wid)
     {
@@ -325,7 +311,7 @@ class Imagick extends AbstractImage
      * Resize the image object to the height parameter passed.
      *
      * @param  int|string $hgt
-     * @return mixed
+     * @return Imagick
      */
     public function resizeToHeight($hgt)
     {
@@ -346,7 +332,7 @@ class Imagick extends AbstractImage
      * Resize the image object to the largest dimension
      *
      * @param  int|string $px
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function resize($px)
     {
@@ -371,7 +357,7 @@ class Imagick extends AbstractImage
      * Scale the image object
      *
      * @param  float|string $scl
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function scale($scl)
     {
@@ -413,7 +399,7 @@ class Imagick extends AbstractImage
      * @param  int|string $px
      * @param  int|string $x
      * @param  int|string $y
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function cropThumb($px, $x = 0, $y = 0)
     {
@@ -441,7 +427,7 @@ class Imagick extends AbstractImage
      * to rotate the image.
      *
      * @param  int|string $deg
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function rotate($deg)
     {
@@ -455,6 +441,16 @@ class Imagick extends AbstractImage
     }
 
     /**
+     * Method to get the fonts recognized by Imagick
+     *
+     * @return array
+     */
+    public function getFonts()
+    {
+        return $this->resource->queryFonts();
+    }
+
+    /**
      * Create text within the an image object
      *
      * @param  string     $str
@@ -465,7 +461,7 @@ class Imagick extends AbstractImage
      * @param  int|string $rotate
      * @param  boolean    $stroke
      * @throws Exception
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function text($str, $size, $x, $y, $font = null, $rotate = null, $stroke = false)
     {
@@ -528,7 +524,7 @@ class Imagick extends AbstractImage
      * @param  int $y1
      * @param  int $x2
      * @param  int $y2
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function drawLine($x1, $y1, $x2, $y2)
     {
@@ -548,7 +544,7 @@ class Imagick extends AbstractImage
      * @param  int $y
      * @param  int $w
      * @param  int $h
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function drawRectangle($x, $y, $w, $h = null)
     {
@@ -575,7 +571,7 @@ class Imagick extends AbstractImage
      * @param  int     $x
      * @param  int     $y
      * @param  int     $w
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function drawSquare($x, $y, $w)
     {
@@ -590,7 +586,7 @@ class Imagick extends AbstractImage
      * @param  int $y
      * @param  int $w
      * @param  int $h
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function drawEllipse($x, $y, $w, $h = null)
     {
@@ -617,7 +613,7 @@ class Imagick extends AbstractImage
      * @param  int     $x
      * @param  int     $y
      * @param  int     $w
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function drawCircle($x, $y, $w)
     {
@@ -634,7 +630,7 @@ class Imagick extends AbstractImage
      * @param  int $end
      * @param  int $w
      * @param  int $h
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function drawArc($x, $y, $start, $end, $w, $h = null)
     {
@@ -681,7 +677,7 @@ class Imagick extends AbstractImage
      * Method to add a polygon to the image.
      *
      * @param  array $points
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function drawPolygon($points)
     {
@@ -703,7 +699,7 @@ class Imagick extends AbstractImage
      * Method to adjust the hue of the image.
      *
      * @param  int $h
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function hue($h)
     {
@@ -715,7 +711,7 @@ class Imagick extends AbstractImage
      * Method to adjust the saturation of the image.
      *
      * @param  int $s
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function saturation($s)
     {
@@ -727,7 +723,7 @@ class Imagick extends AbstractImage
      * Method to adjust the brightness of the image.
      *
      * @param  int $b
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function brightness($b)
     {
@@ -741,7 +737,7 @@ class Imagick extends AbstractImage
      * @param  int $h
      * @param  int $s
      * @param  int $b
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function hsb($h, $s, $b)
     {
@@ -755,7 +751,7 @@ class Imagick extends AbstractImage
      * @param  int   $black
      * @param  float $gamma
      * @param  int   $white
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function level($black, $gamma, $white)
     {
@@ -780,7 +776,7 @@ class Imagick extends AbstractImage
      * Method to adjust the contrast of the image.
      *
      * @param  int $amount
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function contrast($amount)
     {
@@ -800,7 +796,7 @@ class Imagick extends AbstractImage
     /**
      * Method to desaturate of the image.
      *
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function desaturate()
     {
@@ -813,7 +809,7 @@ class Imagick extends AbstractImage
      *
      * @param  int $radius
      * @param  int $sigma
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function sharpen($radius = 0, $sigma = 0)
     {
@@ -828,7 +824,7 @@ class Imagick extends AbstractImage
      * @param  int $sigma
      * @param  int $angle
      * @param  int $type
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function blur($radius = 0, $sigma = 0, $angle = 0, $type = Imagick::BLUR)
     {
@@ -856,7 +852,7 @@ class Imagick extends AbstractImage
      * @param  int $w
      * @param  int $h
      * @param  int $type
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function border($w, $h = null, $type = Imagick::INNER_BORDER)
     {
@@ -882,7 +878,7 @@ class Imagick extends AbstractImage
      * @param  string     $ovr
      * @param  int|string $x
      * @param  int|string $y
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function overlay($ovr, $x = 0, $y = 0)
     {
@@ -898,10 +894,10 @@ class Imagick extends AbstractImage
     /**
      * Method to colorize the image with the color passed.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Image\Imagick
+     * @param  Space\ColorInterface $color
+     * @return Imagick
      */
-    public function colorize(ColorInterface $color)
+    public function colorize(Space\ColorInterface $color)
     {
         $this->resource->colorizeImage($color->get(3, true), $this->opacity);
         return $this;
@@ -910,7 +906,7 @@ class Imagick extends AbstractImage
     /**
      * Method to invert the image (create a negative.)
      *
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function invert()
     {
@@ -921,7 +917,7 @@ class Imagick extends AbstractImage
     /**
      * Method to flip the image over the x-axis.
      *
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function flip()
     {
@@ -932,7 +928,7 @@ class Imagick extends AbstractImage
     /**
      * Method to flip the image over the y-axis.
      *
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function flop()
     {
@@ -943,7 +939,7 @@ class Imagick extends AbstractImage
     /**
      * Flatten the image layers
      *
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function flatten()
     {
@@ -955,7 +951,7 @@ class Imagick extends AbstractImage
      * Apply an oil paint effect to the image using the pixel radius threshold
      *
      * @param  int $radius
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function paint($radius)
     {
@@ -968,7 +964,7 @@ class Imagick extends AbstractImage
      *
      * @param  int     $levels
      * @param  boolean $dither
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function posterize($levels, $dither = false)
     {
@@ -980,7 +976,7 @@ class Imagick extends AbstractImage
      * Apply a noise effect to the image
      *
      * @param  int $type
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function noise($type = \Imagick::NOISE_MULTIPLICATIVEGAUSSIAN)
     {
@@ -992,7 +988,7 @@ class Imagick extends AbstractImage
      * Apply a diffusion effect to the image
      *
      * @param  int $radius
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function diffuse($radius)
     {
@@ -1003,12 +999,12 @@ class Imagick extends AbstractImage
     /**
      * Apply a skew effect to the image
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @param  int                             $x
-     * @param  int                             $y
-     * @return \Pop\Image\Imagick
+     * @param  Space\ColorInterface $color
+     * @param  int                  $x
+     * @param  int                  $y
+     * @return Imagick
      */
-    public function skew(ColorInterface $color, $x, $y)
+    public function skew(Space\ColorInterface $color, $x, $y)
     {
         $this->resource->shearImage($color->get(3, true), $x, $y);
         return $this;
@@ -1018,7 +1014,7 @@ class Imagick extends AbstractImage
      * Apply a swirl effect to the image
      *
      * @param  int $degrees
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function swirl($degrees)
     {
@@ -1031,7 +1027,7 @@ class Imagick extends AbstractImage
      *
      * @param  int $amp
      * @param  int $length
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function wave($amp, $length)
     {
@@ -1044,7 +1040,7 @@ class Imagick extends AbstractImage
      *
      * @param  int $w
      * @param  int $h
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function pixelate($w, $h = null)
     {
@@ -1063,7 +1059,7 @@ class Imagick extends AbstractImage
      * @param  int $radius
      * @param  int $sigma
      * @param  int $angle
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function pencil($radius, $sigma, $angle)
     {
@@ -1087,7 +1083,7 @@ class Imagick extends AbstractImage
      * @param int|string $format
      * @return array
      */
-    public function getColors($format = \Pop\Image\Imagick::HEX)
+    public function getColors($format = Imagick::HEX)
     {
         // Initialize the colors array and the image resource.
         $colors = array();
@@ -1121,7 +1117,7 @@ class Imagick extends AbstractImage
      *
      * @param  string     $type
      * @throws Exception
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function convert($type)
     {
@@ -1131,15 +1127,15 @@ class Imagick extends AbstractImage
         if (!array_key_exists($type, $this->allowed)) {
             throw new Exception('Error: That image type is not supported.');
         // Check if the image is already the requested image type.
-        } else if (strtolower($this->ext) == $type) {
+        } else if (strtolower($this->extension) == $type) {
             throw new Exception('Error: This image file is already a ' . strtoupper($type) . ' image file.');
         }
 
         // Else, save the image as the new type.
-        $old = $this->ext;
-        $this->ext = $type;
-        $this->mime = $this->allowed[$this->ext];
-        $this->fullpath = $this->dir . $this->filename . '.' . $this->ext;
+        $old = $this->extension;
+        $this->extension = $type;
+        $this->mime = $this->allowed[$this->extension];
+        $this->fullpath = $this->dir . $this->filename . '.' . $this->extension;
         $this->basename = basename($this->fullpath);
 
         if (($old == 'psd') || ($old == 'tif') || ($old == 'tiff')) {
@@ -1154,7 +1150,7 @@ class Imagick extends AbstractImage
      * Output the image object directly.
      *
      * @param  boolean $download
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function output($download = false)
     {
@@ -1165,10 +1161,10 @@ class Imagick extends AbstractImage
             'Content-disposition' => $attach . 'filename=' . $this->basename
         );
 
-        $response = new \Pop\Http\Response(200, $headers);
-
         if ($_SERVER['SERVER_PORT'] == 443) {
-            $response->setSslHeaders();
+            $headers['Expires']       = 0;
+            $headers['Cache-Control'] = 'private, must-revalidate';
+            $headers['Pragma']        = 'cache';
         }
 
         if (null !== $this->compression) {
@@ -1178,7 +1174,12 @@ class Imagick extends AbstractImage
             $this->resource->setImageCompressionQuality($this->quality);
         }
 
-        $response->sendHeaders();
+        // Send the headers and output the image
+        header('HTTP/1.1 200 OK');
+        foreach ($headers as $name => $value) {
+            header($name . ": " . $value);
+        }
+
         echo $this->resource;
 
         return $this;
@@ -1188,10 +1189,9 @@ class Imagick extends AbstractImage
      * Save the image object to disk.
      *
      * @param  string  $to
-     * @param  boolean $append
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
-    public function save($to = null, $append = false)
+    public function save($to = null)
     {
         if (null !== $this->compression) {
             $this->resource->setImageCompression($this->compression);
@@ -1204,7 +1204,7 @@ class Imagick extends AbstractImage
 
         clearstatcache();
 
-        $this->setFile($img);
+        $this->setImage($img);
         $this->setImageInfo();
 
         return $this;
@@ -1213,10 +1213,10 @@ class Imagick extends AbstractImage
     /**
      * Destroy the image object and the related image file directly.
      *
-     * @param  boolean $file
+     * @param  boolean $delete
      * @return void
      */
-    public function destroy($file = false)
+    public function destroy($delete = false)
     {
         $this->resource->clear();
         $this->resource->destroy();
@@ -1224,16 +1224,16 @@ class Imagick extends AbstractImage
         // Clear PHP's file status cache.
         clearstatcache();
 
-        // If the $file flag is passed, delete the image file.
-        if ($file) {
-            $this->delete();
+        // If the $delete flag is passed, delete the image file.
+        if (($delete) && file_exists($this->fullpath)) {
+            unlink($this->fullpath);
         }
     }
 
     /**
      * Set the current object formats to include the supported formats of Imagick.
      *
-     * @return \Pop\Image\Imagick
+     * @return Imagick
      */
     public function setFormats()
     {
@@ -1252,7 +1252,7 @@ class Imagick extends AbstractImage
     }
 
     /**
-     * Get the array of supported formats of Imagick.
+     * Get the array of supported formats with Imagick.
      *
      * @return array
      */
@@ -1264,7 +1264,7 @@ class Imagick extends AbstractImage
     }
 
     /**
-     * Get the number of supported formats of Imagick.
+     * Get the number of supported formats with Imagick.
      *
      * @return int
      */
@@ -1322,9 +1322,9 @@ class Imagick extends AbstractImage
     protected function setImageInfo()
     {
         // Set image object properties.
-        $this->width = $this->resource->getImageWidth();
-        $this->height = $this->resource->getImageHeight();
-        $this->depth = $this->resource->getImageDepth();
+        $this->width   = $this->resource->getImageWidth();
+        $this->height  = $this->resource->getImageHeight();
+        $this->depth   = $this->resource->getImageDepth();
         $this->quality = null;
 
         $this->alpha = ($this->resource->getImageAlphaChannel() == 1) ? true : false;
@@ -1436,11 +1436,10 @@ class Imagick extends AbstractImage
     /**
      * Set and return a color identifier.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @throws Exception
-     * @return mixed
+     * @param  Space\ColorInterface $color
+     * @return \ImagickPixel
      */
-    protected function setColor(ColorInterface $color = null)
+    protected function setColor(Space\ColorInterface $color = null)
     {
         $clr = (null !== $color) ? $color->get(3, true) : 'rgb(0,0,0)';
         return new \ImagickPixel($clr);

@@ -13,10 +13,12 @@
 /**
  * @namespace
  */
-namespace Pop\Graph\Graph;
+namespace Pop\Graph\Adapter;
+
+use Pop\Color\Space;
 
 /**
- * Vertical graph class
+ * Vertical graph adapter class
  *
  * @category   Pop
  * @package    Pop_Graph
@@ -25,7 +27,7 @@ namespace Pop\Graph\Graph;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class VBar extends AbstractGraph
+class VBar extends AbstractAdapter
 {
 
     /**
@@ -34,7 +36,7 @@ class VBar extends AbstractGraph
      * @param  array $dataPoints
      * @param  array $xAxis
      * @param  array $yAxis
-     * @return \Pop\Graph\Graph\VBar
+     * @return \Pop\Graph\Adapter\VBar
      */
     public function create(array $dataPoints, array $xAxis, array $yAxis)
     {
@@ -71,7 +73,7 @@ class VBar extends AbstractGraph
             }
         } else {
             $this->graph->adapter()->setStrokeWidth($this->graph->getStrokeWidth());
-            $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : new Rgb(0, 0, 0));
+            $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : new Space\Rgb(0, 0, 0));
             for ($i = 0; $i < count($dataPoints); $i++) {
                 $x = ($realXDiv * ($i + 1)) - ($this->graph->getBarWidth() / 1.75);
                 $y = $points->yOffset - ((($dataPoints[$i]) / $points->yRange) * $points->yLength);

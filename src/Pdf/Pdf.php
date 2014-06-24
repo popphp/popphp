@@ -185,7 +185,7 @@ class Pdf
     protected $compress = true;
 
     /**
-     * Full path of pdf file, i.e. '/path/to/fontfile.ext'
+     * Full path of pdf file, i.e. '/path/to/pdffile.ext'
      * @var string
      */
     protected $fullpath = null;
@@ -197,13 +197,13 @@ class Pdf
     protected $dir = null;
 
     /**
-     * Full basename of pdf file, i.e. 'fontfile.ext'
+     * Full basename of pdf file, i.e. 'pdffile.ext'
      * @var string
      */
     protected $basename = null;
 
     /**
-     * Full filename of pdf file, i.e. 'fontfile'
+     * Full filename of pdf file, i.e. 'pdffile'
      * @var string
      */
     protected $filename = null;

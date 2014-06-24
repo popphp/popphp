@@ -112,27 +112,27 @@ class Captcha
      * CAPTCHA colors
      * @var int
      */
-    protected $colors = array(
-        'background' => array('r' => 255, 'g' => 255,'b' => 255),
-        'text'       => array('r' =>   0, 'g' =>   0,'b' =>   0),
-        'grid'       => array('r' => 180, 'g' => 180,'b' => 180),
-        'border'     => array('r' =>   0, 'g' =>   0,'b' =>   0)
-    );
+    protected $colors = [
+        'background' => ['r' => 255, 'g' => 255,'b' => 255],
+        'text'       => ['r' =>   0, 'g' =>   0,'b' =>   0],
+        'grid'       => ['r' => 180, 'g' => 180,'b' => 180],
+        'border'     => ['r' =>   0, 'g' =>   0,'b' =>   0]
+    ];
 
     /**
      * Constructor
      *
      * Instantiate a CAPTCHA image object. Valid options are:
      *
-     *     $options = array(
+     *     $options = [
      *         'width'      => 75,
      *         'height'     => 25,
      *         'background' => array(200, 200, 200) // R, G, B values for the background color
-     *     );
+     *     ];
      *
-     *     $options = array(
+     *     $options = [
      *         'image'  => 'some-image-background,gif'
-     *     );
+     *     ];
      *
      * This $forceGd flag forces the object to use the Gd extension. If both are
      * installed, it will default to Imagick unless this flag is set to true.
@@ -140,7 +140,7 @@ class Captcha
      * @param array   $options
      * @param boolean $forceGd
      * @throws Exception
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function __construct(array $options, $forceGd = false)
     {
@@ -158,12 +158,12 @@ class Captcha
         // Parse through the options
         if (isset($options['image']) && file_exists($options['image'])) {
             $image = $options['image'];
-            $w = null;
-            $h = null;
+            $w     = null;
+            $h     = null;
         } else if (isset($options['width']) && isset($options['height']) && is_numeric($options['width']) && is_numeric($options['height'])) {
             $image = 'pop-captcha.gif';
-            $w = $options['width'];
-            $h = $options['height'];
+            $w     = $options['width'];
+            $h     = $options['height'];
         } else  {
             throw new Exception('Error: You must either pass a valid width and height or a valid image in the $options parameter.');
         }
@@ -176,19 +176,6 @@ class Captcha
 
         // Create new image object
         $this->image = new $class($image, $w, $h, $background);
-    }
-
-    /**
-     * Static method to instantiate the CAPTCHA image object
-     * and return itself to facilitate chaining methods together.
-     *
-     * @param array   $options
-     * @param boolean $forceGd
-     * @return \Pop\Image\Captcha
-     */
-    public static function factory(array $options, $forceGd = false)
-    {
-        return new self($options, $forceGd);
     }
 
     /**
@@ -345,7 +332,7 @@ class Captcha
      * Method to set the string length
      *
      * @param int $length
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setLength($length = 4)
     {
@@ -357,7 +344,7 @@ class Captcha
      * Method to set the grid spacing
      *
      * @param int $grid
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setGridWidth($grid = 5)
     {
@@ -369,7 +356,7 @@ class Captcha
      * Method to set the border width
      *
      * @param mixed $border
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setBorderWidth($border = 0.55)
     {
@@ -381,7 +368,7 @@ class Captcha
      * Method to set the font size
      *
      * @param int $size
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setSize($size = 20)
     {
@@ -393,7 +380,7 @@ class Captcha
      * Method to set the expiration length in seconds
      *
      * @param int $expire
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setExpire($expire = 300)
     {
@@ -405,7 +392,7 @@ class Captcha
      * Method to set the font
      *
      * @param string $font
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setFont($font = null)
     {
@@ -417,7 +404,7 @@ class Captcha
      * Method to set the rotation
      *
      * @param int $rotate
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setRotate($rotate = null)
     {
@@ -429,7 +416,7 @@ class Captcha
      * Method to set the X position
      *
      * @param int $x
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setX($x = null)
     {
@@ -441,7 +428,7 @@ class Captcha
      * Method to set the Y position
      *
      * @param int $y
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setY($y = null)
     {
@@ -454,7 +441,7 @@ class Captcha
      *
      * @param int $x
      * @param int $y
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setXY($x = null, $y = null)
     {
@@ -467,7 +454,7 @@ class Captcha
      * Method to set the swirl
      *
      * @param int $swirl
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setSwirl($swirl = null)
     {
@@ -481,7 +468,7 @@ class Captcha
      * @param int $r
      * @param int $g
      * @param int $b
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setBackgroundColor($r, $g, $b)
     {
@@ -498,7 +485,7 @@ class Captcha
      * @param int $r
      * @param int $g
      * @param int $b
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setTextColor($r, $g, $b)
     {
@@ -515,7 +502,7 @@ class Captcha
      * @param int $r
      * @param int $g
      * @param int $b
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setGridColor($r = null, $g = null, $b = null)
     {
@@ -538,7 +525,7 @@ class Captcha
      * @param int $r
      * @param int $g
      * @param int $b
-     * @return \Pop\Image\Captcha
+     * @return Captcha
      */
     public function setBorderColor($r = null, $g = null, $b = null)
     {
@@ -562,7 +549,7 @@ class Captcha
      */
     public function output()
     {
-        $width = $this->image->getWidth();
+        $width  = $this->image->getWidth();
         $height = $this->image->getHeight();
 
         // If grid is set, draw grid
@@ -637,7 +624,7 @@ class Captcha
             $this->image->text($this->token['value'], $this->size, $this->x, $this->y);
         }
 
-        if (null !== $this->swirl) {
+        if ((null !== $this->swirl) && method_exists($this->image, 'swirl')) {
             $this->image->swirl($this->swirl);
         }
 
@@ -682,12 +669,12 @@ class Captcha
 
         // If no captcha token has been created, create one
         if (!isset($_SESSION['pop_captcha'])) {
-            $this->token = array(
+            $this->token = [
                 'captcha' => '<img id="pop-captcha-image" src="' . $_SERVER['PHP_SELF'] . '" alt="POP Captcha Image" /><br />(<a class="reload" href="#" onclick="document.getElementById(\'pop-captcha-image\').src = document.getElementById(\'pop-captcha-image\').src + \'?reload=1\'; return false;">Reload</a>)',
                 'value'   => $str,
                 'expire'  => (int)$this->expire,
                 'start'   => time()
-            );
+            ];
             $_SESSION['pop_captcha'] = serialize($this->token);
         // Else, retrieve the existing one
         } else {

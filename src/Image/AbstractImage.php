@@ -27,7 +27,7 @@ use Pop\Color\Space\ColorInterface;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-abstract class AbstractImage extends \Pop\File\File
+abstract class AbstractImage
 {
 
     /**
@@ -59,6 +59,18 @@ abstract class AbstractImage extends \Pop\File\File
      * @var int
      */
     const HEX = 1;
+
+    /**
+     * Array of allowed image types.
+     * @var array
+     */
+    protected $allowed = array(
+        'gif'  => 'image/gif',
+        'jpe'  => 'image/jpeg',
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png'  => 'image/png'
+    );
 
     /**
      * Image extension info
@@ -139,21 +151,83 @@ abstract class AbstractImage extends \Pop\File\File
     protected $resource = null;
 
     /**
+     * Full path of image file, i.e. '/path/to/image.ext'
+     * @var string
+     */
+    protected $fullpath = null;
+
+    /**
+     * Full, absolute directory of the image file, i.e. '/some/dir/'
+     * @var string
+     */
+    protected $dir = null;
+
+    /**
+     * Full basename of image file, i.e. 'image.ext'
+     * @var string
+     */
+    protected $basename = null;
+
+    /**
+     * Full filename of image file, i.e. 'image'
+     * @var string
+     */
+    protected $filename = null;
+
+    /**
+     * Image file extension, i.e. 'ext'
+     * @var string
+     */
+    protected $extension = 'pdf';
+
+    /**
+     * Image file size in bytes
+     * @var int
+     */
+    protected $size = 0;
+
+    /**
+     * Image file mime type
+     * @var string
+     */
+    protected $mime = null;
+
+    /**
+     * Image file output buffer
+     * @var string
+     */
+    protected $output = null;
+
+    /**
      * Constructor
      *
      * Instantiate an image file object based on either a pre-existing
      * image file on disk, or a new image file.
      *
-     * @param  string                          $img
-     * @param  int|string                      $w
-     * @param  int|string                      $h
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @param  array                           $types
-     * @return \Pop\Image\AbstractImage
+     * @param  string         $img
+     * @param  int            $w
+     * @param  int            $h
+     * @param  ColorInterface $color
+     * @param  array          $types
+     * @return AbstractImage
      */
-    public function __construct($img, $w = null, $h = null, ColorInterface $color = null, $types = null)
+    public function __construct($img, $w = null, $h = null, ColorInterface $color = null, array $types = null)
     {
-        parent::__construct($img, $types);
+        if (null !== $types) {
+            $this->allowed = $types;
+        }
+        $this->setImage($img);
+    }
+
+    /**
+     * Get formats
+     *
+     * @return array
+     */
+    public static function formats()
+    {
+        $i = new static('i.jpg', 1, 1);
+        return $i->getFormats();
     }
 
     /**
@@ -165,6 +239,40 @@ abstract class AbstractImage extends \Pop\File\File
     {
         return $this->info;
     }
+
+    /**
+     * Get the image full path
+     *
+     * @return string
+     */
+    public function getFullPath()
+    {
+        return $this->fullpath;
+    }
+
+    /**
+     * Get the image mime type
+     *
+     * @return string
+     */
+    public function getMime()
+    {
+        return $this->mime;
+    }
+
+    /**
+     * Get the array of supported image formats.
+     *
+     * @return array
+     */
+    abstract public function getFormats();
+
+    /**
+     * Get the number of supported image formats.
+     *
+     * @return int
+     */
+    abstract public function getNumberOfFormats();
 
     /**
      * Set the image quality based on the type of image.
@@ -237,7 +345,7 @@ abstract class AbstractImage extends \Pop\File\File
     /**
      * Set the fill color.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
+     * @param  ColorInterface $color
      * @return mixed
      */
     public function setFillColor(ColorInterface $color = null)
@@ -249,7 +357,7 @@ abstract class AbstractImage extends \Pop\File\File
     /**
      * Set the background color.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
+     * @param  ColorInterface $color
      * @return mixed
      */
     public function setBackgroundColor(ColorInterface $color = null)
@@ -261,7 +369,7 @@ abstract class AbstractImage extends \Pop\File\File
     /**
      * Set the stroke color.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
+     * @param  ColorInterface $color
      * @return mixed
      */
     public function setStrokeColor(ColorInterface $color = null)
@@ -280,6 +388,30 @@ abstract class AbstractImage extends \Pop\File\File
     {
         $this->strokeWidth = $wid;
         return $this;
+    }
+
+    /**
+     * Set the image
+     *
+     * @param  string $img
+     * @throws Exception
+     * @return void
+     */
+    protected function setImage($img)
+    {
+        $this->fullpath  = $img;
+        $parts           = pathinfo($img);
+        $this->size      = (file_exists($img) ? filesize($img) : 0);
+        $this->dir       = realpath($parts['dirname']);
+        $this->basename  = $parts['basename'];
+        $this->filename  = $parts['filename'];
+        $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
+
+        if (null === $this->extension) {
+            throw new Exception('Error: That image file does not have the correct extension.');
+        } else {
+            $this->mime = $this->allowed[$this->extension];
+        }
     }
 
     /**
@@ -484,7 +616,7 @@ abstract class AbstractImage extends \Pop\File\File
     /**
      * Method to colorize the image with the color passed.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
+     * @param  ColorInterface $color
      * @return mixed
      */
     abstract public function colorize(ColorInterface $color);
@@ -548,7 +680,7 @@ abstract class AbstractImage extends \Pop\File\File
     /**
      * Set and return a color identifier.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
+     * @param  ColorInterface $color
      * @throws Exception
      * @return mixed
      */

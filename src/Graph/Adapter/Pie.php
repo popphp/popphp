@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Graph\Graph;
+namespace Pop\Graph\Adapter;
 
 /**
- * Pie chart class
+ * Pie chart adapter class
  *
  * @category   Pop
  * @package    Pop_Graph
@@ -25,7 +25,7 @@ namespace Pop\Graph\Graph;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Pie extends AbstractGraph
+class Pie extends AbstractAdapter
 {
 
     /**
@@ -35,7 +35,7 @@ class Pie extends AbstractGraph
      * @param  array $percents
      * @param  int   $explode
      * @throws Exception
-     * @return \Pop\Graph\Graph\Pie
+     * @return \Pop\Graph\Adapter\Pie
      */
     public function create(array $pie, array $percents, $explode = 0)
     {

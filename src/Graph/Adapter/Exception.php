@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Graph\Graph;
+namespace Pop\Graph\Adapter;
 
 /**
- * Graph abstract exception class
+ * Graph adapter exception class
  *
  * @category   Pop
  * @package    Pop_Graph
