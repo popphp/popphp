@@ -15,7 +15,7 @@
  */
 namespace Pop\Shipping\Adapter;
 
-use Pop\Curl\Curl;
+use Pop\Http\Client\Curl;
 use Pop\Dom\Dom;
 use Pop\Dom\Child;
 
@@ -396,7 +396,7 @@ class Ups extends AbstractAdapter
         }
 
         $curl = new Curl($this->url, $options);
-        $curl->execute();
+        $curl->send();
         $this->response     = simplexml_load_string($curl->getBody());
         $this->responseCode = (int)$this->response->Response->ResponseStatusCode;
 

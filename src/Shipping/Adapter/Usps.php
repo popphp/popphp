@@ -15,7 +15,7 @@
  */
 namespace Pop\Shipping\Adapter;
 
-use Pop\Curl\Curl;
+use Pop\Http\Client\Curl;
 use Pop\Dom\Child;
 
 /**
@@ -252,7 +252,7 @@ class Usps extends AbstractAdapter
         }
 
         $curl = new Curl($url, $options);
-        $curl->execute();
+        $curl->send();
         $this->response = simplexml_load_string($curl->getBody());
 
         if (isset($this->response->Package)) {

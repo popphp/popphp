@@ -156,26 +156,12 @@ class Response
 
         // If a URL, use a stream to get the header and URL contents
         if ((strtolower(substr($response, 0, 7)) == 'http://') || (strtolower(substr($response, 0, 8)) == 'https://')) {
-            $http_response_header = null;
-
-            $stream = (null !== $context) ?
-                @fopen($response, $mode, false, stream_context_create(['http' => $context])) :
-                @fopen($response, $mode);
-
-            if ($stream != false) {
-                $meta = stream_get_meta_data($stream);
-                $body = stream_get_contents($stream);
-
-                $firstLine = $meta['wrapper_data'][0];
-                unset($meta['wrapper_data'][0]);
-                $allHeadersAry = $meta['wrapper_data'];
-                $bodyStr = $body;
-            } else {
-                $firstLine = $http_response_header[0];
-                unset($http_response_header[0]);
-                $allHeadersAry = $http_response_header;
-                $bodyStr = null;
-            }
+            $client = new Client\Stream($response);
+            $code    = $client->getCode();
+            $headers = $client->getHeaders();
+            $body    = $client->getBody();
+            $message = $client->getMessage();
+            $version = $client->getHttpVersion();
         // Else, if a response string, parse the headers and contents
         } else if (substr($response, 0, 5) == 'HTTP/'){
             if (strpos($response, "\r") !== false) {
@@ -189,32 +175,32 @@ class Response
             $firstLine = trim(substr($headerStr, 0, strpos($headerStr, "\n")));
             $allHeaders = trim(substr($headerStr, strpos($headerStr, "\n")));
             $allHeadersAry = explode("\n", $allHeaders);
+
+            // Get the version, code and message
+            $version = substr($firstLine, 0, strpos($firstLine, ' '));
+            $version = substr($version, (strpos($version, '/') + 1));
+            preg_match('/\d\d\d/', trim($firstLine), $match);
+            $code = $match[0];
+            $message = str_replace('HTTP/' . $version . ' ' . $code . ' ', '', $firstLine);
+
+            // Get the headers
+            foreach ($allHeadersAry as $hdr) {
+                $name = substr($hdr, 0, strpos($hdr, ':'));
+                $value = substr($hdr, (strpos($hdr, ' ') + 1));
+                $headers[trim($name)] = trim($value);
+            }
+
+            // If the body content is encoded, decode the body content
+            if (array_key_exists('Content-Encoding', $headers)) {
+                if (isset($headers['Transfer-Encoding']) && ($headers['Transfer-Encoding'] == 'chunked')) {
+                    $bodyStr = self::decodeChunkedBody($bodyStr);
+                }
+                $body = self::decodeBody($bodyStr, $headers['Content-Encoding']);
+            } else {
+                $body = $bodyStr;
+            }
         } else {
             throw new Exception('The response was not properly formatted.');
-        }
-
-        // Get the version, code and message
-        $version = substr($firstLine, 0, strpos($firstLine, ' '));
-        $version = substr($version, (strpos($version, '/') + 1));
-        preg_match('/\d\d\d/', trim($firstLine), $match);
-        $code = $match[0];
-        $message = str_replace('HTTP/' . $version . ' ' . $code . ' ', '', $firstLine);
-
-        // Get the headers
-        foreach ($allHeadersAry as $hdr) {
-            $name = substr($hdr, 0, strpos($hdr, ':'));
-            $value = substr($hdr, (strpos($hdr, ' ') + 1));
-            $headers[trim($name)] = trim($value);
-        }
-
-        // If the body content is encoded, decode the body content
-        if (array_key_exists('Content-Encoding', $headers)) {
-            if (isset($headers['Transfer-Encoding']) && ($headers['Transfer-Encoding'] == 'chunked')) {
-                $bodyStr = self::decodeChunkedBody($bodyStr);
-            }
-            $body = self::decodeBody($bodyStr, $headers['Content-Encoding']);
-        } else {
-            $body = $bodyStr;
         }
 
         return new Response([

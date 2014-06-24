@@ -15,7 +15,7 @@
  */
 namespace Pop\Payment\Adapter;
 
-use Pop\Curl\Curl;
+use Pop\Http\Client\Curl;
 
 /**
  * PayPal payment adapter class
@@ -211,8 +211,9 @@ class PayPal extends AbstractAdapter
         }
 
         $curl = new Curl($url, $options);
+        $curl->send();
 
-        $this->response      = $curl->execute();
+        $this->response      = $curl->getResponse();
         $this->responseCodes = $this->parseResponseCodes();
 
         if (stripos($this->responseCodes['ACK'], 'Success') !== false) {

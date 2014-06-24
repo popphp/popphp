@@ -15,7 +15,7 @@
  */
 namespace Pop\Payment\Adapter;
 
-use Pop\Curl\Curl;
+use Pop\Http\Client\Curl;
 
 /**
  * USAEPay payment adapter class
@@ -176,8 +176,9 @@ class UsaEpay extends AbstractAdapter
         }
 
         $curl = new Curl($url, $options);
+        $curl->send();
 
-        $this->response      = $curl->execute();
+        $this->response      = $curl->getResponse();
         $this->responseCodes = $this->parseResponseCodes();
         $this->responseCode  = $this->responseCodes['UMerrorcode'];
         $this->message       = $this->responseCodes['UMerror'];

@@ -15,7 +15,7 @@
  */
 namespace Pop\Payment\Adapter;
 
-use Pop\Curl\Curl;
+use Pop\Http\Client\Curl;
 
 /**
  * PayLeap payment adapter class
@@ -162,8 +162,9 @@ class PayLeap extends AbstractAdapter
         }
 
         $curl = new Curl($url, $options);
+        $curl->send();
 
-        $this->response      = $curl->execute();
+        $this->response      = $curl->getResponse();
         $this->responseCodes = $this->parseResponseCodes();
         $this->responseCode  = $this->responseCodes['Result'];
         $this->message       = $this->responseCodes['RespMSG'];

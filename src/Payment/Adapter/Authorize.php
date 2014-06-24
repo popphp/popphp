@@ -15,7 +15,7 @@
  */
 namespace Pop\Payment\Adapter;
 
-use Pop\Curl\Curl;
+use Pop\Http\Client\Curl;
 
 /**
  * Authorize payment adapter class
@@ -213,7 +213,8 @@ class Authorize extends AbstractAdapter
         }
 
         $curl = new Curl($url, $options);
-        $this->response        = $curl->execute();
+        $curl->send();
+        $this->response        = $curl->getResponse();
         $this->responseCodes   = explode('|', $this->response);
         $this->responseCode    = $this->responseCodes[0];
         $this->responseSubcode = $this->responseCodes[1];

@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Curl
+ * @package    Pop_Http
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,13 +13,13 @@
 /**
  * @namespace
  */
-namespace Pop\Curl;
+namespace Pop\Http\Client;
 
 /**
  * Curl exception class
  *
  * @category   Pop
- * @package    Pop_Curl
+ * @package    Pop_Http
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License

@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Curl
+ * @package    Pop_Http
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,80 +13,20 @@
 /**
  * @namespace
  */
-namespace Pop\Curl;
+namespace Pop\Http\Client;
 
 /**
  * Curl class
  *
  * @category   Pop
- * @package    Pop_Curl
+ * @package    Pop_Http
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Curl
+class Curl extends AbstractClient
 {
-
-    /**
-     * cURL resource
-     * @var cURL resource
-     */
-    protected $curl = null;
-
-    /**
-     * HTTP version from response
-     * @var string
-     */
-    protected $version = null;
-
-    /**
-     * Response code
-     * @var int
-     */
-    protected $code = null;
-
-    /**
-     * Response message
-     * @var string
-     */
-    protected $message = null;
-
-    /**
-     * Response string
-     * @var string
-     */
-    protected $response = null;
-
-    /**
-     * Raw response header
-     * @var string
-     */
-    protected $header = null;
-
-    /**
-     * Raw response header size
-     * @var int
-     */
-    protected $headerSize = 0;
-
-    /**
-     * Response headers
-     * @var array
-     */
-    protected $headers = [];
-
-    /**
-     * Response body
-     * @var string
-     */
-    protected $body = null;
-
-    /**
-     * Fields
-     * @var array
-     */
-    protected $fields = [];
 
     /**
      * cURL options
@@ -101,13 +41,14 @@ class Curl
      *
      * @param  string $url
      * @param  array  $opts
-     * @return \Pop\Curl\Curl
+     * @return Curl
      */
     public function __construct($url, array $opts = null)
     {
-        $this->curl = curl_init();
+        $this->setUrl($url);
+        $this->resource = curl_init();
 
-        $this->setOption(CURLOPT_URL, $url);
+        $this->setOption(CURLOPT_URL, $this->url);
         $this->setOption(CURLOPT_HEADER, true);
         $this->setOption(CURLOPT_RETURNTRANSFER, true);
 
@@ -121,11 +62,11 @@ class Curl
      *
      * @param  int    $opt
      * @param  string $val
-     * @return \Pop\Curl\Curl
+     * @return Curl
      */
     public function setOption($opt, $val)
     {
-        curl_setopt($this->curl, $opt, $val);
+        curl_setopt($this->resource, $opt, $val);
         $this->options[$opt] = $val;
 
         return $this;
@@ -135,11 +76,11 @@ class Curl
      * Set cURL session options.
      *
      * @param  array $opts
-     * @return \Pop\Curl\Curl
+     * @return Curl
      */
     public function setOptions($opts)
     {
-        curl_setopt_array($this->curl, $opts);
+        curl_setopt_array($this->resource, $opts);
 
         // Set the protected property to the cURL options.
         foreach ($opts as $k => $v) {
@@ -150,37 +91,10 @@ class Curl
     }
 
     /**
-     * Set a field
-     *
-     * @param  string $name
-     * @param  mixed  $value
-     * @return \Pop\Curl\Curl
-     */
-    public function setField($name, $value)
-    {
-        $this->fields[$name] = $value;
-        return $this;
-    }
-
-    /**
-     * Set all fields
-     *
-     * @param  array $fields
-     * @return \Pop\Curl\Curl
-     */
-    public function setFields(array $fields)
-    {
-        foreach ($fields as $name => $value) {
-            $this->setField($name, $value);
-        }
-        return $this;
-    }
-
-    /**
      * Set cURL option to return the header
      *
      * @param  boolean $header
-     * @return \Pop\Curl\Curl
+     * @return Curl
      */
     public function setReturnHeader($header = false)
     {
@@ -192,7 +106,7 @@ class Curl
      * Set cURL option to return the transfer
      *
      * @param  boolean $transfer
-     * @return \Pop\Curl\Curl
+     * @return Curl
      */
     public function setReturnTransfer($transfer = false)
     {
@@ -204,7 +118,7 @@ class Curl
      * Set cURL option for POST
      *
      * @param  boolean $post
-     * @return \Pop\Curl\Curl
+     * @return Curl
      */
     public function setPost($post = false)
     {
@@ -243,42 +157,6 @@ class Curl
     }
 
     /**
-     * Get a field
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public function getField($name)
-    {
-        return (isset($this->fields[$name])) ? $this->fields[$name] : null;
-    }
-
-    /**
-     * Get all field
-     *
-     * @return array
-     */
-    public function getFields()
-    {
-        return $this->fields;
-    }
-
-    /**
-     * Remove a field
-     *
-     * @param  string $name
-     * @return \Pop\Curl\Curl
-     */
-    public function removeField($name)
-    {
-        if (isset($this->fields[$name])) {
-            unset($this->fields[$name]);
-        }
-
-        return $this;
-    }
-
-    /**
      * Get a cURL session option.
      *
      * @param  int $opt
@@ -297,96 +175,15 @@ class Curl
      */
     public function getInfo($opt = null)
     {
-        return (null !== $opt) ? curl_getinfo($this->curl, $opt) : curl_getinfo($this->curl);
+        return (null !== $opt) ? curl_getinfo($this->resource, $opt) : curl_getinfo($this->resource);
     }
 
     /**
-     * Get the full cURL response
+     * Method to send the request and get the response
      *
-     * @return string
+     * @return void
      */
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
-     * Get a response header
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public function getHeader($name)
-    {
-        return (isset($this->headers[$name])) ? $this->headers[$name] : null;
-    }
-
-    /**
-     * Get all response headers
-     *
-     * @return array
-     */
-    public function getHeaders()
-    {
-        return $this->headers;
-    }
-
-    /**
-     * Get raw response header
-     *
-     * @return string
-     */
-    public function getRawHeader()
-    {
-        return $this->header;
-    }
-
-    /**
-     * Get the cURL response body
-     *
-     * @return string
-     */
-    public function getBody()
-    {
-        return $this->body;
-    }
-
-    /**
-     * Get the cURL response code
-     *
-     * @return string
-     */
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    /**
-     * Get the cURL response HTTP version
-     *
-     * @return string
-     */
-    public function getHttpVersion()
-    {
-        return $this->version;
-    }
-
-    /**
-     * Get the cURL response HTTP message
-     *
-     * @return string
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    /**
-     * Execute the cURL session.
-     *
-     * @return mixed
-     */
-    public function execute()
+    public function send()
     {
         // Set query data if there is any
         if (count($this->fields) > 0) {
@@ -398,24 +195,26 @@ class Curl
             }
         }
 
-        $this->response = curl_exec($this->curl);
+        $this->response = curl_exec($this->resource);
         if ($this->response === false) {
             $this->showError();
         }
 
         // If the CURLOPT_RETURNTRANSFER option is set, get the response body and parse the headers.
         if (isset($this->options[CURLOPT_RETURNTRANSFER]) && ($this->options[CURLOPT_RETURNTRANSFER] == true)) {
-            $this->headerSize = $this->getInfo(CURLINFO_HEADER_SIZE);
+            $headerSize = $this->getInfo(CURLINFO_HEADER_SIZE);
             if ($this->options[CURLOPT_HEADER]) {
-                $this->header = substr($this->response, 0, $this->headerSize);
-                $this->body = substr($this->response, $this->headerSize);
+                $this->header = substr($this->response, 0, $headerSize);
+                $this->body   = substr($this->response, $headerSize);
                 $this->parseHeaders();
             } else {
                 $this->body = $this->response;
             }
         }
 
-        return $this->response;
+        if (array_key_exists('Content-Encoding', $this->headers)) {
+            $this->decodeBody();
+        }
     }
 
     /**
@@ -429,34 +228,14 @@ class Curl
     }
 
     /**
-     * Determine whether or not connected
-     *
-     * @return boolean
-     */
-    public function isConnected()
-    {
-        return is_resource($this->curl);
-    }
-
-    /**
-     * Get the connection resource
-     *
-     * @return resource
-     */
-    public function getConnection()
-    {
-        return $this->curl;
-    }
-
-    /**
-     * Close the FTP connection.
+     * Close the cURL connection.
      *
      * @return void
      */
     public function disconnect()
     {
-        if ($this->isConnected()) {
-            curl_close($this->curl);
+        if ($this->hasResource()) {
+            curl_close($this->resource);
         }
     }
 
@@ -477,7 +256,7 @@ class Curl
                     $this->code = $match[0];
                     $this->message = trim(str_replace('HTTP/' . $this->version . ' ' . $this->code . ' ', '', $header));
                 } else if (strpos($header, ':') !== false) {
-                    $name = substr($header, 0, strpos($header, ':'));
+                    $name  = substr($header, 0, strpos($header, ':'));
                     $value = substr($header, strpos($header, ':') + 1);
                     $this->headers[trim($name)] = trim($value);
                 }
@@ -493,7 +272,7 @@ class Curl
      */
     protected function showError()
     {
-        throw new Exception('Error: ' . curl_errno($this->curl) . ' => ' . curl_error($this->curl) . '.');
+        throw new Exception('Error: ' . curl_errno($this->resource) . ' => ' . curl_error($this->resource) . '.');
     }
 
 }

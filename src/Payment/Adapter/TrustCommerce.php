@@ -15,7 +15,7 @@
  */
 namespace Pop\Payment\Adapter;
 
-use Pop\Curl\Curl;
+use Pop\Http\Client\Curl;
 
 /**
  * TrustCommerce payment adapter class
@@ -173,8 +173,9 @@ class TrustCommerce extends AbstractAdapter
         }
 
         $curl = new Curl($this->url, $options);
+        $curl->send();
 
-        $this->response      = $curl->execute();
+        $this->response      = $curl->getResponse();
         $this->responseCodes = $this->parseResponseCodes();
         $this->responseCode  = (isset($this->responseCodes['transid']) ? $this->responseCodes['transid'] : null);
         $this->message       = $this->responseCodes['status'];
