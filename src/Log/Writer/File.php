@@ -71,7 +71,7 @@ class File implements WriterInterface
     protected $size = 0;
 
     /**
-     * Archive mime type
+     * Log file mime type
      * @var string
      */
     protected $mime = 'text/plain';

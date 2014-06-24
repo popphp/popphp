@@ -32,21 +32,20 @@ class Loca
      * Location offsets
      * @var array
      */
-    public $offsets = array();
+    public $offsets = [];
 
     /**
      * Constructor
      *
      * Instantiate a TTF 'loca' table object.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return \Pop\Font\TrueType\Table\Loca
      */
-    public function __construct(\Pop\Font\AbstractFont $font)
+    public function __construct(\Pop\Font\TrueType $font)
     {
-        $bytePos = $font->tableInfo['loca']->offset;
-
-        $format = ($font->header->indexToLocFormat == 1) ? 'N' : 'n';
+        $bytePos    = $font->tableInfo['loca']->offset;
+        $format     = ($font->header->indexToLocFormat == 1) ? 'N' : 'n';
         $byteLength = ($font->header->indexToLocFormat == 1) ? 4 : 2;
         $multiplier = ($font->header->indexToLocFormat == 1) ? 1 : 2;
 

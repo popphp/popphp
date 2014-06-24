@@ -32,13 +32,13 @@ class Name
      * Font info
      * @var array
      */
-    protected $fontInfo = array();
+    protected $fontInfo = [];
 
     /**
      * TrueType font info names
      * @var array
      */
-    protected $names = array(
+    protected $names = [
         0  => 'copyright',
         1  => 'fontFamily',
         2  => 'fontSubFamily',
@@ -58,17 +58,17 @@ class Name
         17 => 'preferredSubFamily',
         18 => 'compatibleFull',
         19 => 'sampleText'
-    );
+    ];
 
     /**
      * Constructor
      *
      * Instantiate a TTF 'name' table object.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return \Pop\Font\TrueType\Table\Name
      */
-    public function __construct(\Pop\Font\AbstractFont $font)
+    public function __construct(\Pop\Font\TrueType $font)
     {
         $font->tableInfo['name']->header = new \ArrayObject(
             unpack(

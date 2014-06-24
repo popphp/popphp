@@ -50,13 +50,13 @@ class TrueType extends AbstractFont
      * TrueType font tables
      * @var array
      */
-    public $tables = array();
+    public $tables = [];
 
     /**
      * TrueType font table info
      * @var array
      */
-    public $tableInfo = array();
+    public $tableInfo = [];
 
     /**
      * Constructor
@@ -161,12 +161,12 @@ class TrueType extends AbstractFont
             $this->tables['head']->xMax = $this->toEmSpace($this->tables['head']->xMax);
             $this->tables['head']->yMax = $this->toEmSpace($this->tables['head']->yMax);
 
-            $this->bBox = new \ArrayObject(array(
+            $this->bBox = new \ArrayObject([
                 'xMin' => $this->tables['head']->xMin,
                 'yMin' => $this->tables['head']->yMin,
                 'xMax' => $this->tables['head']->xMax,
                 'yMax' => $this->tables['head']->yMax
-            ), \ArrayObject::ARRAY_AS_PROPS);
+            ], \ArrayObject::ARRAY_AS_PROPS);
 
             $this->header = $this->tables['head'];
         }

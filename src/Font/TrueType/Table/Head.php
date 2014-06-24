@@ -32,32 +32,32 @@ class Head
      * Header info
      * @var array
      */
-    protected $headerInfo = array();
+    protected $headerInfo = [];
 
     /**
      * Constructor
      *
      * Instantiate a TTF 'head' table object.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return \Pop\Font\TrueType\Table\Head
      */
-    public function __construct(\Pop\Font\AbstractFont $font)
+    public function __construct(\Pop\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['head']->offset;
 
         $tableVersionNumberBytes = $font->read($bytePos, 4);
-        $tableVersionNumber = $font->readFixed(16, 16, $tableVersionNumberBytes);
+        $tableVersionNumber      = $font->readFixed(16, 16, $tableVersionNumberBytes);
 
         $bytePos += 4;
 
         $fontRevisionBytes = $font->read($bytePos, 4);
-        $fontRevision = $font->readFixed(16, 16, $fontRevisionBytes);
+        $fontRevision      = $font->readFixed(16, 16, $fontRevisionBytes);
 
-        $versionArray = array(
+        $versionArray = [
             'tableVersionNumber' => $tableVersionNumber,
             'fontRevision'       => $fontRevision
-        );
+        ];
 
         $bytePos += 4;
 

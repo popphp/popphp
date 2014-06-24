@@ -51,10 +51,10 @@ class Hhea
      *
      * Instantiate a TTF 'hhea' table object.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return \Pop\Font\TrueType\Table\Hhea
      */
-    public function __construct(\Pop\Font\AbstractFont $font)
+    public function __construct(\Pop\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['hhea']->offset + 4;
 
@@ -64,7 +64,7 @@ class Hhea
         );
 
         $ary = $font->shiftToSigned($ary);
-        $this->ascent = $font->toEmSpace($ary['ascent']);
+        $this->ascent  = $font->toEmSpace($ary['ascent']);
         $this->descent = $font->toEmSpace($ary['descent']);
 
         $bytePos = $font->tableInfo['hhea']->offset + 34;

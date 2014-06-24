@@ -32,23 +32,23 @@ class Glyf
      * Glyphs
      * @var array
      */
-    public $glyphs = array();
+    public $glyphs = [];
 
     /**
      * Glyph widths
      * @var array
      */
-    public $glyphWidths = array();
+    public $glyphWidths = [];
 
     /**
      * Constructor
      *
      * Instantiate a TTF 'glyf' table object.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return \Pop\Font\TrueType\Table\Glyf
      */
-    public function __construct(\Pop\Font\AbstractFont $font)
+    public function __construct(\Pop\Font\TrueType $font)
     {
         $locaLength = count($font->tables['loca']->offsets);
         $j = 0;
@@ -62,15 +62,15 @@ class Glyf
                 'nyMax', $font->read($bytePos, 10)
             );
             $ary = $font->shiftToSigned($ary);
-            $ary['xMin'] = $font->toEmSpace($ary['xMin']);
-            $ary['yMin'] = $font->toEmSpace($ary['yMin']);
-            $ary['xMax'] = $font->toEmSpace($ary['xMax']);
-            $ary['yMax'] = $font->toEmSpace($ary['yMax']);
+            $ary['xMin']  = $font->toEmSpace($ary['xMin']);
+            $ary['yMin']  = $font->toEmSpace($ary['yMin']);
+            $ary['xMax']  = $font->toEmSpace($ary['xMax']);
+            $ary['yMax']  = $font->toEmSpace($ary['yMax']);
             $ary['width'] = $ary['xMin'] + $ary['xMax'];
             $this->glyphWidths[] = $ary['width'];
 
             $bytePos += 10;
-            $ary['endPtsOfContours'] = array();
+            $ary['endPtsOfContours'] = [];
             $ary['instructionLength'] = null;
             $ary['instructions'] = null;
             $ary['flags'] = null;

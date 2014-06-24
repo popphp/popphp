@@ -46,14 +46,14 @@ class Post
      *
      * Instantiate a TTF 'post' table object.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return \Pop\Font\TrueType\Table\Post
      */
-    public function __construct(\Pop\Font\AbstractFont $font)
+    public function __construct(\Pop\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['post']->offset + 4;
 
-        $italicBytes = $font->read($bytePos, 4);
+        $italicBytes       = $font->read($bytePos, 4);
         $this->italicAngle = $font->readFixed(16, 16, $italicBytes);
 
         $bytePos += 8;

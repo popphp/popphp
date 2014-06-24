@@ -39,13 +39,13 @@ class Maxp
      *
      * Instantiate a TTF 'maxp' table object.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return \Pop\Font\TrueType\Table\Maxp
      */
-    public function __construct(\Pop\Font\AbstractFont $font)
+    public function __construct(\Pop\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['maxp']->offset + 4;
-        $ary = unpack('nnumberOfGlyphs/', $font->read($bytePos, 2));
+        $ary     = unpack('nnumberOfGlyphs/', $font->read($bytePos, 2));
         $this->numberOfGlyphs = $ary['numberOfGlyphs'];
     }
 

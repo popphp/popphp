@@ -32,17 +32,17 @@ class Hmtx
      * Glyph widths
      * @var array
      */
-    public $glyphWidths = array();
+    public $glyphWidths = [];
 
     /**
      * Constructor
      *
      * Instantiate a TTF 'hmtx' table object.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return \Pop\Font\TrueType\Table\Hmtx
      */
-    public function __construct(\Pop\Font\AbstractFont $font)
+    public function __construct(\Pop\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['hmtx']->offset;
 

@@ -38,17 +38,17 @@ class Cmap
      * Cmap subtables
      * @var \ArrayObject
      */
-    public $subTables = array();
+    public $subTables = [];
 
     /**
      * Constructor
      *
-     * Instantiate a TTF 'cmap table object.
+     * Instantiate a TTF 'cmap' table object.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return \Pop\Font\TrueType\Table\Cmap
      */
-    public function __construct(\Pop\Font\AbstractFont $font)
+    public function __construct(\Pop\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['cmap']->offset;
 
@@ -65,14 +65,14 @@ class Cmap
     /**
      * Method to parse the CMAP subtables.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return void
      */
-    protected function parseSubTables($font)
+    protected function parseSubTables(\Pop\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['cmap']->offset + 4;
 
-        // Get each of the subtable's data.
+        // Get each of the sub-table's data.
         for ($i = 0; $i < $this->header->numberOfTables; $i++) {
             $ary = unpack(
                 'nplatformId/' .
@@ -94,7 +94,7 @@ class Cmap
             $bytePos += 8;
         }
 
-        // Parse each of the subtable's data.
+        // Parse each of the sub-table's data.
         foreach ($this->subTables as $key => $subTable) {
             $bytePos = $font->tableInfo['cmap']->offset + $subTable->offset;
             $ary = unpack(

@@ -51,12 +51,12 @@ class Os2
      *
      * Instantiate a OTF 'OS/2' table object.
      *
-     * @param  \Pop\Font\AbstractFont $font
+     * @param  \Pop\Font\TrueType $font
      * @return \Pop\Font\TrueType\Table\Os2
      */
-    public function __construct(\Pop\Font\AbstractFont $font)
+    public function __construct(\Pop\Font\TrueType $font)
     {
-        $this->flags = new \ArrayObject(array(
+        $this->flags = new \ArrayObject([
             'isFixedPitch'  => false,
             'isSerif'       => false,
             'isSymbolic'    => false,
@@ -66,14 +66,14 @@ class Os2
             'isAllCap'      => false,
             'isSmallCap'    => false,
             'isForceBold'   => false
-        ), \ArrayObject::ARRAY_AS_PROPS);
+        ], \ArrayObject::ARRAY_AS_PROPS);
 
         $bytePos = $font->tableInfo['OS/2']->offset + 8;
-        $ary = unpack("nfsType", $font->read($bytePos, 2));
+        $ary     = unpack("nfsType", $font->read($bytePos, 2));
         $this->embeddable = (($ary['fsType'] != 2) && (($ary['fsType'] & 0x200) == 0));
 
         $bytePos = $font->tableInfo['OS/2']->offset + 30;
-        $ary = unpack("nfamily_class", $font->read($bytePos, 2));
+        $ary     = unpack("nfamily_class", $font->read($bytePos, 2));
         $familyClass = ($font->shiftToSigned($ary['family_class']) >> 8);
 
         if ((($familyClass >= 1) && ($familyClass <= 5)) || ($familyClass == 7)) {

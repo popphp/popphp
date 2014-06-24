@@ -25,7 +25,7 @@ namespace Pop\Font;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-abstract class AbstractFont extends \Pop\File\File
+abstract class AbstractFont
 {
 
     /**
@@ -62,7 +62,7 @@ abstract class AbstractFont extends \Pop\File\File
      * Font glyph widths
      * @var array
      */
-    public $glyphWidths = array();
+    public $glyphWidths = [];
 
     /**
      * Missing glyph width
@@ -122,13 +122,55 @@ abstract class AbstractFont extends \Pop\File\File
      * Array of allowed file types.
      * @var array
      */
-    protected $allowed = array(
+    protected $allowed = [
         'afm' => 'application/x-font-afm',
         'otf' => 'application/x-font-otf',
         'pfb' => 'application/x-font-pfb',
         'pfm' => 'application/x-font-pfm',
         'ttf' => 'application/x-font-ttf'
-    );
+    ];
+
+    /**
+     * Full path of font file, i.e. '/path/to/fontfile.ext'
+     * @var string
+     */
+    protected $fullpath = null;
+
+    /**
+     * Full, absolute directory of the font file, i.e. '/some/dir/'
+     * @var string
+     */
+    protected $dir = null;
+
+    /**
+     * Full basename of font file, i.e. 'fontfile.ext'
+     * @var string
+     */
+    protected $basename = null;
+
+    /**
+     * Full filename of font file, i.e. 'fontfile'
+     * @var string
+     */
+    protected $filename = null;
+
+    /**
+     * Font file extension, i.e. 'ext'
+     * @var string
+     */
+    protected $extension = null;
+
+    /**
+     * Font file size in bytes
+     * @var int
+     */
+    protected $size = 0;
+
+    /**
+     * Font file mime type
+     * @var string
+     */
+    protected $mime = 'text/plain';
 
     /**
      * Constructor
@@ -145,7 +187,7 @@ abstract class AbstractFont extends \Pop\File\File
             throw new Exception('The font file does not exist.');
         }
 
-        $this->flags = new \ArrayObject(array(
+        $this->flags = new \ArrayObject([
             'isFixedPitch'  => false,
             'isSerif'       => false,
             'isSymbolic'    => false,
@@ -155,9 +197,45 @@ abstract class AbstractFont extends \Pop\File\File
             'isAllCap'      => false,
             'isSmallCap'    => false,
             'isForceBold'   => false
-        ), \ArrayObject::ARRAY_AS_PROPS);
+        ], \ArrayObject::ARRAY_AS_PROPS);
 
-        parent::__construct($font);
+        $this->fullpath  = $font;
+        $parts           = pathinfo($font);
+        $this->size      = filesize($font);
+        $this->dir       = realpath($parts['dirname']);
+        $this->basename  = $parts['basename'];
+        $this->filename  = $parts['filename'];
+        $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
+
+        if (null === $this->extension) {
+            throw new Exception('Error: That font file does not have an extension.');
+        }
+
+        if ((null !== $this->extension) && !isset($this->allowed[$this->extension])) {
+            throw new Exception('Error: That font file type is not allowed.');
+        }
+
+        $this->mime = $this->allowed[$this->extension];
+    }
+
+    /**
+     * Read data from the font file.
+     *
+     * @param  int $offset
+     * @param  int $length
+     * @return string
+     */
+    public function read($offset = null, $length = null)
+    {
+        if (null !== $offset) {
+            $data = (null !== $length) ?
+                file_get_contents($this->fullpath, null, null, $offset, $length) :
+                file_get_contents($this->fullpath, null, null, $offset);
+        } else {
+            $data = file_get_contents($this->fullpath);
+        }
+
+        return $data;
     }
 
     /**

@@ -96,7 +96,7 @@ class Type1 extends AbstractFont
 
         $dir = realpath($this->dir);
 
-        if (strtolower($this->ext) == 'pfb') {
+        if (strtolower($this->extension) == 'pfb') {
             $this->pfbPath = $this->fullpath;
             $this->parsePfb($this->fullpath);
             if (file_exists($dir . DIRECTORY_SEPARATOR . $this->filename . '.afm')) {
@@ -107,7 +107,7 @@ class Type1 extends AbstractFont
             if (null !== $this->afmPath) {
                 $this->parseAfm($this->afmPath);
             }
-        } else if (strtolower($this->ext) == 'afm') {
+        } else if (strtolower($this->extension) == 'afm') {
             $this->afmPath = $this->fullpath;
             $this->parseAfm($this->afmPath);
             if (file_exists($dir . DIRECTORY_SEPARATOR . $this->filename . '.pfb')) {
@@ -140,7 +140,7 @@ class Type1 extends AbstractFont
         $this->length2 = $a['size'];
         $this->fontData .= fread($f, $this->length2);
 
-        $info = array();
+        $info = [];
         $this->dict = substr($data, stripos($data, 'FontDirectory'));
         $this->dict = substr($this->dict, 0, stripos($this->dict, 'currentdict end'));
 
@@ -174,7 +174,7 @@ class Type1 extends AbstractFont
         }
 
         if (stripos($this->dict, '/UniqueId') !== false) {
-            $matches = array();
+            $matches = [];
             preg_match('/UniqueID\s\d/', $this->dict, $matches, PREG_OFFSET_CAPTURE);
             $id = substr($this->dict, ($matches[0][1] + 9));
             $id = trim(substr($id, 0, stripos($id, 'def')));
@@ -196,12 +196,12 @@ class Type1 extends AbstractFont
             $bbox = substr($bbox, 0, stripos($bbox, 'readonly def'));
             $bbox = trim($this->strip($bbox));
             $bboxAry = explode(' ', $bbox);
-            $this->bBox = new \ArrayObject(array(
+            $this->bBox = new \ArrayObject([
                 'xMin' => str_replace('{', '', $bboxAry[0]),
                 'yMin' => $bboxAry[1],
                 'xMax' => $bboxAry[2],
                 'yMax' => str_replace('}', '', $bboxAry[3])
-            ), \ArrayObject::ARRAY_AS_PROPS);
+            ], \ArrayObject::ARRAY_AS_PROPS);
         }
 
         if (stripos($this->dict, '/Ascent') !== false) {
@@ -260,12 +260,12 @@ class Type1 extends AbstractFont
             $bbox = substr($bbox, 0, stripos($bbox, "\n"));
             $bbox = trim($bbox);
             $bboxAry = explode(' ', $bbox);
-            $this->bBox = new \ArrayObject(array(
+            $this->bBox = new \ArrayObject([
                 'xMin' => $bboxAry[0],
                 'yMin' => $bboxAry[1],
                 'xMax' => $bboxAry[2],
                 'yMax' => $bboxAry[3]
-            ), \ArrayObject::ARRAY_AS_PROPS);
+            ], \ArrayObject::ARRAY_AS_PROPS);
         }
 
         if (stripos($data, 'ItalicAngle') !== false) {
@@ -305,7 +305,7 @@ class Type1 extends AbstractFont
             $chars = substr($data, (stripos($data, 'StartCharMetrics ') + 17 + strlen($this->numberOfGlyphs)));
             $chars = trim(substr($chars, 0, stripos($chars, 'EndCharMetrics')));
             $glyphs = explode("\n", $chars);
-            $widths = array();
+            $widths = [];
             foreach ($glyphs as $glyph) {
                 $w = substr($glyph, (stripos($glyph, 'WX ') + 3));
                 $w = substr($w, 0, strpos($w, ' ;'));
