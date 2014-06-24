@@ -15,10 +15,8 @@
  */
 namespace Pop\Application;
 
-use Pop\I18n\I18n;
-
 /**
- * Application install class
+ * Application build class
  *
  * @category   Pop
  * @package    Pop_Application
@@ -27,7 +25,7 @@ use Pop\I18n\I18n;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Install
+class Build
 {
 
     /**
@@ -60,7 +58,7 @@ class Install
 
         $input = self::cliInput();
         if ($input == 'n') {
-            echo I18n::factory()->__('Aborted.') . PHP_EOL . PHP_EOL;
+            echo 'Aborted.' . PHP_EOL . PHP_EOL;
             exit(0);
         }
 
@@ -70,7 +68,7 @@ class Install
 
         // Check if a project folder already exists.
         if (file_exists($install->project->name)) {
-            echo wordwrap(I18n::factory()->__('Application folder exists. This may overwrite any project files you may already have under that project folder.'), 70, PHP_EOL) . PHP_EOL;
+            echo wordwrap('Application folder exists. This may overwrite any project files you may already have under that project folder.', 70, PHP_EOL) . PHP_EOL;
             $input = self::cliInput();
         } else {
             $input = 'y';
@@ -78,7 +76,7 @@ class Install
 
         // If 'No', abort
         if ($input == 'n') {
-            echo I18n::factory()->__('Aborted.') . PHP_EOL . PHP_EOL;
+            echo 'Aborted.' . PHP_EOL . PHP_EOL;
             exit(0);
         // Else, continue
         } else {
@@ -89,8 +87,8 @@ class Install
             // to test and install the database.
             if (isset($install->databases)) {
                 $databases =  $install->databases->asArray();
-                echo I18n::factory()->__('Database credentials and schema detected.') . PHP_EOL;
-                $input = self::cliInput(I18n::factory()->__('Test and install the database(s)?') . ' (Y/N) ');
+                echo 'Database credentials and schema detected.' . PHP_EOL;
+                $input = self::cliInput('Test and install the database(s)?' . ' (Y/N) ');
                 $db = ($input == 'n') ? false : true;
             }
 
@@ -102,12 +100,12 @@ class Install
                 error_reporting(E_ERROR);
 
                 // Test the databases
-                echo I18n::factory()->__('Testing the database(s)...') . PHP_EOL;
+                echo 'Testing the database(s)...' . PHP_EOL;
 
                 foreach ($databases as $dbname => $db) {
-                    echo I18n::factory()->__('Testing') . ' \'' . $dbname . '\'...' . PHP_EOL;
+                    echo 'Testing' . ' \'' . $dbname . '\'...' . PHP_EOL;
                     if (!isset($db['type']) || !isset($db['database'])) {
-                        echo I18n::factory()->__('The database type and database name must be set for the database ') . '\'' . $dbname . '\'.' . PHP_EOL . PHP_EOL;
+                        echo 'The database type and database name must be set for the database ' . '\'' . $dbname . '\'.' . PHP_EOL . PHP_EOL;
                         exit(0);
                     }
                     $check = Build\Dbs::check($db);
@@ -115,8 +113,8 @@ class Install
                         echo $check . PHP_EOL . PHP_EOL;
                         exit(0);
                     } else {
-                        echo I18n::factory()->__('Database') . ' \'' . $dbname . '\' passed.' . PHP_EOL;
-                        echo I18n::factory()->__('Installing database') .' \'' . $dbname . '\'...' . PHP_EOL;
+                        echo 'Database' . ' \'' . $dbname . '\' passed.' . PHP_EOL;
+                        echo 'Installing database' .' \'' . $dbname . '\'...' . PHP_EOL;
                         $tables = Build\Dbs::install($dbname, $db, $installDir, $install);
                         if (count($tables) > 0) {
                             $dbTables = array_merge($dbTables, $tables);
@@ -156,7 +154,7 @@ class Install
             // Create 'bootstrap.php' file
             Build\Bootstrap::install($install);
 
-            echo I18n::factory()->__('Application install complete.') . PHP_EOL . PHP_EOL;
+            echo 'Application install complete.' . PHP_EOL . PHP_EOL;
         }
 
     }
@@ -170,8 +168,8 @@ class Install
     {
         $msg1 = "This process will create and install the base foundation of your project under the folder specified in the install file. Minimally, the install file should return a Pop\\Config object containing your project install settings, such as project name, folders, forms, controllers, views and any database credentials.";
         $msg2 = "Besides creating the base folders and files for you, one of the main benefits is ability to test and install the database and the corresponding configuration and class files. You can take advantage of this by having the database SQL files in the same folder as your install file, like so:";
-        echo wordwrap(I18n::factory()->__($msg1), 70, PHP_EOL) . PHP_EOL . PHP_EOL;
-        echo wordwrap(I18n::factory()->__($msg2), 70, PHP_EOL) . PHP_EOL . PHP_EOL;
+        echo wordwrap($msg1, 70, PHP_EOL) . PHP_EOL . PHP_EOL;
+        echo wordwrap($msg2, 70, PHP_EOL) . PHP_EOL . PHP_EOL;
         echo 'projectname' . DIRECTORY_SEPARATOR . 'project.install.php' . PHP_EOL;
         echo 'projectname' . DIRECTORY_SEPARATOR . '*.sql' . PHP_EOL . PHP_EOL;
     }
@@ -183,13 +181,13 @@ class Install
      */
     public static function cliHelp()
     {
-        echo ' -c --check                     ' . I18n::factory()->__('Check the current configuration for required dependencies') . PHP_EOL;
-        echo ' -h --help                      ' . I18n::factory()->__('Display this help') . PHP_EOL;
-        echo ' -i --install file.php          ' . I18n::factory()->__('Install a project based on the install file specified') . PHP_EOL;
-        echo ' -l --lang fr                   ' . I18n::factory()->__('Set the default language for the project') . PHP_EOL;
-        echo ' -m --map folder file.php       ' . I18n::factory()->__('Create a class map file from the source folder and save to the output file') . PHP_EOL;
-        echo ' -s --show                      ' . I18n::factory()->__('Show project install instructions') . PHP_EOL;
-        echo ' -v --version                   ' . I18n::factory()->__('Display version of Pop PHP Framework and latest available') . PHP_EOL . PHP_EOL;
+        echo ' -c --check                     ' . 'Check the current configuration for required dependencies' . PHP_EOL;
+        echo ' -h --help                      ' . 'Display this help' . PHP_EOL;
+        echo ' -i --install file.php          ' . 'Install a project based on the install file specified' . PHP_EOL;
+        echo ' -l --lang fr                   ' . 'Set the default language for the project' . PHP_EOL;
+        echo ' -m --map folder file.php       ' . 'Create a class map file from the source folder and save to the output file' . PHP_EOL;
+        echo ' -s --show                      ' . 'Show project install instructions' . PHP_EOL;
+        echo ' -v --version                   ' . 'Display version of Pop PHP Framework and latest available' . PHP_EOL . PHP_EOL;
     }
 
     /**
@@ -205,8 +203,8 @@ class Install
         if (!array_key_exists($i, self::$cliErrorCodes)) {
             $i = 0;
         }
-        $msg = I18n::factory()->__(self::$cliErrorCodes[$i]) . $arg . PHP_EOL .
-               I18n::factory()->__('Run \'.' . DIRECTORY_SEPARATOR . 'pop -h\' for help.') . PHP_EOL . PHP_EOL;
+        $msg = self::$cliErrorCodes[$i] . $arg . PHP_EOL .
+               'Run \'.' . DIRECTORY_SEPARATOR . 'pop -h\' for help.' . PHP_EOL . PHP_EOL;
         return $msg;
     }
 
@@ -218,7 +216,7 @@ class Install
      */
     public static function cliInput($msg = null)
     {
-        echo ((null === $msg) ? I18n::factory()->__('Continue?') . ' (Y/N) ' : $msg);
+        echo ((null === $msg) ? 'Continue?' . ' (Y/N) ' : $msg);
         $input = null;
 
         while (($input != 'y') && ($input != 'n')) {
@@ -241,13 +239,13 @@ class Install
      */
     public static function getBootstrap()
     {
-        $msg = I18n::factory()->__('Enter the folder where the \'bootstrap.php\' is located in relation to the current folder: ');
+        $msg = 'Enter the folder where the \'bootstrap.php\' is located in relation to the current folder: ';
         echo $msg;
         $input = null;
 
         while (!file_exists($input . '/bootstrap.php')) {
             if (null !== $input) {
-                echo I18n::factory()->__('Bootstrap file not found. Try again.') . PHP_EOL . $msg;
+                echo 'Bootstrap file not found. Try again.' . PHP_EOL . $msg;
             }
             $prompt = fopen("php://stdin", "r");
             $input = fgets($prompt, 255);
@@ -265,13 +263,13 @@ class Install
      */
     public static function getPop()
     {
-        $msg = I18n::factory()->__('Enter the folder where the \'vendor\' folder is contained in relation to the current folder: ');
+        $msg = 'Enter the folder where the \'vendor\' folder is contained in relation to the current folder: ';
         echo $msg;
         $input = null;
 
         while (!file_exists($input . '/vendor/PopPHPFramework/src/Pop/Loader/Autoloader.php')) {
             if (null !== $input) {
-                echo I18n::factory()->__('Pop PHP Framework not found. Try again.') . PHP_EOL . $msg;
+                echo 'Pop PHP Framework not found. Try again.' . PHP_EOL . $msg;
             }
             $prompt = fopen("php://stdin", "r");
             $input = fgets($prompt, 255);
@@ -290,7 +288,7 @@ class Install
      */
     public static function getLanguage($langs)
     {
-        $msg = I18n::factory()->__('Enter the numeric code for the default language: ');
+        $msg = 'Enter the numeric code for the default language: ';
         echo $msg;
         $lang = null;
         $keys = array_keys($langs);
@@ -306,6 +304,30 @@ class Install
         }
 
         return $lang;
+    }
+
+    /**
+     * Method to convert the string from under_score to camelCase format
+     *
+     * @param  string $string
+     * @return string
+     */
+    public static function underscoreToCamelcase($string)
+    {
+        $strAry = explode('_', $string);
+        $camelCase = null;
+        $i = 0;
+
+        foreach ($strAry as $word) {
+            if ($i == 0) {
+                $camelCase .= $word;
+            } else {
+                $camelCase .= ucfirst($word);
+            }
+            $i++;
+        }
+
+        return $camelCase;
     }
 
 }

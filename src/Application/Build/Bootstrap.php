@@ -15,8 +15,6 @@
  */
 namespace Pop\Application\Build;
 
-use Pop\Filter\String;
-
 /**
  * Bootstrap install class
  *
@@ -108,10 +106,10 @@ class Bootstrap
                 if (count($subs) > 0) {
                     $ctls = "'{$key}' => array(" . PHP_EOL;
                     if (array_key_exists('index', $value)) {
-                        $ctls .= "            '/' => '{$install->project->name}\\Controller\\" . ucfirst(String::underscoreToCamelcase(substr($key, 1))) . "\\IndexController'," . PHP_EOL;
+                        $ctls .= "            '/' => '{$install->project->name}\\Controller\\" . ucfirst(\Pop\Application\Build::underscoreToCamelcase(substr($key, 1))) . "\\IndexController'," . PHP_EOL;
                     }
                     foreach ($subs as $sub) {
-                        $ctls .= "            '{$sub}' => '{$install->project->name}\\Controller\\" . ucfirst(String::underscoreToCamelcase(substr($key, 1))) . "\\" . ucfirst(String::underscoreToCamelcase(substr($sub, 1))) . "Controller'," . PHP_EOL;
+                        $ctls .= "            '{$sub}' => '{$install->project->name}\\Controller\\" . ucfirst(\Pop\Application\Build::underscoreToCamelcase(substr($key, 1))) . "\\" . ucfirst(\Pop\Application\Build::underscoreToCamelcase(substr($sub, 1))) . "Controller'," . PHP_EOL;
                     }
                     $ctls .= '        )';
                     $ctrls[] = $ctls;
@@ -121,9 +119,9 @@ class Bootstrap
                     } else {
                         $controllerName = substr($key, 1);
                         if (array_key_exists('index', $value)) {
-                            $ctrls[] = "'{$key}' => '{$install->project->name}\\Controller\\" . ucfirst(String::underscoreToCamelcase($controllerName)) . "\\IndexController'";
+                            $ctrls[] = "'{$key}' => '{$install->project->name}\\Controller\\" . ucfirst(\Pop\Application\Build::underscoreToCamelcase($controllerName)) . "\\IndexController'";
                         } else {
-                            $ctrls[] = "'{$key}' => '{$install->project->name}\\Controller\\" . ucfirst(String::underscoreToCamelcase($controllerName)) . "Controller'";
+                            $ctrls[] = "'{$key}' => '{$install->project->name}\\Controller\\" . ucfirst(\Pop\Application\Build::underscoreToCamelcase($controllerName)) . "Controller'";
                         }
                     }
                 }

@@ -92,9 +92,13 @@ class File implements WriterInterface
             $this->allowed = $types;
         }
 
+        if (!file_exists($file)) {
+            touch($file);
+        }
+
         $this->fullpath  = $file;
         $parts           = pathinfo($file);
-        $this->size      = (file_exists($file)) ? filesize($file) : 0;
+        $this->size      = filesize($file);
         $this->basename  = $parts['basename'];
         $this->filename  = $parts['filename'];
         $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
@@ -112,10 +116,9 @@ class File implements WriterInterface
      * Method to write to the log
      *
      * @param  array $logEntry
-     * @param  array $options
      * @return \Pop\Log\Writer\File
      */
-    public function writeLog(array $logEntry, array $options = [])
+    public function writeLog(array $logEntry)
     {
         switch ($this->mime) {
             case 'text/plain':
@@ -124,26 +127,25 @@ class File implements WriterInterface
                 break;
 
             case 'text/csv':
-                $logEntry['message'] = '"' . $logEntry['message'] . '"' ;
+                $logEntry['message'] = '"' . str_replace('"', '\"', $logEntry['message']) . '"' ;
                 $entry = implode(",", $logEntry) . PHP_EOL;
                 file_put_contents($this->fullpath, $entry, FILE_APPEND);
                 break;
 
             case 'text/tsv':
-                $logEntry['message'] = '"' . $logEntry['message'] . '"' ;
+                $logEntry['message'] = '"' . str_replace('"', '\"', $logEntry['message']) . '"' ;
                 $entry = implode("\t", $logEntry) . PHP_EOL;
                 file_put_contents($this->fullpath, $entry, FILE_APPEND);
                 break;
 
             case 'application/xml':
-                if ($this->size == 0) {
-                    $header = '<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL . '<log>' . PHP_EOL . '</log>' . PHP_EOL;
-                    file_put_contents($this->fullpath, $header);
-                }
                 $output = file_get_contents($this->fullpath);
+                if (strpos($output, '<?xml version') === false) {
+                    $output = '<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL . '<log>' . PHP_EOL . '</log>' . PHP_EOL;
+                }
                 $entry  = '    <entry timestamp="' . $logEntry['timestamp'] . '" priority="' . $logEntry['priority'] . '" name="' . $logEntry['name'] . '"><![CDATA[' . $logEntry['message'] . ']]></entry>' . PHP_EOL;
                 $output = str_replace('</log>' . PHP_EOL, $entry . '</log>' . PHP_EOL, $output);
-                file_put_contents($this->fullpath, $output, FILE_APPEND);
+                file_put_contents($this->fullpath, $output);
                 break;
         }
 

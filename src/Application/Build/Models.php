@@ -16,7 +16,6 @@
 namespace Pop\Application\Build;
 
 use Pop\Code\Generator;
-use Pop\Code\Generator\MethodGenerator;
 use Pop\Code\Generator\NamespaceGenerator;
 
 /**
@@ -40,7 +39,7 @@ class Models
      */
     public static function install($install)
     {
-        echo \Pop\I18n\I18n::factory()->__('Creating model class files...') . PHP_EOL;
+        echo 'Creating model class files...' . PHP_EOL;
 
         // Create model class folder
         $modelDir = $install->project->base . '/module/' . $install->project->name . '/src/' . $install->project->name . '/Model';
@@ -50,7 +49,7 @@ class Models
 
         $models = $install->models->asArray();
         foreach ($models as $model) {
-            $modelName = ucfirst(\Pop\Filter\String::underscoreToCamelcase($model));
+            $modelName = ucfirst(\Pop\Application\Build::underscoreToCamelcase($model));
 
             // Define namespace
             $ns = new NamespaceGenerator($install->project->name . '\Model');

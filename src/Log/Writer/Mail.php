@@ -35,18 +35,27 @@ class Mail implements WriterInterface
     protected $emails = [];
 
     /**
+     * Array of mail-specific options, i.e. subject, headers, etc.
+     * @var array
+     */
+    protected $options = [];
+
+    /**
      * Constructor
      *
      * Instantiate the Mail writer object.
      *
-     * @param  array $emails
+     * @param  mixed $emails
+     * @param  array $options
      * @throws Exception
      * @return \Pop\Log\Writer\Mail
      */
-    public function __construct(array $emails)
+    public function __construct($emails, array $options = [])
     {
-        if (count($emails) == 0) {
-            throw new Exception('Error: There must be at least one email address passed.');
+        $this->options = $options;
+
+        if (!is_array($emails)) {
+            $emails = [$emails];
         }
 
         foreach ($emails as $key => $value) {
@@ -67,20 +76,19 @@ class Mail implements WriterInterface
      * Method to write to the log
      *
      * @param  array $logEntry
-     * @param  array $options
      * @return \Pop\Log\Writer\Mail
      */
-    public function writeLog(array $logEntry, array $options = [])
+    public function writeLog(array $logEntry)
     {
-        $subject = (isset($options['subject'])) ?
-            $options['subject'] :
+        $subject = (isset($this->options['subject'])) ?
+            $this->options['subject'] :
             'Log Entry:';
 
         $subject .= ' ' . $logEntry['name'] . ' (' . $logEntry['priority'] . ')';
 
         $mail = new \Pop\Mail\Mail($subject, $this->emails);
-        if (isset($options['headers'])) {
-            $mail->setHeaders($options['headers']);
+        if (isset($this->options['headers'])) {
+            $mail->setHeaders($this->options['headers']);
         }
 
         $entry = implode("\t", $logEntry) . PHP_EOL;

@@ -15,6 +15,9 @@
  */
 namespace Pop\Mvc;
 
+use Pop\Application\Application;
+use Pop\Http\Request;
+
 /**
  * Mvc router class
  *
@@ -29,14 +32,14 @@ class Router
 {
 
     /**
-     * Project object
-     * @var \Pop\Project\Project
+     * Application object
+     * @var Application
      */
-    protected $project = null;
+    protected $application = null;
 
     /**
      * Request object
-     * @var \Pop\Http\Request
+     * @var Request
      */
     protected $request = null;
 
@@ -48,7 +51,7 @@ class Router
 
     /**
      * Current controller object
-     * @var \Pop\Mvc\Controller
+     * @var Controller
      */
     protected $controller = null;
 
@@ -56,7 +59,7 @@ class Router
      * Array of available controllers class names
      * @var array
      */
-    protected $controllers = array();
+    protected $controllers = [];
 
     /**
      * Base path URI
@@ -69,33 +72,21 @@ class Router
      *
      * Instantiate the router object
      *
-     * @param  array             $controllers
-     * @param  \Pop\Http\Request $request
-     * @return \Pop\Mvc\Router
+     * @param  array   $controllers
+     * @param  Request $request
+     * @return Router
      */
-    public function __construct(array $controllers, \Pop\Http\Request $request = null)
+    public function __construct(array $controllers, Request $request = null)
     {
-        $this->request = (null !== $request) ? $request : new \Pop\Http\Request();
+        $this->request = (null !== $request) ? $request : new Request();
         $this->controllers = $controllers;
-    }
-
-    /**
-     * Create a Pop\Mvc\Router object
-     *
-     * @param  array             $controllers
-     * @param  \Pop\Http\Request $request
-     * @return \Pop\Mvc\Router
-     */
-    public static function factory(array $controllers, \Pop\Http\Request $request = null)
-    {
-        return new self($controllers, $request);
     }
 
     /**
      * Add controllers
      *
      * @param  array $controller
-     * @return \Pop\Mvc\Router
+     * @return Router
      */
     public function addControllers(array $controller)
     {
@@ -115,19 +106,19 @@ class Router
     }
 
     /**
-     * Get the project object
+     * Get the application object
      *
-     * @return \Pop\Project\Project
+     * @return Application
      */
-    public function getProject()
+    public function getApplication()
     {
-        return $this->project;
+        return $this->application;
     }
 
     /**
      * Get the request object
      *
-     * @return \Pop\Http\Request
+     * @return Request
      */
     public function getRequest()
     {
@@ -137,7 +128,7 @@ class Router
     /**
      * Get the current controller object
      *
-     * @return \Pop\Mvc\Controller
+     * @return Controller
      */
     public function getController()
     {
@@ -145,19 +136,19 @@ class Router
     }
 
     /**
-     * Get the project object (shorthand alias)
+     * Get the application object (shorthand alias)
      *
-     * @return \Pop\Project\Project
+     * @return Application
      */
-    public function project()
+    public function application()
     {
-        return $this->project;
+        return $this->application;
     }
 
     /**
      * Get the request object (shorthand alias)
      *
-     * @return \Pop\Http\Request
+     * @return Request
      */
     public function request()
     {
@@ -167,7 +158,7 @@ class Router
     /**
      * Get the current controller object (shorthand alias)
      *
-     * @return \Pop\Mvc\Controller
+     * @return Controller
      */
     public function controller()
     {
@@ -238,13 +229,13 @@ class Router
     /**
      * Route to the correct controller
      *
-     * @param  \Pop\Project\Project $project
+     * @param  Application $application
      * @return void
      */
-    public function route(\Pop\Project\Project $project = null)
+    public function route(Application $application = null)
     {
-        if (null !== $project) {
-            $this->project = $project;
+        if (null !== $application) {
+            $this->application = $application;
         }
 
         // If the request isn't root '/', traverse the URI path
@@ -259,28 +250,28 @@ class Router
         if ((null !== $this->controllerClass) && class_exists($this->controllerClass)) {
             // Push the real base path and URI into the request object
             $realBasePath = $this->request->getBasePath() . $this->basePath;
-            $realUri = substr($this->request->getFullUri(), strlen($this->request->getBasePath() . $this->basePath));
+            $realUri      = substr($this->request->getFullUri(), strlen($this->request->getBasePath() . $this->basePath));
 
             // Create the controller object
             $this->controller = new $this->controllerClass(
                 $this->request->setRequestUri($realUri, $realBasePath),
                 null,
-                $this->project
+                $this->application
             );
             // Trigger any route events
-            if (null !== $this->project) {
-                if (null !== $this->project->getEventManager()->get('route')) {
-                    $this->project->log('[Event] Route', time(), \Pop\Log\Logger::NOTICE);
+            if (null !== $this->application) {
+                if (null !== $this->application->getEventManager()->get('route')) {
+                    $this->application->log('[Event] Route', time(), 5);
                 }
-                $this->project->getEventManager()->trigger('route', array('router' => $this));
+                $this->application->getEventManager()->trigger('route', ['router' => $this]);
             }
         // Else, trigger any route error events
         } else {
-            if (null !== $this->project) {
-                if (null !== $this->project->getEventManager()->get('route.error')) {
-                    $this->project->log('[Event] Route Error', time(), \Pop\Log\Logger::NOTICE);
+            if (null !== $this->application) {
+                if (null !== $this->application->getEventManager()->get('route.error')) {
+                    $this->application->log('[Event] Route Error', time(), 5);
                 }
-                $this->project->getEventManager()->trigger('route.error', array('router' => $this));
+                $this->application->getEventManager()->trigger('route.error', ['router' => $this]);
             }
         }
     }

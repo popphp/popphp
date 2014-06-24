@@ -40,7 +40,7 @@ class Forms
      */
     public static function install($install)
     {
-        echo \Pop\I18n\I18n::factory()->__('Creating form class files...') . PHP_EOL;
+        echo 'Creating form class files...' . PHP_EOL;
 
         // Create form class folder
         $formDir = $install->project->base . '/module/' . $install->project->name . '/src/' . $install->project->name . '/Form';
@@ -50,7 +50,7 @@ class Forms
 
         $forms = $install->forms->asArray();
         foreach ($forms as $name => $form) {
-            $formName = ucfirst(\Pop\Filter\String::underscoreToCamelcase($name));
+            $formName = ucfirst(\Pop\Application\Build::underscoreToCamelcase($name));
 
             // Define namespace
             $ns = new NamespaceGenerator($install->project->name . '\Form');

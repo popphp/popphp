@@ -39,12 +39,22 @@ class Db implements WriterInterface
      *
      * Instantiate the DB writer object.
      *
+     * The DB table requires the following fields at a minimum:
+     *     timestamp  DATETIME
+     *     priority   INT
+     *     name       VARCHAR
+     *     message    TEXT, VARCHAR, etc.
+     *
      * @param  \Pop\Db\Sql $sql
+     * @param  string      $table
      * @throws Exception
      * @return \Pop\Log\Writer\Db
      */
-    public function __construct(\Pop\Db\Sql $sql)
+    public function __construct(\Pop\Db\Sql $sql, $table = null)
     {
+        if (null !== $table) {
+            $sql->setTable($table);
+        }
         if (null === $sql->getTable()) {
             throw new Exception('Error: The SQL object does not have a table defined.');
         }
@@ -55,10 +65,9 @@ class Db implements WriterInterface
      * Method to write to the log
      *
      * @param  array $logEntry
-     * @param  array $options
      * @return \Pop\Log\Writer\Db
      */
-    public function writeLog(array $logEntry, array $options = [])
+    public function writeLog(array $logEntry)
     {
         $columns = [];
         $params  = [];
@@ -78,7 +87,6 @@ class Db implements WriterInterface
         }
 
         $this->sql->insert($columns);
-
         $this->sql->db()->prepare((string)$this->sql)
                         ->bindParams($params)
                         ->execute();

@@ -89,7 +89,7 @@ class Manager
         if (!isset($this->listeners[$name])) {
             $this->listeners[$name] = new \SplPriorityQueue();
         }
-        $this->listeners[$name]->insert($action, (int) $priority);
+        $this->listeners[$name]->insert($action, (int)$priority);
 
         return $this;
     }

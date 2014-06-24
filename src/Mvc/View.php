@@ -44,7 +44,7 @@ class View
      * Model data
      * @var array
      */
-    protected $data = null;
+    protected $data = [];
 
     /**
      * View output string
@@ -59,33 +59,15 @@ class View
      *
      * @param  string $template
      * @param  array  $data
-     * @return \Pop\Mvc\View
+     * @return View
      */
-    public function __construct($template = null, array $data = null)
+    public function __construct($template = null, array $data = [])
     {
         if (null !== $template) {
-            if (((substr($template, -6) == '.phtml') ||
-                 (substr($template, -5) == '.php3') ||
-                 (substr($template, -4) == '.php')) && (file_exists($template))) {
-                $this->templateFile = $template;
-            } else {
-                $this->templateString = $template;
-            }
+            $this->setTemplate($template);
         }
 
         $this->data = $data;
-    }
-
-    /**
-     * Create a Pop\Mvc\View object
-     *
-     * @param  string $template
-     * @param  array  $data
-     * @return \Pop\Mvc\View
-     */
-    public static function factory($template = null, array $data = null)
-    {
-        return new self($template, $data);
     }
 
     /**
@@ -147,21 +129,41 @@ class View
     }
 
     /**
+     * Determine whether the view uses a template file
+     *
+     * @return boolean
+     */
+    public function hasTemplateFile()
+    {
+        return (null !== $this->templateFile);
+    }
+
+    /**
+     * Determine whether the view uses a template string
+     *
+     * @return boolean
+     */
+    public function hasTemplateString()
+    {
+        return (null !== $this->templateString);
+    }
+
+    /**
      * Set view template with auto-detect
      *
      * @param  string $template
-     * @return \Pop\Mvc\View
+     * @return View
      */
     public function setTemplate($template)
     {
         if (((substr($template, -6) == '.phtml') ||
-                (substr($template, -5) == '.php3') ||
-                (substr($template, -4) == '.php')) && (file_exists($template))) {
-            $this->templateFile = $template;
+             (substr($template, -5) == '.php3') ||
+             (substr($template, -4) == '.php')) && (file_exists($template))) {
+            $this->templateFile   = $template;
             $this->templateString = null;
         } else {
             $this->templateString = $template;
-            $this->templateFile = null;
+            $this->templateFile   = null;
         }
 
         return $this;
@@ -172,14 +174,14 @@ class View
      *
      * @param  string $template
      * @throws Exception
-     * @return \Pop\Mvc\View
+     * @return View
      */
     public function setTemplateFile($template)
     {
         if (((substr($template, -6) == '.phtml') ||
              (substr($template, -5) == '.php3') ||
              (substr($template, -4) == '.php')) && (file_exists($template))) {
-            $this->templateFile = $template;
+            $this->templateFile   = $template;
             $this->templateString = null;
         } else {
             throw new Exception('That template file either does not exist or is not the correct format.');
@@ -192,12 +194,12 @@ class View
      * Set view template string
      *
      * @param  string $template
-     * @return \Pop\Mvc\View
+     * @return View
      */
     public function setTemplateString($template)
     {
         $this->templateString = $template;
-        $this->templateFile = null;
+        $this->templateFile   = null;
         return $this;
     }
 
@@ -206,7 +208,7 @@ class View
      *
      * @param  string $name
      * @param  mixed  $value
-     * @return \Pop\Mvc\View
+     * @return View
      */
     public function set($name, $value)
     {
@@ -218,7 +220,7 @@ class View
      * Merge new model data
      *
      * @param  array $data
-     * @return \Pop\Mvc\View
+     * @return View
      */
     public function merge(array $data)
     {
@@ -230,9 +232,9 @@ class View
      * Set all model data
      *
      * @param  array $data
-     * @return \Pop\Mvc\View
+     * @return View
      */
-    public function setData(array $data = array())
+    public function setData(array $data = [])
     {
         $this->data = $data;
         return $this;

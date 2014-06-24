@@ -15,7 +15,7 @@
  */
 namespace Pop\Application\Build;
 
-use Pop\Db\Db;
+use Pop\Db\Adapter;
 
 /**
  * Db install class

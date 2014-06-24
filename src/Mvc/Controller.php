@@ -15,9 +15,9 @@
  */
 namespace Pop\Mvc;
 
+use Pop\Application\Application;
 use Pop\Http\Response;
 use Pop\Http\Request;
-use Pop\Project\Project;
 
 /**
  * Mvc controller class
@@ -34,25 +34,25 @@ class Controller
 
     /**
      * Request
-     * @var \Pop\Http\Request
+     * @var Request
      */
     protected $request = null;
 
     /**
      * Response
-     * @var \Pop\Http\Response
+     * @var Response
      */
     protected $response = null;
 
     /**
-     * Project config object
-     * @var \Pop\Project\Project
+     * Application object
+     * @var Application
      */
-    protected $project = null;
+    protected $application = null;
 
     /**
      * View object
-     * @var \Pop\Mvc\View
+     * @var View
      */
     protected $view = null;
 
@@ -73,31 +73,30 @@ class Controller
      *
      * Instantiate the controller object
      *
-     * @param \Pop\Http\Request    $request
-     * @param \Pop\Http\Response   $response
-     * @param \Pop\Project\Project $project
-     * @param string               $viewPath
-     * @return \Pop\Mvc\Controller
+     * @param  Request     $request
+     * @param  Response    $response
+     * @param  Application $application
+     * @param  string      $viewPath
+     * @return Controller
      */
-    public function __construct(Request $request = null, Response $response = null, Project $project = null, $viewPath = null)
+    public function __construct(Request $request = null, Response $response = null, Application $application = null, $viewPath = null)
     {
-        $this->request = (null !== $request) ? $request : new Request();
-        $this->response = (null !== $response) ? $response : new Response();
+        $this->setRequest(((null !== $request) ? $request : new Request()));
+        $this->setResponse(((null !== $response) ? $response : new Response()));
 
-        if (null !== $project) {
-            $this->project = $project;
+        if (null !== $application) {
+            $this->setApplication($application);
         }
-
         if (null !== $viewPath) {
-            $this->viewPath = $viewPath;
+            $this->setViewPath($viewPath);
         }
     }
 
     /**
      * Set the request object
      *
-     * @param  \Pop\Http\Request $request
-     * @return \Pop\Mvc\Controller
+     * @param  Request $request
+     * @return Controller
      */
     public function setRequest(Request $request)
     {
@@ -108,8 +107,8 @@ class Controller
     /**
      * Set the response object
      *
-     * @param  \Pop\Http\Response $response
-     * @return \Pop\Mvc\Controller
+     * @param  Response $response
+     * @return Controller
      */
     public function setResponse(Response $response)
     {
@@ -120,12 +119,12 @@ class Controller
     /**
      * Set the response object
      *
-     * @param  \Pop\Project\Project $project
-     * @return \Pop\Mvc\Controller
+     * @param  Application $application
+     * @return Controller
      */
-    public function setProject(Project $project)
+    public function setApplication(Application $application)
     {
-        $this->project = $project;
+        $this->application = $application;
         return $this;
     }
 
@@ -133,7 +132,7 @@ class Controller
      * Set the response object
      *
      * @param  string $viewPath
-     * @return \Pop\Mvc\Controller
+     * @return Controller
      */
     public function setViewPath($viewPath)
     {
@@ -145,7 +144,7 @@ class Controller
      * Set the error action
      *
      * @param  string $error
-     * @return \Pop\Mvc\Controller
+     * @return Controller
      */
     public function setErrorAction($error)
     {
@@ -156,7 +155,7 @@ class Controller
     /**
      * Get the request object
      *
-     * @return \Pop\Http\Request
+     * @return Request
      */
     public function getRequest()
     {
@@ -166,7 +165,7 @@ class Controller
     /**
      * Get the response object
      *
-     * @return \Pop\Http\Response
+     * @return Response
      */
     public function getResponse()
     {
@@ -174,19 +173,19 @@ class Controller
     }
 
     /**
-     * Get the project object
+     * Get the application object
      *
-     * @return \Pop\Project\Project
+     * @return Application
      */
-    public function getProject()
+    public function getApplication()
     {
-        return $this->project;
+        return $this->application;
     }
 
     /**
      * Get the view object
      *
-     * @return \Pop\Mvc\View
+     * @return View
      */
     public function getView()
     {
@@ -217,14 +216,15 @@ class Controller
      * Dispatch the controller based on the action
      *
      * @param  string $action
-     * @throws \Pop\Mvc\Exception
-     * @return \Pop\Mvc\Controller
+     * @throws Exception
+     * @return Controller
      */
     public function dispatch($action = 'index')
     {
         if (method_exists($this, $action)) {
-            if (null !== $this->project->logger()) {
-                $this->project->log("Dispatch ['" . get_class($this) . "']->" . $action . "\t" . $this->request->getRequestUri() . "\t" . $this->request->getFullUri(), time());
+            if (null !== $this->application->logger()) {
+                $this->application->log("Dispatch ['" . get_class($this) . "']->" . $action . "\t" .
+                    $this->request->getRequestUri() . "\t" . $this->request->getFullRequestUri(), time());
             }
             $this->$action();
         } else {
@@ -237,7 +237,7 @@ class Controller
      *
      * @param  int   $code
      * @param  array $headers
-     * @throws \Pop\Mvc\Exception
+     * @throws Exception
      * @return void
      */
     public function send($code = 200, array $headers = null)
@@ -250,8 +250,8 @@ class Controller
             throw new Exception('The view object is not an instance of Pop\Mvc\View.');
         }
 
-        if (null !== $this->project->logger()) {
-            $this->project->log("Response [" . $code . "]", time());
+        if (null !== $this->application->logger()) {
+            $this->application->log("Response [" . $code . "]", time());
         }
         $this->response->setCode($code);
 
@@ -262,44 +262,18 @@ class Controller
         }
 
         // Trigger any dispatch events, then send the response
-        if (null !== $this->project->getEventManager()->get('dispatch')) {
-            $this->project->log('[Event] Dispatch', time(), \Pop\Log\Logger::NOTICE);
+        if (null !== $this->application->getEventManager()->get('dispatch')) {
+            $this->application->log('[Event] Dispatch', time(), 5);
         }
-        $this->project->getEventManager()->trigger('dispatch', array('controller' => $this));
+        $this->application->getEventManager()->trigger('dispatch', array('controller' => $this));
 
         $this->response->setBody($this->view->render(true));
 
-        if (null !== $this->project->getEventManager()->get('dispatch.send')) {
-            $this->project->log('[Event] Dispatch Send', time(), \Pop\Log\Logger::NOTICE);
+        if (null !== $this->application->getEventManager()->get('dispatch.send')) {
+            $this->application->log('[Event] Dispatch Send', time(), 5);
         }
-        $this->project->getEventManager()->trigger('dispatch.send', array('controller' => $this));
+        $this->application->getEventManager()->trigger('dispatch.send', array('controller' => $this));
         $this->response->send();
-    }
-
-    /**
-     * Method to send a JSON response
-     *
-     * @param  mixed $values
-     * @param  int   $code
-     * @param  array $headers
-     * @return void
-     */
-    public function sendJson($values, $code = 200, array $headers = null)
-    {
-        // Build the response and send it
-        $response = new Response();
-        $this->response->setCode($code);
-
-        if (null !== $headers) {
-            foreach ($headers as $name => $value) {
-                $this->response->setHeader($name, $value);
-            }
-        }
-
-        // Force JSON content-type header
-        $response->setHeader('Content-Type', 'application/json')
-                 ->setBody(json_encode($values));
-        $response->send();
     }
 
 }

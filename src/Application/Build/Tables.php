@@ -41,7 +41,7 @@ class Tables
      */
     public static function install($install, $dbTables)
     {
-        echo \Pop\I18n\I18n::factory()->__('Creating database table class files...') . PHP_EOL;
+        echo 'Creating database table class files...' . PHP_EOL;
 
         // Create table class folder
         $tableDir = $install->project->base . '/module/' . $install->project->name . '/src/' . $install->project->name . '/Table';
@@ -52,7 +52,7 @@ class Tables
         // Loop through the tables, creating the classes
         foreach ($dbTables as $table => $value) {
             $prefix = (isset($value['prefix'])) ? $value['prefix'] : null;
-            $tableName = ucfirst(\Pop\Filter\String::underscoreToCamelcase(str_replace($prefix, '', $table)));
+            $tableName = ucfirst(\Pop\Application\Build::underscoreToCamelcase(str_replace($prefix, '', $table)));
 
             $ns = new NamespaceGenerator($install->project->name . '\Table');
             $ns->setUse('Pop\Db\Record');
