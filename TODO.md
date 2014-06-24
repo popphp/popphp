@@ -8,7 +8,6 @@ COMPONENTS
  - Code        [DONE]
  - Color       [DONE]
  - Crypt       [DONE]
- - Curl        [DONE]
  - Data        [DONE]
  - Db          [DONE]
  - Dom         [DONE]
