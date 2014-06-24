@@ -32,13 +32,13 @@ class Import
      * PDF imported objects
      * @var array
      */
-    public $objects = array();
+    public $objects = [];
 
     /**
      * PDF imported page objects
      * @var array
      */
-    public $pages = array();
+    public $pages = [];
 
     /**
      * PDF imported data
@@ -50,13 +50,13 @@ class Import
      * PDF imported kids indices
      * @var array
      */
-    protected $kids = array();
+    protected $kids = [];
 
     /**
      * PDF imported thumb objects
      * @var array
      */
-    protected $thumbs = array();
+    protected $thumbs = [];
 
     /**
      * Constructor
@@ -93,7 +93,7 @@ class Import
                 $pAry[] = $this->pages[$pgs - 1];
             }
 
-            $rm = array();
+            $rm = [];
             foreach ($this->pages as $value) {
                 if (!in_array($value, $pAry)) {
                     $rm[] = $value;
@@ -140,8 +140,8 @@ class Import
     {
         if ($this->firstIndex($this->objects) <= $si) {
             ksort($this->objects);
-            $keyChanges = array();
-            $newObjects = array();
+            $keyChanges = [];
+            $newObjects = [];
 
             foreach ($this->objects as $key => $value) {
                 $keyChanges[$key] = $si;
@@ -155,7 +155,7 @@ class Import
             $keyChanges = array_reverse($keyChanges, true);
             foreach ($newObjects as $key => $obj) {
                 if (count($obj['refs']) > 0) {
-                    $matches = array();
+                    $matches = [];
                     preg_match_all('/\d+\s0\sR/mi', $newObjects[$key]['data'], $matches, PREG_OFFSET_CAPTURE);
                     if (isset($matches[0][0])) {
                         $start = count($matches[0]) - 1;
@@ -190,7 +190,7 @@ class Import
      */
     public function returnObjects($par)
     {
-        $objs = array();
+        $objs = [];
         $keys = array_keys($this->objects);
 
         foreach ($keys as $key) {
@@ -277,12 +277,12 @@ class Import
                     } else {
                         $type = 'content';
                     }
-                    $this->objects[$index] = array('type' => $type, 'data' => $obj_data, 'refs' => $this->getRefs($obj_data));
+                    $this->objects[$index] = ['type' => $type, 'data' => $obj_data, 'refs' => $this->getRefs($obj_data)];
                 }
             }
 
             // Order the page objects correctly.
-            $pageOrder = array();
+            $pageOrder = [];
 
             foreach ($this->objects as $key => $value) {
                 if ($value['type'] == 'page') {
@@ -314,8 +314,8 @@ class Import
      */
     protected function getRefs($data)
     {
-        $r = array();
-        $refs = array();
+        $r    = [];
+        $refs = [];
 
         // Grab reference start points.
         if (strpos($data, 'stream') !== false) {

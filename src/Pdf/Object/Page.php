@@ -62,25 +62,25 @@ class Page
      * PDF page annotations
      * @var array
      */
-    public $annots = array();
+    public $annots = [];
 
     /**
      * PDF page content objects
      * @var array
      */
-    public $content = array();
+    public $content = [];
 
     /**
      * PDF page xobjects
      * @var array
      */
-    public $xobjs = array();
+    public $xobjs = [];
 
     /**
      * PDF page fonts
      * @var array
      */
-    public $fonts = array();
+    public $fonts = [];
 
     /**
      * PDF page thumb object
@@ -98,38 +98,38 @@ class Page
      * Array of page sizes
      * @var array
      */
-    protected $sizes = array(
-        '#10 Envelope' => array('width' => '297', 'height' => '684'),
-        'C5 Envelope'  => array('width' => '461', 'height' => '648'),
-        'DL Envelope'  => array('width' => '312', 'height' => '624'),
-        'Folio'        => array('width' => '595', 'height' => '935'),
-        'Executive'    => array('width' => '522', 'height' => '756'),
-        'Letter'       => array('width' => '612', 'height' => '792'),
-        'Legal'        => array('width' => '612', 'height' => '1008'),
-        'Ledger'       => array('width' => '1224', 'height' => '792'),
-        'Tabloid'      => array('width' => '792', 'height' => '1224'),
-        'A0'           => array('width' => '2384', 'height' => '3370'),
-        'A1'           => array('width' => '1684', 'height' => '2384'),
-        'A2'           => array('width' => '1191', 'height' => '1684'),
-        'A3'           => array('width' => '842', 'height' => '1191'),
-        'A4'           => array('width' => '595', 'height' => '842'),
-        'A5'           => array('width' => '420', 'height' => '595'),
-        'A6'           => array('width' => '297', 'height' => '420'),
-        'A7'           => array('width' => '210', 'height' => '297'),
-        'A8'           => array('width' => '148', 'height' => '210'),
-        'A9'           => array('width' => '105', 'height' => '148'),
-        'B0'           => array('width' => '2920', 'height' => '4127'),
-        'B1'           => array('width' => '2064', 'height' => '2920'),
-        'B2'           => array('width' => '1460', 'height' => '2064'),
-        'B3'           => array('width' => '1032', 'height' => '1460'),
-        'B4'           => array('width' => '729', 'height' => '1032'),
-        'B5'           => array('width' => '516', 'height' => '729'),
-        'B6'           => array('width' => '363', 'height' => '516'),
-        'B7'           => array('width' => '258', 'height' => '363'),
-        'B8'           => array('width' => '181', 'height' => '258'),
-        'B9'           => array('width' => '127', 'height' => '181'),
-        'B10'          => array('width' => '91', 'height' => '127')
-    );
+    protected $sizes = [
+        '#10 Envelope' => ['width' => '297', 'height' => '684'],
+        'C5 Envelope'  => ['width' => '461', 'height' => '648'],
+        'DL Envelope'  => ['width' => '312', 'height' => '624'],
+        'Folio'        => ['width' => '595', 'height' => '935'],
+        'Executive'    => ['width' => '522', 'height' => '756'],
+        'Letter'       => ['width' => '612', 'height' => '792'],
+        'Legal'        => ['width' => '612', 'height' => '1008'],
+        'Ledger'       => ['width' => '1224', 'height' => '792'],
+        'Tabloid'      => ['width' => '792', 'height' => '1224'],
+        'A0'           => ['width' => '2384', 'height' => '3370'],
+        'A1'           => ['width' => '1684', 'height' => '2384'],
+        'A2'           => ['width' => '1191', 'height' => '1684'],
+        'A3'           => ['width' => '842', 'height' => '1191'],
+        'A4'           => ['width' => '595', 'height' => '842'],
+        'A5'           => ['width' => '420', 'height' => '595'],
+        'A6'           => ['width' => '297', 'height' => '420'],
+        'A7'           => ['width' => '210', 'height' => '297'],
+        'A8'           => ['width' => '148', 'height' => '210'],
+        'A9'           => ['width' => '105', 'height' => '148'],
+        'B0'           => ['width' => '2920', 'height' => '4127'],
+        'B1'           => ['width' => '2064', 'height' => '2920'],
+        'B2'           => ['width' => '1460', 'height' => '2064'],
+        'B3'           => ['width' => '1032', 'height' => '1460'],
+        'B4'           => ['width' => '729', 'height' => '1032'],
+        'B5'           => ['width' => '516', 'height' => '729'],
+        'B6'           => ['width' => '363', 'height' => '516'],
+        'B7'           => ['width' => '258', 'height' => '363'],
+        'B8'           => ['width' => '181', 'height' => '258'],
+        'B9'           => ['width' => '127', 'height' => '181'],
+        'B10'          => ['width' => '91', 'height' => '127']
+    ];
 
     /**
      * Constructor

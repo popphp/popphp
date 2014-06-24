@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Font
+ * @package    Pop_Pdf
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,13 +13,13 @@
 /**
  * @namespace
  */
-namespace Pop\Font\TrueType\Table;
+namespace Pop\Pdf\Font\TrueType\Table;
 
 /**
  * CMAP table class
  *
  * @category   Pop
- * @package    Pop_Font
+ * @package    Pop_Pdf
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -45,10 +45,10 @@ class Cmap
      *
      * Instantiate a TTF 'cmap' table object.
      *
-     * @param  \Pop\Font\TrueType $font
-     * @return \Pop\Font\TrueType\Table\Cmap
+     * @param  \Pop\Pdf\Font\TrueType $font
+     * @return \Pop\Pdf\Font\TrueType\Table\Cmap
      */
-    public function __construct(\Pop\Font\TrueType $font)
+    public function __construct(\Pop\Pdf\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['cmap']->offset;
 
@@ -63,12 +63,12 @@ class Cmap
     }
 
     /**
-     * Method to parse the CMAP subtables.
+     * Method to parse the CMAP sub-tables.
      *
-     * @param  \Pop\Font\TrueType $font
+     * @param  \Pop\Pdf\Font\TrueType $font
      * @return void
      */
-    protected function parseSubTables(\Pop\Font\TrueType $font)
+    protected function parseSubTables(\Pop\Pdf\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['cmap']->offset + 4;
 

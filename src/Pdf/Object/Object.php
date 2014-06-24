@@ -126,7 +126,7 @@ class Object
      */
     public function __toString()
     {
-        $matches = array();
+        $matches = [];
 
         // Set the content stream.
         $stream = (null !== $this->stream) ? "stream" . $this->stream . "endstream\n" : '';

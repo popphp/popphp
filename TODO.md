@@ -16,7 +16,6 @@ COMPONENTS
  - Feed [DONE -> w/ deps: Dom]
  - File [DONE]
  - Filter [DONE]
- - Font
  - Form
  - Ftp [DONE]
  - Geo [DONE]
@@ -30,7 +29,7 @@ COMPONENTS
  - Nav [DONE - w/ deps: Acl, Dom]
  - Paginator [DONE]
  - Payment [DONE -> w/ deps: Curl]
- - Pdf
+ - Pdf [IN PROGRESS - w/ deps: Color, Image]
  - Service [DONE]
  - Shipping [DONE -> w/ deps: Curl, Dom]
  - Validator [DONE]

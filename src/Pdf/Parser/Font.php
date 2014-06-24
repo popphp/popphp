@@ -64,7 +64,7 @@ class Font
      * Font objects
      * @var array
      */
-    protected $objects = array();
+    protected $objects = [];
 
     /**
      * Font compress flag
@@ -95,13 +95,13 @@ class Font
         $ext = strtolower(substr($fle, -4));
         switch ($ext) {
             case '.ttf':
-                $this->font = new \Pop\Font\TrueType($fle);
+                $this->font = new \Pop\Pdf\Font\TrueType($fle);
                 break;
             case '.otf':
-                $this->font = new \Pop\Font\TrueType\OpenType($fle);
+                $this->font = new \Pop\Pdf\Font\TrueType\OpenType($fle);
                 break;
             case '.pfb':
-                $this->font = new \Pop\Font\Type1($fle);
+                $this->font = new \Pop\Pdf\Font\Type1($fle);
                 if (null === $this->font->afmPath) {
                     throw new Exception('The AFM font file was not found.');
                 }
@@ -140,7 +140,7 @@ class Font
      */
     public function getFontName()
     {
-        $fontName = ($this->font instanceof \Pop\Font\Type1) ? $this->font->info->postscriptName : $this->font->tables['name']->postscriptName;
+        $fontName = ($this->font instanceof \Pop\Pdf\Font\Type1) ? $this->font->info->postscriptName : $this->font->tables['name']->postscriptName;
         return $fontName;
     }
 
@@ -161,22 +161,22 @@ class Font
      */
     protected function createFontObjects()
     {
-        if ($this->font instanceof \Pop\Font\Type1) {
-            $fontType = 'Type1';
-            $fontName = $this->font->info->postscriptName;
-            $fontFile = 'FontFile';
-            $glyphWidths = array('encoding' => 'StandardEncoding', 'widths' => $this->font->glyphWidths);
+        if ($this->font instanceof \Pop\Pdf\Font\Type1) {
+            $fontType     = 'Type1';
+            $fontName     = $this->font->info->postscriptName;
+            $fontFile     = 'FontFile';
+            $glyphWidths  = ['encoding' => 'StandardEncoding', 'widths' => $this->font->glyphWidths];
             $unCompStream = $this->font->fontData;
-            $length1 = $this->font->length1;
-            $length2 = " /Length2 " . $this->font->length2 . " /Length3 0";
+            $length1      = $this->font->length1;
+            $length2      = " /Length2 " . $this->font->length2 . " /Length3 0";
         } else {
-            $fontType = 'TrueType';
-            $fontName = $this->font->tables['name']->postscriptName;
-            $fontFile = 'FontFile2';
-            $glyphWidths = $this->getGlyphWidths($this->font->tables['cmap']);
+            $fontType     = 'TrueType';
+            $fontName     = $this->font->tables['name']->postscriptName;
+            $fontFile     = 'FontFile2';
+            $glyphWidths  = $this->getGlyphWidths($this->font->tables['cmap']);
             $unCompStream = $this->font->read();
-            $length1 = strlen($unCompStream);
-            $length2 = null;
+            $length1      = strlen($unCompStream);
+            $length2      = null;
         }
 
         $this->objects[$this->objectIndex] = new Object("{$this->objectIndex} 0 obj\n<<\n    /Type /Font\n    /Subtype /{$fontType}\n    /FontDescriptor {$this->fontDescIndex} 0 R\n    /Name /TT{$this->fontIndex}\n    /BaseFont /" . $fontName . "\n    /FirstChar 32\n    /LastChar 255\n    /Widths [" . implode(' ', $glyphWidths['widths']) . "]\n    /Encoding /" . $glyphWidths['encoding'] . "\n>>\nendobj\n\n");
@@ -196,12 +196,12 @@ class Font
     /**
      * Method to to get the glyph widths
      *
-     * @param  \Pop\Font\TrueType\Table\Cmap $cmap
+     * @param  \Pop\Pdf\Font\TrueType\Table\Cmap $cmap
      * @return array
      */
-    protected function getGlyphWidths(\Pop\Font\TrueType\Table\Cmap $cmap)
+    protected function getGlyphWidths(\Pop\Pdf\Font\TrueType\Table\Cmap $cmap)
     {
-        $gw = array('encoding' => null, 'widths' => array());
+        $gw = ['encoding' => null, 'widths' => []];
         $uniTable = null;
         $msTable = null;
         $macTable = null;

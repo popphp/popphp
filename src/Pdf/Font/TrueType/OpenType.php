@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Font
+ * @package    Pop_Pdf
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,19 +13,19 @@
 /**
  * @namespace
  */
-namespace Pop\Font\TrueType;
+namespace Pop\Pdf\Font\TrueType;
 
 /**
  * OpenType font class
  *
  * @category   Pop
- * @package    Pop_Font
+ * @package    Pop_Pdf
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class OpenType extends \Pop\Font\TrueType
+class OpenType extends \Pop\Pdf\Font\TrueType
 {
 
     /**
@@ -34,7 +34,7 @@ class OpenType extends \Pop\Font\TrueType
      * Instantiate a OpenType font file object based on a pre-existing font file on disk.
      *
      * @param  string $font
-     * @return \Pop\Font\TrueType\OpenType
+     * @return \Pop\Pdf\Font\TrueType\OpenType
      */
     public function __construct($font)
     {

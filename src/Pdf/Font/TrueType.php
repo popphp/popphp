@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Font
+ * @package    Pop_Pdf
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,13 +13,13 @@
 /**
  * @namespace
  */
-namespace Pop\Font;
+namespace Pop\Pdf\Font;
 
 /**
  * TrueType font class
  *
  * @category   Pop
- * @package    Pop_Font
+ * @package    Pop_Pdf
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -64,7 +64,7 @@ class TrueType extends AbstractFont
      * Instantiate a TrueType font file object based on a pre-existing font file on disk.
      *
      * @param  string $font
-     * @return \Pop\Font\TrueType
+     * @return \Pop\Pdf\Font\TrueType
      */
     public function __construct($font)
     {

@@ -44,7 +44,7 @@ class ParentObject
      * PDF parent kids object indices
      * @var array
      */
-    public $kids = array();
+    public $kids = [];
 
     /**
      * PDF parent object data
@@ -62,7 +62,7 @@ class ParentObject
      */
     public function __construct($str = null)
     {
-        $matches = array();
+        $matches = [];
 
         // Use default settings for a new PDF and its parent object.
         if (null === $str) {

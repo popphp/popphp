@@ -32,9 +32,12 @@ As of June 20, 2014
         + Removed unused functionality from Filter\String
     - I18n
         + Added support for JSON language files
+    - Pdf
+        + Font component moved under Pdf
 * Removed
     - Compress
     - Db\Adapter\Mysql (renamed old Mysqli adapter class to Mysql)
     - Filter\Search
+    - Font (moved under the Pdf component)
     - Loader
     - Project

@@ -15,8 +15,7 @@
  */
 namespace Pop\Pdf;
 
-use Pop\Color\Color;
-use Pop\Color\Space\ColorInterface;
+use Pop\Color\Space;
 use Pop\Pdf\Object;
 
 /**
@@ -29,7 +28,7 @@ use Pop\Pdf\Object;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Pdf extends \Pop\File\File
+class Pdf
 {
 
     /**
@@ -51,22 +50,16 @@ class Pdf extends \Pop\File\File
     protected $info = 3;
 
     /**
-     * Array of allowed file types.
-     * @var array
-     */
-    protected $allowed = array('pdf' => 'application/pdf');
-
-    /**
      * Array of PDF page object indices.
      * @var array
      */
-    protected $pages = array();
+    protected $pages = [];
 
     /**
      * Array of PDF objects.
      * @var array
      */
-    protected $objects = array();
+    protected $objects = [];
 
     /**
      * PDF trailer.
@@ -84,7 +77,7 @@ class Pdf extends \Pop\File\File
      * PDF text parameters.
      * @var array
      */
-    protected $textParams = array('c' => 0, 'w' => 0, 'h' => 100, 'v' => 100, 'rot' => 0, 'rend' => 0);
+    protected $textParams = ['c' => 0, 'w' => 0, 'h' => 100, 'v' => 100, 'rot' => 0, 'rend' => 0];
 
     /**
      * PDF bytelength
@@ -96,40 +89,40 @@ class Pdf extends \Pop\File\File
      * Standard PDF fonts with their approximate character width and height factors.
      * @var array
      */
-    protected $standardFonts = array(
-        'Arial'                    => array('width_factor' => 0.5, 'height_factor' => 1),
-        'Arial,Italic'             => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'Arial,Bold'               => array('width_factor' => 0.55, 'height_factor' => 1.12),
-        'Arial,BoldItalic'         => array('width_factor' => 0.55, 'height_factor' => 1.12),
-        'Courier'                  => array('width_factor' => 0.65, 'height_factor' => 1),
-        'CourierNew'               => array('width_factor' => 0.65, 'height_factor' => 1),
-        'Courier-Oblique'          => array('width_factor' => 0.65, 'height_factor' => 1),
-        'CourierNew,Italic'        => array('width_factor' => 0.65, 'height_factor' => 1),
-        'Courier-Bold'             => array('width_factor' => 0.65, 'height_factor' => 1),
-        'CourierNew,Bold'          => array('width_factor' => 0.65, 'height_factor' => 1),
-        'Courier-BoldOblique'      => array('width_factor' => 0.65, 'height_factor' => 1),
-        'CourierNew,BoldItalic'    => array('width_factor' => 0.65, 'height_factor' => 1),
-        'Helvetica'                => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'Helvetica-Oblique'        => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'Helvetica-Bold'           => array('width_factor' => 0.55, 'height_factor' => 1.12),
-        'Helvetica-BoldOblique'    => array('width_factor' => 0.55, 'height_factor' => 1.12),
-        'Symbol'                   => array('width_factor' => 0.85, 'height_factor' => 1.12),
-        'Times-Roman'              => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'Times-Bold'               => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'Times-Italic'             => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'Times-BoldItalic'         => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'TimesNewRoman'            => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'TimesNewRoman,Italic'     => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'TimesNewRoman,Bold'       => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'TimesNewRoman,BoldItalic' => array('width_factor' => 0.5, 'height_factor' => 1.12),
-        'ZapfDingbats'             => array('width_factor' => 0.75, 'height_factor' => 1.12)
-    );
+    protected $standardFonts = [
+        'Arial'                    => ['width_factor' => 0.5, 'height_factor' => 1],
+        'Arial,Italic'             => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'Arial,Bold'               => ['width_factor' => 0.55, 'height_factor' => 1.12],
+        'Arial,BoldItalic'         => ['width_factor' => 0.55, 'height_factor' => 1.12],
+        'Courier'                  => ['width_factor' => 0.65, 'height_factor' => 1],
+        'CourierNew'               => ['width_factor' => 0.65, 'height_factor' => 1],
+        'Courier-Oblique'          => ['width_factor' => 0.65, 'height_factor' => 1],
+        'CourierNew,Italic'        => ['width_factor' => 0.65, 'height_factor' => 1],
+        'Courier-Bold'             => ['width_factor' => 0.65, 'height_factor' => 1],
+        'CourierNew,Bold'          => ['width_factor' => 0.65, 'height_factor' => 1],
+        'Courier-BoldOblique'      => ['width_factor' => 0.65, 'height_factor' => 1],
+        'CourierNew,BoldItalic'    => ['width_factor' => 0.65, 'height_factor' => 1],
+        'Helvetica'                => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'Helvetica-Oblique'        => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'Helvetica-Bold'           => ['width_factor' => 0.55, 'height_factor' => 1.12],
+        'Helvetica-BoldOblique'    => ['width_factor' => 0.55, 'height_factor' => 1.12],
+        'Symbol'                   => ['width_factor' => 0.85, 'height_factor' => 1.12],
+        'Times-Roman'              => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'Times-Bold'               => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'Times-Italic'             => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'Times-BoldItalic'         => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'TimesNewRoman'            => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'TimesNewRoman,Italic'     => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'TimesNewRoman,Bold'       => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'TimesNewRoman,BoldItalic' => ['width_factor' => 0.5, 'height_factor' => 1.12],
+        'ZapfDingbats'             => ['width_factor' => 0.75, 'height_factor' => 1.12]
+    ];
 
     /**
      * Current fonts added to the PDF
      * @var array
      */
-    protected $fonts = array();
+    protected $fonts = [];
 
     /**
      * Last font name
@@ -141,7 +134,7 @@ class Pdf extends \Pop\File\File
      * Array of images added to the PDF
      * @var string
      */
-    protected $images = array();
+    protected $images = [];
 
     /**
      * Stroke ON or OFF flag
@@ -192,6 +185,54 @@ class Pdf extends \Pop\File\File
     protected $compress = true;
 
     /**
+     * Full path of pdf file, i.e. '/path/to/fontfile.ext'
+     * @var string
+     */
+    protected $fullpath = null;
+
+    /**
+     * Full, absolute directory of the pdf file, i.e. '/some/dir/'
+     * @var string
+     */
+    protected $dir = null;
+
+    /**
+     * Full basename of pdf file, i.e. 'fontfile.ext'
+     * @var string
+     */
+    protected $basename = null;
+
+    /**
+     * Full filename of pdf file, i.e. 'fontfile'
+     * @var string
+     */
+    protected $filename = null;
+
+    /**
+     * PDF file extension, i.e. 'ext'
+     * @var string
+     */
+    protected $extension = 'pdf';
+
+    /**
+     * PDF file size in bytes
+     * @var int
+     */
+    protected $size = 0;
+
+    /**
+     * PDF file mime type
+     * @var string
+     */
+    protected $mime = 'application/pdf';
+
+    /**
+     * PDF output buffer
+     * @var string
+     */
+    protected $output = null;
+
+    /**
      * Constructor
      *
      * Instantiate a PDF file object based on either a pre-existing PDF file on disk,
@@ -202,14 +243,25 @@ class Pdf extends \Pop\File\File
      * @param  string $sz
      * @param  int    $w
      * @param  int    $h
-     * @return \Pop\Pdf\Pdf
+     * @throws Exception
+     * @return Pdf
      */
     public function __construct($pdf, $sz = null, $w = null, $h = null)
     {
-        $this->fillColor = new \Pop\Color\Space\Rgb(0, 0, 0);
-        $this->backgroundColor = new \Pop\Color\Space\Rgb(255, 255, 255);
+        $this->fillColor       = new Space\Rgb(0, 0, 0);
+        $this->backgroundColor = new Space\Rgb(255, 255, 255);
 
-        parent::__construct($pdf);
+        $this->fullpath  = $pdf;
+        $parts           = pathinfo($pdf);
+        $this->size      = (file_exists($pdf) ? filesize($pdf) : 0);
+        $this->dir       = realpath($parts['dirname']);
+        $this->basename  = $parts['basename'];
+        $this->filename  = $parts['filename'];
+        $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
+
+        if ((null === $this->extension) || ($this->extension != 'pdf')) {
+            throw new Exception('Error: That pdf file does not have the correct extension.');
+        }
 
         $this->objects[1] = new Object\Root();
         $this->objects[2] = new Object\ParentObject();
@@ -231,7 +283,7 @@ class Pdf extends \Pop\File\File
      *
      * @param  string           $pdf
      * @param  int|string|array $pg
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function import($pdf, $pg = null)
     {
@@ -273,7 +325,7 @@ class Pdf extends \Pop\File\File
      * @param  string $sz
      * @param  int    $w
      * @param  int    $h
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function addPage($sz = null, $w = null, $h = null)
     {
@@ -304,7 +356,7 @@ class Pdf extends \Pop\File\File
      *
      * @param  int $pg
      * @throws Exception
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function copyPage($pg)
     {
@@ -345,7 +397,7 @@ class Pdf extends \Pop\File\File
      *
      * @param  int $pg
      * @throws Exception
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function deletePage($pg)
     {
@@ -378,14 +430,14 @@ class Pdf extends \Pop\File\File
 
         // Reset the kids array.
         $tmpAry = $this->objects[$this->parent]->kids;
-        $this->objects[$this->parent]->kids = array();
+        $this->objects[$this->parent]->kids = [];
         foreach ($tmpAry as $value) {
             $this->objects[$this->parent]->kids[] = $value;
         }
 
         // Reset the pages array.
         $tmpAry = $this->pages;
-        $this->pages = array();
+        $this->pages = [];
         foreach ($tmpAry as $value) {
             $this->pages[] = $value;
         }
@@ -398,11 +450,11 @@ class Pdf extends \Pop\File\File
      *
      * @param  array $pgs
      * @throws Exception
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function orderPages($pgs)
     {
-        $newOrder = array();
+        $newOrder = [];
 
         // Check if the PDF has more than one page.
         if (count($this->pages) <= 1) {
@@ -485,7 +537,7 @@ class Pdf extends \Pop\File\File
      * Method to set the compression of the PDF.
      *
      * @param  boolean $comp
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function setCompression($comp = false)
     {
@@ -498,7 +550,7 @@ class Pdf extends \Pop\File\File
      *
      * @param  int $pg
      * @throws Exception
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function setPage($pg)
     {
@@ -517,7 +569,7 @@ class Pdf extends \Pop\File\File
      * Method to set the PDF version.
      *
      * @param  string $ver
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function setVersion($ver)
     {
@@ -529,7 +581,7 @@ class Pdf extends \Pop\File\File
      * Method to set the PDF info title.
      *
      * @param  string $tle
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function setTitle($tle)
     {
@@ -541,7 +593,7 @@ class Pdf extends \Pop\File\File
      * Method to set the PDF info author.
      *
      * @param  string $auth
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function setAuthor($auth)
     {
@@ -553,7 +605,7 @@ class Pdf extends \Pop\File\File
      * Method to set the PDF info subject.
      *
      * @param  string $subj
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function setSubject($subj)
     {
@@ -565,7 +617,7 @@ class Pdf extends \Pop\File\File
      * Method to set the PDF info creation date.
      *
      * @param  string $dt
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function setCreateDate($dt)
     {
@@ -577,7 +629,7 @@ class Pdf extends \Pop\File\File
      * Method to set the PDF info modification date.
      *
      * @param  string $dt
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function setModDate($dt)
     {
@@ -588,10 +640,10 @@ class Pdf extends \Pop\File\File
     /**
      * Method to set the background of the document.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Pdf\Pdf
+     * @param  Space\ColorInterface $color
+     * @return Pdf
      */
-    public function setBackgroundColor(ColorInterface $color)
+    public function setBackgroundColor(Space\ColorInterface $color)
     {
         $this->backgroundColor = $color;
         return $this;
@@ -600,10 +652,10 @@ class Pdf extends \Pop\File\File
     /**
      * Method to set the fill color of objects and text in the PDF.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Pdf\Pdf
+     * @param  Space\ColorInterface $color
+     * @return Pdf
      */
-    public function setFillColor(ColorInterface $color)
+    public function setFillColor(Space\ColorInterface $color)
     {
         $this->fillColor = $color;
 
@@ -616,10 +668,10 @@ class Pdf extends \Pop\File\File
     /**
      * Method to set the stroke color of paths in the PDF.
      *
-     * @param  \Pop\Color\Space\ColorInterface $color
-     * @return \Pop\Pdf\Pdf
+     * @param  Space\ColorInterface $color
+     * @return Pdf
      */
-    public function setStrokeColor(ColorInterface $color)
+    public function setStrokeColor(Space\ColorInterface $color)
     {
         $this->strokeColor = $color;
 
@@ -635,7 +687,7 @@ class Pdf extends \Pop\File\File
      * @param  int $w
      * @param  int $dash_len
      * @param  int $dash_gap
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function setStrokeWidth($w = null, $dash_len = null, $dash_gap = null)
     {
@@ -673,7 +725,7 @@ class Pdf extends \Pop\File\File
      * @param  int $rot  (rotation)
      * @param  int $rend (render flag, 0 - 7)
      * @throws Exception
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function setTextParams($c = 0, $w = 0, $h = 100, $v = 100, $rot = 0, $rend = 0)
     {
@@ -704,7 +756,7 @@ class Pdf extends \Pop\File\File
      * @param  string  $font
      * @param  boolean $embedOverride
      * @throws Exception
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function addFont($font, $embedOverride = false)
     {
@@ -763,7 +815,7 @@ class Pdf extends \Pop\File\File
      * @param  string $str
      * @param  string $font
      * @throws Exception
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function addText($x, $y, $size, $str, $font = null)
     {
@@ -824,10 +876,10 @@ class Pdf extends \Pop\File\File
         }
 
         // Calculate the approximate width, height and offset baseline values of the string at the certain font.
-        $size = array();
+        $size = [];
 
-        $size['width'] = round(($sz * $this->standardFonts[$font]['width_factor']) * strlen($str));
-        $size['height'] = round($sz * $this->standardFonts[$font]['height_factor']);
+        $size['width']    = round(($sz * $this->standardFonts[$font]['width_factor']) * strlen($str));
+        $size['height']   = round($sz * $this->standardFonts[$font]['height_factor']);
         $size['baseline'] = round($sz / 3);
 
         return $size;
@@ -840,7 +892,7 @@ class Pdf extends \Pop\File\File
      * @param  int $y1
      * @param  int $x2
      * @param  int $y2
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawLine($x1, $y1, $x2, $y2)
     {
@@ -858,7 +910,7 @@ class Pdf extends \Pop\File\File
      * @param  int $w
      * @param  int $h
      * @param  boolean $fill
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawRectangle($x, $y, $w, $h = null, $fill = true)
     {
@@ -879,7 +931,7 @@ class Pdf extends \Pop\File\File
      * @param  int     $y
      * @param  int     $w
      * @param  boolean $fill
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawSquare($x, $y, $w, $fill = true)
     {
@@ -895,7 +947,7 @@ class Pdf extends \Pop\File\File
      * @param  int     $w
      * @param  int     $h
      * @param  boolean $fill
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawEllipse($x, $y, $w, $h = null, $fill = true)
     {
@@ -952,7 +1004,7 @@ class Pdf extends \Pop\File\File
      * @param  int     $y
      * @param  int     $w
      * @param  boolean $fill
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawCircle($x, $y, $w, $fill = true)
     {
@@ -970,7 +1022,7 @@ class Pdf extends \Pop\File\File
      * @param  int $w
      * @param  int $h
      * @param  boolean $fill
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawArc($x, $y, $start, $end, $w, $h = null, $fill = true)
     {
@@ -983,19 +1035,19 @@ class Pdf extends \Pop\File\File
         $eX = round($w * cos($end / 180 * pi()));
         $eY = round($h * sin($end / 180 * pi()));
 
-        $centerPoint = array('x' => $x, 'y' => $y);
-        $startPoint = array('x' => $x + $sX, 'y' => $y - $sY);
-        $endPoint = array('x' => $x + $eX, 'y' => $y - $eY);
+        $centerPoint = ['x' => $x, 'y' => $y];
+        $startPoint  = ['x' => $x + $sX, 'y' => $y - $sY];
+        $endPoint    = ['x' => $x + $eX, 'y' => $y - $eY];
 
         $startQuad = $this->getQuadrant($startPoint, $centerPoint);
         $endQuad = $this->getQuadrant($endPoint, $centerPoint);
 
-        $maskPoint1 = array('x' => ($x + $w + 50), 'y' => ($y - $h - 50));
-        $maskPoint2 = array('x' => ($x - $w - 50), 'y' => ($y - $h - 50));
-        $maskPoint3 = array('x' => ($x - $w - 50), 'y' => ($y + $h + 50));
-        $maskPoint4 = array('x' => ($x + $w + 50), 'y' => ($y + $h + 50));
+        $maskPoint1 = ['x' => ($x + $w + 50), 'y' => ($y - $h - 50)];
+        $maskPoint2 = ['x' => ($x - $w - 50), 'y' => ($y - $h - 50)];
+        $maskPoint3 = ['x' => ($x - $w - 50), 'y' => ($y + $h + 50)];
+        $maskPoint4 = ['x' => ($x + $w + 50), 'y' => ($y + $h + 50)];
 
-        $polyPoints = array($centerPoint, $startPoint);
+        $polyPoints = [$centerPoint, $startPoint];
 
         switch ($startQuad) {
             case 1:
@@ -1004,7 +1056,7 @@ class Pdf extends \Pop\File\File
                     $polyPoints[] = $maskPoint4;
                     $polyPoints[] = $maskPoint3;
                     $polyPoints[] = $maskPoint2;
-                    $polyPoints[] = array('x' => $endPoint['x'], 'y' => $maskPoint2['y']);
+                    $polyPoints[] = ['x' => $endPoint['x'], 'y' => $maskPoint2['y']];
                 } else if ($endQuad == 2) {
                     $polyPoints[] = $maskPoint4;
                     $polyPoints[] = $maskPoint3;
@@ -1023,7 +1075,7 @@ class Pdf extends \Pop\File\File
                     $polyPoints[] = $maskPoint1;
                     $polyPoints[] = $maskPoint4;
                     $polyPoints[] = $maskPoint3;
-                    $polyPoints[] = array('x' => $maskPoint3['x'], 'y' => $endPoint['y']);
+                    $polyPoints[] = ['x' => $maskPoint3['x'], 'y' => $endPoint['y']];
                 } else if ($endQuad == 3) {
                     $polyPoints[] = $maskPoint1;
                     $polyPoints[] = $maskPoint4;
@@ -1042,7 +1094,7 @@ class Pdf extends \Pop\File\File
                     $polyPoints[] = $maskPoint2;
                     $polyPoints[] = $maskPoint1;
                     $polyPoints[] = $maskPoint4;
-                    $polyPoints[] = array('x' => $endPoint['x'], 'y' => $maskPoint4['y']);
+                    $polyPoints[] = ['x' => $endPoint['x'], 'y' => $maskPoint4['y']];
                 } else if ($endQuad == 4) {
                     $polyPoints[] = $maskPoint2;
                     $polyPoints[] = $maskPoint1;
@@ -1061,7 +1113,7 @@ class Pdf extends \Pop\File\File
                     $polyPoints[] = $maskPoint3;
                     $polyPoints[] = $maskPoint2;
                     $polyPoints[] = $maskPoint1;
-                    $polyPoints[] = array('x' => $maskPoint1['x'], 'y' => $endPoint['y']);
+                    $polyPoints[] = ['x' => $maskPoint1['x'], 'y' => $endPoint['y']];
                 } else if ($endQuad == 1) {
                     $polyPoints[] = $maskPoint3;
                     $polyPoints[] = $maskPoint2;
@@ -1089,7 +1141,7 @@ class Pdf extends \Pop\File\File
      *
      * @param  array $points
      * @param  boolean $fill
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawPolygon($points, $fill = true)
     {
@@ -1116,7 +1168,7 @@ class Pdf extends \Pop\File\File
      * Method to open a new graphics state layer within the PDF.
      * Must be used in conjunction with the closeLayer() method.
      *
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function openLayer()
     {
@@ -1130,7 +1182,7 @@ class Pdf extends \Pop\File\File
      * Method to close a new graphics state layer within the PDF.
      * Must be used in conjunction with the openLayer() method.
      *
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function closeLayer()
     {
@@ -1147,7 +1199,7 @@ class Pdf extends \Pop\File\File
      * @param  int $y
      * @param  int $w
      * @param  int $h
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawClippingRectangle($x, $y, $w, $h = null)
     {
@@ -1179,7 +1231,7 @@ class Pdf extends \Pop\File\File
      * @param  int     $x
      * @param  int     $y
      * @param  int     $w
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawClippingSquare($x, $y, $w)
     {
@@ -1194,7 +1246,7 @@ class Pdf extends \Pop\File\File
      * @param  int     $y
      * @param  int     $w
      * @param  int     $h
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawClippingEllipse($x, $y, $w, $h = null)
     {
@@ -1265,7 +1317,7 @@ class Pdf extends \Pop\File\File
      * @param  int     $x
      * @param  int     $y
      * @param  int     $w
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawClippingCircle($x, $y, $w)
     {
@@ -1277,7 +1329,7 @@ class Pdf extends \Pop\File\File
      * Method to add a clipping polygon to the PDF.
      *
      * @param  array $points
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function drawClippingPolygon($points)
     {
@@ -1324,7 +1376,7 @@ class Pdf extends \Pop\File\File
      * @param  int    $w
      * @param  int    $h
      * @param  string $url
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function addUrl($x, $y, $w, $h, $url)
     {
@@ -1352,7 +1404,7 @@ class Pdf extends \Pop\File\File
      * @param  int $Z
      * @param  int $dest
      * @throws Exception
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function addLink($x, $y, $w, $h, $X, $Y, $Z, $dest = null)
     {
@@ -1388,7 +1440,7 @@ class Pdf extends \Pop\File\File
      * @param  mixed   $scl
      * @param  boolean $preserveRes
      * @throws Exception
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function addImage($image, $x, $y, $scl = null, $preserveRes = true)
     {
@@ -1422,12 +1474,12 @@ class Pdf extends \Pop\File\File
             $co_index = $this->getContentObject();
             $this->objects[$co_index]->setStream($imageParser->getStream());
             if ($preserveRes) {
-                $this->images[$image] = array(
+                $this->images[$image] = [
                     'index' => $i,
                     'origW' => $imageParser->getOrigW(),
                     'origH' => $imageParser->getOrigH(),
                     'xobj'  => $imageParser->getXObject()
-                );
+                ];
             }
         }
 
@@ -1438,13 +1490,33 @@ class Pdf extends \Pop\File\File
      * Output the PDF directly to the browser.
      *
      * @param  boolean $download
-     * @return void
+     * @return Pdf
      */
     public function output($download = false)
     {
         // Format and finalize the PDF.
         $this->finalize();
-        parent::output($download);
+
+        // Determine if the force download argument has been passed.
+        $attach = ($download) ? 'attachment; ' : null;
+        $headers = array(
+            'Content-type'        => $this->mime,
+            'Content-disposition' => $attach . 'filename=' . $this->basename
+        );
+
+        if (isset($_SERVER['SERVER_PORT']) && ($_SERVER['SERVER_PORT'] == 443)) {
+            $headers['Expires']       = 0;
+            $headers['Cache-Control'] = 'private, must-revalidate';
+            $headers['Pragma']        = 'cache';
+        }
+
+        header('HTTP/1.1 200 OK');
+        foreach ($headers as $name => $value) {
+            header($name . ": " . $value);
+        }
+
+        echo $this->output;
+        return $this;
     }
 
     /**
@@ -1453,13 +1525,20 @@ class Pdf extends \Pop\File\File
      * @param  string  $to
      * @param  boolean $append
      * @throws Exception
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function save($to = null, $append = false)
     {
         // Format and finalize the PDF.
         $this->finalize();
-        parent::save($to, $append);
+
+        $file = (null === $to) ? $this->fullpath : $to;
+
+        if ($append) {
+            file_put_contents($file, $this->output, FILE_APPEND);
+        } else {
+            file_put_contents($file, $this->output);
+        }
 
         return $this;
     }
@@ -1467,7 +1546,7 @@ class Pdf extends \Pop\File\File
     /**
      * Method to finalize the PDF.
      *
-     * @return \Pop\Pdf\Pdf
+     * @return Pdf
      */
     public function finalize()
     {
@@ -1502,9 +1581,6 @@ class Pdf extends \Pop\File\File
         // Append the trailer to the final output.
         $this->output .= $this->trailer;
 
-        // Write to the file.
-        $this->write($this->output);
-
         return $this;
     }
 
@@ -1537,11 +1613,10 @@ class Pdf extends \Pop\File\File
     protected function calcTextMatrix()
     {
         // Define some variables.
-        $tm = '';
-        $a = '';
-        $b = '';
-        $c = '';
-        $d = '';
+        $a   = '';
+        $b   = '';
+        $c   = '';
+        $d   = '';
         $neg = null;
 
         // Determine is the rotate parameter is negative or not.
@@ -1605,8 +1680,6 @@ class Pdf extends \Pop\File\File
      */
     protected function getQuadrant($point, $center)
     {
-        $quad = 0;
-
         if ($point['x'] >= $center['x']) {
             $quad = ($point['y'] >= $center['y']) ? 4 : 1;
         } else {

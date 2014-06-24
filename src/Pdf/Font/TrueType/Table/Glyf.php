@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Font
+ * @package    Pop_Pdf
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,13 +13,13 @@
 /**
  * @namespace
  */
-namespace Pop\Font\TrueType\Table;
+namespace Pop\Pdf\Font\TrueType\Table;
 
 /**
  * GLYF table class
  *
  * @category   Pop
- * @package    Pop_Font
+ * @package    Pop_Pdf
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -45,10 +45,10 @@ class Glyf
      *
      * Instantiate a TTF 'glyf' table object.
      *
-     * @param  \Pop\Font\TrueType $font
-     * @return \Pop\Font\TrueType\Table\Glyf
+     * @param  \Pop\Pdf\Font\TrueType $font
+     * @return \Pop\Pdf\Font\TrueType\Table\Glyf
      */
-    public function __construct(\Pop\Font\TrueType $font)
+    public function __construct(\Pop\Pdf\Font\TrueType $font)
     {
         $locaLength = count($font->tables['loca']->offsets);
         $j = 0;

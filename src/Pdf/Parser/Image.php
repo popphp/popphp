@@ -60,7 +60,7 @@ class Image
      * Image objects
      * @var array
      */
-    protected $objects = array();
+    protected $objects = [];
 
     /**
      * XObject string
@@ -126,19 +126,10 @@ class Image
      */
     public function __construct($img, $x, $y, $i, $scl = null, $preserveRes = false)
     {
-        $this->x = $x;
-        $this->y = $y;
+        $this->x     = $x;
+        $this->y     = $y;
         $this->index = $i;
-
-        $allowed = array(
-            'gif'  => 'image/gif',
-            'jpe'  => 'image/jpeg',
-            'jpg'  => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'png'  => 'image/png'
-        );
-
-        $this->img = new Gd($img);
+        $this->img   = new Gd($img);
 
         // If a scale value is passed, scale the image.
         if (null !== $scl) {
@@ -274,7 +265,7 @@ class Image
             throw new Exception('Error: The image scale value is not valid.');
         }
 
-        $dims = array('w' => $wid, 'h' => $hgt);
+        $dims = ['w' => $wid, 'h' => $hgt];
 
         return $dims;
     }

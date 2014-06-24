@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/nicksagona/PopPHP
  * @category   Pop
- * @package    Pop_Font
+ * @package    Pop_Pdf
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,41 +13,37 @@
 /**
  * @namespace
  */
-namespace Pop\Font\TrueType\Table\Cmap;
+namespace Pop\Pdf\Font\TrueType\Table\Cmap;
 
 /**
- * CMAP trimmed-table class
+ * CMAP byte-encoding class
  *
  * @category   Pop
- * @package    Pop_Font
+ * @package    Pop_Pdf
  * @author     Nick Sagona, III <info@popphp.org>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class TrimmedTable
+class ByteEncoding
 {
 
     /**
-     * Method to parse the Trimmed Table (Format 6) CMAP data
+     * Method to parse the Byte Encoding (Format 0) CMAP data
      *
      * @param  string $data
      * @return array
      */
     public static function parseData($data)
     {
-        $ary = unpack(
-            'nfirstCode/' .
-            'nentryCount', substr($data, 0, 4)
-        );
+        $ary = array();
 
-        $ary['glyphId'] = array();
-
-        $bytePos = 4;
-        for ($i = 0; $i < $ary['entryCount']; $i++) {
-            $ar = unpack('nglyphIndex', substr($data, $bytePos, 2));
-            $ary['glyphId'][$i] = $ar['glyphIndex'];
-            $bytePos += 2;
+        for ($i = 0; $i < strlen($data); $i++) {
+            $ary[$i] = new \ArrayObject(array(
+                'hex'   => bin2hex($data[$i]),
+                'ascii' => ord($data[$i]),
+                'char'  => chr(ord($data[$i]))
+            ), \ArrayObject::ARRAY_AS_PROPS);
         }
 
         return $ary;
