@@ -77,31 +77,31 @@ class Element extends Child
      * Form element validators
      * @var array
      */
-    protected $validators = array();
+    protected $validators = [];
 
     /**
      * Form element error display format
      * @var array
      */
-    protected $errorDisplay = array(
+    protected $errorDisplay = [
         'container'  => 'div',
-        'attributes' => array(
+        'attributes' => [
             'class' => 'error'
-        ),
+        ],
         'pre' => false
-    );
+    ];
 
     /**
      * Form element errors
      * @var array
      */
-    protected $errors = array();
+    protected $errors = [];
 
     /**
      * Form element allowed types
      * @var array
      */
-    protected $allowedTypes = array(
+    protected $allowedTypes = [
         'button',
         'checkbox',
         'file',
@@ -114,7 +114,7 @@ class Element extends Child
         'submit',
         'text',
         'textarea'
-    );
+    ];
 
     /**
      * Constructor
@@ -144,7 +144,7 @@ class Element extends Child
             // Textarea element
             case 'textarea':
                 parent::__construct('textarea', null, null, false, $indent);
-                $this->setAttributes(array('name' => $name, 'id' => $name));
+                $this->setAttributes(['name' => $name, 'id' => $name]);
                 $this->nodeValue = $value;
                 $this->value = $value;
                 break;
@@ -152,24 +152,24 @@ class Element extends Child
             // Select element
             case 'select':
                 parent::__construct('select', null, null, false, $indent);
-                $this->setAttributes(array('name' => $name, 'id' => $name));
+                $this->setAttributes(['name' => $name, 'id' => $name]);
 
                 // Create the child option elements.
                 foreach ($value as $k => $v) {
                     if (is_array($v)) {
                         $opt = new Child('optgroup', null, null, false, $indent);
-                        $opt->setAttributes('label', $k);
+                        $opt->setAttribute('label', $k);
                         foreach ($v as $ky => $vl) {
                             $o = new Child('option', null, null, false, $indent);
-                            $o->setAttributes('value', $ky);
+                            $o->setAttribute('value', $ky);
                             // Determine if the current option element is selected.
                             if (is_array($this->marked)) {
                                 if (in_array($ky, $this->marked)) {
-                                    $o->setAttributes('selected', 'selected');
+                                    $o->setAttribute('selected', 'selected');
                                 }
                             } else {
                                 if ($ky == $this->marked) {
-                                    $o->setAttributes('selected', 'selected');
+                                    $o->setAttribute('selected', 'selected');
                                 }
                             }
                             $o->setNodeValue($vl);
@@ -177,15 +177,15 @@ class Element extends Child
                         }
                     } else {
                         $opt = new Child('option', null, null, false, $indent);
-                        $opt->setAttributes('value', $k);
+                        $opt->setAttribute('value', $k);
                         // Determine if the current option element is selected.
                         if (is_array($this->marked)) {
                             if (in_array($k, $this->marked)) {
-                                $opt->setAttributes('selected', 'selected');
+                                $opt->setAttribute('selected', 'selected');
                             }
                         } else {
                             if ($k == $this->marked) {
-                                $opt->setAttributes('selected', 'selected');
+                                $opt->setAttribute('selected', 'selected');
                             }
                         }
                         $opt->setNodeValue($v);
@@ -199,29 +199,29 @@ class Element extends Child
             // Radio element(s)
             case 'radio':
                 parent::__construct('fieldset', null, null, false, $indent);
-                $this->setAttributes('class', 'radio-btn-fieldset');
+                $this->setAttribute('class', 'radio-btn-fieldset');
 
                 // Create the radio elements and related span elements.
                 $i = null;
                 foreach ($value as $k => $v) {
                     $rad = new Child('input', null, null, false, $indent);
-                    $rad->setAttributes(array(
-                        'type' => $type,
+                    $rad->setAttributes([
+                        'type'  => $type,
                         'class' => 'radio-btn',
-                        'name' => $name,
-                        'id' => ($name . $i),
+                        'name'  => $name,
+                        'id'    => ($name . $i),
                         'value' => $k
-                    ));
+                    ]);
 
                     // Determine if the current radio element is checked.
                     if ($k == $this->marked) {
-                        $rad->setAttributes('checked', 'checked');
+                        $rad->setAttribute('checked', 'checked');
                     }
 
                     $span = new Child('span', null, null, false, $indent);
-                    $span->setAttributes('class', 'radio-span');
+                    $span->setAttribute('class', 'radio-span');
                     $span->setNodeValue($v);
-                    $this->addChildren(array($rad, $span));
+                    $this->addChildren([$rad, $span]);
                     $i++;
                 }
 
@@ -231,29 +231,29 @@ class Element extends Child
             // Checkbox element(s)
             case 'checkbox':
                 parent::__construct('fieldset', null, null, false, $indent);
-                $this->setAttributes('class', 'check-box-fieldset');
+                $this->setAttribute('class', 'check-box-fieldset');
 
                 // Create the checkbox elements and related span elements.
                 $i = null;
                 foreach ($value as $k => $v) {
                     $chk = new Child('input', null, null, false, $indent);
-                    $chk->setAttributes(array(
-                        'type' => $type,
+                    $chk->setAttributes([
+                        'type'  => $type,
                         'class' => 'check-box',
-                        'name' => ($name . '[]'),
-                        'id' => ($name . $i),
+                        'name'  => ($name . '[]'),
+                        'id'    => ($name . $i),
                         'value' => $k
-                    ));
+                    ]);
 
                     // Determine if the current radio element is checked.
                     if (in_array($k, $this->marked)) {
-                        $chk->setAttributes('checked', 'checked');
+                        $chk->setAttribute('checked', 'checked');
                     }
 
                     $span = new Child('span', null, null, false, $indent);
-                    $span->setAttributes('class', 'check-span');
+                    $span->setAttribute('class', 'check-span');
                     $span->setNodeValue($v);
-                    $this->addChildren(array($chk, $span));
+                    $this->addChildren([$chk, $span]);
                     $i++;
                 }
 
@@ -269,12 +269,12 @@ class Element extends Child
                     $nodeType = 'input';
                 }
                 parent::__construct($nodeType, null, null, false, $indent);
-                $this->setAttributes(array('type' => $type, 'name' => $name, 'id' => $name));
+                $this->setAttributes(['type' => $type, 'name' => $name, 'id' => $name]);
                 if (!is_array($value)) {
                     if ($nodeType == 'button') {
                         $this->nodeValue = $value;
                     }
-                    $this->setAttributes('value', $value);
+                    $this->setAttribute('value', $value);
                 }
                 $this->value = $value;
         }
@@ -317,7 +317,7 @@ class Element extends Child
      */
     public function setMarked($marked)
     {
-        $this->marked = ($this->isMultiple()) ? array() : null;
+        $this->marked = ($this->isMultiple()) ? [] : null;
 
         if (is_array($marked)) {
             foreach ($marked as $v) {
@@ -464,7 +464,7 @@ class Element extends Child
      * @param  array $validators
      * @return \Pop\Form\Element
      */
-    public function setValidators(array $validators = array())
+    public function setValidators(array $validators = [])
     {
         $this->validators = $validators;
         return $this;
@@ -477,7 +477,7 @@ class Element extends Child
      */
     public function clearErrors()
     {
-        $this->errors = array();
+        $this->errors = [];
         return $this;
     }
 
@@ -649,7 +649,7 @@ class Element extends Child
     public function isMultiple()
     {
         $multiple = false;
-        $class = get_class($this);
+        $class    = get_class($this);
 
         if (($class == 'Pop\Form\Element\Checkbox') || ($class == 'Pop\Form\Element\Select')) {
             $multiple = true;
@@ -677,7 +677,7 @@ class Element extends Child
      */
     public function validate()
     {
-        $this->errors = array();
+        $this->errors = [];
 
         // Check if the element is required.
         if ($this->required == true) {
@@ -690,7 +690,7 @@ class Element extends Child
             }
 
             if (empty($curElemValue) && ($curElemValue != '0')) {
-                $this->errors[] = \Pop\I18n\I18n::factory()->__('This field is required.');
+                $this->errors[] = 'This field is required.';
             }
         }
 
@@ -702,7 +702,7 @@ class Element extends Child
                     $curElemValue = $this->marked;
                 } else if (($_FILES) && (isset($_FILES[$this->name]['name']))) {
                     $curElemValue = $_FILES[$this->name]['name'];
-                    $curElemSize = $_FILES[$this->name]['size'];
+                    $curElemSize  = $_FILES[$this->name]['size'];
                 } else {
                     $curElemValue = $this->value;
                 }
@@ -724,7 +724,7 @@ class Element extends Child
                     }
                 // Else, if callable
                 } else {
-                    $result = call_user_func_array($validator, array($curElemValue));
+                    $result = call_user_func_array($validator, [$curElemValue]);
                     if (null !== $result) {
                         $this->errors[] = $result;
                     }
@@ -748,10 +748,10 @@ class Element extends Child
      */
     public function render($ret = false, $depth = 0, $indent = null, $errorIndent = null)
     {
-        $output = parent::render(true, $depth, $indent);
-        $errors = null;
+        $output    = parent::render(true, $depth, $indent);
+        $errors    = null;
         $container = $this->errorDisplay['container'];
-        $attribs = null;
+        $attribs   = null;
         foreach ($this->errorDisplay['attributes'] as $a => $v) {
             $attribs .= ' ' . $a . '="' . $v . '"';
         }
@@ -779,7 +779,7 @@ class Element extends Child
      */
     public function output()
     {
-        echo $this->render();
+        echo $this->render(true);
     }
 
 }

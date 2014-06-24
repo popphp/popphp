@@ -32,7 +32,7 @@ class Csrf extends \Pop\Form\Element
      * Current token data
      * @var array
      */
-    protected $token = array();
+    protected $token = [];
 
     /**
      * Constructor
@@ -54,11 +54,11 @@ class Csrf extends \Pop\Form\Element
 
         // If token does not exist, create one
         if (!isset($_SESSION['pop_csrf'])) {
-            $this->token = array(
+            $this->token = [
                 'value'  => sha1(rand(10000, getrandmax()) . $value),
                 'expire' => (int)$expire,
                 'start'  => time()
-            );
+            ];
             $_SESSION['pop_csrf'] = serialize($this->token);
         // Else, retrieve existing token
         } else {
@@ -67,11 +67,11 @@ class Csrf extends \Pop\Form\Element
             // Check to see if the token has expired
             if ($this->token['expire'] > 0) {
                 if (($this->token['expire'] + $this->token['start']) < time()) {
-                    $this->token = array(
+                    $this->token = [
                         'value'  => sha1(rand(10000, getrandmax()) . $value),
                         'expire' => (int)$expire,
                         'start'  => time()
-                    );
+                    ];
                     $_SESSION['pop_csrf'] = serialize($this->token);
                 }
             }
@@ -92,7 +92,7 @@ class Csrf extends \Pop\Form\Element
     {
         // Get query data
         if ($_SERVER['REQUEST_METHOD']) {
-            $queryData = array();
+            $queryData = [];
             switch ($_SERVER['REQUEST_METHOD']) {
                 case 'GET':
                     $queryData = $_GET;
@@ -115,7 +115,7 @@ class Csrf extends \Pop\Form\Element
             // If there is query data, set validator to check against the token value
             if (count($queryData) > 0) {
                 $val = (isset($queryData[$this->name])) ? $queryData[$this->name] : '';
-                $this->addValidator(new \Pop\Validator\Equal($val, \Pop\I18n\I18n::factory()->__('The security token does not match.')));
+                $this->addValidator(new \Pop\Validator\Equal($val, 'The security token does not match.'));
             }
         } else {
             throw new \Pop\Form\Exception('Error: The server request method is not set.');

@@ -32,7 +32,7 @@ class Captcha extends \Pop\Form\Element
      * Current token data
      * @var array
      */
-    protected $token = array();
+    protected $token = [];
 
     /**
      * Constructor
@@ -61,12 +61,12 @@ class Captcha extends \Pop\Form\Element
                 $captcha = strtoupper($captcha);
             }
 
-            $this->token = array(
+            $this->token = [
                 'captcha' => $captcha,
                 'value'   => null,
                 'expire'  => (int)$expire,
                 'start'   => time()
-            );
+            ];
             $_SESSION['pop_captcha'] = serialize($this->token);
         // Else, retrieve existing token
         } else {
@@ -81,12 +81,12 @@ class Captcha extends \Pop\Form\Element
                         $captcha = strtoupper($captcha);
                     }
 
-                    $this->token = array(
+                    $this->token = [
                         'captcha' => $captcha,
                         'value'   => null,
                         'expire'  => (int)$expire,
                         'start'   => time()
-                    );
+                    ];
                     $_SESSION['pop_captcha'] = serialize($this->token);
                 }
             }
@@ -108,7 +108,7 @@ class Captcha extends \Pop\Form\Element
         parent::setLabel($label);
         if (isset($this->token['captcha'])) {
             if ((strpos($this->token['captcha'], '<img') === false) && ((strpos($this->token['captcha'], ' + ') !== false) || (strpos($this->token['captcha'], ' - ') !== false) || (strpos($this->token['captcha'], ' * ') !== false) || (strpos($this->token['captcha'], ' / ') !== false))) {
-                $this->label = $this->label . '(' . str_replace(array(' * ', ' / '), array(' &#215; ', ' &#247; '), $this->token['captcha'] .')');
+                $this->label = $this->label . '(' . str_replace([' * ', ' / '], [' &#215; ', ' &#247; '], $this->token['captcha'] .')');
             } else {
                 $this->label = $this->label . $this->token['captcha'];
             }
@@ -126,7 +126,7 @@ class Captcha extends \Pop\Form\Element
     {
         // Get query data
         if ($_SERVER['REQUEST_METHOD']) {
-            $queryData = array();
+            $queryData = [];
             switch ($_SERVER['REQUEST_METHOD']) {
                 case 'GET':
                     $queryData = $_GET;
@@ -157,7 +157,7 @@ class Captcha extends \Pop\Form\Element
                     } else {
                         $answer = $captcha;
                     }
-                    $this->addValidator(new \Pop\Validator\Equal($answer, \Pop\I18n\I18n::factory()->__('The answer is incorrect.')));
+                    $this->addValidator(new \Pop\Validator\Equal($answer, 'The answer is incorrect.'));
                 }
             }
         } else {
@@ -172,12 +172,12 @@ class Captcha extends \Pop\Form\Element
      */
     protected function generateEquation()
     {
-        $ops = array(' + ', ' - ', ' * ', ' / ');
+        $ops = [' + ', ' - ', ' * ', ' / '];
         $equation = null;
 
         $rand1 = rand(1, 10);
         $rand2 = rand(1, 10);
-        $op = $ops[rand(0, 3)];
+        $op    = $ops[rand(0, 3)];
 
         // If the operator is division, keep the equation very simple, with no remainder
         if ($op == ' / ') {
@@ -185,7 +185,7 @@ class Captcha extends \Pop\Form\Element
             while ($mod != 0) {
                 $rand1 = rand(1, 10);
                 $rand2 = rand(1, 10);
-                $mod = ($rand2 > $rand1) ? $rand2 % $rand1 : $rand1 % $rand2;
+                $mod   = ($rand2 > $rand1) ? $rand2 % $rand1 : $rand1 % $rand2;
             }
         }
 

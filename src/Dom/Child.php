@@ -62,7 +62,7 @@ class Child extends AbstractNode
      * @param  mixed  $childNode
      * @param  boolean $first
      * @param  string $indent
-     * @return \Pop\Dom\Child
+     * @return Child
      */
     public function __construct($name, $value = null, $childNode = null, $first = false, $indent = null)
     {
@@ -81,7 +81,7 @@ class Child extends AbstractNode
      * Static factory method to create a child object
      *
      * @param  array $c
-     * @return \Pop\Dom\Child
+     * @return Child
      */
     public static function factory(array $c)
     {
@@ -126,7 +126,7 @@ class Child extends AbstractNode
      * Method to set the child node name.
      *
      * @param  string $name
-     * @return \Pop\Dom\Child
+     * @return Child
      */
     public function setNodeName($name)
     {
@@ -138,7 +138,7 @@ class Child extends AbstractNode
      * Method to set the child node value.
      *
      * @param  string $value
-     * @return \Pop\Dom\Child
+     * @return Child
      */
     public function setNodeValue($value)
     {
@@ -147,20 +147,28 @@ class Child extends AbstractNode
     }
 
     /**
+     * Set an attribute for the child element object.
+     *
+     * @param  string $a
+     * @param  string $v
+     * @return Child
+     */
+    public function setAttribute($a, $v)
+    {
+        $this->attributes[$a] = $v;
+        return $this;
+    }
+    
+    /**
      * Set an attribute or attributes for the child element object.
      *
-     * @param  array|string $a
-     * @param  string $v
-     * @return \Pop\Dom\Child
+     * @param  array $a
+     * @return Child
      */
-    public function setAttributes($a, $v = null)
+    public function setAttributes(array $a)
     {
-        if (is_array($a)) {
-            foreach ($a as $name => $value) {
-                $this->attributes[$name] = $value;
-            }
-        } else {
-            $this->attributes[$a] = $v;
+        foreach ($a as $name => $value) {
+            $this->attributes[$name] = $value;
         }
         return $this;
     }

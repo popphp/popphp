@@ -32,7 +32,7 @@ class Fields
      * Fields array
      * @var array
      */
-    protected $fields = array();
+    protected $fields = [];
 
     /**
      * Constructor
@@ -57,21 +57,6 @@ class Fields
     }
 
     /**
-     * Static method to instantiate the fields object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  mixed $fields
-     * @param  array $attribs
-     * @param  array $values
-     * @param  mixed $omit
-     * @return \Pop\Form\Fields
-     */
-    public static function factory($fields = null, array $attribs = null, array $values = null, $omit = null)
-    {
-        return new self($fields, $attribs, $values, $omit);
-    }
-
-    /**
      * Add form fields from a related database table. The $tableInfo
      * parameter should be the returned array result from calling the
      * static Pop\Db\Record method, Record::getTableInfo();
@@ -91,20 +76,20 @@ class Fields
 
         if (null !== $omit) {
             if (!is_array($omit)) {
-                $omit = array($omit);
+                $omit = [$omit];
             }
         } else {
-            $omit = array();
+            $omit = [];
         }
 
         foreach ($tableInfo['columns'] as $key => $value) {
             if (!in_array($key, $omit)) {
-                $fieldName = $key;
+                $fieldName  = $key;
                 $fieldValue = null;
                 $fieldLabel = null;
-                $required = ($value['null']) ? false : true;
+                $required   = ($value['null']) ? false : true;
                 $attributes = null;
-                $marked = null;
+                $marked     = null;
                 $validators = (isset($values[$key]['validators'])) ? $values[$key]['validators'] : null;
 
                 $fieldType = (stripos($key, 'password') !== false) ?
@@ -139,7 +124,7 @@ class Fields
                     $validators = new \Pop\Validator\Email();
                 }
 
-                $this->fields[$fieldName] = array(
+                $this->fields[$fieldName] = [
                     'type'       => $fieldType,
                     'label'      => $fieldLabel,
                     'value'      => $fieldValue,
@@ -147,7 +132,7 @@ class Fields
                     'attributes' => $attributes,
                     'marked'     => $marked,
                     'validators' => $validators
-                );
+                ];
             }
         }
 
@@ -158,7 +143,7 @@ class Fields
      * Add form fields
      *
      * @param  array $fields
-     * @return \Pop\Form\Fields
+     * @return Fields
      */
     public function addFields(array $fields)
     {
@@ -172,7 +157,7 @@ class Fields
      * @param  string $field
      * @param  mixed  $attrib
      * @param  mixed  $value
-     * @return \Pop\Form\Fields
+     * @return Fields
      */
     public function setField($field, $attrib, $value = null)
     {

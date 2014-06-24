@@ -16,7 +16,7 @@ COMPONENTS
  - Feed        [DONE - deps: Dom]
  - File        [DONE]
  - Filter      [DONE]
- - Form        [IN PROGRESS - deps: Dom, Validator]
+ - Form        [DONE - deps: Dom, Validator]
  - Ftp         [DONE]
  - Geo         [DONE]
  - Graph       [DONE - deps: Color, Image, Pdf]
