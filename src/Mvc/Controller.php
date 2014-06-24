@@ -222,10 +222,6 @@ class Controller
     public function dispatch($action = 'index')
     {
         if (method_exists($this, $action)) {
-            if (null !== $this->application->logger()) {
-                $this->application->log("Dispatch ['" . get_class($this) . "']->" . $action . "\t" .
-                    $this->request->getRequestUri() . "\t" . $this->request->getFullRequestUri(), time());
-            }
             $this->$action();
         } else {
             throw new Exception('That action is not defined in the controller.');
@@ -250,9 +246,6 @@ class Controller
             throw new Exception('The view object is not an instance of Pop\Mvc\View.');
         }
 
-        if (null !== $this->application->logger()) {
-            $this->application->log("Response [" . $code . "]", time());
-        }
         $this->response->setCode($code);
 
         if (null !== $headers) {
@@ -262,16 +255,8 @@ class Controller
         }
 
         // Trigger any dispatch events, then send the response
-        if (null !== $this->application->getEventManager()->get('dispatch')) {
-            $this->application->log('[Event] Dispatch', time(), 5);
-        }
         $this->application->getEventManager()->trigger('dispatch', array('controller' => $this));
-
         $this->response->setBody($this->view->render(true));
-
-        if (null !== $this->application->getEventManager()->get('dispatch.send')) {
-            $this->application->log('[Event] Dispatch Send', time(), 5);
-        }
         $this->application->getEventManager()->trigger('dispatch.send', array('controller' => $this));
         $this->response->send();
     }

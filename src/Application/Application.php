@@ -17,7 +17,6 @@ namespace Pop\Application;
 
 use Pop\Config;
 use Pop\Event\Manager;
-use Pop\Log\Logger;
 use Pop\Mvc\Router;
 use Pop\Service\Locator;
 
@@ -65,12 +64,6 @@ class Application
     protected $services = null;
 
     /**
-     * Application logger
-     * @var Logger
-     */
-    protected $logger = null;
-
-    /**
      * Application start timestamp
      * @var int
      */
@@ -102,14 +95,6 @@ class Application
 
         $this->events   = new Manager();
         $this->services = new Locator();
-
-        if (isset($this->config->log)) {
-            if (!file_exists($this->config->log)) {
-                touch($this->config->log);
-                chmod($this->config->log, 0777);
-            }
-            $this->logger = new Logger(new \Pop\Log\Writer\File(realpath($this->config->log)));
-        }
 
         if (isset($this->config->defaultDb)) {
             $default = $this->config->defaultDb;
@@ -188,16 +173,6 @@ class Application
     public function router()
     {
         return $this->router;
-    }
-
-    /**
-     * Access the project logger
-     *
-     * @return Logger
-     */
-    public function logger()
-    {
-        return $this->logger;
     }
 
     /**
@@ -355,23 +330,13 @@ class Application
     }
 
     /**
-     * Log the project.
+     * Get the application start time
      *
-     * @param  string $message
-     * @param  int    $time
-     * @param  int    $priority
-     * @return void
+     * @return int
      */
-    public function log($message, $time = null, $priority = Logger::INFO)
+    public function getStart()
     {
-        if (null !== $this->logger) {
-            if (null !== $time) {
-                $end = ((stripos($message, 'send') === false) && ((stripos($message, 'kill') !== false) || (stripos($message, 'end') !== false))) ?
-                    PHP_EOL : null;
-                $message = "[" . ($time - $this->start) . " seconds]\t\t" . $message . $end;
-            }
-            $this->logger->log($priority, $message);
-        }
+        return $this->start;
     }
 
     /**
@@ -385,49 +350,21 @@ class Application
         if (null !== $this->router) {
             $this->start = time();
 
-            if (isset($_SERVER['REQUEST_METHOD'])) {
-                $session = '[' . $_SERVER['REQUEST_METHOD'] . ']';
-                if (isset($_SERVER['REMOTE_ADDR'])) {
-                    $session .= ' ' . $_SERVER['REMOTE_ADDR'];
-                    if (isset($_SERVER['SERVER_PORT'])) {
-                        $session .= ':' . $_SERVER['SERVER_PORT'];
-                    }
-                    if (isset($_SERVER['HTTP_USER_AGENT'])) {
-                        $session .= ' ' . $_SERVER['HTTP_USER_AGENT'];
-                    }
-                }
-            } else {
-                $session = '[CLI]';
-            }
-
-            $this->log($session, time());
-
-            if (null !== $this->events->get('route.pre')) {
-                $this->log('[Event] Pre-Route', time(), Logger::NOTICE);
-            }
-
             // Trigger any pre-route events, route, then trigger any post-route events
             $this->events->trigger('route.pre', ['router' => $this->router]);
 
             // If still alive after 'route.pre'
             if ($this->events->alive()) {
-                $this->log('Route Start', time());
                 $this->router->route($this);
 
                 // If still alive after 'route'
                 if ($this->events->alive()) {
-                    if (null !== $this->events->get('route.post')) {
-                        $this->log('[Event] Post-Route', time(), Logger::NOTICE);
-                    }
                     $this->events->trigger('route.post', ['router' => $this->router]);
 
                     // If still alive after 'route.post' and if a controller was properly
                     // routed and created, then dispatch it
                     if (($this->events->alive()) && (null !== $this->router->controller())) {
                         // Trigger any pre-dispatch events
-                        if (null !== $this->events->get('dispatch.pre')) {
-                            $this->log('[Event] Pre-Dispatch', time(), Logger::NOTICE);
-                        }
                         $this->events->trigger('dispatch.pre', ['router' => $this->router]);
 
                         // If still alive after 'dispatch.pre'
@@ -441,25 +378,17 @@ class Application
                             } else if (method_exists($this->router->controller(), $this->router->controller()->getErrorAction())) {
                                 $this->router->controller()->dispatch($this->router->controller()->getErrorAction());
                             } else {
-                                if (null !== $this->events->get('dispatch.error')) {
-                                    $this->log('[Event] Dispatch Error', time(), Logger::ERR);
-                                }
                                 $this->events->trigger('dispatch.error', ['router' => $this->router]);
                             }
                             // If still alive after 'dispatch'
                             if ($this->events->alive()) {
                                 // Trigger any post-dispatch events
-                                if (null !== $this->events->get('dispatch.post')) {
-                                    $this->log('[Event] Post-Dispatch', time(), Logger::NOTICE);
-                                }
                                 $this->events->trigger('dispatch.post', ['router' => $this->router]);
                             }
                         }
                     }
                 }
             }
-
-            $this->log('Route End', time());
         }
     }
 

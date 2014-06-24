@@ -76,7 +76,7 @@ class Router
      * @param  Request $request
      * @return Router
      */
-    public function __construct(array $controllers, Request $request = null)
+    public function __construct(array $controllers = [], Request $request = null)
     {
         $this->request = (null !== $request) ? $request : new Request();
         $this->controllers = $controllers;
@@ -250,7 +250,7 @@ class Router
         if ((null !== $this->controllerClass) && class_exists($this->controllerClass)) {
             // Push the real base path and URI into the request object
             $realBasePath = $this->request->getBasePath() . $this->basePath;
-            $realUri      = substr($this->request->getFullUri(), strlen($this->request->getBasePath() . $this->basePath));
+            $realUri      = substr($this->request->getFullRequestUri(), strlen($this->request->getBasePath() . $this->basePath));
 
             // Create the controller object
             $this->controller = new $this->controllerClass(
@@ -260,17 +260,11 @@ class Router
             );
             // Trigger any route events
             if (null !== $this->application) {
-                if (null !== $this->application->getEventManager()->get('route')) {
-                    $this->application->log('[Event] Route', time(), 5);
-                }
                 $this->application->getEventManager()->trigger('route', ['router' => $this]);
             }
         // Else, trigger any route error events
         } else {
             if (null !== $this->application) {
-                if (null !== $this->application->getEventManager()->get('route.error')) {
-                    $this->application->log('[Event] Route Error', time(), 5);
-                }
                 $this->application->getEventManager()->trigger('route.error', ['router' => $this]);
             }
         }

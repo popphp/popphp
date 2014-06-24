@@ -1,7 +1,7 @@
 COMPONENTS
 ----------
  - Acl [DONE]
- - Application [IN PROGRESS - w/ deps: Code, Config, Db, Event, Log, Mvc, Service]
+ - Application [IN PROGRESS - w/ deps: Code, Config, Db, Event, Mvc, Service]
  - Archive [DONE]
  - Auth [DONE]
  - Cache [DONE]
@@ -26,8 +26,8 @@ COMPONENTS
  - Image
  - Log [DONE - w/ deps: Db, Mail]
  - Mail [DONE]
- - Mvc [IN PROGRESS - w/ deps: Application, Http]
- - Nav [DONE - w/ deps: ~Acl, Dom]
+ - Mvc [DONE - w/ deps: Application, Http]
+ - Nav [DONE - w/ deps: Acl, Dom]
  - Paginator [DONE]
  - Payment [DONE -> w/ deps: Curl]
  - Pdf
