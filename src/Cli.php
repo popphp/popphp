@@ -29,16 +29,6 @@ class Cli
 {
 
     /**
-     * CLI error codes & messages
-     * @var array
-     */
-    protected static $errorCodes = array(
-        0 => 'Unknown error.',
-        2 => 'You must pass an build file to build the project.',
-        3 => 'That file does not exist.',
-    );
-
-    /**
      * CLI arguments
      * @var array
      */
