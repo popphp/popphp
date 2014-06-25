@@ -32,7 +32,7 @@ class Cli
      * CLI arguments
      * @var array
      */
-    protected $args = null;
+    protected $args = [];
 
     /**
      * Available CLI commands
