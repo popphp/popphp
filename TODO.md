@@ -33,5 +33,6 @@ COMPONENTS
  - Shipping    [DONE - deps: Http, Dom]
  - Validator   [DONE]
  - Web         [DONE]
+ - Cli         [IN PROGESS]
  - Config      [DONE]
  - Version     [DONE]

@@ -29,66 +29,60 @@ class Build
 {
 
     /**
-     * CLI error codes & messages
-     * @var array
-     */
-    protected static $cliErrorCodes = array(
-        0 => 'Unknown error.',
-        1 => 'You must pass a source folder and a output file to generate a class map file.',
-        2 => 'The source folder passed does not exist.',
-        3 => 'The output file passed must be a PHP file.',
-        4 => 'You must pass an install file to install the project.',
-        5 => 'Unknown option: ',
-        6 => 'You must pass at least one argument.',
-        7 => 'That folder does not exist.',
-        8 => 'The folder argument is not a folder.'
-    );
-
-    /**
-     * Install the project based on the available config files
+     * Build the application based on the available config file
      *
-     * @param string $installFile
+     * @param string $buildFile
      * @return void
      */
-    public static function install($installFile)
+    public static function build($buildFile)
     {
         // Display instructions to continue
-        $dbTables = array();
-        self::instructions();
+        \Pop\Cli::instructions();
+        $dbTables = [];
 
-        $input = self::cliInput();
+        $input = self::input();
         if ($input == 'n') {
             echo 'Aborted.' . PHP_EOL . PHP_EOL;
-            exit(0);
+            exit();
         }
 
-        // Get the install config.
-        $installDir = realpath(dirname($installFile));
-        $install = include $installFile;
+        // Get the build config.
+        $buildDir = realpath(dirname($buildFile));
+        $build    = include $buildFile;
 
-        // Check if a project folder already exists.
-        if (file_exists($install->project->name)) {
-            echo wordwrap('Application folder exists. This may overwrite any project files you may already have under that project folder.', 70, PHP_EOL) . PHP_EOL;
-            $input = self::cliInput();
+        //print_r($build);
+
+        // Check if a application folder already exists.
+        if (file_exists(realpath($build->application->base) . DIRECTORY_SEPARATOR . $build->application->name)) {
+            echo PHP_EOL . wordwrap('    The application folder already exists. This may overwrite any application files ' . '
+                you may already have under that application folder.', 70, PHP_EOL . '    ') . PHP_EOL . PHP_EOL;
+            $input = self::input();
         } else {
             $input = 'y';
         }
 
         // If 'No', abort
         if ($input == 'n') {
-            echo 'Aborted.' . PHP_EOL . PHP_EOL;
-            exit(0);
+            echo PHP_EOL . '    Aborted.' . PHP_EOL . PHP_EOL;
+            exit();
         // Else, continue
         } else {
-            $db = false;
-            $databases = array();
 
-            // Test for a database creds and schema, and ask
-            // to test and install the database.
-            if (isset($install->databases)) {
-                $databases =  $install->databases->asArray();
-                echo 'Database credentials and schema detected.' . PHP_EOL;
-                $input = self::cliInput('Test and install the database(s)?' . ' (Y/N) ');
+            // Build base folder and file structure
+            Build\Base::build($build);
+
+            // Build application file
+            Build\Application::build($build, $buildDir);
+
+            $db        = false;
+            $databases = [];
+
+            // Test for a database credentials and schema
+            // and ask to test and install the database.
+            if (isset($build->databases)) {
+                $databases = $build->databases->toArray();
+                echo PHP_EOL . '    Database credentials and schema detected.' . PHP_EOL;
+                $input = self::input('    Test and install the database(s)?' . ' (Y/N) ');
                 $db = ($input == 'n') ? false : true;
             }
 
@@ -100,22 +94,23 @@ class Build
                 error_reporting(E_ERROR);
 
                 // Test the databases
-                echo 'Testing the database(s)...' . PHP_EOL;
+                echo PHP_EOL . '    Testing the database(s)...' . PHP_EOL;
 
                 foreach ($databases as $dbname => $db) {
-                    echo 'Testing' . ' \'' . $dbname . '\'...' . PHP_EOL;
+                    echo '      - Testing' . ' \'' . $dbname . '\'...' . PHP_EOL;
                     if (!isset($db['type']) || !isset($db['database'])) {
-                        echo 'The database type and database name must be set for the database ' . '\'' . $dbname . '\'.' . PHP_EOL . PHP_EOL;
-                        exit(0);
+                        echo PHP_EOL . '    The database type and database name must be set for the database ' .
+                            '\'' . $dbname . '\'.' . PHP_EOL . PHP_EOL;
+                        exit();
                     }
                     $check = Build\Dbs::check($db);
                     if (null !== $check) {
-                        echo $check . PHP_EOL . PHP_EOL;
-                        exit(0);
+                        echo PHP_EOL . '    ' . $check . PHP_EOL . PHP_EOL;
+                        exit();
                     } else {
-                        echo 'Database' . ' \'' . $dbname . '\' passed.' . PHP_EOL;
-                        echo 'Installing database' .' \'' . $dbname . '\'...' . PHP_EOL;
-                        $tables = Build\Dbs::install($dbname, $db, $installDir, $install);
+                        echo PHP_EOL . '    Database' . ' \'' . $dbname . '\' passed.' . PHP_EOL;
+                        echo '      - Installing ' .' \'' . $dbname . '\'...' . PHP_EOL;
+                        $tables = Build\Dbs::install($dbname, $db, $buildDir, $build);
                         if (count($tables) > 0) {
                             $dbTables = array_merge($dbTables, $tables);
                         }
@@ -124,88 +119,11 @@ class Build
                 // Return error reporting to its original state
                 error_reporting($oldError);
             }
-
-            // Install base folder and file structure
-            Build\Base::install($install);
-
-            // Install project files
-            Build\Applications::install($install, $installDir);
-
-            // Install table class files
-            if (count($dbTables) > 0) {
-                Build\Tables::install($install, $dbTables);
-            }
-
-            // Install controller class files
-            if (isset($install->controllers)) {
-                Build\Controllers::install($install, $installDir);
-            }
-
-            // Install form class files
-            if (isset($install->forms)) {
-                Build\Forms::install($install);
-            }
-
-            // Install model class files
-            if (isset($install->models)) {
-                Build\Models::install($install);
-            }
-
-            // Create 'bootstrap.php' file
-            Build\Bootstrap::install($install);
-
-            echo 'Application install complete.' . PHP_EOL . PHP_EOL;
         }
 
-    }
 
-    /**
-     * Display CLI instructions
-     *
-     * @return string
-     */
-    public static function instructions()
-    {
-        $msg1 = "This process will create and install the base foundation of your project under the folder specified in the install file. Minimally, the install file should return a Pop\\Config object containing your project install settings, such as project name, folders, forms, controllers, views and any database credentials.";
-        $msg2 = "Besides creating the base folders and files for you, one of the main benefits is ability to test and install the database and the corresponding configuration and class files. You can take advantage of this by having the database SQL files in the same folder as your install file, like so:";
-        echo wordwrap($msg1, 70, PHP_EOL) . PHP_EOL . PHP_EOL;
-        echo wordwrap($msg2, 70, PHP_EOL) . PHP_EOL . PHP_EOL;
-        echo 'projectname' . DIRECTORY_SEPARATOR . 'project.install.php' . PHP_EOL;
-        echo 'projectname' . DIRECTORY_SEPARATOR . '*.sql' . PHP_EOL . PHP_EOL;
-    }
-
-    /**
-     * Print the CLI help message
-     *
-     * @return void
-     */
-    public static function cliHelp()
-    {
-        echo ' -c --check                     ' . 'Check the current configuration for required dependencies' . PHP_EOL;
-        echo ' -h --help                      ' . 'Display this help' . PHP_EOL;
-        echo ' -i --install file.php          ' . 'Install a project based on the install file specified' . PHP_EOL;
-        echo ' -l --lang fr                   ' . 'Set the default language for the project' . PHP_EOL;
-        echo ' -m --map folder file.php       ' . 'Create a class map file from the source folder and save to the output file' . PHP_EOL;
-        echo ' -s --show                      ' . 'Show project install instructions' . PHP_EOL;
-        echo ' -v --version                   ' . 'Display version of Pop PHP Framework and latest available' . PHP_EOL . PHP_EOL;
-    }
-
-    /**
-     * Return a CLI error message based on the code
-     *
-     * @param int    $num
-     * @param string $arg
-     * @return string
-     */
-    public static function cliError($num = 0, $arg = null)
-    {
-        $i = (int)$num;
-        if (!array_key_exists($i, self::$cliErrorCodes)) {
-            $i = 0;
-        }
-        $msg = self::$cliErrorCodes[$i] . $arg . PHP_EOL .
-               'Run \'.' . DIRECTORY_SEPARATOR . 'pop -h\' for help.' . PHP_EOL . PHP_EOL;
-        return $msg;
+        echo PHP_EOL . '    Application build complete.' . PHP_EOL . PHP_EOL;
+        exit();
     }
 
     /**
@@ -214,9 +132,9 @@ class Build
      * @param  string $msg
      * @return string
      */
-    public static function cliInput($msg = null)
+    public static function input($msg = null)
     {
-        echo ((null === $msg) ? 'Continue?' . ' (Y/N) ' : $msg);
+        echo ((null === $msg) ? '    Continue?' . ' (Y/N) ' : $msg);
         $input = null;
 
         while (($input != 'y') && ($input != 'n')) {
@@ -224,86 +142,12 @@ class Build
                 echo $msg;
             }
             $prompt = fopen("php://stdin", "r");
-            $input = fgets($prompt, 5);
-            $input = substr(strtolower(rtrim($input)), 0, 1);
-            fclose ($prompt);
+            $input  = fgets($prompt, 5);
+            $input  = substr(strtolower(rtrim($input)), 0, 1);
+            fclose($prompt);
         }
 
         return $input;
-    }
-
-    /**
-     * Return the location of the bootstrap file from STDIN
-     *
-     * @return string
-     */
-    public static function getBootstrap()
-    {
-        $msg = 'Enter the folder where the \'bootstrap.php\' is located in relation to the current folder: ';
-        echo $msg;
-        $input = null;
-
-        while (!file_exists($input . '/bootstrap.php')) {
-            if (null !== $input) {
-                echo 'Bootstrap file not found. Try again.' . PHP_EOL . $msg;
-            }
-            $prompt = fopen("php://stdin", "r");
-            $input = fgets($prompt, 255);
-            $input = rtrim($input);
-            fclose ($prompt);
-        }
-
-        return $input;
-    }
-
-    /**
-     * Return the location of the vendor folder and the Pop PHP framework from STDIN
-     *
-     * @return string
-     */
-    public static function getPop()
-    {
-        $msg = 'Enter the folder where the \'vendor\' folder is contained in relation to the current folder: ';
-        echo $msg;
-        $input = null;
-
-        while (!file_exists($input . '/vendor/PopPHPFramework/src/Pop/Loader/Autoloader.php')) {
-            if (null !== $input) {
-                echo 'Pop PHP Framework not found. Try again.' . PHP_EOL . $msg;
-            }
-            $prompt = fopen("php://stdin", "r");
-            $input = fgets($prompt, 255);
-            $input = rtrim($input);
-            fclose ($prompt);
-        }
-
-        return $input;
-    }
-
-    /**
-     * Return the two-letter language code from STDIN
-     *
-     * @param array $langs
-     * @return string
-     */
-    public static function getLanguage($langs)
-    {
-        $msg = 'Enter the numeric code for the default language: ';
-        echo $msg;
-        $lang = null;
-        $keys = array_keys($langs);
-
-        while (!array_key_exists($lang, $keys)) {
-            if (null !== $lang) {
-                echo $msg;
-            }
-            $prompt = fopen("php://stdin", "r");
-            $lang = fgets($prompt, 5);
-            $lang = rtrim($lang);
-            fclose ($prompt);
-        }
-
-        return $lang;
     }
 
     /**

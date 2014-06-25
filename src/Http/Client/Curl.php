@@ -41,10 +41,15 @@ class Curl extends AbstractClient
      *
      * @param  string $url
      * @param  array  $opts
+     * @throws Exception
      * @return Curl
      */
     public function __construct($url, array $opts = null)
     {
+        if (!function_exists('curl_init')) {
+            throw new Exception('Error: cURL is not available.');
+        }
+
         $this->setUrl($url);
         $this->resource = curl_init();
 
@@ -253,7 +258,7 @@ class Curl extends AbstractClient
                     $this->version = substr($header, 0, strpos($header, ' '));
                     $this->version = substr($this->version, (strpos($this->version, '/') + 1));
                     preg_match('/\d\d\d/', trim($header), $match);
-                    $this->code = $match[0];
+                    $this->code    = $match[0];
                     $this->message = trim(str_replace('HTTP/' . $this->version . ' ' . $this->code . ' ', '', $header));
                 } else if (strpos($header, ':') !== false) {
                     $name  = substr($header, 0, strpos($header, ':'));

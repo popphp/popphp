@@ -29,39 +29,39 @@ use Pop\Code\Generator\NamespaceGenerator;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Applications
+class Application
 {
 
     /**
-     * Install the project class files
+     * Install the application class files
      *
-     * @param \Pop\Config $install
-     * @param string     $installDir
+     * @param \Pop\Config $build
+     * @param string      $buildDir
      * @return void
      */
-    public static function install($install, $installDir)
+    public static function build($build, $buildDir)
     {
-        // Create the project class file
-        $projectCls = new Generator(
-            $install->project->base . '/module/' . $install->project->name . '/src/' . $install->project->name . '/Application.php',
+        // Create the application class file
+        $applicationCls = new Generator(
+            $build->application->base . $build->application->name . '/src/Application.php',
             Generator::CREATE_CLASS
         );
 
         // Set namespace
-        $ns = new NamespaceGenerator($install->project->name);
+        $ns = new NamespaceGenerator($build->application->name);
         $ns->setUse('Pop\Application\Application', 'App');
 
         // Create 'run' method
         $run = new MethodGenerator('run');
-        $run->setDesc('Add any project specific code to this method for run-time use here.');
+        $run->setDesc('Add any application specific code to this method for run-time use here.');
         $run->appendToBody('parent::run();', false);
         $run->getDocblock()->setReturn('void');
 
-        // Finalize the project config file and save it
-        $projectCls->setNamespace($ns);
-        $projectCls->code()->setParent('P')
-                           ->addMethod($run);
-        $projectCls->save();
+        // Finalize the application config file and save it
+        $applicationCls->setNamespace($ns);
+        $applicationCls->code()->setParent('App')
+                               ->addMethod($run);
+        $applicationCls->save();
 
         $input = self::installWeb();
 
@@ -70,24 +70,24 @@ class Applications
             if (file_exists(__DIR__ . '/Web/index.php')) {
                 $index = new Generator(__DIR__ . '/Web/index.php');
                 $contents = $index->read() .
-                    '// Run the project' . PHP_EOL .
+                    '// Run the application' . PHP_EOL .
                     'try {' . PHP_EOL .
-                    '    $project->run();' . PHP_EOL .
+                    '    $application->run();' . PHP_EOL .
                     '} catch (\Exception $e) {' . PHP_EOL .
                     '    echo $e->getMessage();' . PHP_EOL .
                     '}' . PHP_EOL;
-                file_put_contents($install->project->docroot . '/index.php', $contents);
+                file_put_contents($build->application->docroot . '/index.php', $contents);
             }
             if ($input == 'a') {
                 if (file_exists(__DIR__ . '/Web/ht.access')) {
-                    copy(__DIR__ . '/Web/ht.access', $install->project->docroot . '/.htaccess');
+                    copy(__DIR__ . '/Web/ht.access', $build->application->docroot . '/.htaccess');
                 }
             } else if ($input == 'i') {
                 if (file_exists(__DIR__ . '/Web/web.config')) {
-                    copy(__DIR__ . '/Web/web.config', $install->project->docroot . '/web.config');
+                    copy(__DIR__ . '/Web/web.config', $build->application->docroot . '/web.config');
                 }
             } else {
-                echo 'You will have to install your web server rewrite configuration manually.' . PHP_EOL;
+                echo PHP_EOL . '    You will have to install your web server rewrite configuration manually.' . PHP_EOL;
             }
         }
     }
@@ -99,7 +99,7 @@ class Applications
      */
     public static function installWeb()
     {
-        $msg = 'Install index controller and web configuration files?' . ' ([A]pache/[I]IS/[O]ther/[N]o) ';
+        $msg = '    Install index controller and web configuration files?' . ' ([A]pache/[I]IS/[O]ther/[N]o) ';
         echo $msg;
         $input = null;
 
@@ -108,9 +108,9 @@ class Applications
                 echo $msg;
             }
             $prompt = fopen("php://stdin", "r");
-            $input = fgets($prompt, 32);
-            $input = substr(strtolower(rtrim($input)), 0, 1);
-            fclose ($prompt);
+            $input  = fgets($prompt, 32);
+            $input  = substr(strtolower(rtrim($input)), 0, 1);
+            fclose($prompt);
         }
 
         return $input;

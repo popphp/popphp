@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE phpunit [
+    <!ELEMENT dataset (table+)>
+    <!ELEMENT table (column*, row*)>
+    <!ATTLIST table
+         name CDATA #REQUIRED
+    >
+    <!ELEMENT column (#PCDATA)>
+    <!ELEMENT row (value | null)*>
+    <!ELEMENT value (#PCDATA)>
+    <!ELEMENT null EMPTY>
+]>
+<phpunit>
+    <testsuites>
+        <testsuite name="Pop PHP Framework PHPUnit Test">
+            <directory>./PopTest</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <blacklist>
+            <directory suffix=".php">/usr/lib/php</directory>
+            <directory suffix=".php">C:/PHP</directory>
+            <directory suffix=".php">C:/PROGRA~1/PHP</directory>
+        </blacklist>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../src</directory>
+            <exclude>
+                <directory>../src/Ftp</directory>
+                <directory>../src/Web</directory>
+                <file>../src/Db/Adapter/Mysql.php</file>
+                <file>../src/Db/Adapter/Oracle.php</file>
+                <file>../src/Db/Adapter/Pdo.php</file>
+                <file>../src/Db/Adapter/Pgsql.php</file>
+                <file>../src/Db/Adapter/Sqlsrv.php</file>
+                <file>../src/Form/Element/Csrf.php</file>
+                <file>../src/Form/Element/Captcha.php</file>
+                <file>../src/Image/Captcha.php</file>
+                <file>../src/Payment/Adapter/Authorize.php</file>
+                <file>../src/Payment/Adapter/PayLeap.php</file>
+                <file>../src/Payment/Adapter/PayPal.php</file>
+                <file>../src/Payment/Adapter/TrustCommerce.php</file>
+                <file>../src/Payment/Adapter/UsaEpay.php</file>
+                <file>../src/Shipping/Adapter/Fedex.php</file>
+                <file>../src/Shipping/Adapter/Ups.php</file>
+                <file>../src/Shipping/Adapter/Usps.php</file>
+            </exclude>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="/tmp/popphp-cc-report" charset="UTF-8"
+            yui="true" highlight="false" showUncoveredFiles="true"
+            lowUpperBound="35" highLowerBound="70" />
+    </logging>
+</phpunit>

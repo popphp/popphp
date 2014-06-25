@@ -79,9 +79,8 @@ class Version
      */
     public static function check()
     {
-        $pdoDrivers  = (class_exists('Pdo', false)) ? \PDO::getAvailableDrivers() : [];
-        $includePath = explode(PATH_SEPARATOR, get_include_path());
-        $latest      = self::getLatest();
+        $pdoDrivers = (class_exists('Pdo', false)) ? \PDO::getAvailableDrivers() : [];
+        $latest     = self::getLatest();
 
         // Define initial system environment
         $system = [
@@ -104,7 +103,6 @@ class Version
                     'zip'  => (class_exists('ZipArchive', false)),
                     'bz2'  => (function_exists('bzcompress')),
                     'zlib' => (function_exists('gzcompress'))
-
                 ],
                 'curl' => (function_exists('curl_init')),
                 'db'   => [

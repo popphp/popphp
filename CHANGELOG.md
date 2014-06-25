@@ -3,7 +3,7 @@ Pop PHP Framework Changelog
 
 2.0.0a
 ------
-As of June 24, 2014
+As of June 25, 2014
 
 * PHP 5.4+ Only
 * Composer Support
@@ -31,14 +31,14 @@ As of June 24, 2014
     - Filter
         + Removed unused functionality from Filter\String
     - Http
-        + Curl moved under new Http\Client sub componet
+        + Curl moved under new Http\Client sub component
     - I18n
         + Added support for JSON language files
     - Pdf
         + Font component moved under Pdf
 * Removed
     - Compress
-    - Curl (moved under the Http component
+    - Curl (moved under the Http component)
     - Db\Adapter\Mysql (renamed old Mysqli adapter class to Mysql)
     - Filter\Search
     - Font (moved under the Pdf component)

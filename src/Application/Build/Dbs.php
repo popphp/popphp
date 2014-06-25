@@ -40,7 +40,6 @@ class Dbs
     public static function check($db)
     {
         if (($db['type'] != 'Mysql') &&
-            ($db['type'] != 'Mysqli') &&
             ($db['type'] != 'Oracle') &&
             ($db['type'] != 'Pgsql') &&
             ($db['type'] != 'Sqlite') &&
@@ -58,7 +57,8 @@ class Dbs
                     } else {
                         $type = $db['type'];
                     }
-                    $dbconn = Db::factory($type, $db);
+                    $class = '\Pop\Db\Adapter\\' . $type;
+                    $dbconn = new $class($db);
                 }
                 return $result;
             } catch (\Exception $e) {
@@ -73,16 +73,16 @@ class Dbs
      * @param string  $dbname
      * @param array   $db
      * @param string  $dir
-     * @param mixed   $install
+     * @param mixed   $build
      * @param boolean $suppress
      * @param boolean $clear
      * @throws Exception
      * @return array
      */
-    public static function install($dbname, $db, $dir, $install = null, $suppress = false, $clear = true)
+    public static function install($dbname, $db, $dir, $build = null, $suppress = false, $clear = true)
     {
         // Detect any SQL files
-        $sqlFiles = array();
+        $sqlFiles = [];
         if (is_string($dir) && file_exists($dir) && (strtolower(substr($dir, -4)) == '.sql')) {
             $sqlFiles[] = $dir;
         } else {
@@ -98,16 +98,16 @@ class Dbs
 
         // If SQLite, create folder and empty SQLite file
         if (stripos($db['type'], 'sqlite') !== false) {
-            if (is_string($install) && file_exists($install)) {
-                $db['database'] = $install;
+            if (is_string($build) && file_exists($build)) {
+                $db['database'] = $build;
             } else {
                 // Define folders to create
-                $folders = array(
-                    $install->project->base,
-                    $install->project->base . '/module',
-                    $install->project->base . '/module/' . $install->project->name,
-                    $install->project->base . '/module/' . $install->project->name . '/data'
-                );
+                $folders = [
+                    $build->application->base,
+                    $build->application->base .
+                    $build->application->base . $build->application->name,
+                    $build->application->base . $build->application->name . '/data'
+                ];
                 // Create the folders
                 foreach ($folders as $folder) {
                     if (!file_exists($folder)) {
@@ -115,10 +115,10 @@ class Dbs
                     }
                 }
                 // Create empty SQLite file and make file and folder writable
-                chmod($install->project->base . '/module/' . $install->project->name . '/data', 0777);
-                touch($install->project->base . '/module/' . $install->project->name . '/data/' . $db['database']);
-                chmod($install->project->base . '/module/' . $install->project->name . '/data/' . $db['database'], 0777);
-                $db['database'] = $install->project->base . '/module/' . $install->project->name . '/data/' . $db['database'];
+                chmod($build->application->base . $build->application->name . '/data', 0777);
+                touch($build->application->base . $build->application->name . '/data/' . $db['database']);
+                chmod($build->application->base . $build->application->name . '/data/' . $db['database'], 0777);
+                $db['database'] = $build->application->base . $build->application->name . '/data/' . $db['database'];
             }
         }
 
@@ -129,31 +129,33 @@ class Dbs
         } else {
             $type = $db['type'];
         }
-        $popdb = Db::factory($type, $db);
+
+        $class = '\Pop\Db\Adapter\\' . $type;
+        $popdb = new $class($db);
 
         // If there are SQL files, parse them and execute the SQL queries
         if (count($sqlFiles) > 0) {
             if (!$suppress) {
-                echo 'SQL files found. Executing SQL queries...' . PHP_EOL;
+                echo '          > SQL files found. Executing SQL queries...' . PHP_EOL;
             }
 
             // Clear database
             if ($clear) {
-                $oldTables = $popdb->adapter()->getTables();
+                $oldTables = $popdb->getTables();
                 if (count($oldTables) > 0) {
-                    if (($type == 'Mysqli') || ($db['type'] == 'mysql')) {
-                        $popdb->adapter()->query('SET foreign_key_checks = 0;');
+                    if (($type == 'Mysql') || ($db['type'] == 'mysql')) {
+                        $popdb->query('SET foreign_key_checks = 0;');
                         foreach ($oldTables as $tab) {
-                            $popdb->adapter()->query("DROP TABLE " . $tab);
+                            $popdb->query("DROP TABLE " . $tab);
                         }
-                        $popdb->adapter()->query('SET foreign_key_checks = 1;');
+                        $popdb->query('SET foreign_key_checks = 1;');
                     } else if (($type == 'Pgsql') || ($db['type'] == 'pgsql')) {
                         foreach ($oldTables as $tab) {
-                            $popdb->adapter()->query("DROP TABLE " . $tab . ' CASCADE');
+                            $popdb->query("DROP TABLE " . $tab . ' CASCADE');
                         }
                     } else {
                         foreach ($oldTables as $tab) {
-                            $popdb->adapter()->query("DROP TABLE " . $tab);
+                            $popdb->query("DROP TABLE " . $tab);
                         }
                     }
                 }
@@ -170,10 +172,10 @@ class Dbs
                 foreach ($statements as $s) {
                     if (!empty($s)) {
                         try {
-                            $popdb->adapter()->query(str_replace('[{prefix}]', $prefix, trim($s)));
+                            $popdb->query(str_replace('[{prefix}]', $prefix, trim($s)));
                         } catch (\Exception $e) {
                             echo $e->getMessage() . PHP_EOL . PHP_EOL;
-                            exit(0);
+                            exit();
                         }
                     }
                 }
@@ -181,19 +183,19 @@ class Dbs
         }
 
         // Get table info
-        $tables = array();
+        $tables = [];
 
         try {
             // Get Sqlite table info
             if (stripos($db['type'], 'sqlite') !== false) {
-                $tablesFromDb = $popdb->adapter()->getTables();
+                $tablesFromDb = $popdb->getTables();
                 if (count($tablesFromDb) > 0) {
                     foreach ($tablesFromDb as $table) {
-                        $tables[$table] = array('primaryId' => null, 'auto' => false);
-                        $popdb->adapter()->query("PRAGMA table_info('" . $table . "')");
-                        while (($row = $popdb->adapter()->fetch()) != false) {
+                        $tables[$table] = ['primaryId' => null, 'auto' => false];
+                        $popdb->query("PRAGMA table_info('" . $table . "')");
+                        while (($row = $popdb->fetch()) != false) {
                             if ($row['pk'] == 1) {
-                                $tables[$table] = array('primaryId' => $row['name'], 'auto' => true);
+                                $tables[$table] = ['primaryId' => $row['name'], 'auto' => true];
                             }
                         }
                     }
@@ -219,28 +221,28 @@ class Dbs
                     $constraintName = 'CONSTRAINT_NAME';
                     $columnName = 'COLUMN_NAME';
                 }
-                $popdb->adapter()->query("SELECT * FROM information_schema.TABLES WHERE TABLE_" . $schema . " = '" . $dbname . "'" . $tableSchema);
+                $popdb->query("SELECT * FROM information_schema.TABLES WHERE TABLE_" . $schema . " = '" . $dbname . "'" . $tableSchema);
 
                 // Get the auto increment info (mysql) and set table name
-                while (($row = $popdb->adapter()->fetch()) != false) {
+                while (($row = $popdb->fetch()) != false) {
                     $auto = (!empty($row['AUTO_INCREMENT'])) ? true : false;
-                    $tables[$row[$tableName]] = array('primaryId' => null, 'auto' => $auto);
+                    $tables[$row[$tableName]] = ['primaryId' => null, 'auto' => $auto];
                 }
 
                 // Get the primary key info
                 foreach ($tables as $table => $value) {
                     // Pgsql sequence info for auto increment
                     if ($db['type'] == 'Pgsql') {
-                        $popdb->adapter()->query("SELECT column_name FROM information_schema.COLUMNS WHERE table_name = '" . $table . "'");
-                        $columns = array();
-                        while (($row = $popdb->adapter()->fetch()) != false) {
+                        $popdb->query("SELECT column_name FROM information_schema.COLUMNS WHERE table_name = '" . $table . "'");
+                        $columns = [];
+                        while (($row = $popdb->fetch()) != false) {
                             $columns[] = $row['column_name'];
                         }
 
                         if (count($columns) > 0) {
                             foreach ($columns as $column) {
-                                $popdb->adapter()->query("SELECT pg_get_serial_sequence('" . $table . "', '" . $column . "')");
-                                while (($row = $popdb->adapter()->fetch()) != false) {
+                                $popdb->query("SELECT pg_get_serial_sequence('" . $table . "', '" . $column . "')");
+                                while (($row = $popdb->fetch()) != false) {
                                     if (!empty($row['pg_get_serial_sequence'])) {
                                         $idAry = explode('_', $row['pg_get_serial_sequence']);
                                         if (isset($idAry[1]) && (in_array($idAry[1], $columns))) {
@@ -253,9 +255,9 @@ class Dbs
                     }
 
                     // Get primary id, if there is one
-                    $ids = array();
-                    $popdb->adapter()->query("SELECT * FROM information_schema.KEY_COLUMN_USAGE WHERE CONSTRAINT_" . $schema . " = '" . $dbname . "' AND TABLE_NAME = '" . $table . "'");
-                    while (($row = $popdb->adapter()->fetch()) != false) {
+                    $ids = [];
+                    $popdb->query("SELECT * FROM information_schema.KEY_COLUMN_USAGE WHERE CONSTRAINT_" . $schema . " = '" . $dbname . "' AND TABLE_NAME = '" . $table . "'");
+                    while (($row = $popdb->fetch()) != false) {
                         if (isset($row[$constraintName])) {
                             if (!isset($tables[$table]['primaryId'])) {
                                 $tables[$table]['primaryId'] = $row[$columnName];
@@ -277,7 +279,7 @@ class Dbs
             }
         } catch (\Exception $e) {
             echo $e->getMessage() . PHP_EOL . PHP_EOL;
-            exit(0);
+            exit();
         }
 
         return $tables;

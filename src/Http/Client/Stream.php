@@ -88,22 +88,21 @@ class Stream extends AbstractClient
             @fopen($this->url, $this->mode);
 
         if ($this->resource != false) {
-            $meta = stream_get_meta_data($this->resource);
+            $meta      = stream_get_meta_data($this->resource);
             $rawHeader = implode("\r\n", $meta['wrapper_data']) . "\r\n\r\n";
-            $body = stream_get_contents($this->resource);
+            $body      = stream_get_contents($this->resource);
 
             $firstLine = $meta['wrapper_data'][0];
             unset($meta['wrapper_data'][0]);
             $allHeadersAry = $meta['wrapper_data'];
-            $bodyStr = $body;
+            $bodyStr       = $body;
         } else {
             $rawHeader = implode("\r\n", $http_response_header) . "\r\n\r\n";
             $firstLine = $http_response_header[0];
             unset($http_response_header[0]);
             $allHeadersAry = $http_response_header;
-            $bodyStr = null;
+            $bodyStr       = null;
         }
-
 
         // Get the version, code and message
         $version = substr($firstLine, 0, strpos($firstLine, ' '));

@@ -305,6 +305,38 @@ class Generator
     }
 
     /**
+     * Read data from the code file.
+     *
+     * @param  int|string $off
+     * @param  int|string $len
+     * @return string
+     */
+    public function read($off = null, $len = null)
+    {
+        $data = null;
+
+        // Read from the output buffer
+        if (null !== $this->output) {
+            if (null !== $off) {
+                $data = (null !== $len) ? substr($this->output, $off, $len) : substr($this->output, $off);
+            } else {
+                $data = $this->output;
+            }
+            // Else, if the file exists, then read the data from the actual file
+        } else if (file_exists($this->fullpath)) {
+            if (null !== $off) {
+                $data = (null !== $len) ?
+                    file_get_contents($this->fullpath, null, null, $off, $len) :
+                    $this->output = file_get_contents($this->fullpath, null, null, $off);
+            } else {
+                $data = file_get_contents($this->fullpath);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Render method
      *
      * @param  boolean $ret
