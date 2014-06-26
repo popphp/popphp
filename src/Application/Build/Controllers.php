@@ -35,18 +35,17 @@ class Controllers
     /**
      * Build the controller class files
      *
-     * @param \Pop\Config $install
-     * @param string     $installDir
+     * @param \Pop\Config $build
+     * @param string      $buildDir
      * @return void
      */
-    public static function install($install, $installDir)
+    public static function build($build, $buildDir)
     {
-        echo 'Creating controller class files...' . PHP_EOL;
+        echo PHP_EOL . '    Creating controller class files...' . PHP_EOL;
 
         // Make the controller folder
-        $module = (substr($install->project->base, -1) == '/') ? 'module/' : '/module/';
-        $ctrlDir = $install->project->base . $module . $install->project->name . '/src/' . $install->project->name . '/Controller';
-        $viewDir = $install->project->base . $module . $install->project->name . '/view';
+        $ctrlDir = $build->application->base . $build->application->name . '/src/Controller';
+        $viewDir = $build->application->base . $build->application->name . '/view';
 
         if (!file_exists($ctrlDir)) {
             mkdir($ctrlDir);
@@ -57,14 +56,14 @@ class Controllers
         }
 
         // Create the controller class files
-        if (isset($install->controllers)) {
-            $controllers = $install->controllers->asArray();
+        if (isset($build->controllers)) {
+            $controllers = $build->controllers->toArray();
 
             self::createControllers($controllers, array(
                 'src'        => realpath($ctrlDir),
                 'view'       => realpath($viewDir),
-                'namespace'  => $install->project->name . '\Controller',
-                'installDir' => $installDir
+                'namespace'  => $build->application->name . '\Controller',
+                'installDir' => $buildDir
             ));
         }
     }
@@ -145,7 +144,7 @@ class Controllers
                     $construct->addArguments(array(
                         array('name' => 'request', 'value' => 'null', 'type' => 'Request'),
                         array('name' => 'response', 'value' => 'null', 'type' => 'Response'),
-                        array('name' => 'project', 'value' => 'null', 'type' => 'Application'),
+                        array('name' => 'application', 'value' => 'null', 'type' => 'Application'),
                         array('name' => 'viewPath', 'value' => 'null', 'type' => 'string')
                     ));
 
@@ -161,7 +160,7 @@ class Controllers
                                   ->appendToBody("}" . PHP_EOL);
                     }
 
-                    $construct->appendToBody("parent::__construct(\$request, \$response, \$project, \$viewPath);", false);
+                    $construct->appendToBody("parent::__construct(\$request, \$response, \$application, \$viewPath);", false);
                     $construct->getDocblock()->setReturn('self');
 
                     $controllerCls->setNamespace($ns);
@@ -197,7 +196,7 @@ class Controllers
                 } else {
                     $vp = $value;
                 }
-                $method->appendToBody("\$this->view = View::factory(\$this->viewPath . '/{$vp}');");
+                $method->appendToBody("\$this->view = new View(\$this->viewPath . '/{$vp}');");
                 $method->appendToBody("\$this->send(" . $code . ");", false);
                 $method->getDocblock()->setReturn('void');
 

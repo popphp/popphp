@@ -35,16 +35,16 @@ class Tables
     /**
      * Build the table class files
      *
-     * @param \Pop\Config $install
-     * @param array  $dbTables
+     * @param \Pop\Config $build
+     * @param array       $dbTables
      * @return void
      */
-    public static function install($install, $dbTables)
+    public static function build($build, $dbTables)
     {
-        echo 'Creating database table class files...' . PHP_EOL;
+        echo PHP_EOL . '    Creating database table class files...' . PHP_EOL;
 
         // Create table class folder
-        $tableDir = $install->project->base . '/module/' . $install->project->name . '/src/' . $install->project->name . '/Table';
+        $tableDir = $build->application->base . $build->application->name . '/src/Table';
         if (!file_exists($tableDir)) {
             mkdir($tableDir);
         }
@@ -54,7 +54,7 @@ class Tables
             $prefix = (isset($value['prefix'])) ? $value['prefix'] : null;
             $tableName = ucfirst(\Pop\Application\Build::underscoreToCamelcase(str_replace($prefix, '', $table)));
 
-            $ns = new NamespaceGenerator($install->project->name . '\Table');
+            $ns = new NamespaceGenerator($build->application->name . '\Table');
             $ns->setUse('Pop\Db\Record');
 
             if (strpos($value['primaryId'], '|') !== false) {
@@ -67,16 +67,16 @@ class Tables
 
             if (null !== $prefix) {
                 $prefix = new PropertyGenerator('prefix', 'string', $prefix, 'protected');
+                $prefix->setStatic(true);
             }
             $propId = new PropertyGenerator('primaryId', $pIdType, $pId, 'protected');
-            $propAuto = new PropertyGenerator('auto', 'boolean', $value['auto'], 'protected');
+            $propId->setStatic(true);
 
             // Create and save table class file
             $tableCls = new Generator($tableDir . '/' . $tableName . '.php', Generator::CREATE_CLASS);
             $tableCls->setNamespace($ns);
             $tableCls->code()->setParent('Record')
-                             ->addProperty($propId)
-                             ->addProperty($propAuto);
+                             ->addProperty($propId);
 
             if (null !== $prefix) {
                 $tableCls->code()->addProperty($prefix);

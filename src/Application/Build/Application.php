@@ -36,10 +36,9 @@ class Application
      * Install the application class files
      *
      * @param \Pop\Config $build
-     * @param string      $buildDir
      * @return void
      */
-    public static function build($build, $buildDir)
+    public static function build($build)
     {
         // Create the application class file
         $applicationCls = new Generator(

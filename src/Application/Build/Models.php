@@ -34,25 +34,25 @@ class Models
     /**
      * Build the model class files
      *
-     * @param \Pop\Config $install
+     * @param \Pop\Config $build
      * @return void
      */
-    public static function install($install)
+    public static function build($build)
     {
-        echo 'Creating model class files...' . PHP_EOL;
+        echo PHP_EOL . '    Creating model class files...' . PHP_EOL;
 
         // Create model class folder
-        $modelDir = $install->project->base . '/module/' . $install->project->name . '/src/' . $install->project->name . '/Model';
+        $modelDir = $build->application->base . $build->application->name . '/src/Model';
         if (!file_exists($modelDir)) {
             mkdir($modelDir);
         }
 
-        $models = $install->models->asArray();
+        $models = $build->models->toArray();
         foreach ($models as $model) {
             $modelName = ucfirst(\Pop\Application\Build::underscoreToCamelcase($model));
 
             // Define namespace
-            $ns = new NamespaceGenerator($install->project->name . '\Model');
+            $ns = new NamespaceGenerator($build->application->name . '\Model');
 
             // Create and save model class file
             $modelCls = new Generator($modelDir . '/' . $modelName . '.php', Generator::CREATE_CLASS);

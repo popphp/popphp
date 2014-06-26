@@ -35,25 +35,25 @@ class Forms
     /**
      * Build the form class files
      *
-     * @param \Pop\Config $install
+     * @param \Pop\Config $build
      * @return void
      */
-    public static function install($install)
+    public static function build($build)
     {
-        echo 'Creating form class files...' . PHP_EOL;
+        echo PHP_EOL . '    Creating form class files...' . PHP_EOL;
 
         // Create form class folder
-        $formDir = $install->project->base . '/module/' . $install->project->name . '/src/' . $install->project->name . '/Form';
+        $formDir = $build->application->base . $build->application->name . '/src/Form';
         if (!file_exists($formDir)) {
             mkdir($formDir);
         }
 
-        $forms = $install->forms->asArray();
+        $forms = $build->forms->toArray();
         foreach ($forms as $name => $form) {
             $formName = ucfirst(\Pop\Application\Build::underscoreToCamelcase($name));
 
             // Define namespace
-            $ns = new NamespaceGenerator($install->project->name . '\Form');
+            $ns = new NamespaceGenerator($build->application->name . '\Form');
             $ns->setUse('Pop\Form\Form')
                ->setUse('Pop\Form\Element')
                ->setUse('Pop\Validator');
@@ -73,11 +73,11 @@ class Forms
 
             // Create the init values array within the constructor
             if (is_array($form) && (count($form) > 0)) {
-                $construct->appendToBody("\$this->initFieldsValues = array (");
+                $construct->appendToBody("\$this->initFieldsValues = [");
                 $i = 0;
-                foreach ($form as $name => $field) {
+                foreach ($form as $nm => $field) {
                     $i++;
-                    $construct->appendToBody("    '" . $name . "' => array (");
+                    $construct->appendToBody("    '" . $nm . "' => [");
                     $j = 0;
                     foreach ($field as $key => $value) {
                         $j++;
@@ -85,11 +85,11 @@ class Forms
                         if ($key == 'validators') {
                             $val = null;
                             if (is_array($value)) {
-                                $val = 'array(' . PHP_EOL;
+                                $val = '[' . PHP_EOL;
                                 foreach ($value as $v) {
                                     $val .= '            new Validator\\' . $v . ',' . PHP_EOL;
                                 }
-                                $val .= '        )';
+                                $val .= '        ]';
                             } else {
                                 $val = 'new Validator\\' . $value;
                             }
@@ -110,10 +110,10 @@ class Forms
                             $construct->appendToBody("        '{$key}' => {$val}{$comma}");
                         }
                     }
-                    $end = ($i < count($form)) ? '    ),' : '    )';
+                    $end = ($i < count($form)) ? '    ],' : '    ]';
                     $construct->appendToBody($end);
                 }
-                $construct->appendToBody(");");
+                $construct->appendToBody("];");
             }
 
             $construct->appendToBody("parent::__construct(\$action, \$method, \$fields, \$indent);");

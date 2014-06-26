@@ -50,8 +50,6 @@ class Build
         $buildDir = realpath(dirname($buildFile));
         $build    = include $buildFile;
 
-        //print_r($build);
-
         // Check if a application folder already exists.
         if (file_exists(realpath($build->application->base) . DIRECTORY_SEPARATOR . $build->application->name)) {
             echo PHP_EOL . wordwrap('    The application folder already exists. This may overwrite any application files ' . '
@@ -72,7 +70,7 @@ class Build
             Build\Base::build($build);
 
             // Build application file
-            Build\Application::build($build, $buildDir);
+            Build\Application::build($build);
 
             $db        = false;
             $databases = [];
@@ -119,11 +117,33 @@ class Build
                 // Return error reporting to its original state
                 error_reporting($oldError);
             }
+
+            // Build table class files
+            if (count($dbTables) > 0) {
+                Build\Tables::build($build, $dbTables);
+            }
+
+            // Build controller class files
+            if (isset($build->controllers)) {
+                Build\Controllers::build($build, $buildDir);
+            }
+
+            // Build form class files
+            if (isset($build->forms)) {
+                Build\Forms::build($build);
+            }
+
+            // Build model class files
+            if (isset($build->models)) {
+                Build\Models::build($build);
+            }
+
+            // Create 'bootstrap.php' file
+            Build\Bootstrap::build($build);
+
+            echo PHP_EOL . '    Application build complete.' . PHP_EOL . PHP_EOL;
+            exit();
         }
-
-
-        echo PHP_EOL . '    Application build complete.' . PHP_EOL . PHP_EOL;
-        exit();
     }
 
     /**

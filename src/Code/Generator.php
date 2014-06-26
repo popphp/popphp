@@ -305,6 +305,16 @@ class Generator
     }
 
     /**
+     * Get the fullpath
+     *
+     * @return string
+     */
+    public function getFullpath()
+    {
+        return $this->fullpath;
+    }
+
+    /**
      * Read data from the code file.
      *
      * @param  int|string $off
