@@ -2,7 +2,7 @@
 /**
  * Pop PHP Framework (http://www.popphp.org/)
  *
- * @link       https://github.com/nicksagona/PopPHP
+ * @link       https://github.com/popphp/popphp2
  * @category   Pop
  * @package    Pop_Http
  * @author     Nick Sagona, III <info@popphp.org>

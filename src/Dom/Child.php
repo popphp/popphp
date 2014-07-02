@@ -2,7 +2,7 @@
 /**
  * Pop PHP Framework (http://www.popphp.org/)
  *
- * @link       https://github.com/nicksagona/PopPHP
+ * @link       https://github.com/popphp/popphp2
  * @category   Pop
  * @package    Pop_Dom
  * @author     Nick Sagona, III <info@popphp.org>
@@ -158,7 +158,7 @@ class Child extends AbstractNode
         $this->attributes[$a] = $v;
         return $this;
     }
-    
+
     /**
      * Set an attribute or attributes for the child element object.
      *
