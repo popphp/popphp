@@ -3,7 +3,7 @@
 /**
  * Pop PHP Framework PHP CLI script (http://www.popphp.org/)
  *
- * @link       https://github.com/nicksagona/PopPHP
+ * @link       https://github.com/popphp/popphp2
  * @category   Pop
  * @package    Pop_Cli
  * @author     Nick Sagona, III <nick@popphp.org>
