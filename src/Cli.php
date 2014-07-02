@@ -107,8 +107,8 @@ class Cli
 
         echo '    ' . wordwrap($msg1, 70, PHP_EOL . '    ') . PHP_EOL . PHP_EOL;
         echo '    ' . wordwrap($msg2, 70, PHP_EOL . '    ') . PHP_EOL . PHP_EOL;
-        echo '    project' . DIRECTORY_SEPARATOR . 'build.php' . PHP_EOL;
-        echo '    project' . DIRECTORY_SEPARATOR . 'db.sql' . PHP_EOL . PHP_EOL;
+        echo '    app' . DIRECTORY_SEPARATOR . 'build.php' . PHP_EOL;
+        echo '    app' . DIRECTORY_SEPARATOR . 'db.sql' . PHP_EOL . PHP_EOL;
     }
 
     /**

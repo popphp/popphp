@@ -50,8 +50,8 @@ class Bootstrap
         // If the base and docroot are the same
         if (strlen($base) == strlen($docroot)) {
             $autoload       = "__DIR__ . '/vendor/autoload.php'";
-            $applicationSrc = "__DIR__ . '/" . $build->application->name . "/src'";
-            $applicationCfg = "__DIR__ . '/" . $build->application->name . "/config.php'";
+            $applicationSrc = "__DIR__ . '/app/src'";
+            $applicationCfg = "__DIR__ . '/app/config/application.php'";
         // If the docroot is under the base
         } else if (strlen($base) < strlen($docroot)) {
             // Calculate how many levels up the base is from the docroot
@@ -62,14 +62,14 @@ class Bootstrap
                 $dirs .= '../';
             }
             $autoload       = "__DIR__ . '" . $dirs . "vendor/autoload.php'";
-            $applicationSrc = "__DIR__ . '" . $dirs . $build->application->name . "/src'";
-            $applicationCfg = "__DIR__ . '" . $dirs . $build->application->name . "/config.php'";
+            $applicationSrc = "__DIR__ . '" . $dirs . "app/src'";
+            $applicationCfg = "__DIR__ . '" . $dirs . "app/config/application.php'";
         // If the base is under the docroot
         } else if (strlen($base) > strlen($docroot)) {
             $dir = str_replace($docroot, '', $base);
             $autoload       = "__DIR__ . '" . $dir . "/vendor/autoload.php'";
-            $applicationSrc = "__DIR__ . '" . $dir . '/' . $build->application->name . "/src'";
-            $applicationCfg = "__DIR__ . '" . $dir . $build->application->name . "/config.php'";
+            $applicationSrc = "__DIR__ . '" . $dir . "/app/src'";
+            $applicationCfg = "__DIR__ . '" . $dir . "/app/config/application.php'";
         }
 
         // Create new Code file object
@@ -81,7 +81,7 @@ class Bootstrap
         }
 
         // Else, just append to the existing bootstrap file
-        $bootstrap->appendToBody("\$autoloader->add('{$build->application->name}', {$applicationSrc});" . PHP_EOL)
+        $bootstrap->appendToBody("\$autoloader->addPsr4('{$build->application->name}\\\\', {$applicationSrc});" . PHP_EOL)
                   ->appendToBody("// Create a application object")
                   ->appendToBody("\$application = new {$build->application->name}\\Application(")
                   ->appendToBody("    include {$applicationCfg},");

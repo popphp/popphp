@@ -42,7 +42,7 @@ class Application
     {
         // Create the application class file
         $applicationCls = new Generator(
-            $build->application->base . $build->application->name . '/src/Application.php',
+            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Application.php',
             Generator::CREATE_CLASS
         );
 
@@ -66,8 +66,8 @@ class Application
 
         // Install any web config and controller files
         if ($input != 'n') {
-            if (file_exists(__DIR__ . '/Web/index.php')) {
-                $index = new Generator(__DIR__ . '/Web/index.php');
+            if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'Web' . DIRECTORY_SEPARATOR . 'index.php')) {
+                $index = new Generator(__DIR__ . DIRECTORY_SEPARATOR . 'Web' . DIRECTORY_SEPARATOR . 'index.php');
                 $contents = $index->read() .
                     '// Run the application' . PHP_EOL .
                     'try {' . PHP_EOL .
@@ -75,15 +75,21 @@ class Application
                     '} catch (\Exception $e) {' . PHP_EOL .
                     '    echo $e->getMessage();' . PHP_EOL .
                     '}' . PHP_EOL;
-                file_put_contents($build->application->docroot . '/index.php', $contents);
+                file_put_contents($build->application->docroot . DIRECTORY_SEPARATOR . 'index.php', $contents);
             }
             if ($input == 'a') {
-                if (file_exists(__DIR__ . '/Web/ht.access')) {
-                    copy(__DIR__ . '/Web/ht.access', $build->application->docroot . '/.htaccess');
+                if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'Web' . DIRECTORY_SEPARATOR . 'ht.access')) {
+                    copy(
+                        __DIR__ . DIRECTORY_SEPARATOR . 'Web' . DIRECTORY_SEPARATOR . 'ht.access',
+                        $build->application->docroot . DIRECTORY_SEPARATOR . '.htaccess'
+                    );
                 }
             } else if ($input == 'i') {
-                if (file_exists(__DIR__ . '/Web/web.config')) {
-                    copy(__DIR__ . '/Web/web.config', $build->application->docroot . '/web.config');
+                if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'Web' . DIRECTORY_SEPARATOR . 'web.config')) {
+                    copy(
+                        __DIR__ . DIRECTORY_SEPARATOR . 'Web' . DIRECTORY_SEPARATOR . 'web.config',
+                        $build->application->docroot . DIRECTORY_SEPARATOR . 'web.config'
+                    );
                 }
             } else {
                 echo PHP_EOL . '    You will have to install your web server rewrite configuration manually.' . PHP_EOL;

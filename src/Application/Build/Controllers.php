@@ -44,8 +44,8 @@ class Controllers
         echo PHP_EOL . '    Creating controller class files...' . PHP_EOL;
 
         // Make the controller folder
-        $ctrlDir = $build->application->base . $build->application->name . '/src/Controller';
-        $viewDir = $build->application->base . $build->application->name . '/view';
+        $ctrlDir = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller';
+        $viewDir = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'view';
 
         if (!file_exists($ctrlDir)) {
             mkdir($ctrlDir);
@@ -87,12 +87,12 @@ class Controllers
                     if (strpos($l, '/') !== false) {
                         $l = substr($l, 0, strpos($l, '/'));
                     }
-                    $ns = '\\' . ucfirst($l);
-                    $l = '/' . ucfirst($l);
+                    $ns    = '\\' . ucfirst($l);
+                    $l     = '/' . ucfirst($l);
                     $lView = $level;
                 } else {
-                    $ns = null;
-                    $l = null;
+                    $ns    = null;
+                    $l     = null;
                     $lView = null;
                 }
 
@@ -102,20 +102,20 @@ class Controllers
                     exit(0);
                 }
 
-                $viewPath = $base['view'] . (($level != '/') ? $level : null);
-                $relativeViewPath = (strpos($base['src'] . $l, 'Controller/') !== false) ? '/../../../../view' . $lView : '/../../../view' . $lView;
-                $srcPath = $base['src'] . $l;
-                $namespace = $base['namespace'] . $ns;
+                $viewPath         = $base['view'] . (($level != '/') ? $level : null);
+                $relativeViewPath = (strpos($base['src'] . $l, 'Controller/') !== false) ? '/../../../view' . $lView : '/../../view' . $lView;
+                $srcPath          = $base['src'] . $l;
+                $namespace        = $base['namespace'] . $ns;
 
                 if (array_key_exists('index', $value) && ((null === $l) || (strtolower($key) == strtolower($l)))) {
                     $ctrlFile = $base['src'] . $l . '/IndexController.php';
-                    $parent = 'C';
+                    $parent   = 'C';
                 } else if (array_key_exists('index', $value) && (strtolower($key) != strtolower($l))) {
                     $ctrlFile = $base['src'] . $l . '/' . ucfirst(substr($key, 1)) . 'Controller.php';
-                    $parent = 'C';
+                    $parent   = 'C';
                 } else {
                     $ctrlFile = $base['src'] . $l . '/' . ucfirst(substr($key, 1)) . 'Controller.php';
-                    $parent = 'IndexController';
+                    $parent   = 'IndexController';
                 }
 
                 if (!file_exists($viewPath)) {

@@ -116,7 +116,7 @@ class Row extends AbstractGateway
                 $placeholder .= ($i + 1);
             }
             $this->sql->select()->where->equalTo($primaryKey, $placeholder);
-            $params[] = $this->primaryValues[$i];
+            $params[$primaryKey] = $this->primaryValues[$i];
         }
 
         $this->sql->select()->limit(1);
@@ -160,7 +160,7 @@ class Row extends AbstractGateway
                         $placeholder .= ($i + 1);
                     }
                     $columns[$column] = $placeholder;
-                    $params[]         = $value;
+                    $params[$column]  = $value;
                     $i++;
                 }
             }
@@ -176,7 +176,7 @@ class Row extends AbstractGateway
                     $placeholder .= $i;
                 }
                 $this->sql->update()->where->equalTo($primaryKey, $placeholder);
-                $params[] = $this->primaryValues[$key];
+                $params[$key] = $this->primaryValues[$key];
                 $i++;
             }
 
@@ -195,7 +195,7 @@ class Row extends AbstractGateway
                     $placeholder .= $i;
                 }
                 $columns[$column] = $placeholder;
-                $params[]         = $value;
+                $params[$column]  = $value;
                 $i++;
             }
             $this->sql->from($this->table)->insert($columns);
@@ -244,7 +244,7 @@ class Row extends AbstractGateway
                 $placeholder .= ($i + 1);
             }
             $this->sql->delete()->where->equalTo($primaryKey, $placeholder);
-            $params[] = $this->primaryValues[$i];
+            $params[$primaryKey] = $this->primaryValues[$i];
         }
 
         $this->sql->delete()->limit(1);

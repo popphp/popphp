@@ -1,7 +1,7 @@
 COMPONENTS
 ----------
  - Acl         [DONE]
- - Application [IN PROGRESS - deps: Code, Config, Db, Event, Mvc, Service]
+ - Application [IN PROGRESS (modules) - deps: Code, Config, Db, Event, Http, Mvc, Service]
  - Archive     [DONE]
  - Auth        [DONE]
  - Cache       [DONE]
@@ -33,6 +33,6 @@ COMPONENTS
  - Shipping    [DONE - deps: Http, Dom]
  - Validator   [DONE]
  - Web         [DONE]
- - Cli         [IN PROGESS]
+ - Cli         [DONE]
  - Config      [DONE]
  - Version     [DONE]

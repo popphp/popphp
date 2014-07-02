@@ -44,7 +44,7 @@ class Tables
         echo PHP_EOL . '    Creating database table class files...' . PHP_EOL;
 
         // Create table class folder
-        $tableDir = $build->application->base . $build->application->name . '/src/Table';
+        $tableDir = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'src/Table';
         if (!file_exists($tableDir)) {
             mkdir($tableDir);
         }
@@ -58,19 +58,16 @@ class Tables
             $ns->setUse('Pop\Db\Record');
 
             if (strpos($value['primaryId'], '|') !== false) {
-                $pIdType = 'array';
-                $pId = explode('|', $value['primaryId']);
+                $pKeys = explode('|', $value['primaryId']);
             } else {
-                $pIdType = 'string';
-                $pId = $value['primaryId'];
+                $pKeys = [$value['primaryId']];
             }
 
             if (null !== $prefix) {
                 $prefix = new PropertyGenerator('prefix', 'string', $prefix, 'protected');
                 $prefix->setStatic(true);
             }
-            $propId = new PropertyGenerator('primaryId', $pIdType, $pId, 'protected');
-            $propId->setStatic(true);
+            $propId = new PropertyGenerator('primaryKeys', 'array', $pKeys, 'protected');
 
             // Create and save table class file
             $tableCls = new Generator($tableDir . '/' . $tableName . '.php', Generator::CREATE_CLASS);

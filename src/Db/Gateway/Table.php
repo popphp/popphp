@@ -181,7 +181,7 @@ class Table extends AbstractGateway
                 $placeholder .= ($i + 1);
             }
             $columns[$column] = $placeholder;
-            $params[]  = $value;
+            $params[$column]  = $value;
             $i++;
         }
 
@@ -227,8 +227,8 @@ class Table extends AbstractGateway
         }
 
         if (count($pars) > 0) {
-            foreach ($pars as $p) {
-                $params[] = $p;
+            foreach ($pars as $k => $p) {
+                $params[$k] = $p;
             }
         }
 

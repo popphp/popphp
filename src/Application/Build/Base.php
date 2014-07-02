@@ -40,11 +40,14 @@ class Base
 
         // Define folders to create
         $folders = [
-            $build->application->base . $build->application->name,
-            $build->application->base . $build->application->name . '/data',
-            $build->application->base . $build->application->name . '/src',
-            $build->application->base . $build->application->name . '/view',
-            $build->application->docroot
+            $build->application->base,
+            $build->application->base . DIRECTORY_SEPARATOR . 'app',
+            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config',
+            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'data',
+            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'modules',
+            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'src',
+            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'view',
+            $build->application->docroot,
         ];
 
         // Create the folders
@@ -55,51 +58,21 @@ class Base
         }
 
         // Make the '/data' folder writable
-        chmod($build->application->base . $build->application->name . '/data', 0777);
-
-        // Figure out the relative base and docroot
-        $base    = str_replace("\\", '/', realpath($build->application->base));
-        $docroot = str_replace("\\", '/', realpath($build->application->docroot));
-        $base    = (substr($base, -1) == '/') ? substr($base, 0, -1) : $base;
-        $docroot = (substr($docroot, -1) == '/') ? substr($docroot, 0, -1) : $docroot;
-
-        // If the base and docroot are the same
-        if (strlen($base) == strlen($docroot)) {
-            $base    = "__DIR__ . '/../'";
-            $docroot = "__DIR__ . '/../'";
-        // If the docroot is under the base
-        } else if (strlen($base) < strlen($docroot)) {
-            $relDocroot = str_replace($base, '', $docroot);
-            $base       = "__DIR__ . '/../'";
-            $docroot    = "__DIR__ . '/.." . $relDocroot . "'";
-        // If the base is under the docroot
-        } else if (strlen($base) > strlen($docroot)) {
-            // Calculate how many levels up the docroot is from the base
-            $diff = str_replace($docroot, '/', $base);
-            $levels = substr_count($diff, '/');
-            $dirs = null;
-            for ($i = 0; $i < $levels; $i++) {
-                $dirs .= '../';
-            }
-            $base    = "__DIR__ . '/../'";
-            $docroot = "__DIR__ . '/" . $dirs . "'";
-        }
+        chmod($build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'data', 0777);
 
         // Create application.php file
-        $applicationCfg = new \Pop\Code\Generator($build->application->base . $build->application->name . '/config.php');
-        $applicationCfg->appendToBody('return new Pop\Config([', true)
-                       ->appendToBody("    '" . $build->application->name . "' => [")
-                       ->appendToBody("        'base'      => " . $base . ",")
-                       ->appendToBody("        'docroot'   => " . $docroot . ",")
-                       ->appendToBody("        'data'      => __DIR__ . '/data',")
-                       ->appendToBody("        'src'       => __DIR__ . '/src',")
-                       ->appendToBody("        'view'      => __DIR__ . '/view'", false);
+        $applicationCfg = new \Pop\Code\Generator(
+            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR .
+            'config' . DIRECTORY_SEPARATOR . 'application.php'
+        );
 
+        $applicationCfg->appendToBody('return new Pop\Config([', true)
+                       ->appendToBody("    'base'      => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR)", false);
 
         // Add the database config to it
         if (isset($build->databases)) {
             $applicationCfg->appendToBody(",")
-                           ->appendToBody("        'databases' => [");
+                           ->appendToBody("    'databases' => [");
             $databases = $build->databases->toArray();
             $default   = null;
             $i = 0;
@@ -115,7 +88,7 @@ class Base
                     $realDbType = $db['type'];
                 }
 
-                $applicationCfg->appendToBody("            '" . $dbname . "' => new Pop\\Db\\Adapter\\" . $realDbType . "([");
+                $applicationCfg->appendToBody("        '" . $dbname . "' => new Pop\\Db\\Adapter\\" . $realDbType . "([");
                 $j = 0;
                 $default = ($db['default']) ? $dbname : null;
                 $dbCreds = $db;
@@ -125,32 +98,31 @@ class Base
                 foreach ($dbCreds as $key => $value) {
                     $j++;
                     if ($isSqlite) {
-                        $dbFile = "__DIR__ . '/../" . $build->application->name . "/data/" . basename($value) . "'";
-                        $ary = "                '{$key}' => {$dbFile}";
+                        $dbFile = "realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . '" . basename($value) . "')";
+                        $ary = "            '{$key}' => {$dbFile}";
                     } else {
-                        $ary = "                '{$key}' => '{$value}'";
+                        $ary = "            '{$key}' => '{$value}'";
                     }
                     if ($isPdo) {
-                        $ary .= "," . PHP_EOL . "                'type' => '{$pdoType}'";
+                        $ary .= "," . PHP_EOL . "            'type' => '{$pdoType}'";
                     }
                     if ($j < count($dbCreds)) {
-                       $ary .= ',';
+                        $ary .= ',';
                     }
                     $applicationCfg->appendToBody($ary);
                 }
                 $i++;
-                $end = ($i < count($databases)) ? '            ]),' : '            ])';
+                $end = ($i < count($databases)) ? '        ]),' : '        ])';
                 $applicationCfg->appendToBody($end);
             }
-            $applicationCfg->appendToBody('        ]', false);
+            $applicationCfg->appendToBody('    ]', false);
 
             if (null !== $default) {
-                $applicationCfg->appendToBody("," . PHP_EOL . "        'defaultDb' => '" . $default . "'");
+                $applicationCfg->appendToBody("," . PHP_EOL . "    'defaultDb' => '" . $default . "'");
             }
         }
 
         // Save application config
-        $applicationCfg->appendToBody('    ]');
         $applicationCfg->appendToBody(']);', false);
         $applicationCfg->save();
     }

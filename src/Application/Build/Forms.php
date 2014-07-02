@@ -43,7 +43,7 @@ class Forms
         echo PHP_EOL . '    Creating form class files...' . PHP_EOL;
 
         // Create form class folder
-        $formDir = $build->application->base . $build->application->name . '/src/Form';
+        $formDir = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'src/Form';
         if (!file_exists($formDir)) {
             mkdir($formDir);
         }

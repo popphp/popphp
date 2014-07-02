@@ -105,8 +105,8 @@ class Dbs
                 $folders = [
                     $build->application->base,
                     $build->application->base .
-                    $build->application->base . $build->application->name,
-                    $build->application->base . $build->application->name . '/data'
+                    $build->application->base . DIRECTORY_SEPARATOR  . 'app',
+                    $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'data'
                 ];
                 // Create the folders
                 foreach ($folders as $folder) {
@@ -115,10 +115,10 @@ class Dbs
                     }
                 }
                 // Create empty SQLite file and make file and folder writable
-                chmod($build->application->base . $build->application->name . '/data', 0777);
-                touch($build->application->base . $build->application->name . '/data/' . $db['database']);
-                chmod($build->application->base . $build->application->name . '/data/' . $db['database'], 0777);
-                $db['database'] = $build->application->base . $build->application->name . '/data/' . $db['database'];
+                chmod($build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'data', 0777);
+                touch($build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . $db['database']);
+                chmod($build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . $db['database'], 0777);
+                $db['database'] = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . $db['database'];
             }
         }
 

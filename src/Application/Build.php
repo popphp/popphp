@@ -38,7 +38,6 @@ class Build
     {
         // Display instructions to continue
         \Pop\Cli::instructions();
-        $dbTables = [];
 
         $input = self::input();
         if ($input == 'n') {
@@ -51,7 +50,7 @@ class Build
         $build    = include $buildFile;
 
         // Check if a application folder already exists.
-        if (file_exists(realpath($build->application->base) . DIRECTORY_SEPARATOR . $build->application->name)) {
+        if (file_exists(realpath($build->application->base) . DIRECTORY_SEPARATOR . 'app')) {
             echo PHP_EOL . wordwrap('    The application folder already exists. This may overwrite any application files ' . '
                 you may already have under that application folder.', 70, PHP_EOL . '    ') . PHP_EOL . PHP_EOL;
             $input = self::input();
@@ -65,15 +64,33 @@ class Build
             exit();
         // Else, continue
         } else {
-
-            // Build base folder and file structure
+            // Build the base folder structure
             Build\Base::build($build);
 
-            // Build application file
+            // Build the application class
             Build\Application::build($build);
+
+            // Build the bootstrap file
+            Build\Bootstrap::build($build);
+
+            // Build controller class files
+            if (isset($build->controllers)) {
+                Build\Controllers::build($build, $buildDir);
+            }
+
+            // Build model class files
+            if (isset($build->models)) {
+                Build\Models::build($build, $buildDir);
+            }
+
+            // Build form class files
+            if (isset($build->forms)) {
+                Build\Forms::build($build, $buildDir);
+            }
 
             $db        = false;
             $databases = [];
+            $dbTables  = [];
 
             // Test for a database credentials and schema
             // and ask to test and install the database.
@@ -122,24 +139,6 @@ class Build
             if (count($dbTables) > 0) {
                 Build\Tables::build($build, $dbTables);
             }
-
-            // Build controller class files
-            if (isset($build->controllers)) {
-                Build\Controllers::build($build, $buildDir);
-            }
-
-            // Build form class files
-            if (isset($build->forms)) {
-                Build\Forms::build($build);
-            }
-
-            // Build model class files
-            if (isset($build->models)) {
-                Build\Models::build($build);
-            }
-
-            // Create 'bootstrap.php' file
-            Build\Bootstrap::build($build);
 
             echo PHP_EOL . '    Application build complete.' . PHP_EOL . PHP_EOL;
             exit();

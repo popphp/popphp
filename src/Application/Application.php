@@ -75,22 +75,22 @@ class Application
      * Instantiate a project object
      *
      * @param  mixed  $config
-     * @param  array  $module
      * @param  Router $router
+     * @param  mixed  $module
      * @return Application
      */
-    public function __construct($config = null, array $module = null, Router $router = null)
+    public function __construct($config = null, Router $router = null, $module = null)
     {
         if (null !== $config) {
             $this->loadConfig($config);
         }
 
-        if (null !== $module) {
-            $this->loadModule($module);
-        }
-
         if (null !== $router) {
             $this->loadRouter($router);
+        }
+
+        if (null !== $module) {
+            $this->loadModule($module);
         }
 
         $this->events   = new Manager();
@@ -204,11 +204,11 @@ class Application
     /**
      * Load a module config
      *
-     * @param  array $module
+     * @param  mixed $module
      * @throws Exception
      * @return Application
      */
-    public function loadModule(array $module)
+    public function loadModule($module)
     {
         foreach ($module as $key => $value) {
             if (is_array($value)) {

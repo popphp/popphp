@@ -42,7 +42,7 @@ class Models
         echo PHP_EOL . '    Creating model class files...' . PHP_EOL;
 
         // Create model class folder
-        $modelDir = $build->application->base . $build->application->name . '/src/Model';
+        $modelDir = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'src/Model';
         if (!file_exists($modelDir)) {
             mkdir($modelDir);
         }
