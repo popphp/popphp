@@ -15,7 +15,6 @@
  */
 namespace Pop\Pdf;
 
-use Pop\Color\Space;
 use Pop\Pdf\Object;
 
 /**
@@ -162,21 +161,21 @@ class Pdf
 
     /**
      * Stroke color of the document
-     * @var mixed
+     * @var array
      */
-    protected $strokeColor = null;
+    protected $strokeColor = [0, 0, 0];
 
     /**
      * Fill color of the document
-     * @var mixed
+     * @var array
      */
-    protected $fillColor = null;
+    protected $fillColor = [0, 0, 0];
 
     /**
      * Background color of the document
-     * @var mixed
+     * @var array
      */
-    protected $backgroundColor = null;
+    protected $backgroundColor = [255, 255, 255];
 
     /**
      * Compression property
@@ -248,9 +247,6 @@ class Pdf
      */
     public function __construct($pdf, $sz = null, $w = null, $h = null)
     {
-        $this->fillColor       = new Space\Rgb(0, 0, 0);
-        $this->backgroundColor = new Space\Rgb(255, 255, 255);
-
         $this->fullpath  = $pdf;
         $parts           = pathinfo($pdf);
         $this->size      = (file_exists($pdf) ? filesize($pdf) : 0);
@@ -375,7 +371,7 @@ class Pdf
         // Duplicate the page's content objects.
         $oldContent = $this->objects[$pi]->content;
         unset($this->objects[$pi]->content);
-        foreach ($oldContent as $key => $value) {
+        foreach ($oldContent as $value) {
             $this->objects[$ci] = new Object\Object((string)$this->objects[$value]);
             $this->objects[$ci]->index = $ci;
             $this->objects[$pi]->content[] = $ci;
@@ -640,27 +636,31 @@ class Pdf
     /**
      * Method to set the background of the document.
      *
-     * @param  Space\ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return Pdf
      */
-    public function setBackgroundColor(Space\ColorInterface $color)
+    public function setBackgroundColor($r = 0, $g = 0, $b = 0)
     {
-        $this->backgroundColor = $color;
+        $this->backgroundColor = [(int)$r, (int)$g, (int)$b];
         return $this;
     }
 
     /**
      * Method to set the fill color of objects and text in the PDF.
      *
-     * @param  Space\ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return Pdf
      */
-    public function setFillColor(Space\ColorInterface $color)
+    public function setFillColor($r = 0, $g = 0, $b = 0)
     {
-        $this->fillColor = $color;
+        $this->fillColor = [(int)$r, (int)$g, (int)$b];
 
         $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n" . $this->convertColor($color->getRed()) . " " . $this->convertColor($color->getGreen()) . " " . $this->convertColor($color->getBlue()) . " rg\n");
+        $this->objects[$co_index]->setStream("\n" . $this->convertColor((int)$r) . " " . $this->convertColor((int)$g) . " " . $this->convertColor((int)$b) . " rg\n");
 
         return $this;
     }
@@ -668,15 +668,17 @@ class Pdf
     /**
      * Method to set the stroke color of paths in the PDF.
      *
-     * @param  Space\ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return Pdf
      */
-    public function setStrokeColor(Space\ColorInterface $color)
+    public function setStrokeColor($r = 0, $g = 0, $b = 0)
     {
-        $this->strokeColor = $color;
+        $this->strokeColor = [(int)$r, (int)$g, (int)$b];
 
         $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n" . $this->convertColor($color->getRed()) . " " . $this->convertColor($color->getGreen()) . " " . $this->convertColor($color->getBlue()) . " RG\n");
+        $this->objects[$co_index]->setStream("\n" . $this->convertColor((int)$r) . " " . $this->convertColor((int)$g) . " " . $this->convertColor((int)$b) . " RG\n");
 
         return $this;
     }

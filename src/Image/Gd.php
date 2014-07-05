@@ -15,8 +15,6 @@
  */
 namespace Pop\Image;
 
-use Pop\Color\Space;
-
 /**
  * GD image class
  *
@@ -42,17 +40,16 @@ class Gd extends AbstractImage
      * Instantiate an image file object based on either a pre-existing
      * image file on disk, or a new image file.
      *
-     * @param  string               $img
-     * @param  int                  $w
-     * @param  int                  $h
-     * @param  Space\ColorInterface $color
-     * @param  array                $types
+     * @param  string $img
+     * @param  int    $w
+     * @param  int    $h
+     * @param  array  $types
      * @throws Exception
      * @return Gd
      */
-    public function __construct($img, $w = null, $h = null, Space\ColorInterface $color = null, $types = null)
+    public function __construct($img, $w = null, $h = null, $types = null)
     {
-        parent::__construct($img, $w, $h, $color, $types);
+        parent::__construct($img, $w, $h, $types);
 
         // Check to see if GD is installed.
         if (!self::isInstalled()) {
@@ -126,13 +123,8 @@ class Gd extends AbstractImage
             // Create a new image and allocate the background color.
             if ($this->mime == 'image/gif') {
                 $this->resource = imagecreate($w, $h);
-                $this->setBackgroundColor((null === $color) ? new Space\Rgb(255, 255, 255) : $color);
-                $clr = $this->setColor($this->backgroundColor);
             } else {
                 $this->resource = imagecreatetruecolor($w, $h);
-                $this->setBackgroundColor((null === $color) ? new Space\Rgb(255, 255, 255) : $color);
-                $clr = $this->setColor($this->backgroundColor);
-                imagefill($this->resource, 0, 0, $clr);
             }
 
             // Set the quality and create a new, blank image file.
@@ -160,6 +152,33 @@ class Gd extends AbstractImage
     public function resource()
     {
         return $this->resource;
+    }
+
+    /**
+     * Set the background color.
+     *
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
+     * @return Gd
+     */
+    public function setBackgroundColor($r = 0, $g = 0, $b = 0)
+    {
+        parent::setBackgroundColor($r, $g, $b);
+
+        if ($this->mime == 'image/gif') {
+            if (null === $this->resource) {
+                $this->resource = imagecreate($this->width, $this->height);
+            }
+            imagefill($this->resource, 0, 0, $this->setColor($this->backgroundColor, false));
+        } else {
+            if (null === $this->resource) {
+                $this->resource = imagecreatetruecolor($this->width, $this->height);
+            }
+            imagefill($this->resource, 0, 0, $this->setColor($this->backgroundColor));
+        }
+
+        return $this;
     }
 
     /**
@@ -427,7 +446,7 @@ class Gd extends AbstractImage
         $this->createResource();
 
         $strokeWidth = (null === $this->strokeWidth) ? 1 : $this->strokeWidth;
-        $strokeColor = (null === $this->strokeColor) ? $this->setColor(new Space\Rgb(0, 0, 0)) : $this->setColor($this->strokeColor);
+        $strokeColor = (null === $this->strokeColor) ? $this->setColor([0, 0, 0]) : $this->setColor($this->strokeColor);
 
         // Draw the line.
         imagesetthickness($this->resource, $strokeWidth);
@@ -456,7 +475,7 @@ class Gd extends AbstractImage
 
         // Set fill color and create rectangle.
         if ((null === $this->fillColor) && (null === $this->backgroundColor)) {
-            $fill = $this->setColor(new Space\Rgb(255, 255, 255));
+            $fill = $this->setColor([255, 255, 255]);
         } else if (null === $this->fillColor) {
             $fill = $this->setColor($this->backgroundColor);
         } else {
@@ -521,7 +540,7 @@ class Gd extends AbstractImage
 
         // Set fill color and create ellipse.
         if ((null === $this->fillColor) && (null === $this->backgroundColor)) {
-            $fill = $this->setColor(new Space\Rgb(255, 255, 255));
+            $fill = $this->setColor([255, 255, 255]);
         } else if (null === $this->fillColor) {
             $fill = $this->setColor($this->backgroundColor);
         } else {
@@ -570,7 +589,7 @@ class Gd extends AbstractImage
 
         // Set fill color and create rectangle.
         if ((null === $this->fillColor) && (null === $this->backgroundColor)) {
-            $fill = $this->setColor(new Space\Rgb(255, 255, 255));
+            $fill = $this->setColor([255, 255, 255]);
         } else if (null === $this->fillColor) {
             $fill = $this->setColor($this->backgroundColor);
         } else {
@@ -624,7 +643,7 @@ class Gd extends AbstractImage
 
         // Set fill color and create rectangle.
         if ((null === $this->fillColor) && (null === $this->backgroundColor)) {
-            $fill = $this->setColor(new Space\Rgb(255, 255, 255));
+            $fill = $this->setColor([255, 255, 255]);
         } else if (null === $this->fillColor) {
             $fill = $this->setColor($this->backgroundColor);
         } else {
@@ -805,14 +824,16 @@ class Gd extends AbstractImage
     /**
      * Method to colorize the image with the color passed.
      *
-     * @param  Space\ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return Gd
      */
-    public function colorize(Space\ColorInterface $color)
+    public function colorize($r = 0, $g = 0, $b = 0)
     {
         // Create an image resource.
         $this->createResource();
-        imagefilter($this->resource, IMG_FILTER_COLORIZE, $color->getRed(), $color->getGreen(), $color->getBlue());
+        imagefilter($this->resource, IMG_FILTER_COLORIZE, (int)$r, (int)$g, (int)$b);
         $this->output = $this->resource;
 
         return $this;
@@ -1207,24 +1228,34 @@ class Gd extends AbstractImage
     /**
      * Set and return a color identifier.
      *
-     * @param  Space\ColorInterface $color
+     * @param  array   $color
+     * @param  boolean $alpha
      * @throws Exception
      * @return mixed
      */
-    protected function setColor(Space\ColorInterface $color = null)
+    protected function setColor(array $color, $alpha = true)
     {
         if (null === $this->resource) {
             throw new Exception('Error: The image resource has not been created.');
         }
 
         $opac = (null === $this->opacity) ? 0 : $this->opacity;
-        if (null !== $color) {
-            $color = imagecolorallocatealpha($this->resource, (int)$color->getRed(), (int)$color->getGreen(), (int)$color->getBlue(), $opac);
+
+        if (count($color) == 3) {
+            $r = (int)$color[0];
+            $g = (int)$color[1];
+            $b = (int)$color[2];
         } else {
-            $color = imagecolorallocatealpha($this->resource, 0, 0, 0, $opac);
+            $r = 0;
+            $g = 0;
+            $b = 0;
         }
 
-        return $color;
+        if ($alpha) {
+            return imagecolorallocatealpha($this->resource, (int)$r, (int)$g, (int)$b, $opac);
+        } else {
+            return imagecolorallocate($this->resource, (int)$r, (int)$g, (int)$b);
+        }
     }
 
     /**

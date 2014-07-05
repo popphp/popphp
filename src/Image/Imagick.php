@@ -15,8 +15,6 @@
  */
 namespace Pop\Image;
 
-use Pop\Color\Space;
-
 /**
  * Imagick image class
  *
@@ -129,15 +127,14 @@ class Imagick extends AbstractImage
      * Any variation in the versions of the required software may contribute to
      * the Pop\Image\Imagick component not functioning properly.
      *
-     * @param  string               $img
-     * @param  int                  $w
-     * @param  int                  $h
-     * @param  Space\ColorInterface $color
-     * @param  array                $types
+     * @param  string $img
+     * @param  int    $w
+     * @param  int    $h
+     * @param  array  $types
      * @throws Exception
      * @return Imagick
      */
-    public function __construct($img, $w = null, $h = null, Space\ColorInterface $color = null, $types = null)
+    public function __construct($img, $w = null, $h = null, $types = null)
     {
         // If image passed is a paged image, like a PDF
         if (!file_exists($img) && (strpos($img, '[') !== false)) {
@@ -154,7 +151,7 @@ class Imagick extends AbstractImage
             $imagickFile = realpath($img);
         }
 
-        parent::__construct($img, $w, $h, $color, $types);
+        parent::__construct($img, $w, $h, $types);
 
         // Check to see if Imagick is installed.
         if (!self::isInstalled()) {
@@ -180,11 +177,8 @@ class Imagick extends AbstractImage
             $this->height = $h;
             $this->channels = null;
 
-            $color = (null === $color) ? new Space\Rgb(255, 255, 255) : $color;
-            $clr = $this->setColor($color);
-
             // Create a new image and allocate the background color.
-            $this->resource->newImage($w, $h, $clr, $this->extension);
+            $this->resource->newImage($w, $h, $this->setColor([255, 255, 255]), $this->extension);
 
             // Set the quality and create a new, blank image file.
             $this->setQuality(100);
@@ -211,6 +205,21 @@ class Imagick extends AbstractImage
     public function resource()
     {
         return $this->resource;
+    }
+
+    /**
+     * Set the background color.
+     *
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
+     * @return Imagick
+     */
+    public function setBackgroundColor($r = 0, $g = 0, $b = 0)
+    {
+        parent::setBackgroundColor($r, $g, $b);
+        $this->resource->newImage($this->width, $this->height, $this->setColor($this->backgroundColor), $this->extension);
+        return $this;
     }
 
     /**
@@ -894,12 +903,14 @@ class Imagick extends AbstractImage
     /**
      * Method to colorize the image with the color passed.
      *
-     * @param  Space\ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return Imagick
      */
-    public function colorize(Space\ColorInterface $color)
+    public function colorize($r = 0, $g = 0, $b = 0)
     {
-        $this->resource->colorizeImage($color->get(3, true), $this->opacity);
+        $this->resource->colorizeImage('rgb(' . (int)$r . ',' . (int)$g . ',' . (int)$b . ',' . ')', $this->opacity);
         return $this;
     }
 
@@ -999,14 +1010,24 @@ class Imagick extends AbstractImage
     /**
      * Apply a skew effect to the image
      *
-     * @param  Space\ColorInterface $color
-     * @param  int                  $x
-     * @param  int                  $y
+     * @param  array $color
+     * @param  int   $x
+     * @param  int   $y
      * @return Imagick
      */
-    public function skew(Space\ColorInterface $color, $x, $y)
+    public function skew(array $color, $x, $y)
     {
-        $this->resource->shearImage($color->get(3, true), $x, $y);
+        if (count($color) == 3) {
+            $r = (int)$color[0];
+            $g = (int)$color[1];
+            $b = (int)$color[2];
+        } else {
+            $r = 0;
+            $g = 0;
+            $b = 0;
+        }
+
+        $this->resource->shearImage('rgb(' . $r . ',' . $g . ',' . $b . ')', $x, $y);
         return $this;
     }
 
@@ -1436,13 +1457,22 @@ class Imagick extends AbstractImage
     /**
      * Set and return a color identifier.
      *
-     * @param  Space\ColorInterface $color
+     * @param  array $color
      * @return \ImagickPixel
      */
-    protected function setColor(Space\ColorInterface $color = null)
+    protected function setColor(array $color)
     {
-        $clr = (null !== $color) ? $color->get(3, true) : 'rgb(0,0,0)';
-        return new \ImagickPixel($clr);
+        if (count($color) == 3) {
+            $r = (int)$color[0];
+            $g = (int)$color[1];
+            $b = (int)$color[2];
+        } else {
+            $r = 0;
+            $g = 0;
+            $b = 0;
+        }
+
+        return new \ImagickPixel('rgb(' . $r . ',' . $g . ',' . $b . ')');
     }
 
 }

@@ -15,8 +15,6 @@
  */
 namespace Pop\Image;
 
-use Pop\Color\Space\Rgb;
-
 /**
  * Image CAPTCHA class
  *
@@ -168,14 +166,12 @@ class Captcha
             throw new Exception('Error: You must either pass a valid width and height or a valid image in the $options parameter.');
         }
 
-        if (isset($options['background']) && is_array($options['background']) && (count($options['background']) == 3)) {
-            $background = new Rgb($options['background'][0], $options['background'][1], $options['background'][2]);
-        } else {
-            $background = null;
-        }
-
         // Create new image object
-        $this->image = new $class($image, $w, $h, $background);
+        $this->image = new $class($image, $w, $h);
+
+        if (isset($options['background']) && is_array($options['background']) && (count($options['background']) == 3)) {
+            $this->image->setBackgroundColor((int)$options['background'][0], (int)$options['background'][1], (int)$options['background'][2]);
+        }
     }
 
     /**
@@ -554,11 +550,11 @@ class Captcha
 
         // If grid is set, draw grid
         if (null !== $this->colors['grid']['r']) {
-            $this->image->setStrokeColor(new Rgb(
+            $this->image->setStrokeColor(
                 $this->colors['grid']['r'],
                 $this->colors['grid']['g'],
                 $this->colors['grid']['b']
-            ));
+            );
 
             // Draw horizontal lines
             for ($i = $this->grid; $i < $height; $i += $this->grid) {
@@ -573,28 +569,28 @@ class Captcha
 
         // If border is set, draw border
         if (null !== $this->colors['border']['r']) {
-            $this->image->setStrokeColor(new Rgb(
+            $this->image->setStrokeColor(
                 $this->colors['border']['r'],
                 $this->colors['border']['g'],
                 $this->colors['border']['b']
-            ))->border($this->border);
+            )->border($this->border);
         }
 
         // Generate the token
         $this->generateToken();
 
         // Set text color
-        $this->image->setFillColor(new Rgb(
+        $this->image->setFillColor(
             $this->colors['text']['r'],
             $this->colors['text']['g'],
             $this->colors['text']['b']
-        ));
+        );
 
-        $this->image->setStrokeColor(new Rgb(
+        $this->image->setStrokeColor(
             $this->colors['text']['r'],
             $this->colors['text']['g'],
             $this->colors['text']['b']
-        ));
+        );
 
         // Draw text using a font
         if (null !== $this->font) {

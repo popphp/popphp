@@ -15,8 +15,6 @@
  */
 namespace Pop\Image;
 
-use Pop\Color\Space\ColorInterface;
-
 /**
  * Image abstract class
  *
@@ -76,7 +74,7 @@ abstract class AbstractImage
      * Image extension info
      * @var \ArrayObject
      */
-    protected  $info = null;
+    protected $info = null;
 
     /**
      * Image width
@@ -122,21 +120,21 @@ abstract class AbstractImage
 
     /**
      * Image fill color
-     * @var mixed
+     * @var array
      */
-    protected $fillColor = null;
+    protected $fillColor = [0, 0, 0];
 
     /**
      * Image background color
-     * @var mixed
+     * @var array
      */
-    protected $backgroundColor = null;
+    protected $backgroundColor = [255, 255, 255];
 
     /**
      * Image stroke color
-     * @var mixed
+     * @var array
      */
-    protected $strokeColor = null;
+    protected $strokeColor = [0, 0, 0];
 
     /**
      * Image stroke width
@@ -194,7 +192,7 @@ abstract class AbstractImage
 
     /**
      * Image file output buffer
-     * @var string
+     * @var mixed
      */
     protected $output = null;
 
@@ -204,14 +202,13 @@ abstract class AbstractImage
      * Instantiate an image file object based on either a pre-existing
      * image file on disk, or a new image file.
      *
-     * @param  string         $img
-     * @param  int            $w
-     * @param  int            $h
-     * @param  ColorInterface $color
-     * @param  array          $types
+     * @param  string $img
+     * @param  int    $w
+     * @param  int    $h
+     * @param  array  $types
      * @return AbstractImage
      */
-    public function __construct($img, $w = null, $h = null, ColorInterface $color = null, array $types = null)
+    public function __construct($img, $w = null, $h = null, array $types = null)
     {
         if (null !== $types) {
             $this->allowed = $types;
@@ -365,36 +362,42 @@ abstract class AbstractImage
     /**
      * Set the fill color.
      *
-     * @param  ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return mixed
      */
-    public function setFillColor(ColorInterface $color = null)
+    public function setFillColor($r = 0, $g = 0, $b = 0)
     {
-        $this->fillColor = $color;
+        $this->fillColor = [(int)$r, (int)$g, (int)$b];
         return $this;
     }
 
     /**
      * Set the background color.
      *
-     * @param  ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return mixed
      */
-    public function setBackgroundColor(ColorInterface $color = null)
+    public function setBackgroundColor($r = 0, $g = 0, $b = 0)
     {
-        $this->backgroundColor = $color;
+        $this->backgroundColor = [(int)$r, (int)$g, (int)$b];
         return $this;
     }
 
     /**
      * Set the stroke color.
      *
-     * @param  ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return mixed
      */
-    public function setStrokeColor(ColorInterface $color = null)
+    public function setStrokeColor($r = 0, $g = 0, $b = 0)
     {
-        $this->strokeColor = $color;
+        $this->strokeColor = [(int)$r, (int)$g, (int)$b];
         return $this;
     }
 
@@ -636,10 +639,12 @@ abstract class AbstractImage
     /**
      * Method to colorize the image with the color passed.
      *
-     * @param  ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return mixed
      */
-    abstract public function colorize(ColorInterface $color);
+    abstract public function colorize($r = 0, $g = 0, $b = 0);
 
     /**
      * Method to invert the image (create a negative.)
@@ -700,10 +705,9 @@ abstract class AbstractImage
     /**
      * Set and return a color identifier.
      *
-     * @param  ColorInterface $color
-     * @throws Exception
+     * @param  array $color
      * @return mixed
      */
-    abstract protected function setColor(ColorInterface $color = null);
+    abstract protected function setColor(array $color);
 
 }

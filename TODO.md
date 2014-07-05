@@ -21,14 +21,14 @@ COMPONENTS
  - Graph       [deps: Color, Image, Pdf]
  - Http
  - I18n
- - Image       [deps: Color]
+ - Image
  - Log         [deps: Db, Mail]
  - Mail
  - Mvc         [deps: Application, Http]
  - Nav         [deps: Acl, Dom]
  - Paginator
  - Payment     [deps: Http]
- - Pdf         [deps: Color, Image]
+ - Pdf
  - Service
  - Shipping    [deps: Http, Dom]
  - Validator
