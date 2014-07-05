@@ -44,7 +44,7 @@ class Tables
         echo PHP_EOL . '    Creating database table class files...' . PHP_EOL;
 
         // Create table class folder
-        $tableDir = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'src/Table';
+        $tableDir = $build->base . DIRECTORY_SEPARATOR . 'src/Table';
         if (!file_exists($tableDir)) {
             mkdir($tableDir);
         }
@@ -54,7 +54,7 @@ class Tables
             $prefix = (isset($value['prefix'])) ? $value['prefix'] : null;
             $tableName = ucfirst(\Pop\Application\Build::underscoreToCamelcase(str_replace($prefix, '', $table)));
 
-            $ns = new NamespaceGenerator($build->application->name . '\Table');
+            $ns = new NamespaceGenerator($build->name . '\Table');
             $ns->setUse('Pop\Db\Record');
 
             if (strpos($value['primaryId'], '|') !== false) {

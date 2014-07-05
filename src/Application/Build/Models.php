@@ -42,7 +42,7 @@ class Models
         echo PHP_EOL . '    Creating model class files...' . PHP_EOL;
 
         // Create model class folder
-        $modelDir = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'src/Model';
+        $modelDir = $build->base . DIRECTORY_SEPARATOR . 'src/Model';
         if (!file_exists($modelDir)) {
             mkdir($modelDir);
         }
@@ -52,7 +52,7 @@ class Models
             $modelName = ucfirst(\Pop\Application\Build::underscoreToCamelcase($model));
 
             // Define namespace
-            $ns = new NamespaceGenerator($build->application->name . '\Model');
+            $ns = new NamespaceGenerator($build->name . '\Model');
 
             // Create and save model class file
             $modelCls = new Generator($modelDir . '/' . $modelName . '.php', Generator::CREATE_CLASS);

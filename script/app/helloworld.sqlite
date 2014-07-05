@@ -5,3 +5,6 @@ CREATE TABLE IF NOT EXISTS "[{prefix}]users" (
   "email" varchar NOT NULL,
   UNIQUE ("id")
 ) ;
+
+INSERT INTO "[{prefix}]users" ("username", "password", "email") VALUES ('testuser1', '12test34', 'test1@test.com');
+INSERT INTO "[{prefix}]users" ("username", "password", "email") VALUES ('testuser2', '56test78', 'test2@test.com');

@@ -40,14 +40,12 @@ class Base
 
         // Define folders to create
         $folders = [
-            $build->application->base,
-            $build->application->base . DIRECTORY_SEPARATOR . 'app',
-            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config',
-            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'data',
-            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'modules',
-            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'src',
-            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'view',
-            $build->application->docroot,
+            $build->base,
+            $build->base . DIRECTORY_SEPARATOR . 'config',
+            $build->base . DIRECTORY_SEPARATOR . 'data',
+            $build->base . DIRECTORY_SEPARATOR . 'src',
+            $build->base . DIRECTORY_SEPARATOR . 'view',
+            $build->docroot,
         ];
 
         // Create the folders
@@ -58,73 +56,93 @@ class Base
         }
 
         // Make the '/data' folder writable
-        chmod($build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'data', 0777);
+        chmod($build->base . DIRECTORY_SEPARATOR . 'data', 0777);
 
-        // Create application.php file
-        $applicationCfg = new \Pop\Code\Generator(
-            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR .
-            'config' . DIRECTORY_SEPARATOR . 'application.php'
-        );
+        // If configuration is for a module
+        if (isset($build->module) && ($build->module)) {
+            // Create module.php file
+            $moduleCfg = new \Pop\Code\Generator(
+                $build->base . DIRECTORY_SEPARATOR .
+                'config' . DIRECTORY_SEPARATOR . 'module.php'
+            );
+            $moduleCfg->appendToBody('return new Pop\Config([', true)
+                      ->appendToBody("    '" . $build->name . "' => [")
+                      ->appendToBody("        'base' => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR)")
+                      ->appendToBody('    ]')
+                      ->appendToBody(']);', false)
+                      ->save();
+        // Else, it's for an application
+        } else {
+            if (!file_exists($build->base . DIRECTORY_SEPARATOR . 'modules')) {
+                mkdir($build->base . DIRECTORY_SEPARATOR . 'modules');
+            }
 
-        $applicationCfg->appendToBody('return new Pop\Config([', true)
-                       ->appendToBody("    'base'      => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR)", false);
+            // Create application.php file
+            $applicationCfg = new \Pop\Code\Generator(
+                $build->base . DIRECTORY_SEPARATOR .
+                'config' . DIRECTORY_SEPARATOR . 'application.php'
+            );
 
-        // Add the database config to it
-        if (isset($build->databases)) {
-            $applicationCfg->appendToBody(",")
-                           ->appendToBody("    'databases' => [");
-            $databases = $build->databases->toArray();
-            $default   = null;
-            $i = 0;
-            foreach ($databases as $dbname => $db) {
-                $isPdo    = (stripos($db['type'], 'pdo') !== false) ? true : false;
-                $isSqlite = (stripos($db['type'], 'sqlite') !== false) ? true : false;
+            $applicationCfg->appendToBody('return new Pop\Config([', true)
+                           ->appendToBody("    'base'      => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR)", false);
 
-                if ($isPdo) {
-                    $pdoType = strtolower(substr($db['type'], (strpos($db['type'], '_') + 1)));
-                    $realDbType = 'Pdo';
-                } else {
-                    $pdoType = null;
-                    $realDbType = $db['type'];
-                }
+            // Add the database config to it
+            if (isset($build->databases)) {
+                $applicationCfg->appendToBody(",")
+                               ->appendToBody("    'databases' => [");
+                $databases = $build->databases->toArray();
+                $default   = null;
+                $i = 0;
+                foreach ($databases as $dbname => $db) {
+                    $isPdo    = (stripos($db['type'], 'pdo') !== false) ? true : false;
+                    $isSqlite = (stripos($db['type'], 'sqlite') !== false) ? true : false;
 
-                $applicationCfg->appendToBody("        '" . $dbname . "' => new Pop\\Db\\Adapter\\" . $realDbType . "([");
-                $j = 0;
-                $default = ($db['default']) ? $dbname : null;
-                $dbCreds = $db;
-                unset($dbCreds['type']);
-                unset($dbCreds['prefix']);
-                unset($dbCreds['default']);
-                foreach ($dbCreds as $key => $value) {
-                    $j++;
-                    if ($isSqlite) {
-                        $dbFile = "realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . '" . basename($value) . "')";
-                        $ary = "            '{$key}' => {$dbFile}";
-                    } else {
-                        $ary = "            '{$key}' => '{$value}'";
-                    }
                     if ($isPdo) {
-                        $ary .= "," . PHP_EOL . "            'type' => '{$pdoType}'";
+                        $pdoType = strtolower(substr($db['type'], (strpos($db['type'], '_') + 1)));
+                        $realDbType = 'Pdo';
+                    } else {
+                        $pdoType = null;
+                        $realDbType = $db['type'];
                     }
-                    if ($j < count($dbCreds)) {
-                        $ary .= ',';
+
+                    $applicationCfg->appendToBody("        '" . $dbname . "' => new Pop\\Db\\Adapter\\" . $realDbType . "([");
+                    $j = 0;
+                    $default = ($db['default']) ? $dbname : null;
+                    $dbCreds = $db;
+                    unset($dbCreds['type']);
+                    unset($dbCreds['prefix']);
+                    unset($dbCreds['default']);
+                    foreach ($dbCreds as $key => $value) {
+                        $j++;
+                        if ($isSqlite) {
+                            $dbFile = "realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . '" . basename($value) . "')";
+                            $ary = "            '{$key}' => {$dbFile}";
+                        } else {
+                            $ary = "            '{$key}' => '{$value}'";
+                        }
+                        if ($isPdo) {
+                            $ary .= "," . PHP_EOL . "            'type' => '{$pdoType}'";
+                        }
+                        if ($j < count($dbCreds)) {
+                            $ary .= ',';
+                        }
+                        $applicationCfg->appendToBody($ary);
                     }
-                    $applicationCfg->appendToBody($ary);
+                    $i++;
+                    $end = ($i < count($databases)) ? '        ]),' : '        ])';
+                    $applicationCfg->appendToBody($end);
                 }
-                $i++;
-                $end = ($i < count($databases)) ? '        ]),' : '        ])';
-                $applicationCfg->appendToBody($end);
-            }
-            $applicationCfg->appendToBody('    ]', false);
+                $applicationCfg->appendToBody('    ]', false);
 
-            if (null !== $default) {
-                $applicationCfg->appendToBody("," . PHP_EOL . "    'defaultDb' => '" . $default . "'");
+                if (null !== $default) {
+                    $applicationCfg->appendToBody("," . PHP_EOL . "    'defaultDb' => '" . $default . "'");
+                }
             }
+
+            // Save application config
+            $applicationCfg->appendToBody(']);', false);
+            $applicationCfg->save();
         }
-
-        // Save application config
-        $applicationCfg->appendToBody(']);', false);
-        $applicationCfg->save();
     }
 
 }

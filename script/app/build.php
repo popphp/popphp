@@ -1,22 +1,21 @@
 <?php
 
 return new Pop\Config([
-    'application' => [
-        'name'    => 'HelloWorld',
-        'base'    => __DIR__ . '/../../',
-        'docroot' => __DIR__ . '/../../public'
-    ],
+    'name'      => 'HelloWorld',
+    'base'      => __DIR__ . '/../../app',
+    'docroot'   => __DIR__ . '/../../public',
+    'module'    => false,
     'databases' => [
         'helloworld' => [
+/*
             'type'     => 'Sqlite',
             'database' => '.hthelloworld.sqlite',
-/*
+*/
             'type'     => 'Mysql',
             'database' => 'helloworld',
             'host'     => 'localhost',
             'username' => 'hello',
             'password' => '12world34',
-*/
             'prefix'   => 'pop_',
             'default'  => true
         ]

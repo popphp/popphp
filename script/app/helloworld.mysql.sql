@@ -6,3 +6,6 @@ CREATE TABLE IF NOT EXISTS `[{prefix}]users` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1001 ;
 
+INSERT INTO `[{prefix}]users` (`username`, `password`, `email`) VALUES
+('testuser1', '12test34', 'test1@test.com'),
+('testuser2', '56test78', 'test2@test.com');

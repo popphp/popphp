@@ -44,8 +44,8 @@ class Controllers
         echo PHP_EOL . '    Creating controller class files...' . PHP_EOL;
 
         // Make the controller folder
-        $ctrlDir = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller';
-        $viewDir = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'view';
+        $ctrlDir = $build->base . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller';
+        $viewDir = $build->base . DIRECTORY_SEPARATOR . 'view';
 
         if (!file_exists($ctrlDir)) {
             mkdir($ctrlDir);
@@ -62,7 +62,7 @@ class Controllers
             self::createControllers($controllers, array(
                 'src'        => realpath($ctrlDir),
                 'view'       => realpath($viewDir),
-                'namespace'  => $build->application->name . '\Controller',
+                'namespace'  => $build->name . '\Controller',
                 'installDir' => $buildDir
             ));
         }

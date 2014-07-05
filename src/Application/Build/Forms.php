@@ -43,7 +43,7 @@ class Forms
         echo PHP_EOL . '    Creating form class files...' . PHP_EOL;
 
         // Create form class folder
-        $formDir = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'src/Form';
+        $formDir = $build->base . DIRECTORY_SEPARATOR . 'src/Form';
         if (!file_exists($formDir)) {
             mkdir($formDir);
         }
@@ -53,7 +53,7 @@ class Forms
             $formName = ucfirst(\Pop\Application\Build::underscoreToCamelcase($name));
 
             // Define namespace
-            $ns = new NamespaceGenerator($build->application->name . '\Form');
+            $ns = new NamespaceGenerator($build->name . '\Form');
             $ns->setUse('Pop\Form\Form')
                ->setUse('Pop\Form\Element')
                ->setUse('Pop\Validator');

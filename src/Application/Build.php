@@ -50,9 +50,9 @@ class Build
         $build    = include $buildFile;
 
         // Check if a application folder already exists.
-        if (file_exists(realpath($build->application->base) . DIRECTORY_SEPARATOR . 'app')) {
-            echo PHP_EOL . wordwrap('    The application folder already exists. This may overwrite any application files ' . '
-                you may already have under that application folder.', 70, PHP_EOL . '    ') . PHP_EOL . PHP_EOL;
+        if (file_exists(realpath($build->base) . DIRECTORY_SEPARATOR . 'app')) {
+            echo PHP_EOL . wordwrap('    The build folder already exists. This may overwrite any  files ' . '
+                you may already have under that folder.', 70, PHP_EOL . '    ') . PHP_EOL . PHP_EOL;
             $input = self::input();
         } else {
             $input = 'y';
@@ -67,11 +67,64 @@ class Build
             // Build the base folder structure
             Build\Base::build($build);
 
-            // Build the application class
-            Build\Application::build($build);
+            // If it's an application (and not a module)
+            if (!isset($build->module) || (isset($build->module) && (!$build->module))) {
+                // Build the application class file and the bootstrap file
+                Build\Application::build($build);
+                Build\Bootstrap::build($build);
 
-            // Build the bootstrap file
-            Build\Bootstrap::build($build);
+                $db        = false;
+                $databases = [];
+                $dbTables  = [];
+
+                // Test for a database credentials and schema
+                // and ask to test and install the database.
+                if (isset($build->databases)) {
+                    $databases = $build->databases->toArray();
+                    echo PHP_EOL . '    Database credentials and schema detected.' . PHP_EOL;
+                    $input = self::input('    Test and install the database(s)?' . ' (Y/N) ');
+                    $db = ($input == 'n') ? false : true;
+                }
+
+                // Handle any databases
+                if ($db) {
+                    // Get current error reporting setting and set
+                    // error reporting to E_ERROR to suppress warnings
+                    $oldError = ini_get('error_reporting');
+                    error_reporting(E_ERROR);
+
+                    // Test the databases
+                    echo PHP_EOL . '    Testing the database(s)...' . PHP_EOL;
+
+                    foreach ($databases as $dbname => $db) {
+                        echo '      - Testing' . ' \'' . $dbname . '\'...' . PHP_EOL;
+                        if (!isset($db['type']) || !isset($db['database'])) {
+                            echo PHP_EOL . '    The database type and database name must be set for the database ' .
+                                '\'' . $dbname . '\'.' . PHP_EOL . PHP_EOL;
+                            exit();
+                        }
+                        $check = Build\Dbs::check($db);
+                        if (null !== $check) {
+                            echo PHP_EOL . '    ' . $check . PHP_EOL . PHP_EOL;
+                            exit();
+                        } else {
+                            echo PHP_EOL . '    Database' . ' \'' . $dbname . '\' passed.' . PHP_EOL;
+                            echo '      - Installing ' .' \'' . $dbname . '\'...' . PHP_EOL;
+                            $tables = Build\Dbs::install($dbname, $db, $buildDir, $build);
+                            if (count($tables) > 0) {
+                                $dbTables = array_merge($dbTables, $tables);
+                            }
+                        }
+                    }
+                    // Return error reporting to its original state
+                    error_reporting($oldError);
+                }
+
+                // Build table class files
+                if (count($dbTables) > 0) {
+                    Build\Tables::build($build, $dbTables);
+                }
+            }
 
             // Build controller class files
             if (isset($build->controllers)) {
@@ -88,59 +141,7 @@ class Build
                 Build\Forms::build($build, $buildDir);
             }
 
-            $db        = false;
-            $databases = [];
-            $dbTables  = [];
-
-            // Test for a database credentials and schema
-            // and ask to test and install the database.
-            if (isset($build->databases)) {
-                $databases = $build->databases->toArray();
-                echo PHP_EOL . '    Database credentials and schema detected.' . PHP_EOL;
-                $input = self::input('    Test and install the database(s)?' . ' (Y/N) ');
-                $db = ($input == 'n') ? false : true;
-            }
-
-            // Handle any databases
-            if ($db) {
-                // Get current error reporting setting and set
-                // error reporting to E_ERROR to suppress warnings
-                $oldError = ini_get('error_reporting');
-                error_reporting(E_ERROR);
-
-                // Test the databases
-                echo PHP_EOL . '    Testing the database(s)...' . PHP_EOL;
-
-                foreach ($databases as $dbname => $db) {
-                    echo '      - Testing' . ' \'' . $dbname . '\'...' . PHP_EOL;
-                    if (!isset($db['type']) || !isset($db['database'])) {
-                        echo PHP_EOL . '    The database type and database name must be set for the database ' .
-                            '\'' . $dbname . '\'.' . PHP_EOL . PHP_EOL;
-                        exit();
-                    }
-                    $check = Build\Dbs::check($db);
-                    if (null !== $check) {
-                        echo PHP_EOL . '    ' . $check . PHP_EOL . PHP_EOL;
-                        exit();
-                    } else {
-                        echo PHP_EOL . '    Database' . ' \'' . $dbname . '\' passed.' . PHP_EOL;
-                        echo '      - Installing ' .' \'' . $dbname . '\'...' . PHP_EOL;
-                        $tables = Build\Dbs::install($dbname, $db, $buildDir, $build);
-                        if (count($tables) > 0) {
-                            $dbTables = array_merge($dbTables, $tables);
-                        }
-                    }
-                }
-                // Return error reporting to its original state
-                error_reporting($oldError);
-            }
-
-            // Build table class files
-            if (count($dbTables) > 0) {
-                Build\Tables::build($build, $dbTables);
-            }
-
-            echo PHP_EOL . '    Application build complete.' . PHP_EOL . PHP_EOL;
+            echo PHP_EOL . '    Build complete.' . PHP_EOL . PHP_EOL;
             exit();
         }
     }

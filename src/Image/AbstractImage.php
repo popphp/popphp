@@ -251,6 +251,26 @@ abstract class AbstractImage
     }
 
     /**
+     * Get the image filename
+     *
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+    /**
+     * Get the image extension
+     *
+     * @return string
+     */
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+    /**
      * Get the image mime type
      *
      * @return string

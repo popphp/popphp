@@ -33,7 +33,7 @@ class Image
 
     /**
      * Image object
-     * @var mixed
+     * @var \Pop\Image\Gd
      */
     protected $img = 0;
 
@@ -279,7 +279,7 @@ class Image
     protected function scaleImage($scl)
     {
         // Define the temp scaled image.
-        $this->scaledImage = realpath(ini_get('upload_tmp_dir')) . DIRECTORY_SEPARATOR . $this->img->getFilename() . '_' . time() . '.' . $this->img->getExt();
+        $this->scaledImage = realpath(ini_get('upload_tmp_dir')) . DIRECTORY_SEPARATOR . $this->img->getFilename() . '_' . time() . '.' . $this->img->getExtension();
 
         // Scale or resize the image
         if (is_array($scl) && (isset($scl['w']) || isset($scl['h']))) {

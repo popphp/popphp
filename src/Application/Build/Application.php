@@ -42,12 +42,12 @@ class Application
     {
         // Create the application class file
         $applicationCls = new Generator(
-            $build->application->base . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Application.php',
+            $build->base . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Application.php',
             Generator::CREATE_CLASS
         );
 
         // Set namespace
-        $ns = new NamespaceGenerator($build->application->name);
+        $ns = new NamespaceGenerator($build->name);
         $ns->setUse('Pop\Application\Application', 'App');
 
         // Create 'run' method
@@ -75,20 +75,20 @@ class Application
                     '} catch (\Exception $e) {' . PHP_EOL .
                     '    echo $e->getMessage();' . PHP_EOL .
                     '}' . PHP_EOL;
-                file_put_contents($build->application->docroot . DIRECTORY_SEPARATOR . 'index.php', $contents);
+                file_put_contents($build->docroot . DIRECTORY_SEPARATOR . 'index.php', $contents);
             }
             if ($input == 'a') {
                 if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'Web' . DIRECTORY_SEPARATOR . 'ht.access')) {
                     copy(
                         __DIR__ . DIRECTORY_SEPARATOR . 'Web' . DIRECTORY_SEPARATOR . 'ht.access',
-                        $build->application->docroot . DIRECTORY_SEPARATOR . '.htaccess'
+                        $build->docroot . DIRECTORY_SEPARATOR . '.htaccess'
                     );
                 }
             } else if ($input == 'i') {
                 if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'Web' . DIRECTORY_SEPARATOR . 'web.config')) {
                     copy(
                         __DIR__ . DIRECTORY_SEPARATOR . 'Web' . DIRECTORY_SEPARATOR . 'web.config',
-                        $build->application->docroot . DIRECTORY_SEPARATOR . 'web.config'
+                        $build->docroot . DIRECTORY_SEPARATOR . 'web.config'
                     );
                 }
             } else {

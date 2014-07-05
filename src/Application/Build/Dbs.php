@@ -101,24 +101,11 @@ class Dbs
             if (is_string($build) && file_exists($build)) {
                 $db['database'] = $build;
             } else {
-                // Define folders to create
-                $folders = [
-                    $build->application->base,
-                    $build->application->base .
-                    $build->application->base . DIRECTORY_SEPARATOR  . 'app',
-                    $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'data'
-                ];
-                // Create the folders
-                foreach ($folders as $folder) {
-                    if (!file_exists($folder)) {
-                        mkdir($folder);
-                    }
-                }
                 // Create empty SQLite file and make file and folder writable
-                chmod($build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'data', 0777);
-                touch($build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . $db['database']);
-                chmod($build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . $db['database'], 0777);
-                $db['database'] = $build->application->base . DIRECTORY_SEPARATOR  . 'app' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . $db['database'];
+                chmod($build->base . DIRECTORY_SEPARATOR . 'data', 0777);
+                touch($build->base . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . $db['database']);
+                chmod($build->base . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . $db['database'], 0777);
+                $db['database'] = $build->base . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . $db['database'];
             }
         }
 
