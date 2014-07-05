@@ -1,38 +1,38 @@
 COMPONENTS
 ----------
- - Acl         [DONE]
- - Application [IN PROGRESS (modules) - deps: Code, Config, Db, Event, Http, Mvc, Service]
- - Archive     [DONE]
- - Auth        [DONE]
- - Cache       [DONE]
- - Code        [DONE]
- - Color       [DONE]
- - Crypt       [DONE]
- - Data        [DONE]
- - Db          [DONE]
- - Dom         [DONE]
- - Event       [DONE]
- - Feed        [DONE - deps: Dom]
- - File        [DONE]
- - Filter      [DONE]
- - Form        [DONE - deps: Dom, Validator]
- - Ftp         [DONE]
- - Geo         [DONE]
- - Graph       [DONE - deps: Color, Image, Pdf]
- - Http        [DONE]
- - I18n        [DONE]
- - Image       [DONE - deps: Color]
- - Log         [DONE - deps: Db, Mail]
- - Mail        [DONE]
- - Mvc         [DONE - deps: Application, Http]
- - Nav         [DONE - deps: Acl, Dom]
- - Paginator   [DONE]
- - Payment     [DONE - deps: Http]
- - Pdf         [DONE - deps: Color, Image]
- - Service     [DONE]
- - Shipping    [DONE - deps: Http, Dom]
- - Validator   [DONE]
- - Web         [DONE]
- - Cli         [DONE]
- - Config      [DONE]
- - Version     [DONE]
+ - Acl
+ - Application [deps: Code, Config, Db, Event, File, Http, Mvc, Service]
+ - Archive
+ - Auth
+ - Cache
+ - Code
+ - Color
+ - Crypt
+ - Data
+ - Db
+ - Dom
+ - Event
+ - Feed        [deps: Dom]
+ - File
+ - Filter
+ - Form        [deps: Dom, Validator]
+ - Ftp
+ - Geo
+ - Graph       [deps: Color, Image, Pdf]
+ - Http
+ - I18n
+ - Image       [deps: Color]
+ - Log         [deps: Db, Mail]
+ - Mail
+ - Mvc         [deps: Application, Http]
+ - Nav         [deps: Acl, Dom]
+ - Paginator
+ - Payment     [deps: Http]
+ - Pdf         [deps: Color, Image]
+ - Service
+ - Shipping    [deps: Http, Dom]
+ - Validator
+ - Web
+ - Cli
+ - Config
+ - Version

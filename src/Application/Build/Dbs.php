@@ -87,9 +87,7 @@ class Dbs
             $sqlFiles[] = $dir;
         } else {
             $dir = new \Pop\File\Dir($dir, true);
-            $files = $dir->getFiles();
-
-            foreach ($files as $file) {
+            foreach ($dir->getFiles() as $file) {
                 if (strtolower(substr($file, -4)) == '.sql') {
                     $sqlFiles[] = $file;
                 }

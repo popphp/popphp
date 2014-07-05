@@ -3,7 +3,7 @@ Pop PHP Framework Changelog
 
 2.0.0a
 ------
-As of June 25, 2014
+As of July 4, 2014
 
 * PHP 5.4+ Only
 * Composer Support

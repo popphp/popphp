@@ -83,7 +83,8 @@ class Base
                 'config' . DIRECTORY_SEPARATOR . 'application.php'
             );
 
-            $applicationCfg->appendToBody('return new Pop\Config([', true)
+            $applicationCfg->appendToBody('return new Pop\Config([')
+                           ->appendToBody("    'name'      => '" . $build->name . "',")
                            ->appendToBody("    'base'      => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR)", false);
 
             // Add the database config to it

@@ -124,6 +124,50 @@ class Build
                 if (count($dbTables) > 0) {
                     Build\Tables::build($build, $dbTables);
                 }
+            } else {
+                $sqlFiles = [];
+                $dir      = new \Pop\File\Dir($buildDir, true);
+                foreach ($dir->getFiles() as $file) {
+                    if (strtolower(substr($file, -4)) == '.sql') {
+                        $sqlFiles[] = $file;
+                    }
+                }
+                if ((count($sqlFiles) > 0) && file_exists($build->base . '/../../config/application.php')) {
+                    $appConfig = include $build->base . '/../../config/application.php';
+                    $tableFiles = [];
+
+                    $dir = new \Pop\File\Dir($build->base . '/../../src/Table', true);
+                    foreach ($dir->getFiles() as $file) {
+                        $tableFiles[] = $file;
+                    }
+
+                    if (isset($tableFiles[0])) {
+                        echo PHP_EOL . '    SQL files found. Executing SQL queries... ' . PHP_EOL;
+                        include $tableFiles[0];
+                        $class     = '\\' . $appConfig->name . '\Table\\' . basename($tableFiles[0], '.php');
+                        $prefix    = $class::getPrefix();
+                        $defaultDb = $appConfig->defaultDb;
+                        $popdb     = $appConfig->databases->{$defaultDb};
+
+                        foreach ($sqlFiles as $sqlFile) {
+                            $sql = trim(file_get_contents($sqlFile));
+                            $explode = (strpos($sql, ";\r\n") !== false) ? ";\r\n" : ";\n";
+                            $statements = explode($explode, $sql);
+
+                            // Loop through each statement found and execute
+                            foreach ($statements as $s) {
+                                if (!empty($s)) {
+                                    try {
+                                        $popdb->query(str_replace('[{prefix}]', $prefix, trim($s)));
+                                    } catch (\Exception $e) {
+                                        echo $e->getMessage() . PHP_EOL . PHP_EOL;
+                                        exit();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             // Build controller class files
@@ -139,6 +183,11 @@ class Build
             // Build form class files
             if (isset($build->forms)) {
                 Build\Forms::build($build, $buildDir);
+            }
+
+            // Build table class files
+            if (isset($build->tables)) {
+                Build\Tables::build($build, $build->tables->toArray());
             }
 
             echo PHP_EOL . '    Build complete.' . PHP_EOL . PHP_EOL;

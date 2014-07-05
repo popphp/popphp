@@ -96,9 +96,9 @@ class Cli
      */
     public static function instructions()
     {
-        $msg1 = "You can construct the scaffolding of your application using the build command. This process will create and " .
-            "build the base foundation of your application under the folder specified in the build file. Minimally, the " .
-            "build file should return a Pop\\Config object containing your application build settings, such as application" .
+        $msg1 = "You can construct the scaffolding of your application or module using the build command. " .
+            "This process will create and build the base foundation under the folder specified in the build file. " .
+            "Minimally, the build file should return a Pop\\Config object containing your build settings, such as " .
             "name, folders, forms, controllers, views and any database credentials.";
 
         $msg2 = "Besides creating the base folders and files for you, one of the main benefits is ability to test and " .
