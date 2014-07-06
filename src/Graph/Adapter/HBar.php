@@ -44,7 +44,7 @@ class HBar extends AbstractAdapter
         if ($this->graph->getShowX()) {
             $this->showXAxis($yAxis, $points);
         }
-        if ($this->graph->getShowX()) {
+        if ($this->graph->getShowY()) {
             $this->showYAxis($xAxis, $points, $this->graph->getBarWidth());
         }
 
@@ -61,14 +61,16 @@ class HBar extends AbstractAdapter
             $this->graph->adapter()->setStrokeWidth($this->graph->getStrokeWidth());
             $len = count($dataPoints);
             for ($i = 0; $i < $len; $i++) {
+                $fillColor   = $this->graph->getFillColor();
+                $strokeColor = (null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : $dataPoints[$i][1];
                 if (is_array($dataPoints[$i])) {
                     $pt = $dataPoints[$i][0];
-                    $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : $dataPoints[$i][1]);
-                    $this->graph->adapter()->setFillColor($dataPoints[$i][1]);
+                    $this->graph->adapter()->setStrokeColor($strokeColor[0], $strokeColor[1], $strokeColor[2]);
+                    $this->graph->adapter()->setFillColor($dataPoints[$i][1][0], $dataPoints[$i][1][1], $dataPoints[$i][1][2]);
                 } else {
                     $pt = $dataPoints[$i];
-                    $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : $this->graph->getFillColor());
-                    $this->graph->adapter()->setFillColor($this->graph->getFillColor());
+                    $this->graph->adapter()->setStrokeColor($strokeColor[0], $strokeColor[1], $strokeColor[2]);
+                    $this->graph->adapter()->setFillColor($fillColor[0], $fillColor[1], $fillColor[2]);
                 }
                 if ($this->graph->adapter() instanceof \Pop\Pdf\Pdf) {
                     $y = ($points->zeroPoint['y'] - ($realYDiv * $i)) + ($this->graph->getBarWidth() / 5);

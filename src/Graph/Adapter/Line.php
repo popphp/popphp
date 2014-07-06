@@ -44,7 +44,7 @@ class Line extends AbstractAdapter
         if ($this->graph->getShowX()) {
             $this->showXAxis($yAxis, $points);
         }
-        if ($this->graph->getShowX()) {
+        if ($this->graph->getShowY()) {
             $this->showYAxis($xAxis, $points);
         }
 
@@ -69,8 +69,10 @@ class Line extends AbstractAdapter
 
         // Draw graph data.
         if (null !== $this->graph->getFillColor()) {
-            $this->graph->adapter()->setFillColor($this->graph->getFillColor());
-            $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : $this->graph->getFillColor());
+            $fillColor   = $this->graph->getFillColor();
+            $strokeColor = (null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : $fillColor;
+            $this->graph->adapter()->setFillColor($fillColor[0], $fillColor[1], $fillColor[2]);
+            $this->graph->adapter()->setStrokeColor($strokeColor[0], $strokeColor[1], $strokeColor[2]);
             $this->graph->adapter()->setStrokeWidth($this->graph->getStrokeWidth());
             $formattedPoints = [];
             for ($i = 0; $i < count($dataPoints); $i++) {

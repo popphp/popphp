@@ -104,10 +104,12 @@ abstract class AbstractAdapter
      */
     protected function showXAxis($xAxis, $points, $offset = 0)
     {
+        $xColor    = $this->graph->getXColor();
+        $fontColor = $this->graph->getFontColor();
         $this->graph->adapter()->setStrokeWidth(1);
-        $this->graph->adapter()->setStrokeColor($this->graph->getYColor());
+        $this->graph->adapter()->setStrokeColor($xColor[0], $xColor[1], $xColor[2]);
         $this->graph->adapter()->drawLine($points->zeroPoint['x'], $points->zeroPoint['y'], $points->endX['x'], $points->endX['y']);
-        $this->graph->adapter()->setFillColor($this->graph->getFontColor());
+        $this->graph->adapter()->setFillColor($fontColor[0], $fontColor[1], $fontColor[2]);
 
         $i = 0;
 
@@ -139,9 +141,11 @@ abstract class AbstractAdapter
      */
     protected function showYAxis($yAxis, $points, $offset = 0)
     {
+        $yColor    = $this->graph->getYColor();
+        $fontColor = $this->graph->getFontColor();
         $this->graph->adapter()->setStrokeWidth(1);
-        $this->graph->adapter()->setStrokeColor($this->graph->getXColor());
-        $this->graph->adapter()->setFillColor($this->graph->getFontColor());
+        $this->graph->adapter()->setStrokeColor($yColor[0], $yColor[1], $yColor[2]);
+        $this->graph->adapter()->setFillColor($fontColor[0], $fontColor[1], $fontColor[2]);
 
         $i = 0;
 
@@ -174,10 +178,12 @@ abstract class AbstractAdapter
      */
     protected function drawXAxis($xAxis, $points, $offset = 0)
     {
+        $axisColor = $this->graph->getAxisColor();
+        $fontColor = $this->graph->getFontColor();
         $this->graph->adapter()->setStrokeWidth($this->graph->getAxisWidth());
-        $this->graph->adapter()->setStrokeColor($this->graph->getAxisColor());
+        $this->graph->adapter()->setStrokeColor($axisColor[0], $axisColor[1], $axisColor[2]);
         $this->graph->adapter()->drawLine($points->zeroPoint['x'], $points->zeroPoint['y'], $points->endX['x'], $points->endX['y']);
-        $this->graph->adapter()->setFillColor($this->graph->getFontColor());
+        $this->graph->adapter()->setFillColor($fontColor[0], $fontColor[1], $fontColor[2]);
 
         $i = 0;
 
@@ -226,10 +232,12 @@ abstract class AbstractAdapter
      */
     protected function drawYAxis($yAxis, $points, $offset = 0)
     {
+        $axisColor = $this->graph->getAxisColor();
+        $fontColor = $this->graph->getFontColor();
         $this->graph->adapter()->setStrokeWidth($this->graph->getAxisWidth());
-        $this->graph->adapter()->setStrokeColor($this->graph->getAxisColor());
+        $this->graph->adapter()->setStrokeColor($axisColor[0], $axisColor[1], $axisColor[2]);
         $this->graph->adapter()->drawLine($points->zeroPoint['x'], $points->zeroPoint['y'], $points->endY['x'], $points->endY['y']);
-        $this->graph->adapter()->setFillColor($this->graph->getFontColor());
+        $this->graph->adapter()->setFillColor($fontColor[0], $fontColor[1], $fontColor[2]);
 
         $i = 0;
 
@@ -290,7 +298,7 @@ abstract class AbstractAdapter
         switch ($type) {
             // Draw data point text on a line graph.
             case 'line':
-                $this->graph->adapter()->setFillColor($fontColor);
+                $this->graph->adapter()->setFillColor($fontColor[0], $fontColor[1], $fontColor[2]);
                 $prevY = null;
                 $nextY = null;
                 $start = $skip;
@@ -345,13 +353,13 @@ abstract class AbstractAdapter
                         }
                     }
                     $prevY = $y;
-                    $this->graph->adapter()->setFillColor($fontColor);
+                    $this->graph->adapter()->setFillColor($fontColor[0], $fontColor[1], $fontColor[2]);
                 }
                 break;
 
             // Draw data point text on a vertical bar graph.
             case 'vBar':
-                $this->graph->adapter()->setFillColor($fontColor);
+                $this->graph->adapter()->setFillColor($fontColor[0], $fontColor[1], $fontColor[2]);
                 $realXDiv = ($points->xLength - ($this->graph->getBarWidth() * 2)) / (count($xAxis) - 1);
                 for ($i = 0; $i < count($dataPoints); $i++) {
                     $strSize = (strlen($dataPoints[$i]) * $fontSize) / 4;
@@ -376,7 +384,7 @@ abstract class AbstractAdapter
 
             // Draw data point text on a horizontal bar graph.
             case 'hBar':
-                $this->graph->adapter()->setFillColor($fontColor);
+                $this->graph->adapter()->setFillColor($fontColor[0], $fontColor[1], $fontColor[2]);
                 if ($this->graph->adapter() instanceof \Pop\Pdf\Pdf) {
                     $realYDiv = ($points->yLength + ($this->graph->getBarWidth() * 2)) / (count($yAxis) - 1);
                 } else {
@@ -413,7 +421,7 @@ abstract class AbstractAdapter
                 for ($i = 0; $i < count($dataPoints); $i++) {
                     $newMidX = $xAxis[$i]['x'];
                     $newMidY = $xAxis[$i]['y'];
-                    $this->graph->adapter()->setFillColor($fontColor);
+                    $this->graph->adapter()->setFillColor($fontColor[0], $fontColor[1], $fontColor[2]);
                     if ($this->graph->adapter() instanceof \Pop\Pdf\Pdf) {
                         // Text not supported on PDF pie charts yet due to clipping path issues.
                     } else {
