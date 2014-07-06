@@ -374,14 +374,14 @@ class Nav
 
             // Set top attributes if they exist
             if (isset($this->config['top']) && isset($this->config['top']['id'])) {
-                $nav->setAttributes('id', $this->config['top']['id']);
+                $nav->setAttribute('id', $this->config['top']['id']);
             }
             if (isset($this->config['top']) && isset($this->config['top']['class'])) {
-                $nav->setAttributes('class', $this->config['top']['class']);
+                $nav->setAttribute('class', $this->config['top']['class']);
             }
             if (isset($this->config['top']['attributes'])) {
                 foreach ($this->config['top']['attributes'] as $attrib => $value) {
-                    $nav->setAttributes($attrib, $value);
+                    $nav->setAttribute($attrib, $value);
                 }
             }
         } else {
@@ -399,14 +399,14 @@ class Nav
 
             // Set parent attributes if they exist
             if (isset($this->config['parent']) && isset($this->config['parent']['id'])) {
-                $nav->setAttributes('id', $this->config['parent']['id'] . '-' . $this->parentLevel);
+                $nav->setAttribute('id', $this->config['parent']['id'] . '-' . $this->parentLevel);
             }
             if (isset($this->config['parent']) && isset($this->config['parent']['class'])) {
-                $nav->setAttributes('class', $this->config['parent']['class'] . '-' . $depth);
+                $nav->setAttribute('class', $this->config['parent']['class'] . '-' . $depth);
             }
             if (isset($this->config['parent']['attributes'])) {
                 foreach ($this->config['parent']['attributes'] as $attrib => $value) {
-                    $nav->setAttributes($attrib, $value);
+                    $nav->setAttribute($attrib, $value);
                 }
             }
         }
@@ -442,10 +442,10 @@ class Nav
                     }
                 }
 
-                $a->setAttributes('href', $href);
+                $a->setAttribute('href', $href);
 
                 if (($this->returnFalse) && (($href == '#') || (substr($href, -1) == '#'))) {
-                    $a->setAttributes('onclick', 'return false;');
+                    $a->setAttribute('onclick', 'return false;');
                 }
                 $url = $_SERVER['REQUEST_URI'];
                 if (strpos($url, '?') !== false) {
@@ -467,10 +467,10 @@ class Nav
                 if (isset($node['attributes'])) {
                     foreach ($node['attributes'] as $attrib => $value) {
                         $value = (($attrib == 'class') && (null !== $linkClass)) ? $value . ' ' . $linkClass : $value;
-                        $a->setAttributes($attrib, $value);
+                        $a->setAttribute($attrib, $value);
                     }
                 } else if (null !== $linkClass) {
-                    $a->setAttributes('class', $linkClass);
+                    $a->setAttribute('class', $linkClass);
                 }
 
                 if (null !== $child) {
@@ -478,14 +478,14 @@ class Nav
 
                     // Set child attributes if they exist
                     if (isset($this->config['child']) && isset($this->config['child']['id'])) {
-                        $navChild->setAttributes('id', $this->config['child']['id'] . '-' . $this->childLevel);
+                        $navChild->setAttribute('id', $this->config['child']['id'] . '-' . $this->childLevel);
                     }
                     if (isset($this->config['child']) && isset($this->config['child']['class'])) {
-                        $navChild->setAttributes('class', $this->config['child']['class'] . '-' . ($depth - 1));
+                        $navChild->setAttribute('class', $this->config['child']['class'] . '-' . ($depth - 1));
                     }
                     if (isset($this->config['child']['attributes'])) {
                         foreach ($this->config['child']['attributes'] as $attrib => $value) {
-                            $navChild->setAttributes($attrib, $value);
+                            $navChild->setAttribute($attrib, $value);
                         }
                     }
 

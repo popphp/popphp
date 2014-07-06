@@ -103,9 +103,9 @@ class Writer extends Dom
         if ($this->doctype == Writer::RSS) {
             // Set up the RSS child node.
             $rss = new Child('rss');
-            $rss->setAttributes('version', '2.0');
-            $rss->setAttributes('xmlns:content', 'http://purl.org/rss/1.0/modules/content/');
-            $rss->setAttributes('xmlns:wfw', 'http://wellformedweb.org/CommentAPI/');
+            $rss->setAttribute('version', '2.0');
+            $rss->setAttribute('xmlns:content', 'http://purl.org/rss/1.0/modules/content/');
+            $rss->setAttribute('xmlns:wfw', 'http://wellformedweb.org/CommentAPI/');
 
             // Set up the Channel child node and the header children.
             $channel = new Child('channel');
@@ -128,10 +128,10 @@ class Writer extends Dom
         } else if ($this->doctype == Writer::ATOM) {
             // Set up the Feed child node.
             $feed = new Child('feed');
-            $feed->setAttributes('xmlns', 'http://www.w3.org/2005/Atom');
+            $feed->setAttribute('xmlns', 'http://www.w3.org/2005/Atom');
 
             if (isset($this->headers['language'])) {
-                $feed->setAttributes('xml:lang', $this->headers['language']);
+                $feed->setAttribute('xml:lang', $this->headers['language']);
             }
 
             // Set up the header children.
@@ -142,7 +142,7 @@ class Writer extends Dom
                     $feed->addChild($auth);
                 } else if ($key == 'link') {
                     $link = new Child($key);
-                    $link->setAttributes('href', $value);
+                    $link->setAttribute('href', $value);
                     $feed->addChild($link);
                 } else if ($key != 'language') {
                     $val = ((stripos($key, 'date') !== false) || (stripos($key, 'published') !== false)) ?
@@ -157,7 +157,7 @@ class Writer extends Dom
                 foreach ($itm as $key => $value) {
                     if ($key == 'link') {
                         $link = new Child($key);
-                        $link->setAttributes('href', $value);
+                        $link->setAttribute('href', $value);
                         $item->addChild($link);
                     } else {
                         $val = ((stripos($key, 'date') !== false) || (stripos($key, 'published') !== false)) ? date($this->dateFormat, strtotime($value)) : $value;
