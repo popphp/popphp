@@ -15,8 +15,6 @@
  */
 namespace Pop\Graph\Adapter;
 
-use Pop\Color\Space;
-
 /**
  * Line graph class
  *
@@ -84,8 +82,9 @@ class Line extends AbstractAdapter
             $formattedPoints[] = ['x' => $lastX, 'y' => $points->zeroPoint['y']];
             $this->graph->adapter()->drawPolygon($formattedPoints);
         } else {
+            $strokeColor = (null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : [0, 0, 0];
             $this->graph->adapter()->setStrokeWidth($this->graph->getStrokeWidth());
-            $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : new Space\Rgb(0, 0, 0));
+            $this->graph->adapter()->setStrokeColor($strokeColor[0], $strokeColor[1], $strokeColor[2]);
 
             for ($i = 1; $i < count($dataPoints); $i++) {
                 $x1 = ((($dataPoints[$i - 1][0] - $dataPoints[0][0]) / $points->xRange) * $points->xLength) + $points->zeroPoint['x'];

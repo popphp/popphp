@@ -39,9 +39,9 @@ class Pie extends AbstractAdapter
      */
     public function create(array $pie, array $percents, $explode = 0)
     {
-        $total = 0;
+        $total      = 0;
         $textMidPts = array();
-        $textQuads = array();
+        $textQuads  = array();
         $textValues = array();
 
         foreach ($percents as $value) {
@@ -61,7 +61,7 @@ class Pie extends AbstractAdapter
             } else {
                 $end = $start + $amt;
             }
-            $this->graph->adapter()->setFillColor($value[1]);
+            $this->graph->adapter()->setFillColor($value[1][0], $value[1][1], $value[1][2]);
 
             if ($explode != 0) {
                 $center = array('x' => $pie['x'], 'y' => $pie['y']);

@@ -18,7 +18,7 @@ COMPONENTS
  - Form        [deps: Dom, Validator]
  - Ftp
  - Geo
- - Graph       [deps: Color, Image, Pdf]
+ - Graph       [deps: Image, Pdf]
  - Http
  - I18n
  - Image

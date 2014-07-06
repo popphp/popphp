@@ -15,7 +15,6 @@
  */
 namespace Pop\Graph;
 
-use Pop\Color\Space;
 use Pop\Pdf\Pdf;
 
 /**
@@ -82,25 +81,25 @@ class Graph
 
     /**
      * Font color
-     * @var mixed
+     * @var array
      */
     protected $fontColor = null;
 
     /**
      * Reverse font color
-     * @var mixed
+     * @var array
      */
     protected $reverseFontColor = null;
 
     /**
      * Fill color
-     * @var mixed
+     * @var array
      */
     protected $fillColor = null;
 
     /**
      * Stroke color
-     * @var mixed
+     * @var array
      */
     protected $strokeColor = null;
 
@@ -112,7 +111,7 @@ class Graph
 
     /**
      * Axis color
-     * @var mixed
+     * @var array
      */
     protected $axisColor = null;
 
@@ -142,7 +141,7 @@ class Graph
 
     /**
      * Show X-axis color
-     * @var mixed
+     * @var array
      */
     protected $showXColor = null;
 
@@ -154,7 +153,7 @@ class Graph
 
     /**
      * Show X-axis color
-     * @var mixed
+     * @var array
      */
     protected $showYColor = null;
 
@@ -182,15 +181,15 @@ class Graph
         }
 
         if (isset($options['background']) && is_array($options['background']) && (count($options['background']) == 3)) {
-            $background = new Space\Rgb($options['background'][0], $options['background'][1], $options['background'][2]);
+            $background = $options['background'][0];
         } else {
             $background = null;
         }
 
-        $this->fontColor  = new Space\Rgb(0, 0, 0);
-        $this->axisColor  = new Space\Rgb(0, 0, 0);
-        $this->showXColor = new Space\Rgb(200, 200, 200);
-        $this->showYColor = new Space\Rgb(200, 200, 200);
+        $this->fontColor  = [0, 0, 0];
+        $this->axisColor  = [0, 0, 0];
+        $this->showXColor = [200, 200, 200];
+        $this->showYColor = [200, 200, 200];
 
         if (stripos($options['filename'], '.pdf') !== false) {
             $this->adapter = new Pdf($options['filename'], null, $this->width, $this->height);
@@ -219,13 +218,22 @@ class Graph
     /**
      * Set the axis options
      *
-     * @param  Space\ColorInterface $color
-     * @param  int                  $width
+     * @param  array $color
+     * @param  int   $width
      * @return Graph
      */
-    public function setAxisOptions(Space\ColorInterface $color = null, $width = 2)
+    public function setAxisOptions(array $color = null, $width = 2)
     {
-        $this->axisColor = (null === $color) ? new Space\Rgb(0, 0, 0) : $color;
+        if ((null !== $color) && (count($color) == 3)) {
+            $r = (int)$color[0];
+            $g = (int)$color[1];
+            $b = (int)$color[2];
+        } else {
+            $r = 0;
+            $g = 0;
+            $b = 0;
+        }
+        $this->axisColor = [$r, $g, $b];
         $this->axisWidth = (int)$width;
 
         return $this;
@@ -291,48 +299,56 @@ class Graph
     /**
      * Set the font color
      *
-     * @param  Space\ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return Graph
      */
-    public function setFontColor(Space\ColorInterface $color)
+    public function setFontColor($r = 0, $g = 0, $b = 0)
     {
-        $this->fontColor = $color;
+        $this->fontColor = [(int)$r, (int)$g, (int)$b];
         return $this;
     }
 
     /**
      * Set the reverse font color
      *
-     * @param  Space\ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return Graph
      */
-    public function setReverseFontColor(Space\ColorInterface $color)
+    public function setReverseFontColor($r = 0, $g = 0, $b = 0)
     {
-        $this->reverseFontColor = $color;
+        $this->reverseFontColor = [(int)$r, (int)$g, (int)$b];
         return $this;
     }
 
     /**
      * Set the fill color
      *
-     * @param  Space\ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return Graph
      */
-    public function setFillColor(Space\ColorInterface $color)
+    public function setFillColor($r = 0, $g = 0, $b = 0)
     {
-        $this->fillColor = $color;
+        $this->fillColor = [(int)$r, (int)$g, (int)$b];
         return $this;
     }
 
     /**
      * Set the stroke color
      *
-     * @param  Space\ColorInterface $color
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
      * @return Graph
      */
-    public function setStrokeColor(Space\ColorInterface $color)
+    public function setStrokeColor($r = 0, $g = 0, $b = 0)
     {
-        $this->strokeColor = $color;
+        $this->strokeColor = [(int)$r, (int)$g, (int)$b];
         return $this;
     }
 
@@ -387,28 +403,48 @@ class Graph
     /**
      * Set the 'show X-axis increment lines' flag
      *
-     * @param  boolean                         $showX
-     * @param  Space\ColorInterface $color
+     * @param  boolean $showX
+     * @param  array   $color
      * @return Graph
      */
-    public function showX($showX, Space\ColorInterface $color = null)
+    public function showX($showX, array $color = null)
     {
-        $this->showX = (boolean)$showX;
-        $this->showXColor = (null === $color) ? new Space\Rgb(200, 200, 200) : $color;
+        if ((null !== $color) && (count($color) == 3)) {
+            $r = (int)$color[0];
+            $g = (int)$color[1];
+            $b = (int)$color[2];
+        } else {
+            $r = 200;
+            $g = 200;
+            $b = 200;
+        }
+
+        $this->showX      = (boolean)$showX;
+        $this->showXColor = [$r, $g, $b];
         return $this;
     }
 
     /**
      * Set the 'show Y-axis increment lines' flag
      *
-     * @param  boolean                         $showY
-     * @param  Space\ColorInterface $color
+     * @param  boolean $showY
+     * @param  array   $color
      * @return Graph
      */
-    public function showY($showY, Space\ColorInterface $color = null)
+    public function showY($showY, array $color = null)
     {
-        $this->showY = (boolean)$showY;
-        $this->showYColor = (null === $color) ? new Space\Rgb(200, 200, 200) : $color;
+        if ((null !== $color) && (count($color) == 3)) {
+            $r = (int)$color[0];
+            $g = (int)$color[1];
+            $b = (int)$color[2];
+        } else {
+            $r = 200;
+            $g = 200;
+            $b = 200;
+        }
+
+        $this->showY      = (boolean)$showY;
+        $this->showYColor = [$r, $g, $b];
         return $this;
     }
 
@@ -455,7 +491,7 @@ class Graph
     /**
      * Get the show X color
      *
-     * @return \Pop\Color\Space\ColorInterface
+     * @return array
      */
     public function getXColor()
     {
@@ -465,7 +501,7 @@ class Graph
     /**
      * Get the show Y color
      *
-     * @return \Pop\Color\Space\ColorInterface
+     * @return array
      */
     public function getYColor()
     {
@@ -485,7 +521,7 @@ class Graph
     /**
      * Get the axis color
      *
-     * @return \Pop\Color\Space\ColorInterface
+     * @return array
      */
     public function getAxisColor()
     {
@@ -540,7 +576,7 @@ class Graph
     /**
      * Get the font color
      *
-     * @return mixed
+     * @return array
      */
     public function getFontColor()
     {
@@ -550,7 +586,7 @@ class Graph
     /**
      * Get the reverse font color
      *
-     * @return mixed
+     * @return array
      */
     public function getReverseFontColor()
     {
@@ -560,7 +596,7 @@ class Graph
     /**
      * Get the fill color
      *
-     * @return mixed
+     * @return array
      */
     public function getFillColor()
     {
@@ -570,7 +606,7 @@ class Graph
     /**
      * Get the stroke color
      *
-     * @return mixed
+     * @return array
      */
     public function getStrokeColor()
     {

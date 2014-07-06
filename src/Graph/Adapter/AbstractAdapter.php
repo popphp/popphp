@@ -307,8 +307,8 @@ abstract class AbstractAdapter
                             if ((null !== $prevY) && ($y < $nextY) && ($y < $prevY)) {
                                 $y -= $fontSize * 2;
                                 if (null !== $fillColor) {
-                                    $revColor = (null !== $reverseFontColor) ? $reverseFontColor : new \Pop\Color\Space\Rgb(255, 255, 255);
-                                    $this->graph->adapter()->setFillColor($revColor);
+                                    $revColor = (null !== $reverseFontColor) ? $reverseFontColor : [255, 255, 255];
+                                    $this->graph->adapter()->setFillColor($revColor[0], $revColor[1], $revColor[2]);
                                 }
                             } else if (((null !== $prevY) && ($y < $nextY) && ($y > $prevY)) || ((null === $prevY) && ($y > $nextY))) {
                                 $x -= $strSize * 2;
@@ -319,8 +319,8 @@ abstract class AbstractAdapter
                             if ((null !== $prevY) && ($y > $nextY) && ($y > $prevY)) {
                                 $y += $fontSize * 2;
                                 if (null !== $fillColor) {
-                                    $revColor = (null !== $reverseFontColor) ? $reverseFontColor : new \Pop\Color\Space\Rgb(255, 255, 255);
-                                    $this->graph->adapter()->setFillColor($revColor);
+                                    $revColor = (null !== $reverseFontColor) ? $reverseFontColor : [255, 255, 255];
+                                    $this->graph->adapter()->setFillColor($revColor[0], $revColor[1], $revColor[2]);
                                 }
                             } else if (((null !== $prevY) && ($y > $nextY) && ($y < $prevY)) || ((null === $prevY) && ($y > $nextY))) {
                                 $x -= $strSize * 2;

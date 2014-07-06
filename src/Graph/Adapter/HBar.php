@@ -15,8 +15,6 @@
  */
 namespace Pop\Graph\Adapter;
 
-use Pop\Color\Space;
-
 /**
  * Horizontal graph adapter class
  *
@@ -83,8 +81,9 @@ class HBar extends AbstractAdapter
                 $this->graph->adapter()->drawRectangle($x, $y, $w, $h);
             }
         } else {
+            $strokeColor = (null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : [0, 0, 0];
             $this->graph->adapter()->setStrokeWidth($this->graph->getStrokeWidth());
-            $this->graph->adapter()->setStrokeColor((null !== $this->graph->getStrokeColor()) ? $this->graph->getStrokeColor() : new Space\Rgb(0, 0, 0));
+            $this->graph->adapter()->setStrokeColor($strokeColor[0], $strokeColor[1], $strokeColor[2]);
             for ($i = 0; $i < count($dataPoints); $i++) {
                 if ($this->graph->adapter() instanceof \Pop\Pdf\Pdf) {
                     $y = ($points->zeroPoint['y'] - ($realYDiv * $i)) + ($this->graph->getBarWidth() / 5);
