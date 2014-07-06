@@ -82,7 +82,7 @@ class Db implements WriterInterface
                 $placeholder .= $i;
             }
             $columns[$column] = $placeholder;
-            $params[]         = $value;
+            $params[$column]  = $value;
             $i++;
         }
 
