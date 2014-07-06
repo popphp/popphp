@@ -24,7 +24,7 @@ COMPONENTS
  - Image
  - Log         [deps: Db, Mail]
  - Mail
- - Mvc         [deps: Application, Http]
+ - Mvc         [deps: Http]
  - Nav         [deps: Acl, Dom]
  - Paginator
  - Payment

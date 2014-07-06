@@ -134,8 +134,7 @@ class Controllers
                         'Pop\Http\Response',
                         'Pop\Http\Request',
                         array('Pop\Mvc\Controller', 'C'),
-                        'Pop\Mvc\View',
-                        'Pop\Application\Application'
+                        'Pop\Mvc\View'
                     ));
 
                     // Create the constructor
@@ -144,7 +143,6 @@ class Controllers
                     $construct->addArguments(array(
                         array('name' => 'request', 'value' => 'null', 'type' => 'Request'),
                         array('name' => 'response', 'value' => 'null', 'type' => 'Response'),
-                        array('name' => 'application', 'value' => 'null', 'type' => 'Application'),
                         array('name' => 'viewPath', 'value' => 'null', 'type' => 'string')
                     ));
 
@@ -160,7 +158,7 @@ class Controllers
                                   ->appendToBody("}" . PHP_EOL);
                     }
 
-                    $construct->appendToBody("parent::__construct(\$request, \$response, \$application, \$viewPath);", false);
+                    $construct->appendToBody("parent::__construct(\$request, \$response, \$viewPath);", false);
                     $construct->getDocblock()->setReturn('self');
 
                     $controllerCls->setNamespace($ns);

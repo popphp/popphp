@@ -15,7 +15,6 @@
  */
 namespace Pop\Mvc;
 
-use Pop\Application\Application;
 use Pop\Http\Response;
 use Pop\Http\Request;
 
@@ -45,12 +44,6 @@ class Controller
     protected $response = null;
 
     /**
-     * Application object
-     * @var Application
-     */
-    protected $application = null;
-
-    /**
      * View object
      * @var View
      */
@@ -73,20 +66,16 @@ class Controller
      *
      * Instantiate the controller object
      *
-     * @param  Request     $request
-     * @param  Response    $response
-     * @param  Application $application
-     * @param  string      $viewPath
+     * @param  Request  $request
+     * @param  Response $response
+     * @param  string   $viewPath
      * @return Controller
      */
-    public function __construct(Request $request = null, Response $response = null, Application $application = null, $viewPath = null)
+    public function __construct(Request $request = null, Response $response = null, $viewPath = null)
     {
-        $this->setRequest(((null !== $request) ? $request : new Request()));
+        $this->setRequest(((null !== $request)   ? $request  : new Request()));
         $this->setResponse(((null !== $response) ? $response : new Response()));
 
-        if (null !== $application) {
-            $this->setApplication($application);
-        }
         if (null !== $viewPath) {
             $this->setViewPath($viewPath);
         }
@@ -113,18 +102,6 @@ class Controller
     public function setResponse(Response $response)
     {
         $this->response = $response;
-        return $this;
-    }
-
-    /**
-     * Set the response object
-     *
-     * @param  Application $application
-     * @return Controller
-     */
-    public function setApplication(Application $application)
-    {
-        $this->application = $application;
         return $this;
     }
 
@@ -170,16 +147,6 @@ class Controller
     public function getResponse()
     {
         return $this->response;
-    }
-
-    /**
-     * Get the application object
-     *
-     * @return Application
-     */
-    public function getApplication()
-    {
-        return $this->application;
     }
 
     /**
@@ -255,9 +222,7 @@ class Controller
         }
 
         // Trigger any dispatch events, then send the response
-        $this->application->getEventManager()->trigger('dispatch', array('controller' => $this));
         $this->response->setBody($this->view->render(true));
-        $this->application->getEventManager()->trigger('dispatch.send', array('controller' => $this));
         $this->response->send();
     }
 

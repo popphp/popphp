@@ -121,9 +121,9 @@ class Application
     public function db($dbname)
     {
         if (isset($this->config->databases) &&
-            isset($this->config->databases->$dbname) &&
-            ($this->config->databases->$dbname instanceof \Pop\Db\Adapter\AbstractAdapter)) {
-            return $this->config->databases->$dbname;
+            isset($this->config->databases->{$dbname}) &&
+            ($this->config->databases->{$dbname} instanceof \Pop\Db\Adapter\AbstractAdapter)) {
+            return $this->config->databases->{$dbname};
         } else {
             return null;
         }
@@ -239,13 +239,10 @@ class Application
      * Attach an event. Default event name hook-points are:
      *
      *   route.pre
-     *   route
-     *   route.error
      *   route.post
+     *   route.error
      *
      *   dispatch.pre
-     *   dispatch
-     *   dispatch.send
      *   dispatch.post
      *   dispatch.error
      *
@@ -264,15 +261,12 @@ class Application
      * Detach an event. Default event name hook-points are:
      *
      *   route.pre
-     *   route
-     *   route.error
      *   route.post
+     *   route.error
      *
      *   dispatch.pre
-     *   dispatch
-     *   dispatch.send
-     *   dispatch.error
      *   dispatch.post
+     *   dispatch.error
      *
      * @param  string $name
      * @param  mixed  $action
@@ -387,6 +381,9 @@ class Application
                             }
                         }
                     }
+                } else {
+                    // Trigger any route error events
+                    $this->events->trigger('route.error', ['router' => $this->router]);
                 }
             }
         }

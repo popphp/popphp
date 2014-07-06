@@ -15,7 +15,6 @@
  */
 namespace Pop\Mvc;
 
-use Pop\Application\Application;
 use Pop\Http\Request;
 
 /**
@@ -30,12 +29,6 @@ use Pop\Http\Request;
  */
 class Router
 {
-
-    /**
-     * Application object
-     * @var Application
-     */
-    protected $application = null;
 
     /**
      * Request object
@@ -78,27 +71,25 @@ class Router
      */
     public function __construct(array $controllers = [], Request $request = null)
     {
-        $this->request = (null !== $request) ? $request : new Request();
+        $this->request     = (null !== $request) ? $request : new Request();
         $this->controllers = $controllers;
     }
-
     /**
-     * Add controllers
+     * Add a controller route
      *
-     * @param  array $controller
+     * @param  string $route
+     * @param  string $controller
      * @return Router
      */
-    public function addControllers(array $controller)
+    public function addController($route, $controller)
     {
-        foreach ($controller as $key => $value) {
-            if (!isset($this->controllers[$key])) {
-                $this->controllers[$key] = $value;
+        if (!isset($this->controllers[$route])) {
+            $this->controllers[$route] = $controller;
+        } else {
+            if (is_array($this->controllers[$route]) && is_array($controller)) {
+                $this->controllers[$route] = array_merge_recursive($this->controllers[$route], $controller);
             } else {
-                if (is_array($this->controllers[$key]) && is_array($value)) {
-                    $this->controllers[$key] = array_merge_recursive($this->controllers[$key], $value);
-                } else {
-                    $this->controllers[$key] = $value;
-                }
+                $this->controllers[$route] = $controller;
             }
         }
 
@@ -106,13 +97,18 @@ class Router
     }
 
     /**
-     * Get the application object
+     * Add multiple controller routes
      *
-     * @return Application
+     * @param  array $controllers
+     * @return Router
      */
-    public function getApplication()
+    public function addControllers(array $controllers)
     {
-        return $this->application;
+        foreach ($controllers as $route => $controller) {
+            $this->addController($route, $controller);
+        }
+
+        return $this;
     }
 
     /**
@@ -133,16 +129,6 @@ class Router
     public function getController()
     {
         return $this->controller;
-    }
-
-    /**
-     * Get the application object (shorthand alias)
-     *
-     * @return Application
-     */
-    public function application()
-    {
-        return $this->application;
     }
 
     /**
@@ -229,15 +215,10 @@ class Router
     /**
      * Route to the correct controller
      *
-     * @param  Application $application
      * @return void
      */
-    public function route(Application $application = null)
+    public function route()
     {
-        if (null !== $application) {
-            $this->application = $application;
-        }
-
         // If the request isn't root '/', traverse the URI path
         if ($this->request->getPath(0) != '') {
             $this->controllerClass = $this->traverseControllers($this->controllers);
@@ -254,19 +235,8 @@ class Router
 
             // Create the controller object
             $this->controller = new $this->controllerClass(
-                $this->request->setRequestUri($realUri, $realBasePath),
-                null,
-                $this->application
+                $this->request->setRequestUri($realUri, $realBasePath)
             );
-            // Trigger any route events
-            if (null !== $this->application) {
-                $this->application->getEventManager()->trigger('route', ['router' => $this]);
-            }
-        // Else, trigger any route error events
-        } else {
-            if (null !== $this->application) {
-                $this->application->getEventManager()->trigger('route.error', ['router' => $this]);
-            }
         }
     }
 
