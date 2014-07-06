@@ -15,9 +15,6 @@
  */
 namespace Pop\Shipping\Adapter;
 
-use Pop\Dom\Dom;
-use Pop\Dom\Child;
-
 /**
  * UPS shipping adapter class
  *
@@ -45,15 +42,15 @@ class Ups extends AbstractAdapter
 
     /**
      * Access Request XML
-     * @var \Pop\Dom\Dom
+     * @var string
      */
-    protected $accessRequest = null;
+    protected $accessRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<AccessRequest xml:lang=\"en-US\">";
 
     /**
      * Rate Request XML
-     * @var \Pop\Dom\Dom
+     * @var string
      */
-    protected $rateRequest = null;
+    protected $rateRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<RatingServiceSelectionRequest>";
 
     /**
      * Pickup Types
@@ -185,21 +182,10 @@ class Ups extends AbstractAdapter
     public function __construct($accessKey, $userId, $password)
     {
         $this->userId        = $userId;
-        $this->accessRequest = new Dom(Dom::XML);
-        $this->rateRequest   = new Dom(Dom::XML);
-
-        $access = new Child('AccessRequest');
-        $access->setAttributes('xml:lang', 'en-US');
-
-        $key = new Child('AccessLicenseNumber', $accessKey);
-        $id  = new Child('UserId', $userId);
-        $pwd = new Child('Password', $password);
-
-        $access->addChild($key)
-               ->addChild($id)
-               ->addChild($pwd);
-
-        $this->accessRequest->addChild($access);
+        $this->accessRequest .= PHP_EOL . '    <AccessLicenseNumber>' . $accessKey . '</AccessLicenseNumber>';
+        $this->accessRequest .= PHP_EOL . '    <UserId>' . $userId . '</UserId>';
+        $this->accessRequest .= PHP_EOL . '    <Password>' . $password . '</Password>';
+        $this->accessRequest .= PHP_EOL . '</AccessRequest>' . PHP_EOL;
     }
 
     /**
@@ -441,107 +427,110 @@ class Ups extends AbstractAdapter
      */
     protected function buildRateRequest()
     {
-        $rating      = new Child('RatingServiceSelectionRequest');
-        $request     = new Child('Request');
-        $transaction = new Child('TransactionReference');
-        $pickup      = new Child('PickupType');
-        $shipment    = new Child('Shipment');
+        $this->rateRequest .= PHP_EOL . '    <Request>';
+        $this->rateRequest .= PHP_EOL . '        <TransactionReference>';
+        $this->rateRequest .= PHP_EOL . '            <CustomerContext>Rating and Service</CustomerContext>';
+        $this->rateRequest .= PHP_EOL . '            <XpciVersion>1.0</XpciVersion>';
+        $this->rateRequest .= PHP_EOL . '        </TransactionReference>';
+        $this->rateRequest .= PHP_EOL . '        <RequestAction>Rate</RequestAction>';
+        $this->rateRequest .= PHP_EOL . '        <RequestOption>Shop</RequestOption>';
+        $this->rateRequest .= PHP_EOL . '    </Request>';
+        $this->rateRequest .= PHP_EOL . '    <PickupType>';
+        $this->rateRequest .= PHP_EOL . '        <Code>' . $this->pickupType . '</Code>';
+        $this->rateRequest .= PHP_EOL . '        <Description>' . self::$pickupTypes[$this->pickupType] . '</Description>';
+        $this->rateRequest .= PHP_EOL . '    </PickupType>';
+        $this->rateRequest .= PHP_EOL . '    <Shipment>';
+        $this->rateRequest .= PHP_EOL . '        <Description>Rate</Description>';
+        $this->rateRequest .= PHP_EOL . '        <Shipper>';
+        $this->rateRequest .= PHP_EOL . '            <ShipperNumber>' . $this->userId . '</ShipperNumber>';
+        $this->rateRequest .= PHP_EOL . '            <Address>';
 
-        $customer      = new Child('CustomerContext', 'Rating and Service');
-        $xpci          = new Child('XpciVersion', '1.0');
-        $requestAction = new Child('RequestAction', 'Rate');
-        $requestOption = new Child('RequestOption', 'Shop');
-
-        $transaction->addChild($customer)
-                    ->addChild($xpci);
-
-        $request->addChild($transaction)
-                ->addChild($requestAction)
-                ->addChild($requestOption);
-
-        $pickup->addChild(new Child('Code', $this->pickupType))
-               ->addChild(new Child('Description', self::$pickupTypes[$this->pickupType]));
-
-        $shipment->addChild(new Child('Description', 'Rate'));
-
-        $shipper = new Child('Shipper');
-        $shipper->addChild(new Child('ShipperNumber', $this->userId));
-
-        $shipTo   = new Child('ShipTo');
-        $shipFrom = new Child('ShipFrom');
-
-        if (null !== $this->shipTo['CompanyName']) {
-            $shipTo->addChild(new Child('CompanyName', $this->shipTo['CompanyName']));
-        }
-
-        if (null !== $this->shipFrom['CompanyName']) {
-            $shipFrom->addChild(new Child('CompanyName', $this->shipFrom['CompanyName']));
-        }
-
-        $shipToAddress = new Child('Address');
-        foreach ($this->shipTo as $key => $value) {
-            if ($key !== 'CompanyName') {
-                $shipToAddress->addChild(new Child($key, $value));
-            }
-        }
-
-        $shipFromAddress = new Child('Address');
         foreach ($this->shipFrom as $key => $value) {
             if ($key !== 'CompanyName') {
-                $shipFromAddress->addChild(new Child($key, $value));
+                if (null !== $value) {
+                    $this->rateRequest .= PHP_EOL . '                <' . $key . '>' . $value . '</' . $key . '>';
+                } else {
+                    $this->rateRequest .= PHP_EOL . '                <' . $key . ' />';
+                }
             }
         }
 
-        $shipTo->addChild($shipToAddress);
-        $shipFrom->addChild($shipFromAddress);
-        $shipper->addChild($shipFromAddress);
+        $this->rateRequest .= PHP_EOL . '            </Address>';
+        $this->rateRequest .= PHP_EOL . '        </Shipper>';
+        $this->rateRequest .= PHP_EOL . '        <ShipTo>';
 
-        $service = new Child('Service');
-        $service->addChild(new Child('Code', $this->service))
-                ->addChild(new Child('Description', self::$services[$this->service]));
+        if (null !== $this->shipTo['CompanyName']) {
+            $this->rateRequest .= PHP_EOL . '            <CompanyName>' . $this->shipTo['CompanyName'] . '</CompanyName>';
+        }
 
-        $package = new Child('Package');
+        $this->rateRequest .= PHP_EOL . '            <Address>';
 
-        $packageType = new Child('PackagingType');
-        $packageType->addChild(new Child('Code', $this->packageType))
-                    ->addChild(new Child('Description', self::$packagingTypes[$this->packageType]));
+        foreach ($this->shipTo as $key => $value) {
+            if ($key !== 'CompanyName') {
+                if (null !== $value) {
+                    $this->rateRequest .= PHP_EOL . '                <' . $key . '>' . $value . '</' . $key . '>';
+                } else {
+                    $this->rateRequest .= PHP_EOL . '                <' . $key . ' />';
+                }
+            }
+        }
 
-        $package->addChild($packageType)
-                ->addChild(new Child('Description', 'Rate'));
+        $this->rateRequest .= PHP_EOL . '            </Address>';
+        $this->rateRequest .= PHP_EOL . '        </ShipTo>';
+        $this->rateRequest .= PHP_EOL . '        <ShipFrom>';
+
+        if (null !== $this->shipFrom['CompanyName']) {
+            $this->rateRequest .= PHP_EOL . '            <CompanyName>' . $this->shipFrom['CompanyName'] . '</CompanyName>';
+        }
+
+        $this->rateRequest .= PHP_EOL . '            <Address>';
+
+        foreach ($this->shipFrom as $key => $value) {
+            if ($key !== 'CompanyName') {
+                if (null !== $value) {
+                    $this->rateRequest .= PHP_EOL . '                <' . $key . '>' . $value . '</' . $key . '>';
+                } else {
+                    $this->rateRequest .= PHP_EOL . '                <' . $key . ' />';
+                }
+            }
+        }
+
+        $this->rateRequest .= PHP_EOL . '            </Address>';
+        $this->rateRequest .= PHP_EOL . '        </ShipFrom>';
+        $this->rateRequest .= PHP_EOL . '        <Service>';
+        $this->rateRequest .= PHP_EOL . '            <Code>' . $this->service . '</Code>';
+        $this->rateRequest .= PHP_EOL . '            <Description>' . self::$services[$this->service] . '</Description>';
+        $this->rateRequest .= PHP_EOL . '        </Service>';
+        $this->rateRequest .= PHP_EOL . '        <Package>';
+        $this->rateRequest .= PHP_EOL . '            <PackagingType>';
+        $this->rateRequest .= PHP_EOL . '                <Code>' . $this->packageType . '</Code>';
+        $this->rateRequest .= PHP_EOL . '                <Description>' . self::$packagingTypes[$this->packageType] . '</Description>';
+        $this->rateRequest .= PHP_EOL . '            </PackagingType>';
+        $this->rateRequest .= PHP_EOL . '            <Description>Rate</Description>';
 
         if ((null !== $this->dimensions['Length']) &&
             (null !== $this->dimensions['Width']) &&
             (null !== $this->dimensions['Height'])) {
-            $dimensions = new Child('Dimensions');
-
-            $unit = new Child('UnitOfMeasurement');
-            $unit->addChild(new Child('Code', $this->dimensions['UnitOfMeasurement']));
-            $dimensions->addChild($unit)
-                       ->addChild(new Child('Length', $this->dimensions['Length']))
-                       ->addChild(new Child('Width', $this->dimensions['Width']))
-                       ->addChild(new Child('Height', $this->dimensions['Height']));
-            $package->addChild($dimensions);
+            $this->rateRequest .= PHP_EOL . '            <Dimensions>';
+            $this->rateRequest .= PHP_EOL . '                <UnitOfMeasurement>';
+            $this->rateRequest .= PHP_EOL . '                    <Code>' . $this->dimensions['UnitOfMeasurement'] . '</Code>';
+            $this->rateRequest .= PHP_EOL . '                </UnitOfMeasurement>';
+            $this->rateRequest .= PHP_EOL . '                <Length>' . $this->dimensions['Length'] . '</Length>';
+            $this->rateRequest .= PHP_EOL . '                <Width>' . $this->dimensions['Width'] . '</Width>';
+            $this->rateRequest .= PHP_EOL . '                <Height>' . $this->dimensions['Height'] . '</Height>';
+            $this->rateRequest .= PHP_EOL . '            </Dimensions>';
         }
 
-        $weight = new Child('PackageWeight');
+        $this->rateRequest .= PHP_EOL . '            <PackageWeight>';
+        $this->rateRequest .= PHP_EOL . '                <UnitOfMeasurement>';
+        $this->rateRequest .= PHP_EOL . '                    <Code>' . $this->weight['UnitOfMeasurement'] . '</Code>';
+        $this->rateRequest .= PHP_EOL . '                </UnitOfMeasurement>';
+        $this->rateRequest .= PHP_EOL . '                <Weight>' . $this->weight['Weight'] . '</Weight>';
+        $this->rateRequest .= PHP_EOL . '            </PackageWeight>';
+        $this->rateRequest .= PHP_EOL . '        </Package>';
 
-        $unit = new Child('UnitOfMeasurement');
-        $unit->addChild(new Child('Code', $this->weight['UnitOfMeasurement']));
-        $weight->addChild($unit)
-               ->addChild(new Child('Weight', $this->weight['Weight']));
-
-        $package->addChild($weight);
-        $shipment->addChild($shipper)
-                 ->addChild($shipTo)
-                 ->addChild($shipFrom)
-                 ->addChild($service)
-                 ->addChild($package);
-
-        $rating->addChild($request)
-               ->addChild($pickup)
-               ->addChild($shipment);
-
-        $this->rateRequest->addChild($rating);
+        $this->rateRequest .= PHP_EOL . '    </Shipment>';
+        $this->rateRequest .= PHP_EOL . '</RatingServiceSelectionRequest>' . PHP_EOL;
     }
 
 }

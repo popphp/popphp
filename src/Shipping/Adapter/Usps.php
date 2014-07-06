@@ -15,8 +15,6 @@
  */
 namespace Pop\Shipping\Adapter;
 
-use Pop\Dom\Child;
-
 /**
  * USPS shipping adapter class
  *
@@ -50,9 +48,9 @@ class Usps extends AbstractAdapter
 
     /**
      * Request XML
-     * @var \Pop\Dom\Dom
+     * @var string
      */
-    protected $request = null;
+    protected $request = '<RateV4Request USERID="[{username}]" PASSWORD="[{password}]">';
 
     /**
      * Ship to fields
@@ -121,11 +119,7 @@ class Usps extends AbstractAdapter
     public function __construct($username, $password, $test = false)
     {
         $this->testMode = (bool)$test;
-        $this->request  = new Child('RateV4Request');
-        $this->request->setAttributes([
-            'USERID'   => $username,
-            'PASSWORD' => $password
-        ]);
+        $this->request  = str_replace(['[{username}]', '[{password}]'], [$username, $password], $this->request);
     }
 
     /**
@@ -299,35 +293,35 @@ class Usps extends AbstractAdapter
      */
     protected function buildRequest()
     {
-        $package = new Child('Package');
-        $package->setAttributes('ID', '1ST');
+        $this->request .= PHP_EOL . '    <Package ID="1ST">';
 
-        $package->addChild(new Child('Service', 'ALL'))
-                ->addChild(new Child('ZipOrigination', $this->shipFrom['ZipOrigination']))
-                ->addChild(new Child('ZipDestination', $this->shipTo['ZipDestination']))
-                ->addChild(new Child('Pounds', $this->weight['Pounds']))
-                ->addChild(new Child('Ounces', $this->weight['Ounces']))
-                ->addChild(new Child('Container', $this->container))
-                ->addChild(new Child('Size', $this->containerSize));
+        $this->request .= PHP_EOL . '        <Service>ALL</Service>';
+        $this->request .= PHP_EOL . '        <ZipOrigination>' . $this->shipFrom['ZipOrigination'] . '</ZipOrigination>';
+        $this->request .= PHP_EOL . '        <ZipDestination>' . $this->shipTo['ZipDestination'] . '</ZipDestination>';
+        $this->request .= PHP_EOL . '        <Pounds>' . $this->weight['Pounds'] . '</Pounds>';
+        $this->request .= PHP_EOL . '        <Ounces>' . $this->weight['Ounces'] . '</Ounces>';
+        $this->request .= PHP_EOL . '        <Container>' . $this->container . '</Container>';
+        $this->request .= PHP_EOL . '        <Size>' . $this->containerSize . '</Size>';
 
         if ((null !== $this->dimensions['Length']) &&
             (null !== $this->dimensions['Width']) &&
             (null !== $this->dimensions['Height'])) {
-            $package->addChild(new Child('Width', $this->dimensions['Width']))
-                    ->addChild(new Child('Length', $this->dimensions['Length']))
-                    ->addChild(new Child('Height', $this->dimensions['Height']));
+            $this->request .= PHP_EOL . '        <Width>' . $this->dimensions['Width'] . '</Width>';
+            $this->request .= PHP_EOL . '        <Length>' . $this->dimensions['Length'] . '</Length>';
+            $this->request .= PHP_EOL . '        <Height>' . $this->dimensions['Height'] . '</Height>';
 
             if (null == $this->dimensions['Girth']) {
                 $this->dimensions['Girth'] = (2 * $this->dimensions['Width']) + (2 * $this->dimensions['Height']);
             }
+            $this->request .= PHP_EOL . '        <Girth>' . $this->dimensions['Girth'] . '</Girth>';
 
-            $package->addChild(new Child('Girth', $this->dimensions['Girth']));
         }
 
-        $package->addChild(new Child('Machinable', $this->machinable))
-                ->addChild(new Child('DropOffTime', '12:00'))
-                ->addChild(new Child('ShipDate', date('Y-m-d')));
+        $this->request .= PHP_EOL . '        <Machinable>' . $this->machinable . '</Machinable>';
+        $this->request .= PHP_EOL . '        <DropOffTime>12:00</DropOffTime>';
+        $this->request .= PHP_EOL . '        <ShipDate>' . date('Y-m-d') . '</ShipDate>';
 
-        $this->request->addChild($package);
+        $this->request .= PHP_EOL . '    </Package>';
+        $this->request .= PHP_EOL . '</RateV4Request>';
     }
 }

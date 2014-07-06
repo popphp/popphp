@@ -30,7 +30,7 @@ COMPONENTS
  - Payment
  - Pdf
  - Service
- - Shipping    [deps: Dom]
+ - Shipping
  - Validator
  - Web
  - Cli
