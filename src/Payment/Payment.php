@@ -220,13 +220,13 @@ class Payment
     public function shippingSameAsBilling()
     {
         $this->fields['shipToFirstName'] = $this->fields['firstName'];
-        $this->fields['shipToLastName'] = $this->fields['lastName'];
-        $this->fields['shipToCompany'] = $this->fields['company'];
-        $this->fields['shipToAddress'] = $this->fields['address'];
-        $this->fields['shipToCity'] = $this->fields['city'];
-        $this->fields['shipToState'] = $this->fields['state'];
-        $this->fields['shipToZip'] = $this->fields['zip'];
-        $this->fields['shipToCountry'] = $this->fields['country'];
+        $this->fields['shipToLastName']  = $this->fields['lastName'];
+        $this->fields['shipToCompany']   = $this->fields['company'];
+        $this->fields['shipToAddress']   = $this->fields['address'];
+        $this->fields['shipToCity']      = $this->fields['city'];
+        $this->fields['shipToState']     = $this->fields['state'];
+        $this->fields['shipToZip']       = $this->fields['zip'];
+        $this->fields['shipToCountry']   = $this->fields['country'];
 
         return $this;
     }

@@ -27,10 +27,10 @@ COMPONENTS
  - Mvc         [deps: Application, Http]
  - Nav         [deps: Acl, Dom]
  - Paginator
- - Payment     [deps: Http]
+ - Payment
  - Pdf
  - Service
- - Shipping    [deps: Http, Dom]
+ - Shipping    [deps: Dom]
  - Validator
  - Web
  - Cli

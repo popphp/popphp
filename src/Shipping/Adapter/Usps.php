@@ -15,7 +15,6 @@
  */
 namespace Pop\Shipping\Adapter;
 
-use Pop\Http\Client\Curl;
 use Pop\Dom\Child;
 
 /**
@@ -242,18 +241,20 @@ class Usps extends AbstractAdapter
     {
         $this->buildRequest();
 
-        $url = (($this->testMode) ? $this->testUrl : $this->liveUrl) . rawurlencode($this->request);
         $options = [
-            CURLOPT_HEADER => false
+            CURLOPT_HEADER         => false,
+            CURLOPT_URL            => ((($this->testMode) ? $this->testUrl : $this->liveUrl) . rawurlencode($this->request)),
+            CURLOPT_RETURNTRANSFER => true
         ];
 
         if (!$verifyPeer) {
             $options[CURLOPT_SSL_VERIFYPEER] = false;
         }
 
-        $curl = new Curl($url, $options);
-        $curl->send();
-        $this->response = simplexml_load_string($curl->getBody());
+        $curl = curl_init();
+        curl_setopt_array($curl, $options);
+
+        $this->response = simplexml_load_string($this->parseResponse($curl));
 
         if (isset($this->response->Package)) {
             $this->responseCode = 1;

@@ -15,8 +15,6 @@
  */
 namespace Pop\Payment\Adapter;
 
-use Pop\Http\Client\Curl;
-
 /**
  * TrustCommerce payment adapter class
  *
@@ -163,19 +161,21 @@ class TrustCommerce extends AbstractAdapter
         $this->transaction['demo'] = ($this->test) ? 'y' : 'n';
 
         $options = [
-            CURLOPT_HEADER     => false,
-            CURLOPT_POST       => true,
-            CURLOPT_POSTFIELDS => $this->buildPostString()
+            CURLOPT_HEADER         => false,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $this->buildPostString(),
+            CURLOPT_URL            => $this->url,
+            CURLOPT_RETURNTRANSFER => true
         ];
 
         if (!$verifyPeer) {
             $options[CURLOPT_SSL_VERIFYPEER] = false;
         }
 
-        $curl = new Curl($this->url, $options);
-        $curl->send();
+        $curl = curl_init();
+        curl_setopt_array($curl, $options);
 
-        $this->response      = $curl->getResponse();
+        $this->response      = $this->parseResponse($curl);
         $this->responseCodes = $this->parseResponseCodes();
         $this->responseCode  = (isset($this->responseCodes['transid']) ? $this->responseCodes['transid'] : null);
         $this->message       = $this->responseCodes['status'];
@@ -202,8 +202,8 @@ class TrustCommerce extends AbstractAdapter
     {
         $post = $this->transaction;
 
-        $post['cc'] = $this->filterCardNum($post['cc']);
-        $post['exp'] = $this->filterExpDate($post['exp']);
+        $post['cc']     = $this->filterCardNum($post['cc']);
+        $post['exp']    = $this->filterExpDate($post['exp']);
         $post['amount'] = str_replace('.', '', $post['amount']);
 
         if ((null !== $post['fname']) && (null !== $post['lname'])) {
@@ -213,7 +213,7 @@ class TrustCommerce extends AbstractAdapter
         }
 
         if ((null !== $post['shipto_fname']) && (null !== $post['shipto_lname'])) {
-            $post['shipto_name'] =  $post['shipto_fname'] . ' ' . $post['shipto_lname'];
+            $post['shipto_name'] = $post['shipto_fname'] . ' ' . $post['shipto_lname'];
             unset($post['shipto_fname']);
             unset($post['shipto_lname']);
         }

@@ -15,7 +15,6 @@
  */
 namespace Pop\Shipping\Adapter;
 
-use Pop\Http\Client\Curl;
 use Pop\Dom\Dom;
 use Pop\Dom\Child;
 
@@ -386,18 +385,21 @@ class Ups extends AbstractAdapter
         $this->buildRateRequest();
 
         $options = [
-            CURLOPT_POST       => true,
-            CURLOPT_POSTFIELDS => $this->accessRequest . $this->rateRequest,
-            CURLOPT_HEADER     => false
+            CURLOPT_HEADER         => false,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $this->accessRequest . $this->rateRequest,
+            CURLOPT_URL            => $this->url,
+            CURLOPT_RETURNTRANSFER => true
         ];
 
         if (!$verifyPeer) {
             $options[CURLOPT_SSL_VERIFYPEER] = false;
         }
 
-        $curl = new Curl($this->url, $options);
-        $curl->send();
-        $this->response     = simplexml_load_string($curl->getBody());
+        $curl = curl_init();
+        curl_setopt_array($curl, $options);
+
+        $this->response     = simplexml_load_string($this->parseResponse($curl));
         $this->responseCode = (int)$this->response->Response->ResponseStatusCode;
 
         if ($this->responseCode == 1) {

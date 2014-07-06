@@ -15,8 +15,6 @@
  */
 namespace Pop\Payment\Adapter;
 
-use Pop\Http\Client\Curl;
-
 /**
  * USAEPay payment adapter class
  *
@@ -164,21 +162,22 @@ class UsaEpay extends AbstractAdapter
             throw new Exception('The required transaction data has not been set.');
         }
 
-        $url = ($this->test) ? $this->testUrl : $this->liveUrl;
         $options = [
-            CURLOPT_HEADER     => false,
-            CURLOPT_POST       => true,
-            CURLOPT_POSTFIELDS => $this->buildPostString()
+            CURLOPT_HEADER         => false,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $this->buildPostString(),
+            CURLOPT_URL            => (($this->test) ? $this->testUrl : $this->liveUrl),
+            CURLOPT_RETURNTRANSFER => true
         ];
 
         if (!$verifyPeer) {
             $options[CURLOPT_SSL_VERIFYPEER] = false;
         }
 
-        $curl = new Curl($url, $options);
-        $curl->send();
+        $curl = curl_init();
+        curl_setopt_array($curl, $options);
 
-        $this->response      = $curl->getResponse();
+        $this->response      = $this->parseResponse($curl);
         $this->responseCodes = $this->parseResponseCodes();
         $this->responseCode  = $this->responseCodes['UMerrorcode'];
         $this->message       = $this->responseCodes['UMerror'];
@@ -236,7 +235,7 @@ class UsaEpay extends AbstractAdapter
         $codes = [];
 
         foreach ($responseCodes as $value) {
-            $value = urldecode($value);
+            $value    = urldecode($value);
             $valueAry = explode('=', $value);
             $codes[$valueAry[0]] = (!empty($valueAry[1])) ? $valueAry[1] : null;
         }

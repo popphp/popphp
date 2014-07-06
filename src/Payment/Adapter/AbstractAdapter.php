@@ -26,7 +26,6 @@ namespace Pop\Payment\Adapter;
  * @version    2.0.0a
  */
 
-
 abstract class AbstractAdapter implements AdapterInterface
 {
 
@@ -322,6 +321,26 @@ abstract class AbstractAdapter implements AdapterInterface
         }
 
         return $filtered;
+    }
+
+    /**
+     * Parse the curl response
+     *
+     * @param  resource $curl
+     * @return string
+     */
+    protected function parseResponse($curl)
+    {
+        $response = curl_exec($curl);
+
+        if (curl_getinfo($curl, CURLOPT_HEADER)) {
+            $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+            $body       = substr($response, $headerSize);
+        } else {
+            $body       = $response;
+        }
+
+        return $body;
     }
 
 }

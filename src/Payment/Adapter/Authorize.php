@@ -15,8 +15,6 @@
  */
 namespace Pop\Payment\Adapter;
 
-use Pop\Http\Client\Curl;
-
 /**
  * Authorize payment adapter class
  *
@@ -201,20 +199,22 @@ class Authorize extends AbstractAdapter
             throw new Exception('The required transaction data has not been set.');
         }
 
-        $url = ($this->test) ? $this->testUrl : $this->liveUrl;
         $options = [
-            CURLOPT_HEADER     => false,
-            CURLOPT_POST       => true,
-            CURLOPT_POSTFIELDS => $this->buildPostString()
+            CURLOPT_HEADER         => false,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $this->buildPostString(),
+            CURLOPT_URL            => (($this->test) ? $this->testUrl : $this->liveUrl),
+            CURLOPT_RETURNTRANSFER => true
         ];
 
         if (!$verifyPeer) {
             $options[CURLOPT_SSL_VERIFYPEER] = false;
         }
 
-        $curl = new Curl($url, $options);
-        $curl->send();
-        $this->response        = $curl->getResponse();
+        $curl = curl_init();
+        curl_setopt_array($curl, $options);
+
+        $this->response        = $this->parseResponse($curl);
         $this->responseCodes   = explode('|', $this->response);
         $this->responseCode    = $this->responseCodes[0];
         $this->responseSubcode = $this->responseCodes[1];

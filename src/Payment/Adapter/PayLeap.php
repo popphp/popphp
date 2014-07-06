@@ -15,8 +15,6 @@
  */
 namespace Pop\Payment\Adapter;
 
-use Pop\Http\Client\Curl;
-
 /**
  * PayLeap payment adapter class
  *
@@ -150,21 +148,20 @@ class PayLeap extends AbstractAdapter
             throw new Exception('The required transaction data has not been set.');
         }
 
-        $url = ($this->test) ? $this->testUrl : $this->liveUrl;
-        $url .= '?' . $this->buildQueryString();
-
         $options = [
-            CURLOPT_HEADER => false
+            CURLOPT_HEADER         => false,
+            CURLOPT_URL            => (($this->test) ? $this->testUrl : $this->liveUrl) . '?' . $this->buildQueryString(),
+            CURLOPT_RETURNTRANSFER => true
         ];
 
         if (!$verifyPeer) {
             $options[CURLOPT_SSL_VERIFYPEER] = false;
         }
 
-        $curl = new Curl($url, $options);
-        $curl->send();
+        $curl = curl_init();
+        curl_setopt_array($curl, $options);
 
-        $this->response      = $curl->getResponse();
+        $this->response      = $this->parseResponse($curl);
         $this->responseCodes = $this->parseResponseCodes();
         $this->responseCode  = $this->responseCodes['Result'];
         $this->message       = $this->responseCodes['RespMSG'];
