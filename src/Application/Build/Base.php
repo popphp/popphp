@@ -65,10 +65,9 @@ class Base
                 $build->base . DIRECTORY_SEPARATOR .
                 'config' . DIRECTORY_SEPARATOR . 'module.php'
             );
-            $moduleCfg->appendToBody('return new Pop\Config([', true)
-                      ->appendToBody("    '" . $build->name . "' => [")
-                      ->appendToBody("        'base' => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR)")
-                      ->appendToBody('    ]')
+            $moduleCfg->appendToBody('return new Pop\Config([')
+                      ->appendToBody("    'name' => '" . $build->name . "',")
+                      ->appendToBody("    'base' => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR)")
                       ->appendToBody(']);', false)
                       ->save();
         // Else, it's for an application
@@ -85,7 +84,8 @@ class Base
 
             $applicationCfg->appendToBody('return new Pop\Config([')
                            ->appendToBody("    'name'      => '" . $build->name . "',")
-                           ->appendToBody("    'base'      => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR)", false);
+                           ->appendToBody("    'base'      => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR),")
+                           ->appendToBody("    'modules'   => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'modules')", false);
 
             // Add the database config to it
             if (isset($build->databases)) {
@@ -138,6 +138,8 @@ class Base
                 if (null !== $default) {
                     $applicationCfg->appendToBody("," . PHP_EOL . "    'defaultDb' => '" . $default . "'");
                 }
+            } else {
+                $applicationCfg->appendToBody(PHP_EOL, false);
             }
 
             // Save application config
