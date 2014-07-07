@@ -80,7 +80,7 @@ class Record
      * Primary keys
      * @var array
      */
-    protected $primaryKeys = [];
+    protected $primaryKeys = ['id'];
 
     /**
      * Constructor
@@ -394,7 +394,7 @@ class Record
             $this->columns = [];
             $this->rows    = [];
         } else {
-            $this->columns = (array)$rows[0];
+            $this->columns = (isset($rows[0])) ? (array)$rows[0] : [];
             $this->rows    = $rows;
         }
     }
@@ -571,10 +571,13 @@ class Record
 
         $i = 1;
         foreach ($columns as $column => $value) {
+            $operator = static::getOperator($column);
             if ($placeholder == ':') {
-                $placeholder .= $column;
+                $pHolder = $placeholder . $operator['column'];
             } else if ($placeholder == '$') {
-                $placeholder .= $i;
+                $pHolder = $placeholder . $i;
+            } else {
+                $pHolder = $placeholder;
             }
 
             // IS NULL or IS NOT NULL
@@ -607,20 +610,49 @@ class Record
                 (substr($value, 0, 1) == '%') || (substr($value, -1) == '%')) {
                 $op = ((substr($value, 0, 2) == '-%') || (substr($value, -2) == '%-')) ? 'NOT LIKE' : 'LIKE';
 
-                $where[]  = $column . ' ' . $op . ' ' .  $placeholder;
+                $where[]  = $column . ' ' . $op . ' ' .  $pHolder;
                 if (substr($value, 0, 2) == '-%') {
                     $value = substr($value, 1);
                 }
                 if (substr($value, -2) == '%-') {
                     $value = substr($value, 0, -1);
                 }
-                $params[$column] = $value;
+                if (isset($params[$column])) {
+                    if (is_array($params[$column])) {
+                        if ($placeholder == ':') {
+                            $where[count($where) - 1] .= $i;
+                        }
+                        $params[$column][] = $value;
+                    } else {
+                        if ($placeholder == ':') {
+                            $where[0] .= ($i - 1);
+                            $where[1] .= $i;
+                        }
+                        $params[$column] = [$params[$column], $value];
+                    }
+                } else {
+                    $params[$column] = $value;
+                }
             // Standard operators
             } else {
-                $op = static::getOperator($column);
-                $column          = $op['column'];
-                $where[]         = $column . ' ' . $op['op'] . ' ' .  $placeholder;
-                $params[$column] = $value;
+                $column          = $operator['column'];
+                $where[]         = $column . ' ' . $operator['op'] . ' ' .  $pHolder;
+                if (isset($params[$column])) {
+                    if (is_array($params[$column])) {
+                        if ($placeholder == ':') {
+                            $where[count($where) - 1] .= $i;
+                        }
+                        $params[$column][] = $value;
+                    } else {
+                        if ($placeholder == ':') {
+                            $where[0] .= ($i - 1);
+                            $where[1] .= $i;
+                        }
+                        $params[$column] = [$params[$column], $value];
+                    }
+                } else {
+                    $params[$column] = $value;
+                }
             }
 
             $i++;
