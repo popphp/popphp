@@ -430,10 +430,10 @@ abstract class AbstractImage
         $this->filename  = $parts['filename'];
         $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
 
-        if (null === $this->extension) {
+        if ((null === $this->extension) || (!isset($this->allowed[strtolower($this->extension)]))) {
             throw new Exception('Error: That image file does not have the correct extension.');
         } else {
-            $this->mime = $this->allowed[$this->extension];
+            $this->mime = $this->allowed[strtolower($this->extension)];
         }
     }
 

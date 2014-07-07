@@ -255,7 +255,7 @@ class Pdf
         $this->filename  = $parts['filename'];
         $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
 
-        if ((null === $this->extension) || ($this->extension != 'pdf')) {
+        if ((null === $this->extension) || (strtolower($this->extension) != 'pdf')) {
             throw new Exception('Error: That pdf file does not have the correct extension.');
         }
 

@@ -1155,7 +1155,7 @@ class Imagick extends AbstractImage
         // Else, save the image as the new type.
         $old = $this->extension;
         $this->extension = $type;
-        $this->mime = $this->allowed[$this->extension];
+        $this->mime = $this->allowed[strtolower($this->extension)];
         $this->fullpath = $this->dir . $this->filename . '.' . $this->extension;
         $this->basename = basename($this->fullpath);
 

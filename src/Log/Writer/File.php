@@ -103,12 +103,12 @@ class File implements WriterInterface
         $this->filename  = $parts['filename'];
         $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
 
-        if ((count($this->allowed) > 0) && !isset($this->allowed[$this->extension])) {
+        if ((count($this->allowed) > 0) && !isset($this->allowed[strtolower($this->extension)])) {
             throw new Exception('Error: That log file type is not allowed.');
         }
 
         if (null !== $this->extension) {
-            $this->mime = $this->allowed[$this->extension];
+            $this->mime = $this->allowed[strtolower($this->extension)];
         }
     }
 

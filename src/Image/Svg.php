@@ -218,10 +218,10 @@ class Svg
         $this->filename  = $parts['filename'];
         $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
 
-        if ((null === $this->extension) || ($this->extension != 'svg')) {
+        if ((null === $this->extension) || (strtolower($this->extension) != 'svg')) {
             throw new Exception('Error: That SVG file does not have the correct extension.');
         } else {
-            $this->mime = $this->allowed[$this->extension];
+            $this->mime = $this->allowed[strtolower($this->extension)];
         }
 
         // If SVG image exists, get image info and store in an array.

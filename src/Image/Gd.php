@@ -1024,7 +1024,7 @@ class Gd extends AbstractImage
             // Change the type of the image object to the new,
             // requested image type.
             $this->extension = $type;
-            $this->mime      = $this->allowed[$this->extension];
+            $this->mime      = $this->allowed[strtolower($this->extension)];
 
             // Redefine the image object properties with the new values.
             $this->fullpath = $this->dir . $this->filename . '.' . $this->extension;
@@ -1037,7 +1037,7 @@ class Gd extends AbstractImage
                 // Change the type of the image object to the new,
                 // requested image type.
                 $this->extension = $type;
-                $this->mime = $this->allowed[$this->extension];
+                $this->mime = $this->allowed[strtolower($this->extension)];
 
                 // Redefine the image object properties with the new values.
                 $this->fullpath = $this->dir . $this->filename . '.' . $this->extension;
@@ -1051,7 +1051,7 @@ class Gd extends AbstractImage
                 // Change the type of the image object to the new,
                 // requested image type.
                 $this->extension = $type;
-                $this->mime      = $this->allowed[$this->extension];
+                $this->mime      = $this->allowed[strtolower($this->extension)];
 
                 // Redefine the image object properties with the new values.
                 $this->fullpath = $this->dir . $this->filename . '.' . $this->extension;

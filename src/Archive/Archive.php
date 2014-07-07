@@ -110,11 +110,11 @@ class Archive
         if (null === $this->extension) {
             throw new Exception('Error: Unable able to detect archive extension or mime type.');
         }
-        if (!isset($this->allowed[$this->extension])) {
+        if (!isset($this->allowed[strtolower($this->extension)])) {
             throw new Exception('Error: That archive type is not allowed.');
         }
 
-        $this->mime = $this->allowed[$this->extension];
+        $this->mime = $this->allowed[strtolower($this->extension)];
         $this->setAdapter($password, $prefix);
     }
 

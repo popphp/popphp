@@ -211,11 +211,11 @@ abstract class AbstractFont
             throw new Exception('Error: That font file does not have an extension.');
         }
 
-        if ((null !== $this->extension) && !isset($this->allowed[$this->extension])) {
+        if ((null !== $this->extension) && !isset($this->allowed[strtolower($this->extension)])) {
             throw new Exception('Error: That font file type is not allowed.');
         }
 
-        $this->mime = $this->allowed[$this->extension];
+        $this->mime = $this->allowed[strtolower($this->extension)];
     }
 
     /**
