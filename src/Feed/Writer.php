@@ -15,9 +15,6 @@
  */
 namespace Pop\Feed;
 
-use Pop\Dom\Dom;
-use Pop\Dom\Child;
-
 /**
  * Feed writer class
  *
@@ -28,7 +25,7 @@ use Pop\Dom\Child;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Writer extends Dom
+class Writer
 {
 
     /**
@@ -47,39 +44,201 @@ class Writer extends Dom
      * Feed date format
      * @var string
      */
-    protected $dateFormat = null;
+    protected $dateFormat = 'D, j M Y H:i:s O';
+
+    /**
+     * Feed type
+     * @var boolean
+     */
+    protected $atom = false;
+
+    /**
+     * Feed output
+     * @var string
+     */
+    protected $output = null;
+
+    /**
+     * Document charset
+     * @var string
+     */
+    protected $charset = 'utf-8';
 
     /**
      * Constructor
      *
      * Instantiate the feed object.
      *
-     * @param  array  $headers
-     * @param  array  $items
-     * @param  mixed  $type
-     * @param  string $date
-     * @return \Pop\Feed\Writer
+     * @param  array   $headers
+     * @param  array   $items
+     * @return Writer
      */
-    public function __construct($headers, $items, $type = Writer::RSS, $date = 'D, j M Y H:i:s O')
+    public function __construct($headers, $items)
     {
-        $this->headers    = $headers;
-        $this->items      = $items;
-        $this->dateFormat = $date;
+        $this->setHeaders($headers);
+        $this->setItems($items);
+    }
 
-        parent::__construct($type, 'utf-8');
-        $this->init();
+    /**
+     * Set a header
+     *
+     * @param  string $header
+     * @param  string $value
+     * @return Writer
+     */
+    public function setHeader($header, $value)
+    {
+        $this->headers[$header] = $value;
+        return $this;
+    }
+
+    /**
+     * Set the headers
+     *
+     * @param  array $headers
+     * @return Writer
+     */
+    public function setHeaders($headers)
+    {
+        $this->headers = $headers;
+        return $this;
+    }
+
+    /**
+     * Set all items
+     *
+     * @param  array $items
+     * @throws Exception
+     * @return Writer
+     */
+    public function setItems(array $items)
+    {
+        if (count($items) == 0) {
+            throw new Exception('Error: The items array must not be empty.');
+        }
+        if (!is_array(array_values($items)[0])) {
+            throw new Exception('Error: The items array must contain arrays of scalar values.');
+        }
+
+        $this->items = $items;
+        return $this;
+    }
+
+    /**
+     * Add an item
+     *
+     * @param  array $item
+     * @throws Exception
+     * @return Writer
+     */
+    public function addItem(array $item)
+    {
+        if (count($item) == 0) {
+            throw new Exception('Error: The item array must not be empty.');
+        }
+
+        if (is_array(array_values($item)[0])) {
+            throw new Exception('Error: The item array must not contain scalar values.');
+        }
+
+        $this->items = array_merge($this->items, $item);
+        return $this;
+    }
+
+    /**
+     * Add items
+     *
+     * @param  array $items
+     * @throws Exception
+     * @return Writer
+     */
+    public function addItems(array $items)
+    {
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                throw new Exception('Error: The item array must contain arrays of scalar values.');
+            }
+            $this->addItem($item);
+        }
+
+        return $this;
     }
 
     /**
      * Set the date format
      *
      * @param  string $date
-     * @return \Pop\Feed\Writer
+     * @return Writer
      */
     public function setDateFormat($date)
     {
         $this->dateFormat = $date;
         return $this;
+    }
+
+    /**
+     * Method to set the  charset.
+     *
+     * @param  string $char
+     * @return Writer
+     */
+    public function setCharset($char)
+    {
+        $this->charset = $char;
+        return $this;
+    }
+
+    /**
+     * Set the feed to an ATOM feed
+     *
+     * @return Writer
+     */
+    public function setAtom()
+    {
+        $this->atom = true;
+        return $this;
+    }
+
+    /**
+     * Set the feed to an RSS feed
+     *
+     * @return Writer
+     */
+    public function setRss()
+    {
+        $this->atom = false;
+        return $this;
+    }
+
+    /**
+     * Get a header
+     *
+     * @param  string $header
+     * @return mixed
+     */
+    public function getHeader($header)
+    {
+        return (isset($this->headers[$header]) ? $this->headers[$header] : null);
+    }
+
+    /**
+     * Get the headers
+     *
+     * @return string
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * Get the items
+     *
+     * @return array
+     */
+    public function getItems()
+    {
+        return $this->items;
     }
 
     /**
@@ -93,6 +252,69 @@ class Writer extends Dom
     }
 
     /**
+     * Method to return the charset.
+     *
+     * @return string
+     */
+    public function getCharset()
+    {
+        return $this->charset;
+    }
+
+    /**
+     * Determine if the feed is an ATOM feed
+     *
+     * @return boolean
+     */
+    public function isAtom()
+    {
+        return $this->atom;
+    }
+
+    /**
+     * Determine if the feed is an RSS feed
+     *
+     * @return boolean
+     */
+    public function isRss()
+    {
+        return (!$this->atom);
+    }
+
+    /**
+     * Method to render the document and its child elements.
+     *
+     * @param  boolean $ret
+     * @return mixed
+     */
+    public function render($ret = false)
+    {
+        $this->init();
+
+        // If the return flag is passed, return output.
+        if ($ret) {
+            return $this->output;
+            // Else, print output.
+        } else {
+            if (!headers_sent()) {
+                header("HTTP/1.1 200 OK");
+                header("Content-type: " . (($this->atom) ? 'application/atom+xml' : 'application/rss+xml'));
+            }
+            echo $this->output;
+        }
+    }
+
+    /**
+     * Render Dom object to string
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->render(true);
+    }
+
+    /**
      * Initialize the feed.
      *
      * @throws Exception
@@ -100,77 +322,57 @@ class Writer extends Dom
      */
     protected function init()
     {
-        if ($this->doctype == Writer::RSS) {
-            // Set up the RSS child node.
-            $rss = new Child('rss');
-            $rss->setAttribute('version', '2.0');
-            $rss->setAttribute('xmlns:content', 'http://purl.org/rss/1.0/modules/content/');
-            $rss->setAttribute('xmlns:wfw', 'http://wellformedweb.org/CommentAPI/');
+        $this->output = str_replace('[{charset}]', $this->charset, "<?xml version=\"1.0\" encoding=\"[{charset}]\"?>\n");
 
-            // Set up the Channel child node and the header children.
-            $channel = new Child('channel');
-            foreach ($this->headers as $key => $value) {
-                $channel->addChild(new Child($key, $value));
-            }
-
-            // Set up the Item child nodes and add them to the Channel child node.
-            foreach ($this->items as $itm) {
-                $item = new Child('item');
-                foreach ($itm as $key => $value) {
-                    $item->addChild(new Child($key, $value));
-                }
-                $channel->addChild($item);
-            }
-
-            // Add the Channel child node to the RSS child node, add the RSS child node to the DOM.
-            $rss->addChild($channel);
-            $this->addChild($rss);
-        } else if ($this->doctype == Writer::ATOM) {
-            // Set up the Feed child node.
-            $feed = new Child('feed');
-            $feed->setAttribute('xmlns', 'http://www.w3.org/2005/Atom');
-
-            if (isset($this->headers['language'])) {
-                $feed->setAttribute('xml:lang', $this->headers['language']);
-            }
-
-            // Set up the header children.
-            foreach ($this->headers as $key => $value) {
-                if ($key == 'author') {
-                    $auth = new Child($key);
-                    $auth->addChild(new Child('name', $value));
-                    $feed->addChild($auth);
-                } else if ($key == 'link') {
-                    $link = new Child($key);
-                    $link->setAttribute('href', $value);
-                    $feed->addChild($link);
-                } else if ($key != 'language') {
-                    $val = ((stripos($key, 'date') !== false) || (stripos($key, 'published') !== false)) ?
-                        date($this->dateFormat, strtotime($value)) : $value;
-                    $feed->addChild(new Child($key, $val));
-                }
-            }
-
-            // Set up the Entry child nodes and add them to the Feed child node.
-            foreach ($this->items as $itm) {
-                $item = new Child('entry');
-                foreach ($itm as $key => $value) {
-                    if ($key == 'link') {
-                        $link = new Child($key);
-                        $link->setAttribute('href', $value);
-                        $item->addChild($link);
-                    } else {
-                        $val = ((stripos($key, 'date') !== false) || (stripos($key, 'published') !== false)) ? date($this->dateFormat, strtotime($value)) : $value;
-                        $item->addChild(new Child($key, $val));
-                    }
-                }
-                $feed->addChild($item);
-            }
-
-            // Add the Feed child node to the DOM.
-            $this->addChild($feed);
+        if ($this->atom) {
+            $this->output .= '<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="' . (isset($this->headers['language']) ? $this->headers['language'] : 'en') . '">' . PHP_EOL;
+            $indent   = '    ';
+            $itemNode = 'entry';
         } else {
-            throw new Exception('Error: The feed type must be only RSS or ATOM.');
+            $this->output .= '<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/">' . PHP_EOL;
+            $this->output .= '    <channel>' . PHP_EOL;
+            $indent   = '        ';
+            $itemNode = 'item';
+        }
+
+        foreach ($this->headers as $header => $value) {
+            if ((stripos($header, 'pubdate') !== false) ||
+                (stripos($header, 'published') !== false) ||
+                (stripos($header, 'updated') !== false)) {
+                $value = date($this->dateFormat, strtotime($value));
+            }
+            if (($this->atom) && ($header == 'author')) {
+                $this->output .= $indent . '<' . $header . '>' . PHP_EOL . $indent .
+                    '    <name>' . $value . '</name>' . PHP_EOL . $indent . '</' . $header . '>' . PHP_EOL;
+            } else if (($this->atom) && ($header == 'link')) {
+                $this->output .= $indent . '<' . $header . ' href="' . $value . '" />' . PHP_EOL;
+            } else if ((($this->atom) && ($header != 'language')) || (!$this->atom)) {
+                $this->output .= $indent . '<' . $header . '>' . $value . '</' . $header . '>' . PHP_EOL;
+            }
+        }
+
+        foreach ($this->items as $item) {
+            $this->output .= $indent . '<' . $itemNode . '>' . PHP_EOL;
+            foreach ($item as $key => $value) {
+                if ((stripos($key, 'pubdate') !== false) ||
+                    (stripos($key, 'published') !== false) ||
+                    (stripos($key, 'updated') !== false)) {
+                    $value = date($this->dateFormat, strtotime($value));
+                }
+                if (($this->atom) && ($key == 'link')) {
+                    $this->output .= $indent . '    <' . $key . ' href="' . $value . '" />' . PHP_EOL;
+                } else {
+                    $this->output .= $indent . '    <' . $key . '>' . $value . '</' . $key . '>' . PHP_EOL;
+                }
+            }
+            $this->output .= $indent . '</' . $itemNode . '>' . PHP_EOL;
+        }
+
+        if ($this->atom) {
+            $this->output .= '</feed>' . PHP_EOL;
+        } else {
+            $this->output .= '    </channel>' . PHP_EOL;
+            $this->output .= '</rss>' . PHP_EOL;
         }
     }
 

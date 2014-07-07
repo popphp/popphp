@@ -15,8 +15,6 @@
  */
 namespace Pop\Feed\Format;
 
-use Pop\I18n\I18n;
-
 /**
  * Abstract feed format class
  *

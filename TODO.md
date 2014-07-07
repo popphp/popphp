@@ -12,7 +12,7 @@ COMPONENTS
  - Db
  - Dom
  - Event
- - Feed        [deps: Dom]
+ - Feed
  - File
  - Filter
  - Form        [deps: Dom, Validator]
