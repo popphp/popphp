@@ -86,8 +86,8 @@ class Dbs
         if (is_string($dir) && file_exists($dir) && (strtolower(substr($dir, -4)) == '.sql')) {
             $sqlFiles[] = $dir;
         } else {
-            $dir = new \Pop\File\Dir($dir, true);
-            foreach ($dir->getFiles() as $file) {
+            $files = scandir($dir);
+            foreach ($files as $file) {
                 if (strtolower(substr($file, -4)) == '.sql') {
                     $sqlFiles[] = $file;
                 }

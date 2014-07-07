@@ -15,6 +15,8 @@
  */
 namespace Pop\Application\Build;
 
+use Pop\Code\Generator;
+
 /**
  * Base install class
  *
@@ -61,7 +63,7 @@ class Base
         // If configuration is for a module
         if (isset($build->module) && ($build->module)) {
             // Create module.php file
-            $moduleCfg = new \Pop\Code\Generator(
+            $moduleCfg = new Generator(
                 $build->base . DIRECTORY_SEPARATOR .
                 'config' . DIRECTORY_SEPARATOR . 'module.php'
             );
@@ -77,7 +79,7 @@ class Base
             }
 
             // Create application.php file
-            $applicationCfg = new \Pop\Code\Generator(
+            $applicationCfg = new Generator(
                 $build->base . DIRECTORY_SEPARATOR .
                 'config' . DIRECTORY_SEPARATOR . 'application.php'
             );

@@ -15,6 +15,8 @@
  */
 namespace Pop\Application\Build;
 
+use Pop\Code\Generator;
+
 /**
  * Bootstrap install class
  *
@@ -65,7 +67,7 @@ class Bootstrap
         }
 
         // Create new Code file object
-        $bootstrap = new \Pop\Code\Generator($build->docroot . '/bootstrap.php');
+        $bootstrap = new Generator($build->docroot . '/bootstrap.php');
 
         // Create new bootstrap file
         if (!file_exists($build->docroot . '/bootstrap.php')) {

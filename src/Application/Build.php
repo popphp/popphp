@@ -126,8 +126,8 @@ class Build
                 }
             } else {
                 $sqlFiles = [];
-                $dir      = new \Pop\File\Dir($buildDir, true);
-                foreach ($dir->getFiles() as $file) {
+                $files    = scandir($buildDir);
+                foreach ($files as $file) {
                     if (strtolower(substr($file, -4)) == '.sql') {
                         $sqlFiles[] = $file;
                     }
@@ -136,8 +136,8 @@ class Build
                     $appConfig = include $build->base . '/../../config/application.php';
                     $tableFiles = [];
 
-                    $dir = new \Pop\File\Dir($build->base . '/../../src/Table', true);
-                    foreach ($dir->getFiles() as $file) {
+                    $files = scandir($build->base . '/../../src/Table');
+                    foreach ($files as $file) {
                         $tableFiles[] = $file;
                     }
 

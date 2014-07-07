@@ -1,7 +1,7 @@
 COMPONENTS
 ----------
  - Acl
- - Application [deps: Code, Config, Db, Event, File, Http, Mvc, Service]
+ - Application [deps: Code, Config, Db, Event, Http, Mvc, Service]
  - Archive
  - Auth
  - Cache
