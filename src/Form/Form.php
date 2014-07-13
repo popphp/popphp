@@ -27,26 +27,8 @@ use Pop\Dom\Child;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Form extends \Pop\Dom\Dom
+class Form extends Child
 {
-
-    /**
-     * Form element node
-     * @var \Pop\Dom\Child
-     */
-    protected $form = null;
-
-    /**
-     * Form action
-     * @var string
-     */
-    protected $action = null;
-
-    /**
-     * Form method
-     * @var string
-     */
-    protected $method = null;
 
     /**
      * Form template for HTML formatting.
@@ -67,10 +49,10 @@ class Form extends \Pop\Dom\Dom
     protected $groups = [];
 
     /**
-     * Form init field values
+     * Form field configuration values
      * @var array
      */
-    protected $initFieldsValues = [];
+    protected $fieldConfig = [];
 
     /**
      * Global Form error display format
@@ -97,28 +79,26 @@ class Form extends \Pop\Dom\Dom
      */
     public function __construct($action = null, $method = 'post', array $fields = null, $indent = null)
     {
-        // Set the form's action and method.
-        $this->action = (null !== $action) ? $action : $_SERVER['REQUEST_URI'];
-        $this->method = $method;
+        parent::__construct('form');
 
-        // Create the parent DOM element and the form child element.
-        parent::__construct(null, 'utf-8', null, $indent);
-        $this->form = new Child('form', null, null, false, $indent);
-        $this->form->setAttributes(['action' => $this->action, 'method' => $this->method]);
-        $this->addChild($this->form);
+        $this->setIndent($indent);
+        $this->setAttributes([
+            'action' => ((null !== $action) ? $action : $_SERVER['REQUEST_URI']),
+            'method' => $method
+        ]);
 
         if (null !== $fields) {
-            $this->setFields($fields);
+            $this->setFieldConfig($fields);
         }
     }
 
     /**
-     * Set the fields of the form object.
+     * Set the field config
      *
      * @param  array $fields
      * @return Form
      */
-    public function setFields(array $fields)
+    public function setFieldConfig(array $fields)
     {
         $keys = array_keys($fields);
         if (is_numeric($keys[0])) {
@@ -130,7 +110,6 @@ class Form extends \Pop\Dom\Dom
                         $this->hasFile = true;
                     }
                 }
-
             }
         } else {
             foreach ($fields as $name => $value) {
@@ -142,55 +121,44 @@ class Form extends \Pop\Dom\Dom
             }
         }
 
-        $this->initFieldsValues = (count($this->initFieldsValues) > 0) ? array_merge($this->initFieldsValues, $fields) : $fields;
+        $this->fieldConfig = (count($this->fieldConfig) > 0) ? array_merge($this->fieldConfig, $fields) : $fields;
 
         return $this;
     }
 
     /**
-     * Set a single field in $initFieldsValues
+     * Add a single field config
      *
      * @param  string $name
      * @param  array  $field
      * @return Form
      */
-    public function setField($name, array $field)
+    public function addFieldConfig($name, array $field)
     {
         $match = false;
-        if (array_key_exists($name, $this->initFieldsValues)) {
-            $this->initFieldsValues[$name] = $field;
+        if (array_key_exists($name, $this->fieldConfig)) {
+            $this->fieldConfig[$name] = $field;
             $match = true;
         } else {
-            foreach ($this->initFieldsValues as $key => $value) {
+            foreach ($this->fieldConfig as $key => $value) {
                 if (array_key_exists($name, $value)) {
-                    $this->initFieldsValues[$key][$name] = $field;
+                    $this->fieldConfig[$key][$name] = $field;
                     $match = true;
                 }
             }
         }
 
         if (!$match) {
-            $keys = array_keys($this->initFieldsValues);
+            $keys = array_keys($this->fieldConfig);
             if (is_numeric($keys[0])) {
                 $last = $keys[(count($keys) - 1)];
-                $this->initFieldsValues[$last][$name] = $field;
+                $this->fieldConfig[$last][$name] = $field;
             } else {
-                $this->initFieldsValues[$name] = $field;
+                $this->fieldConfig[$name] = $field;
             }
         }
 
         return $this;
-    }
-
-    /**
-     * Alias for setFields()
-     *
-     * @param  array $fields
-     * @return Form
-     */
-    public function addFields(array $fields)
-    {
-        $this->setFields($fields);
     }
 
     /**
@@ -209,23 +177,23 @@ class Form extends \Pop\Dom\Dom
         }
 
         // Loop through the initial fields values and build the fields
-        // based on the _initFieldsValues property.
-        if (count($this->initFieldsValues) > 0) {
+        // based on the _fieldConfig property.
+        if (count($this->fieldConfig) > 0) {
             // If the fields are a group of fields
-            $keys = array_keys($this->initFieldsValues);
+            $keys = array_keys($this->fieldConfig);
             if (is_numeric($keys[0])) {
                 $fields = [];
-                foreach ($this->initFieldsValues as $ary) {
+                foreach ($this->fieldConfig as $ary) {
                     $k = array_keys($ary);
                     if (isset($k[0])) {
                         $this->groups[] = $k[0];
                     }
                     $fields = array_merge($fields, $ary);
                 }
-                $this->initFieldsValues = $fields;
+                $this->fieldConfig = $fields;
             }
 
-            foreach ($this->initFieldsValues as $name => $field) {
+            foreach ($this->fieldConfig as $name => $field) {
                 if (is_array($field) && isset($field['type'])) {
                     $type       = $field['type'];
                     $label      = (isset($field['label'])) ? $field['label'] : null;
@@ -425,7 +393,7 @@ class Form extends \Pop\Dom\Dom
      */
     public function setAction($action)
     {
-        $this->action = $action;
+        $this->setAttribute('action', $action);
         return $this;
     }
 
@@ -437,7 +405,7 @@ class Form extends \Pop\Dom\Dom
      */
     public function setMethod($method)
     {
-        $this->method = $method;
+        $this->setAttribute('method', $method);
         return $this;
     }
 
@@ -452,31 +420,6 @@ class Form extends \Pop\Dom\Dom
     }
 
     /**
-     * Set an attribute for the form object.
-     *
-     * @param  string $a
-     * @param  string $v
-     * @return Form
-     */
-    public function setAttribute($a, $v)
-    {
-        $this->form->setAttribute($a, $v);
-        return $this;
-    }
-
-    /**
-     * Set attributes for the form object.
-     *
-     * @param  array $a
-     * @return Form
-     */
-    public function setAttributes(array $a)
-    {
-        $this->form->setAttributes($a);
-        return $this;
-    }
-
-    /**
      * Add a form element or elements to the form object.
      *
      * @param  mixed $e
@@ -485,12 +428,12 @@ class Form extends \Pop\Dom\Dom
     public function addElements($e)
     {
         if (is_array($e)) {
-            $this->form->addChildren($e);
+            $this->addChildren($e);
         } else {
-            $this->form->addChild($e);
+            $this->addChild($e);
         }
 
-        $children = $this->form->getChildren();
+        $children = $this->getChildren();
 
         foreach ($children as $child) {
             $attribs = $child->getAttributes();
@@ -544,33 +487,13 @@ class Form extends \Pop\Dom\Dom
     }
 
     /**
-     * Get the main form element.
-     *
-     * @return array
-     */
-    public function getFormElement()
-    {
-        return $this->form;
-    }
-
-    /**
-     * Get the attributes of the form object.
-     *
-     * @return array
-     */
-    public function getAttributes()
-    {
-        return $this->form->getAttributes();
-    }
-
-    /**
      * Get the form action.
      *
      * @return array
      */
     public function getAction()
     {
-        return $this->action;
+        return $this->getAttribute('action');
     }
 
     /**
@@ -580,7 +503,7 @@ class Form extends \Pop\Dom\Dom
      */
     public function getMethod()
     {
-        return $this->method;
+        return $this->getAttribute('method');
     }
 
     /**
@@ -590,30 +513,31 @@ class Form extends \Pop\Dom\Dom
      */
     public function getElements()
     {
-        return $this->form->getChildren();
+        $children = $this->getChildren();
+        $elements = [];
+
+        foreach ($children as $child) {
+            if ($child instanceof Element){
+                $elements[] = $child;
+            }
+        }
+
+        return $elements;
     }
 
     /**
-     * Get a single field from $initFieldsValues
+     * Get a single field from $fieldConfig
      *
      * @param $name
      * @return array
      */
-    public function getField($name)
+    public function getFieldConfig($name = null)
     {
-        $field = [];
-
-        if (array_key_exists($name, $this->initFieldsValues)) {
-            $field = $this->initFieldsValues[$name];
+        if (null !== $name) {
+            return (array_key_exists($name, $this->fieldConfig)) ? $this->fieldConfig[$name] : [];
         } else {
-            foreach ($this->initFieldsValues as $f) {
-                if (array_key_exists($name, $f)) {
-                    $field = $f[$name];
-                }
-            }
+            return $this->fieldConfig;
         }
-
-        return $field;
     }
 
     /**
@@ -635,7 +559,7 @@ class Form extends \Pop\Dom\Dom
     public function getElement($elementName)
     {
         $i = $this->getElementIndex($elementName);
-        return (null !== $i) ? $this->form->getChild($this->getElementIndex($elementName)) : null;
+        return (null !== $i) ? $this->getChild($this->getElementIndex($elementName)) : null;
     }
 
     /**
@@ -649,7 +573,7 @@ class Form extends \Pop\Dom\Dom
         $name  = null;
         $elem  = null;
         $index = null;
-        $elems =  $this->form->getChildren();
+        $elems = $this->getChildren();
 
         foreach ($elems as $i => $e) {
             if ($e->getNodeName() == 'fieldset') {
@@ -683,10 +607,10 @@ class Form extends \Pop\Dom\Dom
         $i = $this->getElementIndex($elementName);
 
         $newInitValues = [];
-        $keys = array_keys($this->initFieldsValues);
+        $keys = array_keys($this->fieldConfig);
 
         if (isset($keys[0]) && is_numeric($keys[0])) {
-            foreach ($this->initFieldsValues as $fields) {
+            foreach ($this->fieldConfig as $fields) {
                 $newInitValuesAry = [];
                 foreach ($fields as $name => $field) {
                     if (isset($name) && ($name == $elementName)) {
@@ -698,22 +622,22 @@ class Form extends \Pop\Dom\Dom
                 $newInitValues[] = $newInitValuesAry;
             }
         } else {
-            foreach ($this->initFieldsValues as $name => $field) {
+            foreach ($this->fieldConfig as $name => $field) {
                 if (isset($name) && ($name == $elementName)) {
-                    unset($this->initFieldsValues[$name]);
+                    unset($this->fieldConfig[$name]);
                 } else {
                     $newInitValues[$name] = $field;
                 }
             }
         }
-        $this->initFieldsValues = $newInitValues;
+        $this->fieldConfig = $newInitValues;
 
         if (isset($this->fields[$elementName])) {
             unset($this->fields[$elementName]);
         }
 
         if (null !== $i) {
-            $this->form->removeChild($i);
+            $this->removeChild($i);
         }
 
         return $this;
@@ -727,7 +651,7 @@ class Form extends \Pop\Dom\Dom
     public function isValid()
     {
         $noErrors = true;
-        $children = $this->form->getChildren();
+        $children = $this->getChildren();
 
         // Check each element for validators, validate them and return the result.
         foreach ($children as $child) {
@@ -759,8 +683,9 @@ class Form extends \Pop\Dom\Dom
             ];
         }
 
-        foreach ($this->form->childNodes as $child) {
-            $child->setErrorDisplay($container, $attribs, $pre);
+        $elements = $this->getElements();
+        foreach ($elements as $element) {
+            $element->setErrorDisplay($container, $attribs, $pre);
         }
 
         $this->errorDisplay['container'] = $container;
@@ -777,10 +702,11 @@ class Form extends \Pop\Dom\Dom
      */
     public function getErrors()
     {
-        $errors = [];
-        foreach ($this->form->childNodes as $child) {
-            if ($child->hasErrors()) {
-                $errors[str_replace('[]', '', $child->getName())] = $child->getErrors();
+        $errors   = [];
+        $elements = $this->getElements();
+        foreach ($elements as $element) {
+            if ($element->hasErrors()) {
+                $errors[str_replace('[]', '', $element->getName())] = $element->getErrors();
             }
         }
         return $errors;
@@ -791,15 +717,17 @@ class Form extends \Pop\Dom\Dom
      * by a basic 1:1 DT/DD tag structure.
      *
      * @param  boolean $ret
+     * @param  int $depth
+     * @param  string $indent
      * @throws Exception
      * @return mixed
      */
-    public function render($ret = false)
+    public function render($ret = false, $depth = 0, $indent = null)
     {
         // Check to make sure form elements exist.
-        if ((count($this->form->getChildren()) == 0) && (count($this->initFieldsValues) == 0)) {
+        if ((count($this->getChildren()) == 0) && (count($this->fieldConfig) == 0)) {
             throw new Exception('Error: There are no form elements declared for this form object.');
-        } else if ((count($this->form->getChildren()) == 0) && (count($this->initFieldsValues) > 0)) {
+        } else if ((count($this->getChildren()) == 0) && (count($this->fieldConfig) > 0)) {
             $this->setFieldValues();
         }
 
@@ -923,14 +851,14 @@ class Form extends \Pop\Dom\Dom
     {
         // Initialize properties.
         $this->output = null;
-        $children = $this->form->getChildren();
-        $this->form->removeChildren();
+        $children = $this->getChildren();
+        $this->removeChildren();
 
-        $id = (null !== $this->form->getAttribute('id')) ? $this->form->getAttribute('id') . '-field-group-' : 'pop-form-field-group-';
+        $id = (null !== $this->getAttribute('id')) ? $this->getAttribute('id') . '-field-group-' : 'pop-form-field-group-';
 
         // Create DL element.
         $i = 1;
-        $dl = new Child('dl', null, null, false, $this->form->getIndent());
+        $dl = new Child('dl', null, null, false, $this->getIndent());
         $dl->setAttribute('id', $id . $i);
 
         // Loop through the children and create and attach the appropriate DT and DT elements, with labels where applicable.
@@ -949,9 +877,9 @@ class Form extends \Pop\Dom\Dom
 
             if (count($this->groups) > 0) {
                 if (isset($this->groups[$i]) && ($this->groups[$i] == $name)) {
-                    $this->form->addChild($dl);
+                    $this->addChild($dl);
                     $i++;
-                    $dl = new Child('dl', null, null, false, $this->form->getIndent());
+                    $dl = new Child('dl', null, null, false, $this->getIndent());
                     $dl->setAttribute('id', $id . $i);
                 }
             }
@@ -963,14 +891,14 @@ class Form extends \Pop\Dom\Dom
             }
 
             // If the element label is set, render the appropriate DT and DD elements.
-            if (null !== $child->getLabel()) {
+            if (($child instanceof Element) && (null !== $child->getLabel())) {
                 // Create the DT and DD elements.
-                $dt = new Child('dt', null, null, false, ($this->form->getIndent() . '    '));
-                $dd = new Child('dd', null, null, false, ($this->form->getIndent() . '    '));
+                $dt = new Child('dt', null, null, false, ($this->getIndent() . '    '));
+                $dd = new Child('dd', null, null, false, ($this->getIndent() . '    '));
 
                 // Format the label name.
                 $lblName = ($child->getNodeName() == 'fieldset') ? '1' : '';
-                $label   = new Child('label', $child->getLabel(), null, false, ($this->form->getIndent() . '        '));
+                $label   = new Child('label', $child->getLabel(), null, false, ($this->getIndent() . '        '));
                 $label->setAttribute('for', ($name . $lblName));
 
                 $labelAttributes = $child->getLabelAttributes();
@@ -984,12 +912,12 @@ class Form extends \Pop\Dom\Dom
 
                 // Add the appropriate children to the appropriate elements.
                 $dt->addChild($label);
-                $child->setIndent(($this->form->getIndent() . '        '));
+                $child->setIndent(($this->getIndent() . '        '));
                 $childChildren = $child->getChildren();
                 $child->removeChildren();
 
                 foreach ($childChildren as $cChild) {
-                    $cChild->setIndent(($this->form->getIndent() . '            '));
+                    $cChild->setIndent(($this->getIndent() . '            '));
                     $child->addChild($cChild);
                 }
 
@@ -997,16 +925,16 @@ class Form extends \Pop\Dom\Dom
                 $dl->addChildren([$dt, $dd]);
             // Else, render only a DD element.
             } else {
-                $dd = new Child('dd', null, null, false, ($this->form->getIndent() . '    '));
-                $child->setIndent(($this->form->getIndent() . '        '));
+                $dd = new Child('dd', null, null, false, ($this->getIndent() . '    '));
+                $child->setIndent(($this->getIndent() . '        '));
                 $dd->addChild($child);
                 $dl->addChild($dd);
             }
         }
 
         // Add the DL element and its children to the form element.
-        $this->form->addChild($dl);
-        $this->output = $this->form->render(true);
+        $this->addChild($dl);
+        $this->output = parent::render(true);
     }
 
     /**
@@ -1021,7 +949,7 @@ class Form extends \Pop\Dom\Dom
         $template     = $this->template;
         $fileContents = ($isFile) ? file_get_contents($this->template) : null;
         $this->output = null;
-        $children     = $this->form->getChildren();
+        $children     = $this->getChildren();
 
         // Loop through the child elements of the form.
         foreach ($children as $child) {
@@ -1112,9 +1040,9 @@ class Form extends \Pop\Dom\Dom
 
         // Set the rendered form content and remove the children.
         if (!$isFile) {
-            $this->form->setNodeValue("\n" . $template . "\n" . $this->form->getIndent());
-            $this->form->removeChildren();
-            $this->output = $this->form->render(true);
+            $this->setNodeValue("\n" . $template . "\n" . $this->getIndent());
+            $this->removeChildren();
+            $this->output = parent::render(true);
         } else {
             $action = $this->action;
             $method = $this->method;

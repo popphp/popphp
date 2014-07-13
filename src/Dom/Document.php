@@ -25,7 +25,7 @@ namespace Pop\Dom;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Dom extends AbstractNode
+class Document extends AbstractNode
 {
 
     /**
@@ -139,13 +139,13 @@ class Dom extends AbstractNode
      * @param  string $charset
      * @param  mixed  $childNode
      * @param  string $indent
-     * @return \Pop\Dom\Dom
+     * @return Document
      */
     public function __construct($doctype = null, $charset = 'utf-8', $childNode = null, $indent = null)
     {
         $this->setDoctype($doctype);
-        $this->charset = $charset;
-        $this->indent  = $indent;
+        $this->setCharset($charset);
+        $this->setIndent($indent);
 
         if (null !== $childNode) {
             $this->addChild($childNode);
@@ -159,7 +159,7 @@ class Dom extends AbstractNode
      */
     public function getDoctype()
     {
-        return str_replace('[{charset}]', $this->charset, Dom::$doctypes[$this->doctype]);
+        return str_replace('[{charset}]', $this->charset, Document::$doctypes[$this->doctype]);
     }
 
     /**
@@ -186,23 +186,23 @@ class Dom extends AbstractNode
      * Method to set the document type.
      *
      * @param  string $doctype
-     * @return \Pop\Dom\Dom
+     * @return Document
      */
     public function setDoctype($doctype = null)
     {
         if (null !== $doctype) {
             $doctype = (int)$doctype;
 
-            if (array_key_exists($doctype, Dom::$doctypes)) {
+            if (array_key_exists($doctype, Document::$doctypes)) {
                 $this->doctype = $doctype;
                 switch ($this->doctype) {
-                    case Dom::ATOM:
+                    case Document::ATOM:
                         $this->contentType = 'application/atom+xml';
                         break;
-                    case Dom::RSS:
+                    case Document::RSS:
                         $this->contentType = 'application/rss+xml';
                         break;
-                    case Dom::XML:
+                    case Document::XML:
                         $this->contentType = 'application/xml';
                         break;
                     default:
@@ -220,7 +220,7 @@ class Dom extends AbstractNode
      * Method to set the document charset.
      *
      * @param  string $char
-     * @return \Pop\Dom\Dom
+     * @return Document
      */
     public function setCharset($char)
     {
@@ -232,7 +232,7 @@ class Dom extends AbstractNode
      * Method to set the document charset.
      *
      * @param  string $content
-     * @return \Pop\Dom\Dom
+     * @return Document
      */
     public function setContentType($content)
     {
@@ -251,7 +251,7 @@ class Dom extends AbstractNode
         $this->output = null;
 
         if (null !== $this->doctype) {
-            $this->output .= str_replace('[{charset}]', $this->charset, Dom::$doctypes[$this->doctype]);
+            $this->output .= str_replace('[{charset}]', $this->charset, Document::$doctypes[$this->doctype]);
         }
 
         foreach ($this->childNodes as $child) {

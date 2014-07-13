@@ -97,7 +97,7 @@ class Nav
      * Set the return false flag
      *
      * @param  boolean $return
-     * @return \Pop\Nav\Nav
+     * @return Nav
      */
     public function returnFalse($return)
     {
@@ -109,7 +109,7 @@ class Nav
      * Set the nav tree
      *
      * @param  array $tree
-     * @return \Pop\Nav\Nav
+     * @return Nav
      */
     public function setTree(array $tree = null)
     {
@@ -122,7 +122,7 @@ class Nav
      *
      * @param  array   $branch
      * @param  boolean $prepend
-     * @return \Pop\Nav\Nav
+     * @return Nav
      */
     public function addBranch(array $branch, $prepend = false)
     {
@@ -140,7 +140,7 @@ class Nav
      * @param  array   $leaf
      * @param  int     $pos
      * @param  boolean $prepend
-     * @return \Pop\Nav\Nav
+     * @return Nav
      */
     public function addLeaf($branch, array $leaf, $pos = null, $prepend = false)
     {
@@ -154,7 +154,7 @@ class Nav
      * Set the nav tree
      *
      * @param  array $config
-     * @return \Pop\Nav\Nav
+     * @return Nav
      */
     public function setConfig(array $config = null)
     {
@@ -178,7 +178,7 @@ class Nav
      * Set the Acl object
      *
      * @param  \Pop\Acl\Acl $acl
-     * @return \Pop\Nav\Nav
+     * @return Nav
      */
     public function setAcl(\Pop\Acl\Acl $acl = null)
     {
@@ -190,7 +190,7 @@ class Nav
      * Set the Role object
      *
      * @param  \Pop\Acl\Role $role
-     * @return \Pop\Nav\Nav
+     * @return Nav
      */
     public function setRole(\Pop\Acl\Role $role = null)
     {
@@ -251,7 +251,7 @@ class Nav
     /**
      * Build the nav object
      *
-     * @return \Pop\Nav\Nav
+     * @return Nav
      */
     public function build()
     {
@@ -264,7 +264,7 @@ class Nav
     /**
      * Re-build the nav object
      *
-     * @return \Pop\Nav\Nav
+     * @return Nav
      */
     public function rebuild()
     {

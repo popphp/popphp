@@ -648,14 +648,7 @@ class Element extends Child
      */
     public function isMultiple()
     {
-        $multiple = false;
-        $class    = get_class($this);
-
-        if (($class == 'Pop\Form\Element\Checkbox') || ($class == 'Pop\Form\Element\Select')) {
-            $multiple = true;
-        }
-
-        return $multiple;
+        return (substr($this->getAttribute('name'), -2) == '[]');
     }
 
     /**
@@ -673,6 +666,7 @@ class Element extends Child
     /**
      * Validate the form element object.
      *
+     * @throws Exception
      * @return boolean
      */
     public function validate()
@@ -723,11 +717,17 @@ class Element extends Child
                         }
                     }
                 // Else, if callable
-                } else {
-                    $result = call_user_func_array($validator, [$curElemValue]);
+                } else if (is_callable($validator)) {
+                    if (null !== $curElemSize) {
+                        $result = call_user_func_array($validator, [$curElemSize]);
+                    } else {
+                        $result = call_user_func_array($validator, [$curElemValue]);
+                    }
                     if (null !== $result) {
                         $this->errors[] = $result;
                     }
+                } else {
+                    throw new Exception('That validator is not callable.');
                 }
             }
         }

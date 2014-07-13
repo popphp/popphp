@@ -43,7 +43,7 @@ class Fields
      * @param  array $attribs
      * @param  array $values
      * @param  mixed $omit
-     * @return \Pop\Form\Fields
+     * @return Fields
      */
     public function __construct($fields = null, array $attribs = null, array $values = null, $omit = null)
     {
@@ -66,7 +66,7 @@ class Fields
      * @param  array $values
      * @param  mixed $omit
      * @throws Exception
-     * @return \Pop\Form\Fields
+     * @return Fields
      */
     public function addFieldsFromTable(array $tableInfo, array $attribs = null, array $values = null, $omit = null)
     {
