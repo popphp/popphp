@@ -29,6 +29,34 @@ abstract class AbstractCrypt implements CryptInterface
 {
 
     /**
+     * Salt
+     * @var string
+     */
+    protected $salt = null;
+
+    /**
+     * Method to set the salt
+     *
+     * @param  string $salt
+     * @return self
+     */
+    public function setSalt($salt = null)
+    {
+        $this->salt = $salt;
+        return $this;
+    }
+
+    /**
+     * Method to get the salt
+     *
+     * @return string
+     */
+    public function getSalt()
+    {
+        return $this->salt;
+    }
+
+    /**
      * Method to generate a random alphanumeric string of a predefined length.
      *
      * @param  int  $length

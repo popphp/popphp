@@ -29,12 +29,6 @@ class Md5 extends AbstractCrypt
 {
 
     /**
-     * Salt
-     * @var string
-     */
-    protected $salt = null;
-
-    /**
      * Constructor
      *
      * Instantiate the md5 object.
@@ -47,28 +41,6 @@ class Md5 extends AbstractCrypt
         if (CRYPT_MD5 == 0) {
             throw new Exception('Error: MD5 hashing is not supported on this system.');
         }
-    }
-
-    /**
-     * Method to set the salt
-     *
-     * @param  string $salt
-     * @return self
-     */
-    public function setSalt($salt = null)
-    {
-        $this->salt = $salt;
-        return $this;
-    }
-
-    /**
-     * Method to get the salt
-     *
-     * @return string
-     */
-    public function getSalt()
-    {
-        return $this->salt;
     }
 
     /**

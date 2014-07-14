@@ -41,12 +41,6 @@ class Sha extends AbstractCrypt
     protected $rounds = 5000;
 
     /**
-     * Salt
-     * @var string
-     */
-    protected $salt = null;
-
-    /**
      * Constructor
      *
      * Instantiate the sha object.
@@ -126,28 +120,6 @@ class Sha extends AbstractCrypt
     public function getRounds()
     {
         return $this->rounds;
-    }
-
-    /**
-     * Method to set the salt
-     *
-     * @param  string $salt
-     * @return self
-     */
-    public function setSalt($salt = null)
-    {
-        $this->salt = $salt;
-        return $this;
-    }
-
-    /**
-     * Method to get the salt
-     *
-     * @return string
-     */
-    public function getSalt()
-    {
-        return $this->salt;
     }
 
     /**

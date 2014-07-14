@@ -25,14 +25,8 @@ namespace Pop\Crypt;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Crypt implements CryptInterface
+class Crypt extends AbstractCrypt
 {
-
-    /**
-     * Salt
-     * @var string
-     */
-    protected $salt = null;
 
     /**
      * Constructor
@@ -45,28 +39,6 @@ class Crypt implements CryptInterface
     public function __construct($salt = null)
     {
         $this->setSalt($salt);
-    }
-
-    /**
-     * Method to set the salt
-     *
-     * @param  string $salt
-     * @return self
-     */
-    public function setSalt($salt = null)
-    {
-        $this->salt = $salt;
-        return $this;
-    }
-
-    /**
-     * Method to get the salt
-     *
-     * @return string
-     */
-    public function getSalt()
-    {
-        return $this->salt;
     }
 
     /**

@@ -41,12 +41,6 @@ class Bcrypt extends AbstractCrypt
     protected $prefix = '$2y$';
 
     /**
-     * Salt
-     * @var string
-     */
-    protected $salt = null;
-
-    /**
      * Constructor
      *
      * Instantiate the bcrypt object.
@@ -121,28 +115,6 @@ class Bcrypt extends AbstractCrypt
     public function getPrefix()
     {
         return $this->prefix;
-    }
-
-    /**
-     * Method to set the salt
-     *
-     * @param  string $salt
-     * @return self
-     */
-    public function setSalt($salt = null)
-    {
-        $this->salt = $salt;
-        return $this;
-    }
-
-    /**
-     * Method to get the salt
-     *
-     * @return string
-     */
-    public function getSalt()
-    {
-        return $this->salt;
     }
 
     /**

@@ -47,12 +47,6 @@ class Mcrypt extends AbstractCrypt
     protected $source = null;
 
     /**
-     * Salt
-     * @var string
-     */
-    protected $salt = null;
-
-    /**
      * IV
      * @var string
      */
@@ -149,28 +143,6 @@ class Mcrypt extends AbstractCrypt
     public function getSource()
     {
         return $this->source;
-    }
-
-    /**
-     * Method to set the salt
-     *
-     * @param  string $salt
-     * @return self
-     */
-    public function setSalt($salt = null)
-    {
-        $this->salt = $salt;
-        return $this;
-    }
-
-    /**
-     * Method to get the salt
-     *
-     * @return string
-     */
-    public function getSalt()
-    {
-        return $this->salt;
     }
 
     /**
