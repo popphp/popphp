@@ -30,6 +30,8 @@ As of July 14, 2014
         + Trimmed Dir class, removed references to old File class
     - Filter
         + Removed unused functionality from Filter\String
+    - Form
+        + Refactored the Form component, including the organization of the Element classes
     - Http
         + Curl moved under new Http\Client sub component
     - I18n

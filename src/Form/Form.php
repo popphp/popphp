@@ -326,7 +326,7 @@ class Form extends Child
 
         foreach ($children as $child) {
             $attribs = $child->getAttributes();
-            if ($child instanceof Element\Textarea) {
+            if (($child instanceof Element\Textarea) || ($child instanceof Element\Button)) {
                 if (isset($attribs['name'])) {
                     $this->fields[$attribs['name']] = ((null !== $child->getValue()) ? $child->getValue() : null);
                 }
