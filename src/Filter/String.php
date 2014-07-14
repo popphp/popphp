@@ -29,7 +29,7 @@ class String
 {
 
     /**
-     * Method to generate a random alphanumeric string of a predefined length.
+     * Method to generate a random string of a predefined length.
      *
      * @param  int   $length
      * @param  array $options

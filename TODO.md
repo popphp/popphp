@@ -6,7 +6,6 @@ COMPONENTS
  - Auth
  - Cache
  - Code
- - Color
  - Crypt
  - Data
  - Db
@@ -18,7 +17,6 @@ COMPONENTS
  - Form        [deps: Dom, Validator]
  - Ftp
  - Geo
- - Graph       [deps: Image, Pdf]
  - Http
  - I18n
  - Image

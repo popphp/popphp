@@ -3,7 +3,7 @@ Pop PHP Framework Changelog
 
 2.0.0a
 ------
-As of July 4, 2014
+As of July 14, 2014
 
 * PHP 5.4+ Only
 * Composer Support
@@ -37,10 +37,12 @@ As of July 4, 2014
     - Pdf
         + Font component moved under Pdf
 * Removed
+    - Color
     - Compress
     - Curl (moved under the Http component)
     - Db\Adapter\Mysql (renamed old Mysqli adapter class to Mysql)
     - Filter\Search
     - Font (moved under the Pdf component)
+    - Graph
     - Loader
     - Project
