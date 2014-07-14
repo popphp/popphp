@@ -101,7 +101,7 @@ class Curl extends AbstractClient
      * @param  boolean $header
      * @return Curl
      */
-    public function setReturnHeader($header = false)
+    public function setReturnHeader($header = true)
     {
         $this->setOption(CURLOPT_HEADER, (bool)$header);
         return $this;
@@ -113,7 +113,7 @@ class Curl extends AbstractClient
      * @param  boolean $transfer
      * @return Curl
      */
-    public function setReturnTransfer($transfer = false)
+    public function setReturnTransfer($transfer = true)
     {
         $this->setOption(CURLOPT_RETURNTRANSFER, (bool)$transfer);
         return $this;
