@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Form\Element;
+namespace Pop\Form\Element\Input;
 
 /**
- * CAPTCHA form element class
+ * Form CAPTCHA element class
  *
  * @category   Pop
  * @package    Pop_Form
@@ -25,28 +25,22 @@ namespace Pop\Form\Element;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Captcha extends \Pop\Form\Element
+
+class Captcha extends Text
 {
-
-    /**
-     * Current token data
-     * @var array
-     */
-    protected $token = [];
-
     /**
      * Constructor
      *
-     * Instantiate the captcha form element object.
+     * Instantiate the hidden input form element.
      *
      * @param  string $name
      * @param  string $value
+     * @param  string $indent
      * @param  int    $expire
      * @param  string $captcha
-     * @param  string $indent
-     * @return \Pop\Form\Element\Captcha
+     * @return Captcha
      */
-    public function __construct($name, $value = null, $expire = 300, $captcha = null, $indent = null)
+    public function __construct($name, $value = null, $indent = null, $expire = 300, $captcha = null)
     {
         // Start a session.
         if (session_id() == '') {
@@ -68,7 +62,7 @@ class Captcha extends \Pop\Form\Element
                 'start'   => time()
             ];
             $_SESSION['pop_captcha'] = serialize($this->token);
-        // Else, retrieve existing token
+            // Else, retrieve existing token
         } else {
             $this->token = unserialize($_SESSION['pop_captcha']);
 
@@ -92,20 +86,21 @@ class Captcha extends \Pop\Form\Element
             }
         }
 
-        parent::__construct('text', $name, strtoupper($value), null, $indent);
+        parent::__construct($name, strtoupper($value), $indent);
         $this->setRequired(true);
         $this->setValidator();
     }
 
     /**
-     * Set the label of the form element object.
+     * Set the label of the captcha form element.
      *
      * @param  string $label
-     * @return \Pop\Form\Element
+     * @return Captcha
      */
     public function setLabel($label)
     {
         parent::setLabel($label);
+
         if (isset($this->token['captcha'])) {
             if ((strpos($this->token['captcha'], '<img') === false) && ((strpos($this->token['captcha'], ' + ') !== false) || (strpos($this->token['captcha'], ' - ') !== false) || (strpos($this->token['captcha'], ' * ') !== false) || (strpos($this->token['captcha'], ' / ') !== false))) {
                 $this->label = $this->label . '(' . str_replace([' * ', ' / '], [' &#215; ', ' &#247; '], $this->token['captcha'] .')');
@@ -113,13 +108,14 @@ class Captcha extends \Pop\Form\Element
                 $this->label = $this->label . $this->token['captcha'];
             }
         }
+
         return $this;
     }
 
     /**
      * Method to set the validator
      *
-     * @throws \Pop\Form\Exception
+     * @throws Exception
      * @return void
      */
     protected function setValidator()
@@ -161,7 +157,7 @@ class Captcha extends \Pop\Form\Element
                 }
             }
         } else {
-            throw new \Pop\Form\Exception('Error: The server request method is not set.');
+            throw new Exception('Error: The server request method is not set.');
         }
     }
 
@@ -193,4 +189,5 @@ class Captcha extends \Pop\Form\Element
 
         return $equation;
     }
+
 }

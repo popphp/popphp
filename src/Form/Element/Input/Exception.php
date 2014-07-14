@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Form\Element;
+namespace Pop\Form\Element\Input;
 
 /**
- * Form textarea element class
+ * Form input element exception class
  *
  * @category   Pop
  * @package    Pop_Form
@@ -25,28 +25,4 @@ namespace Pop\Form\Element;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-
-class Textarea extends AbstractElement
-{
-
-    /**
-     * Constructor
-     *
-     * Instantiate the textarea form element.
-     *
-     * @param  string $name
-     * @param  string $value
-     * @param  string $indent
-     * @return Textarea
-     */
-    public function __construct($name, $value = null, $indent = null)
-    {
-        $this->type = 'textarea';
-        parent::__construct($this->type, $value, null, false, $indent);
-
-        $this->setAttributes(['name' => $name, 'id' => $name]);
-        $this->setValue($value);
-        $this->setName($name);
-    }
-
-}
+class Exception extends \Exception {}

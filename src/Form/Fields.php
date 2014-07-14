@@ -71,7 +71,7 @@ class Fields
     public function addFieldsFromTable(array $tableInfo, array $attribs = null, array $values = null, $omit = null)
     {
         if (!isset($tableInfo['tableName']) || !isset($tableInfo['primaryId']) || !isset($tableInfo['columns'])) {
-            throw new Exception('Error: The table info parameter is not in the correct format. It should be a returned array value from the getTableInfo() method of the Record component.');
+            throw new Exception('Error: The table info parameter is not in the correct format. It should be a returned array value from the getTableInfo() method of the Db\\Record component.');
         }
 
         if (null !== $omit) {

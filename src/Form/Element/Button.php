@@ -16,7 +16,7 @@
 namespace Pop\Form\Element;
 
 /**
- * Form textarea element class
+ * Form button element class
  *
  * @category   Pop
  * @package    Pop_Form
@@ -26,25 +26,34 @@ namespace Pop\Form\Element;
  * @version    2.0.0a
  */
 
-class Textarea extends AbstractElement
+class Button extends AbstractElement
 {
 
     /**
      * Constructor
      *
-     * Instantiate the textarea form element.
+     * Instantiate the buttom form element.
      *
      * @param  string $name
      * @param  string $value
      * @param  string $indent
-     * @return Textarea
+     * @return Button
      */
     public function __construct($name, $value = null, $indent = null)
     {
-        $this->type = 'textarea';
+        $this->type = 'button';
         parent::__construct($this->type, $value, null, false, $indent);
 
         $this->setAttributes(['name' => $name, 'id' => $name]);
+
+        if (strtolower($name) == 'submit') {
+            $this->setAttribute('type', 'submit');
+        } else if (strtolower($name) == 'reset') {
+            $this->setAttribute('type', 'reset');
+        } else{
+            $this->setAttribute('type', 'button');
+        }
+
         $this->setValue($value);
         $this->setName($name);
     }

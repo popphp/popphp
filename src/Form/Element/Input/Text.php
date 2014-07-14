@@ -13,10 +13,12 @@
 /**
  * @namespace
  */
-namespace Pop\Form\Element;
+namespace Pop\Form\Element\Input;
+
+use Pop\Form\Element\AbstractElement;
 
 /**
- * Form textarea element class
+ * Form text element class
  *
  * @category   Pop
  * @package    Pop_Form
@@ -26,25 +28,25 @@ namespace Pop\Form\Element;
  * @version    2.0.0a
  */
 
-class Textarea extends AbstractElement
+class Text extends AbstractElement
 {
 
     /**
      * Constructor
      *
-     * Instantiate the textarea form element.
+     * Instantiate the text input form element.
      *
      * @param  string $name
      * @param  string $value
      * @param  string $indent
-     * @return Textarea
+     * @return Text
      */
     public function __construct($name, $value = null, $indent = null)
     {
-        $this->type = 'textarea';
-        parent::__construct($this->type, $value, null, false, $indent);
+        $this->type = 'input';
+        parent::__construct($this->type, null, null, false, $indent);
 
-        $this->setAttributes(['name' => $name, 'id' => $name]);
+        $this->setAttributes(['type' => 'text', 'name' => $name, 'id' => $name, 'value' => $value]);
         $this->setValue($value);
         $this->setName($name);
     }

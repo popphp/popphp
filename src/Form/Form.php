@@ -31,7 +31,7 @@ class Form extends Child
 {
 
     /**
-     * Form template for HTML formatting.
+     * Form template.
      * @var string
      */
     protected $template = null;
@@ -74,14 +74,12 @@ class Form extends Child
      * @param  string $action
      * @param  string $method
      * @param  array  $fields
-     * @param  string $indent
      * @return Form
      */
-    public function __construct($action = null, $method = 'post', array $fields = null, $indent = null)
+    public function __construct($action = null, $method = 'post', array $fields = null)
     {
         parent::__construct('form');
 
-        $this->setIndent($indent);
         $this->setAttributes([
             'action' => ((null !== $action) ? $action : $_SERVER['REQUEST_URI']),
             'method' => $method
@@ -169,139 +167,17 @@ class Form extends Child
      * @param  array $filters
      * @return Form
      */
-    public function setFieldValues(array $values = null, $filters = null)
+    public function setFieldValues(array $values = null, array $filters = null)
     {
         // Filter values if passed
         if ((null !== $values) && (null !== $filters)) {
             $values = $this->filterValues($values, $filters);
         }
 
-        // Loop through the initial fields values and build the fields
-        // based on the _fieldConfig property.
-        if (count($this->fieldConfig) > 0) {
-            // If the fields are a group of fields
-            $keys = array_keys($this->fieldConfig);
-            if (is_numeric($keys[0])) {
-                $fields = [];
-                foreach ($this->fieldConfig as $ary) {
-                    $k = array_keys($ary);
-                    if (isset($k[0])) {
-                        $this->groups[] = $k[0];
-                    }
-                    $fields = array_merge($fields, $ary);
-                }
-                $this->fieldConfig = $fields;
-            }
-
-            foreach ($this->fieldConfig as $name => $field) {
-                if (is_array($field) && isset($field['type'])) {
-                    $type       = $field['type'];
-                    $label      = (isset($field['label'])) ? $field['label'] : null;
-                    $required   = (isset($field['required'])) ? $field['required'] : null;
-                    $attributes = (isset($field['attributes'])) ? $field['attributes'] : null;
-                    $validators = (isset($field['validators'])) ? $field['validators'] : null;
-                    $expire     = (isset($field['expire'])) ? $field['expire'] : 300;
-                    $captcha    = (isset($field['captcha'])) ? $field['captcha'] : null;
-                    $data       = (isset($field['data'])) ? $field['data'] : null;
-
-                    if ($type == 'file') {
-                        $this->hasFile = true;
-                    }
-
-                    if (isset($field['error'])) {
-                        $error = [
-                            'container'  => 'div',
-                            'attributes' => [
-                                'class' => 'error'
-                            ],
-                            'pre' => false
-                        ];
-                        foreach ($field['error'] as $key => $value) {
-                            if ($key != 'pre') {
-                                $error['container'] = $key;
-                                $error['attributes'] = $value;
-                            } else if ($key == 'pre') {
-                                $error['pre'] = $value;
-                            }
-                        }
-                    } else {
-                        $error = null;
-                    }
-
-                    if ((null !== $values) && array_key_exists($name, $values)) {
-                        if (($type == 'checkbox') || ($type == 'radio') || ($type == 'select')) {
-                            $value  = (isset($field['value'])) ? $field['value'] : null;
-                            $marked = $values[$name];
-                        } else {
-                            $value  = $values[$name];
-                            $marked = (isset($field['marked'])) ? $field['marked'] : null;
-                        }
-                    } else {
-                        $value  = (isset($field['value']))  ? $field['value'] : null;
-                        $marked = (isset($field['marked'])) ? $field['marked'] : null;
-                    }
-                    // Initialize the form element.
-                    switch (strtolower($type)) {
-                        case 'checkbox':
-                            $elem = new Element\Checkbox($name, $value, $marked);
-                            break;
-                        case 'radio':
-                            $elem = new Element\Radio($name, $value, $marked);
-                            break;
-                        case 'select':
-                            $elem = new Element\Select($name, $value, $marked, null, $data);
-                            break;
-                        case 'textarea':
-                            $elem = new Element\Textarea($name, $value, $marked);
-                            break;
-                        case 'csrf':
-                            $elem = new Element\Csrf($name, $value, $expire);
-                            break;
-                        case 'captcha':
-                            $elem = new Element\Captcha($name, $value, $expire, $captcha);
-                            break;
-                        default:
-                            $elem = new Element($type, $name, $value, $marked);
-                    }
-
-                    // Set the label.
-                    if (null !== $label) {
-                        $elem->setLabel($label);
-                    }
-
-                    // Set if required.
-                    if (null !== $required) {
-                        $elem->setRequired($required);
-                    }
-
-                    // Set if error display.
-                    if (null !== $error) {
-                        $elem->setErrorDisplay($error['container'], $error['attributes'], $error['pre']);
-                    }
-
-                    // Set any attributes.
-                    if (null !== $attributes) {
-                        foreach ($attributes as $a => $v) {
-                            $elem->setAttribute($a, $v);
-                        }
-                    }
-
-                    // Set any validators.
-                    if (null !== $validators) {
-                        if (is_array($validators)) {
-                            foreach ($validators as $val) {
-                                $elem->addValidator($val);
-                            }
-                        } else {
-                            $elem->addValidator($validators);
-                        }
-                    }
-
-                    $this->addElements($elem);
-                }
-            }
-        // Else, set the passed values to the elements that
-        // are already added to the form object
+        // If no fields have been created yet, create the fields assigning the field values
+        if ((count($this->getChildren()) == 0) && (count($this->fieldConfig) > 0)) {
+            $this->createFields($values);
+        // Else, set the field values for the already existing fields
         } else {
             $fields = $this->getElements();
             if ((null !== $values) && (count($fields) > 0)) {
@@ -422,17 +298,30 @@ class Form extends Child
     /**
      * Add a form element or elements to the form object.
      *
-     * @param  mixed $e
+     * @param  Element\AbstractElement $e
      * @return Form
      */
-    public function addElements($e)
+    public function addElement(Element\AbstractElement $e)
     {
-        if (is_array($e)) {
-            $this->addChildren($e);
-        } else {
-            $this->addChild($e);
+        return $this->addElements([$e]);
+    }
+
+    /**
+     * Add a form element or elements to the form object.
+     *
+     * @param  array $e
+     * @throws Exception
+     * @return Form
+     */
+    public function addElements(array $e)
+    {
+        foreach ($e as $c) {
+            if (!($c instanceof Element\AbstractElement)) {
+                throw new Exception('Error: One of the elements passed is not an instance of Pop\\Form\\Element\\AbstractElement.');
+            }
         }
 
+        $this->addChildren($e);
         $children = $this->getChildren();
 
         foreach ($children as $child) {
@@ -446,7 +335,7 @@ class Form extends Child
                     $name = (strpos($attribs['name'], '[]') !== false) ? substr($attribs['name'], 0, strpos($attribs['name'], '[]')) : $attribs['name'];
                     $this->fields[$name] = ((null !== $child->getMarked()) ? $child->getMarked() : null);
                 }
-            } else if ($child instanceof Element\Radio) {
+            } else if ($child instanceof Element\Input\Radio) {
                 $radioChildren = $child->getChildren();
                 if (isset($radioChildren[0])) {
                     $childAttribs = $radioChildren[0]->getAttributes();
@@ -454,7 +343,7 @@ class Form extends Child
                         $this->fields[$childAttribs['name']] = ((null !== $child->getMarked()) ? $child->getMarked() : null);
                     }
                 }
-            } else if ($child instanceof Element\Checkbox) {
+            } else if ($child instanceof Element\Input\Checkbox) {
                 $checkChildren = $child->getChildren();
                 if (isset($checkChildren[0])) {
                     $childAttribs = $checkChildren[0]->getAttributes();
@@ -517,7 +406,7 @@ class Form extends Child
         $elements = [];
 
         foreach ($children as $child) {
-            if ($child instanceof Element){
+            if ($child instanceof Element\AbstractElement){
                 $elements[] = $child;
             }
         }
@@ -554,7 +443,7 @@ class Form extends Child
      * Get an element object of the form by name.
      *
      * @param string $elementName
-     * @return \Pop\Form\Element
+     * @return Element\AbstractElement
      */
     public function getElement($elementName)
     {
@@ -728,7 +617,7 @@ class Form extends Child
         if ((count($this->getChildren()) == 0) && (count($this->fieldConfig) == 0)) {
             throw new Exception('Error: There are no form elements declared for this form object.');
         } else if ((count($this->getChildren()) == 0) && (count($this->fieldConfig) > 0)) {
-            $this->setFieldValues();
+            $this->createFields();
         }
 
         // If the form has a file field
@@ -791,6 +680,155 @@ class Form extends Child
     }
 
     /**
+     * Method to create the form fields
+     *
+     * @param  array $values
+     * @throws Exception
+     * @return void
+     */
+    protected function createFields(array $values = null)
+    {
+        // Loop through the field config and build the fields and build the fields
+        if (count($this->fieldConfig) > 0) {
+            // If the fields are a group of fields
+            $keys = array_keys($this->fieldConfig);
+            if (is_numeric($keys[0])) {
+                $fields = [];
+                foreach ($this->fieldConfig as $ary) {
+                    $k = array_keys($ary);
+                    if (isset($k[0])) {
+                        $this->groups[] = $k[0];
+                    }
+                    $fields = array_merge($fields, $ary);
+                }
+                $this->fieldConfig = $fields;
+            }
+
+            foreach ($this->fieldConfig as $name => $field) {
+                if (is_array($field) && isset($field['type'])) {
+                    $type       = $field['type'];
+                    $label      = (isset($field['label'])) ? $field['label'] : null;
+                    $required   = (isset($field['required'])) ? $field['required'] : null;
+                    $attributes = (isset($field['attributes'])) ? $field['attributes'] : null;
+                    $validators = (isset($field['validators'])) ? $field['validators'] : null;
+                    $expire     = (isset($field['expire'])) ? $field['expire'] : 300;
+                    $captcha    = (isset($field['captcha'])) ? $field['captcha'] : null;
+                    $data       = (isset($field['data'])) ? $field['data'] : null;
+                    $multiple   = (isset($field['multiple'])) ? $field['multiple'] : false;
+
+                    if ($type == 'file') {
+                        $this->hasFile = true;
+                    }
+
+                    if (isset($field['error'])) {
+                        $error = [
+                            'container'  => 'div',
+                            'attributes' => [
+                                'class' => 'error'
+                            ],
+                            'pre' => false
+                        ];
+                        foreach ($field['error'] as $key => $value) {
+                            if ($key != 'pre') {
+                                $error['container'] = $key;
+                                $error['attributes'] = $value;
+                            } else if ($key == 'pre') {
+                                $error['pre'] = $value;
+                            }
+                        }
+                    } else {
+                        $error = null;
+                    }
+
+                    if ((null !== $values) && array_key_exists($name, $values)) {
+                        if (($type == 'checkbox') || ($type == 'radio') || ($type == 'select')) {
+                            $value  = (isset($field['value'])) ? $field['value'] : null;
+                            $marked = $values[$name];
+                        } else {
+                            $value  = $values[$name];
+                            $marked = (isset($field['marked'])) ? $field['marked'] : null;
+                        }
+                    } else {
+                        $value  = (isset($field['value']))  ? $field['value'] : null;
+                        $marked = (isset($field['marked'])) ? $field['marked'] : null;
+                    }
+
+                    // Initialize the form element.
+                    switch (strtolower($type)) {
+                        case 'button':
+                            $elem = new Element\Button($name, $value);
+                            break;
+                        case 'select':
+                            $config = [
+                                'marked'   => $marked,
+                                'multiple' => $multiple,
+                                'data'     => $data
+                            ];
+                            $elem = new Element\Select($name, $value, null, $config);
+                            break;
+                        case 'textarea':
+                            $elem = new Element\Textarea($name, $value);
+                            break;
+                        case 'checkbox':
+                            $elem = new Element\Input\Checkbox($name, $value, null, $marked);
+                            break;
+                        case 'radio':
+                            $elem = new Element\Input\Radio($name, $value, null, $marked);
+                            break;
+                        case 'csrf':
+                            $elem = new Element\Input\Csrf($name, $value, null, $expire);
+                            break;
+                        case 'captcha':
+                            $elem = new Element\Input\Captcha($name, $value, null, $expire, $captcha);
+                            break;
+                        default:
+                            $class = 'Pop\\Form\\Element\\Input\\' . ucfirst(strtolower($type));
+                            if (!class_exists($class)) {
+                                throw new Exception('Error: That class for that form element does not exist.');
+                            }
+                            $elem = new $class($name, $value);
+                    }
+
+                    // Set the label.
+                    if (null !== $label) {
+                        $elem->setLabel($label);
+                    }
+
+                    // Set if required.
+                    if (null !== $required) {
+                        $elem->setRequired($required);
+                    }
+
+                    // Set if error display.
+                    if (null !== $error) {
+                        $elem->setErrorDisplay($error['container'], $error['attributes'], $error['pre']);
+                    }
+
+                    // Set any attributes.
+                    if (null !== $attributes) {
+                        foreach ($attributes as $a => $v) {
+                            $elem->setAttribute($a, $v);
+                        }
+                    }
+
+                    // Set any validators.
+                    if (null !== $validators) {
+                        if (is_array($validators)) {
+                            foreach ($validators as $val) {
+                                $elem->addValidator($val);
+                            }
+                        } else {
+                            $elem->addValidator($validators);
+                        }
+                    }
+
+                    $this->addElement($elem);
+                }
+            }
+        }
+    }
+
+    /**
      * Method to filter the values with the applied
      * callbacks and their parameters
      *
@@ -798,7 +836,7 @@ class Form extends Child
      * @param  array $filters
      * @return array
      */
-    protected function filterValues($values, $filters)
+    protected function filterValues(array $values, array $filters)
     {
         $filteredValues = [];
 
@@ -1044,8 +1082,8 @@ class Form extends Child
             $this->removeChildren();
             $this->output = parent::render(true);
         } else {
-            $action = $this->action;
-            $method = $this->method;
+            $action = $this->getAttribute('action');
+            $method = $this->getAttribute('method');
 
             ob_start();
             include $this->template;

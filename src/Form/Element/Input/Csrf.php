@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Form\Element;
+namespace Pop\Form\Element\Input;
 
 /**
- * CSRF form element class
+ * Form CSRF element class
  *
  * @category   Pop
  * @package    Pop_Form
@@ -25,7 +25,8 @@ namespace Pop\Form\Element;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Csrf extends \Pop\Form\Element
+
+class Csrf extends Hidden
 {
 
     /**
@@ -37,15 +38,15 @@ class Csrf extends \Pop\Form\Element
     /**
      * Constructor
      *
-     * Instantiate the CSRF form element object.
+     * Instantiate the hidden input form element.
      *
      * @param  string $name
      * @param  string $value
-     * @param  int    $expire
      * @param  string $indent
-     * @return \Pop\Form\Element\Csrf
+     * @param  int    $expire
+     * @return Csrf
      */
-    public function __construct($name, $value = null, $expire = 300, $indent = null)
+    public function __construct($name, $value = null, $indent = null, $expire = 300)
     {
         // Start a session.
         if (session_id() == '') {
@@ -60,7 +61,7 @@ class Csrf extends \Pop\Form\Element
                 'start'  => time()
             ];
             $_SESSION['pop_csrf'] = serialize($this->token);
-        // Else, retrieve existing token
+            // Else, retrieve existing token
         } else {
             $this->token = unserialize($_SESSION['pop_csrf']);
 
@@ -77,7 +78,7 @@ class Csrf extends \Pop\Form\Element
             }
         }
 
-        parent::__construct('hidden', $name, $this->token['value'], null, $indent);
+        parent::__construct($name, $this->token['value'], $indent);
         $this->setRequired(true);
         $this->setValidator();
     }
@@ -85,7 +86,7 @@ class Csrf extends \Pop\Form\Element
     /**
      * Method to set the validator
      *
-     * @throws \Pop\Form\Exception
+     * @throws Exception
      * @return void
      */
     protected function setValidator()
@@ -118,7 +119,7 @@ class Csrf extends \Pop\Form\Element
                 $this->addValidator(new \Pop\Validator\Equal($val, 'The security token does not match.'));
             }
         } else {
-            throw new \Pop\Form\Exception('Error: The server request method is not set.');
+            throw new Exception('Error: The server request method is not set.');
         }
     }
 

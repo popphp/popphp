@@ -13,10 +13,12 @@
 /**
  * @namespace
  */
-namespace Pop\Form\Element;
+namespace Pop\Form\Element\Input;
+
+use Pop\Form\Element\AbstractElement;
 
 /**
- * Checkbox form element class
+ * Form file element class
  *
  * @category   Pop
  * @package    Pop_Form
@@ -25,26 +27,28 @@ namespace Pop\Form\Element;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Checkbox extends \Pop\Form\Element
+
+class File extends AbstractElement
 {
 
     /**
      * Constructor
      *
-     * Instantiate the checkbox form element object.
+     * Instantiate the file input form element.
      *
      * @param  string $name
-     * @param  string|array $value
-     * @param  string|array $marked
+     * @param  string $value
      * @param  string $indent
-     * @return \Pop\Form\Element\Checkbox
+     * @return File
      */
-    public function __construct($name, $value = null, $marked = null, $indent = null)
+    public function __construct($name, $value = null, $indent = null)
     {
-        $this->value = $value;
-        $this->setMarked($marked);
+        $this->type = 'input';
+        parent::__construct($this->type, null, null, false, $indent);
 
-        parent::__construct('checkbox', $name, $value, $marked, $indent);
+        $this->setAttributes(['type' => 'file', 'name' => $name, 'id' => $name, 'value' => $value]);
+        $this->setValue($value);
+        $this->setName($name);
     }
 
 }

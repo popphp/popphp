@@ -13,10 +13,12 @@
 /**
  * @namespace
  */
-namespace Pop\Form\Element;
+namespace Pop\Form\Element\Input;
+
+use Pop\Form\Element\AbstractElement;
 
 /**
- * Radio form element class
+ * Form button element class
  *
  * @category   Pop
  * @package    Pop_Form
@@ -25,26 +27,28 @@ namespace Pop\Form\Element;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Radio extends \Pop\Form\Element
+
+class Button extends AbstractElement
 {
 
     /**
      * Constructor
      *
-     * Instantiate the radio form element object.
+     * Instantiate the button input form element.
      *
      * @param  string $name
-     * @param  string|array $value
-     * @param  string|array $marked
+     * @param  string $value
      * @param  string $indent
-     * @return \Pop\Form\Element\Radio
+     * @return Button
      */
-    public function __construct($name, $value = null, $marked = null, $indent = null)
+    public function __construct($name, $value = null, $indent = null)
     {
-        $this->value = $value;
-        $this->setMarked($marked);
+        $this->type = 'input';
+        parent::__construct($this->type, null, null, false, $indent);
 
-        parent::__construct('radio', $name, $value, $marked, $indent);
+        $this->setAttributes(['type' => 'button', 'name' => $name, 'id' => $name, 'value' => $value]);
+        $this->setValue($value);
+        $this->setName($name);
     }
 
 }
