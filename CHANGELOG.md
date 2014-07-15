@@ -32,6 +32,7 @@ As of July 14, 2014
         + Removed unused functionality from Filter\String
     - Form
         + Refactored the Form component, including the organization of the Element classes
+        + Added support for basic, most common HTML5 element types
     - Http
         + Curl moved under new Http\Client sub component
     - I18n

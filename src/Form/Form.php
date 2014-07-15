@@ -929,7 +929,7 @@ class Form extends Child
             }
 
             // If the element label is set, render the appropriate DT and DD elements.
-            if (($child instanceof Element) && (null !== $child->getLabel())) {
+            if (($child instanceof Element\AbstractElement) && (null !== $child->getLabel())) {
                 // Create the DT and DD elements.
                 $dt = new Child('dt', null, null, false, ($this->getIndent() . '    '));
                 $dd = new Child('dd', null, null, false, ($this->getIndent() . '    '));

@@ -74,7 +74,7 @@ class Select extends AbstractElement
     const MINUTES_10 = 'MINUTES_10';
 
     /**
-     * Constant forminutes in increments of 15
+     * Constant for minutes in increments of 15
      * @var string
      */
     const MINUTES_15 = 'MINUTES_15';
