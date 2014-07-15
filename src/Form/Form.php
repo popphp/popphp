@@ -585,11 +585,23 @@ class Form extends Child
     }
 
     /**
+     * Check if form has errors
+     *
+     * @param  string $field
+     * @return boolean
+     */
+    public function hasErrors($field = null)
+    {
+        return (count($this->getErrors($field)) > 0);
+    }
+
+    /**
      * Get all form element errors.
      *
+     * @param  string $field
      * @return array
      */
-    public function getErrors()
+    public function getErrors($field = null)
     {
         $errors   = [];
         $elements = $this->getElements();
@@ -598,7 +610,12 @@ class Form extends Child
                 $errors[str_replace('[]', '', $element->getName())] = $element->getErrors();
             }
         }
-        return $errors;
+
+        if (null !== $field) {
+            return (isset($errors[$field])) ? $errors[$field] : [];
+        } else {
+            return $errors;
+        }
     }
 
     /**
@@ -1084,6 +1101,7 @@ class Form extends Child
         } else {
             $action = $this->getAttribute('action');
             $method = $this->getAttribute('method');
+            $form   = $this;
 
             ob_start();
             include $this->template;
