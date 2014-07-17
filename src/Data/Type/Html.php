@@ -170,7 +170,7 @@ class Html implements TypeInterface
 
             // Set field output.
             $output .= $indent . '        <tr><td>' . implode('</td><td>', $rowAry) . '</td></tr>' . PHP_EOL;
-            $pos = strrpos($output, '<td') + 3;
+            $pos    = strrpos($output, '<td') + 3;
             $output = substr($output, 0, $pos) . substr($output, $pos);
         }
 

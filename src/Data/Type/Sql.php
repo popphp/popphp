@@ -38,11 +38,11 @@ class Sql implements TypeInterface
     {
         $eol = (strpos($data, "),\r\n(") !== false) ? "),\r\n(" : "),\n(";
 
-        $fields = substr($data, (strpos($data, '(') + 1));
-        $fields = substr($fields, 0, strpos($fields, ')'));
-        $search = [', ', '`', '"', "'", '[', ']'];
+        $fields  = substr($data, (strpos($data, '(') + 1));
+        $fields  = substr($fields, 0, strpos($fields, ')'));
+        $search  = [', ', '`', '"', "'", '[', ']'];
         $replace = [',', '', '', "", '', ''];
-        $fields = str_replace($search, $replace, $fields);
+        $fields  = str_replace($search, $replace, $fields);
 
         $fieldsAry = explode(',', $fields);
 

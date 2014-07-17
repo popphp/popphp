@@ -95,7 +95,7 @@ class Data
      * Instantiate the data object.
      *
      * @param  string $data
-     * @return \Pop\Data\Data
+     * @return Data
      */
     public function __construct($data)
     {
@@ -178,7 +178,7 @@ class Data
      * Set the table name
      *
      * @param  string $table
-     * @return \Pop\Data\Data
+     * @return Data
      */
     public function setTable($table)
     {
@@ -190,7 +190,7 @@ class Data
      * Set the identifier quote
      *
      * @param  string $quote
-     * @return \Pop\Data\Data
+     * @return Data
      */
     public function setIdQuote($quote)
     {
@@ -202,7 +202,7 @@ class Data
      * Set the PMA compatible XML flag
      *
      * @param  boolean $comp
-     * @return \Pop\Data\Data
+     * @return Data
      */
     public function setPma($comp)
     {
@@ -213,7 +213,7 @@ class Data
     /**
      * Parse the data from the file.
      *
-     * @return \Pop\Data\Data
+     * @return Data
      */
     public function parseFile()
     {
@@ -228,11 +228,11 @@ class Data
      * @param  string $to
      * @param  array  $options
      * @throws Exception
-     * @return \Pop\Data\Data
+     * @return Data
      */
     public function parseData($to, array $options = null)
     {
-        $to = strtolower($to);
+        $to    = strtolower($to);
         $types = ['csv', 'html', 'json', 'sql', 'xml', 'yaml'];
 
         if (!in_array($to, $types)) {
@@ -259,7 +259,7 @@ class Data
      *
      * @param  string $to
      * @param  boolean $download
-     * @return \Pop\Data\Data
+     * @return Data
      */
     public function output($to, $download = false)
     {
@@ -291,7 +291,7 @@ class Data
      *
      * @param  string $to
      * @param  boolean $append
-     * @return \Pop\Data\Data
+     * @return Data
      */
     public function save($to, $append = false)
     {

@@ -41,7 +41,7 @@ class Csv implements TypeInterface
         // Read the file data, separating by new lines.
         $lines = explode("\n", $data);
 
-        $linesOfData = [];
+        $linesOfData    = [];
         $newLinesOfData = [];
 
         // Loop through the line data, parsing any quoted or escaped data.
@@ -92,8 +92,8 @@ class Csv implements TypeInterface
      */
     public static function encode($data, $omit = null, $delim = ',', $esc = '"', $dt = null)
     {
-        $output = '';
-        $tempAry = [];
+        $output    = '';
+        $tempAry   = [];
         $headerAry = [];
 
         if (null === $omit) {

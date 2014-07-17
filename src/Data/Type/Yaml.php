@@ -36,8 +36,8 @@ class Yaml implements TypeInterface
      */
     public static function decode($data)
     {
-        $eol = (strpos($data, "-\r\n") !== false) ? "-\r\n" : "-\n";
-        $yaml = substr($data, (strpos($data, $eol) + strlen($eol)));
+        $eol     = (strpos($data, "-\r\n") !== false) ? "-\r\n" : "-\n";
+        $yaml    = substr($data, (strpos($data, $eol) + strlen($eol)));
         $yamlAry = explode($eol, $yaml);
 
         $nodes = [];
@@ -48,8 +48,8 @@ class Yaml implements TypeInterface
             $ob = [];
             foreach ($objs as $v) {
                 $vAry = explode(':', $v);
-                $val = trim($vAry[1]);
-                $val = substr($val, 1, -1);
+                $val  = trim($vAry[1]);
+                $val  = substr($val, 1, -1);
                 $ob[trim($vAry[0])] = stripslashes($val);
             }
             $nodes['row_' . $i] = $ob;
