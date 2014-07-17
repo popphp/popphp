@@ -13,5 +13,41 @@ changes planned for the new version is that it will support 5.4+ only, will be
 stripped down to least amount of internal dependencies as possible and will be
 integrated with Composer.
 
-###Stay Tuned!
+COMPONENTS
+----------
+ - Acl
+ - Application
+ - Archive
+ - Auth
+ - Cache
+ - Code
+ - Crypt
+ - Data
+ - Db
+ - Dom
+ - Event
+ - Feed
+ - File
+ - Filter
+ - Form [ _Dom, Validator_ ]
+ - Ftp
+ - Geo
+ - Http
+ - I18n
+ - Image
+ - Log [ _Db, Mail_ ]
+ - Mail
+ - Mvc [ _Http_ ]
+ - Nav [ _Acl, Dom_ ]
+ - Paginator
+ - Payment
+ - Pdf
+ - Service
+ - Shipping
+ - Validator
+ - Web
+ - Cli
+ - Config
+ - Version
+
 

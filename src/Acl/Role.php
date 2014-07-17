@@ -48,7 +48,7 @@ class Role
 
     /**
      * Role parent
-     * @var \Pop\Acl\Role
+     * @var Role
      */
     protected $parent = null;
 
@@ -58,7 +58,7 @@ class Role
      * Instantiate the role object
      *
      * @param  string $name
-     * @return \Pop\Acl\Role
+     * @return Role
      */
     public function __construct($name)
     {
@@ -79,11 +79,25 @@ class Role
      * Method to add a permission to the role
      *
      * @param  string $name
-     * @return \Pop\Acl\Role
+     * @return Role
      */
     public function addPermission($name)
     {
         $this->permissions[$name] = true;
+        return $this;
+    }
+
+    /**
+     * Method to remove a permission from the role
+     *
+     * @param  string $name
+     * @return Role
+     */
+    public function removePermission($name)
+    {
+        if (isset($this->permissions[$name])) {
+            unset($this->permissions[$name]);
+        }
         return $this;
     }
 
@@ -112,32 +126,47 @@ class Role
     /**
      * Method to add a child role
      *
-     * @param  mixed $role
-     * @return \Pop\Acl\Role
+     * @param  Role $role
+     * @return Role
      */
-    public function addChild($role)
+    public function addChild(Role $role)
     {
-        $child = ($role instanceof Role) ? $role : new Role($role);
-        $child->setParent($this);
-        $this->children[] = $child;
+        $this->children[] = $role;
+        if ($role->getName() !== $this) {
+            $role->setParent($this);
+        }
         return $this;
     }
 
     /**
-     * Method to set the role parent
+     * Method to set the inherited role
      *
-     * @param  \Pop\Acl\Role $parent
-     * @return \Pop\Acl\Role
+     * @param  Role $parent
+     * @return Role
      */
-    public function setParent($parent)
+    public function inheritsFrom(Role $parent)
     {
         $this->parent = $parent;
+        $this->parent->addChild($this);
+        return $this;
+    }
+
+    /**
+     * Method to set the parent role
+     *
+     * @param  Role $parent
+     * @return Role
+     */
+    public function setParent(Role $parent)
+    {
+        $this->parent = $parent;
+        return $this;
     }
 
     /**
      * Method to get the role parent
      *
-     * @return \Pop\Acl\Role
+     * @return Role
      */
     public function getParent()
     {
@@ -147,7 +176,7 @@ class Role
     /**
      * Method to see if the role has a parent
      *
-     * @return \Pop\Acl\Role
+     * @return Role
      */
     public function hasParent()
     {

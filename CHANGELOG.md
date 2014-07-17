@@ -3,7 +3,7 @@ Pop PHP Framework Changelog
 
 2.0.0a
 ------
-As of July 14, 2014
+As of July 17, 2014
 
 * PHP 5.4+ Only
 * Composer Support
@@ -13,6 +13,8 @@ As of July 14, 2014
     - Acl (separated from Auth)
     - Row Gateway and Table Gateway classes in the Db component
 * Revised
+    - Acl
+        + Add inheritsFrom() method for Acl\Role
     - Auth
         + Separated the Acl component and moved to its own folder
         + Added support for Http auth
