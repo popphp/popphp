@@ -30,6 +30,12 @@ class Textarea extends AbstractElement
 {
 
     /**
+     * Element type
+     * @var string
+     */
+    protected $type = 'textarea';
+
+    /**
      * Constructor
      *
      * Instantiate the textarea form element.
@@ -41,12 +47,23 @@ class Textarea extends AbstractElement
      */
     public function __construct($name, $value = null, $indent = null)
     {
-        $this->type = 'textarea';
         parent::__construct($this->type, $value, null, false, $indent);
 
         $this->setAttributes(['name' => $name, 'id' => $name]);
         $this->setValue($value);
         $this->setName($name);
+    }
+
+    /**
+     * Set whether the form element is required.
+     *
+     * @param  boolean $required
+     * @return Textarea
+     */
+    public function setRequired($required)
+    {
+        $this->setAttribute('required', 'required');
+        return parent::setRequired($required);
     }
 
 }

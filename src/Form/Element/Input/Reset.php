@@ -15,8 +15,6 @@
  */
 namespace Pop\Form\Element\Input;
 
-use Pop\Form\Element\AbstractElement;
-
 /**
  * Form reset element class
  *
@@ -28,8 +26,14 @@ use Pop\Form\Element\AbstractElement;
  * @version    2.0.0a
  */
 
-class Reset extends AbstractElement
+class Reset extends AbstractInput
 {
+
+    /**
+     * Element attributes
+     * @var array
+     */
+    protected $attributes = ['type' => 'reset'];
 
     /**
      * Constructor
@@ -43,12 +47,8 @@ class Reset extends AbstractElement
      */
     public function __construct($name, $value = null, $indent = null)
     {
-        $this->type = 'input';
-        parent::__construct($this->type, null, null, false, $indent);
-
-        $this->setAttributes(['type' => 'reset', 'name' => $name, 'id' => $name, 'value' => $value]);
-        $this->setValue($value);
-        $this->setName($name);
+        parent::__construct($name, $value, $indent);
+        $this->setAttributes(['name' => $name, 'id' => $name, 'value' => $value]);
     }
 
 }

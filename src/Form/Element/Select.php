@@ -80,6 +80,12 @@ class Select extends AbstractElement
     const MINUTES_15 = 'MINUTES_15';
 
     /**
+     * Element type
+     * @var string
+     */
+    protected $type = 'select';
+
+    /**
      * Constructor
      *
      * Instantiate the select form element object.
@@ -96,7 +102,6 @@ class Select extends AbstractElement
         $multiple = (isset($config['multiple']) ? (boolean)$config['multiple'] : false);
         $data     = (isset($config['data'])     ? $config['data']              : null);
 
-        $this->type = 'select';
         parent::__construct($this->type, null, null, false, $indent);
         $this->setAttributes(['name' => $name, 'id' => $name]);
         $this->setAsMultiple($multiple);
@@ -145,6 +150,18 @@ class Select extends AbstractElement
 
         $this->setValue($values);
         $this->setName($name);
+    }
+
+    /**
+     * Set whether the form element is required.
+     *
+     * @param  boolean $required
+     * @return Select
+     */
+    public function setRequired($required)
+    {
+        $this->setAttribute('required', 'required');
+        return parent::setRequired($required);
     }
 
     /**

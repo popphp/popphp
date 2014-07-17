@@ -15,8 +15,10 @@
  */
 namespace Pop\Form\Element\Input;
 
+use Pop\Form\Element\AbstractElement;
+
 /**
- * Form email element class
+ * Form button element class
  *
  * @category   Pop
  * @package    Pop_Form
@@ -26,41 +28,30 @@ namespace Pop\Form\Element\Input;
  * @version    2.0.0a
  */
 
-class Email extends AbstractInput
+abstract class AbstractInput extends AbstractElement
 {
 
     /**
-     * Element attributes
-     * @var array
+     * Element type
+     * @var string
      */
-    protected $attributes = ['type' => 'email'];
+    protected $type = 'input';
 
     /**
      * Constructor
      *
-     * Instantiate the email input form element.
+     * Instantiate the button input form element.
      *
      * @param  string $name
      * @param  string $value
      * @param  string $indent
-     * @return Email
+     * @return AbstractInput
      */
     public function __construct($name, $value = null, $indent = null)
     {
-        parent::__construct($name, $value, $indent);
-        $this->setAttributes(['name' => $name, 'id' => $name, 'value' => $value]);
-    }
-
-    /**
-     * Set whether the form element is required.
-     *
-     * @param  boolean $required
-     * @return Email
-     */
-    public function setRequired($required)
-    {
-        $this->setAttribute('required', 'required');
-        return parent::setRequired($required);
+        parent::__construct($this->type, null, null, false, $indent);
+        $this->setValue($value);
+        $this->setName($name);
     }
 
 }

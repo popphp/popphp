@@ -57,6 +57,129 @@ class Fields
     }
 
     /**
+     * Static factory method to create a field element object from a field config array
+     *
+     * @param  string $name
+     * @param  array  $field
+     * @param  array  $values
+     * @throws Exception
+     * @return Element\AbstractElement
+     */
+    public static function factory($name, array $field, array $values = null)
+    {
+        if (!isset($field['type'])) {
+            throw new Exception('Error: The field type was not set.');
+        }
+
+        $type       = $field['type'];
+        $label      = (isset($field['label']))      ? $field['label']      : null;
+        $required   = (isset($field['required']))   ? $field['required']   : null;
+        $attributes = (isset($field['attributes'])) ? $field['attributes'] : null;
+        $validators = (isset($field['validators'])) ? $field['validators'] : null;
+        $expire     = (isset($field['expire']))     ? $field['expire']     : 300;
+        $captcha    = (isset($field['captcha']))    ? $field['captcha']    : null;
+        $data       = (isset($field['data']))       ? $field['data']       : null;
+        $multiple   = (isset($field['multiple']))   ? $field['multiple']   : false;
+
+        if (isset($field['error'])) {
+            $error = [
+                'container'  => 'div',
+                'attributes' => ['class' => 'error'],
+                'pre'        => false
+            ];
+            foreach ($field['error'] as $key => $value) {
+                if ($key != 'pre') {
+                    $error['container']  = $key;
+                    $error['attributes'] = $value;
+                } else if ($key == 'pre') {
+                    $error['pre'] = $value;
+                }
+            }
+        } else {
+            $error = null;
+        }
+
+        if ((null !== $values) && array_key_exists($name, $values)) {
+            if (($type == 'checkbox') || ($type == 'radio') || ($type == 'select')) {
+                $value  = (isset($field['value'])) ? $field['value'] : null;
+                $marked = $values[$name];
+            } else {
+                $value  = $values[$name];
+                $marked = (isset($field['marked'])) ? $field['marked'] : null;
+            }
+        } else {
+            $value  = (isset($field['value']))  ? $field['value'] : null;
+            $marked = (isset($field['marked'])) ? $field['marked'] : null;
+        }
+
+        // Initialize the form element.
+        switch (strtolower($type)) {
+            case 'button':
+                $elem = new Element\Button($name, $value);
+                break;
+            case 'select':
+                $config = [
+                    'marked'   => $marked,
+                    'multiple' => $multiple,
+                    'data'     => $data
+                ];
+                $elem = new Element\Select($name, $value, null, $config);
+                break;
+            case 'textarea':
+                $elem = new Element\Textarea($name, $value);
+                break;
+            case 'checkbox':
+                $elem = new Element\Input\Checkbox($name, $value, null, $marked);
+                break;
+            case 'radio':
+                $elem = new Element\Input\Radio($name, $value, null, $marked);
+                break;
+            case 'csrf':
+                $elem = new Element\Input\Csrf($name, $value, null, $expire);
+                break;
+            case 'captcha':
+                $elem = new Element\Input\Captcha($name, $value, null, $expire, $captcha);
+                break;
+            case 'input-button':
+                $elem = new Element\Input\Button($name, $value);
+                break;
+            default:
+                $class = 'Pop\\Form\\Element\\Input\\' . ucfirst(strtolower($type));
+                if (!class_exists($class)) {
+                    throw new Exception('Error: That class for that form element does not exist.');
+                }
+                $elem = new $class($name, $value);
+        }
+
+        // Set the label.
+        if (null !== $label) {
+            $elem->setLabel($label);
+        }
+        // Set if required.
+        if (null !== $required) {
+            $elem->setRequired($required);
+        }
+        // Set if error display.
+        if (null !== $error) {
+            $elem->setErrorDisplay($error['container'], $error['attributes'], $error['pre']);
+        }
+        // Set any attributes.
+        if (null !== $attributes) {
+            $elem->setAttributes($attributes);
+        }
+        // Set any validators.
+        if (null !== $validators) {
+            if (is_array($validators)) {
+                $elem->addValidators($validators);
+            } else {
+                $elem->addValidator($validators);
+            }
+        }
+
+        return $elem;
+    }
+
+    /**
      * Add form fields from a related database table. The $tableInfo
      * parameter should be the returned array result from calling the
      * static Pop\Db\Record method, Record::getTableInfo();
@@ -121,6 +244,7 @@ class Fields
                 }
 
                 if ((stripos($key, 'email') !== false) || (stripos($key, 'e-mail') !== false) || (stripos($key, 'e_mail') !== false)) {
+                    $fieldType  = 'email';
                     $validators = new \Pop\Validator\Email();
                 }
 

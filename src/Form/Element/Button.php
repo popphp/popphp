@@ -30,6 +30,12 @@ class Button extends AbstractElement
 {
 
     /**
+     * Element type
+     * @var string
+     */
+    protected $type = 'button';
+
+    /**
      * Constructor
      *
      * Instantiate the buttom form element.
@@ -41,7 +47,6 @@ class Button extends AbstractElement
      */
     public function __construct($name, $value = null, $indent = null)
     {
-        $this->type = 'button';
         parent::__construct($this->type, $value, null, false, $indent);
 
         $this->setAttributes(['name' => $name, 'id' => $name]);

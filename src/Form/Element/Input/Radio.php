@@ -33,6 +33,12 @@ class Radio extends AbstractElement
 {
 
     /**
+     * Element type
+     * @var string
+     */
+    protected $type = 'input';
+
+    /**
      * Constructor
      *
      * Instantiate the radio input form elements.
@@ -45,7 +51,6 @@ class Radio extends AbstractElement
      */
     public function __construct($name, array $values, $indent = null, $marked = null)
     {
-        $this->type = 'radio';
         parent::__construct('fieldset', null, null, false, $indent);
         $this->setAttribute('class', 'radio-fieldset');
         $this->setMarked($marked);
@@ -53,9 +58,9 @@ class Radio extends AbstractElement
         // Create the radio elements and related span elements.
         $i = null;
         foreach ($values as $k => $v) {
-            $rad = new Child('input', null, null, false, $indent);
+            $rad = new Child($this->type, null, null, false, $indent);
             $rad->setAttributes([
-                'type'  => $this->type,
+                'type'  => 'radio',
                 'class' => 'radio',
                 'name'  => $name,
                 'id'    => ($name . $i),

@@ -15,8 +15,6 @@
  */
 namespace Pop\Form\Element\Input;
 
-use Pop\Form\Element\AbstractElement;
-
 /**
  * Form file element class
  *
@@ -28,8 +26,14 @@ use Pop\Form\Element\AbstractElement;
  * @version    2.0.0a
  */
 
-class File extends AbstractElement
+class File extends AbstractInput
 {
+
+    /**
+     * Element attributes
+     * @var array
+     */
+    protected $attributes = ['type' => 'file'];
 
     /**
      * Constructor
@@ -43,12 +47,20 @@ class File extends AbstractElement
      */
     public function __construct($name, $value = null, $indent = null)
     {
-        $this->type = 'input';
-        parent::__construct($this->type, null, null, false, $indent);
+        parent::__construct($name, $value, $indent);
+        $this->setAttributes(['name' => $name, 'id' => $name, 'value' => $value]);
+    }
 
-        $this->setAttributes(['type' => 'file', 'name' => $name, 'id' => $name, 'value' => $value]);
-        $this->setValue($value);
-        $this->setName($name);
+    /**
+     * Set whether the form element is required.
+     *
+     * @param  boolean $required
+     * @return File
+     */
+    public function setRequired($required)
+    {
+        $this->setAttribute('required', 'required');
+        return parent::setRequired($required);
     }
 
 }

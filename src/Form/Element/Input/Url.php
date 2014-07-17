@@ -15,8 +15,6 @@
  */
 namespace Pop\Form\Element\Input;
 
-use Pop\Form\Element\AbstractElement;
-
 /**
  * Form url element class
  *
@@ -28,8 +26,14 @@ use Pop\Form\Element\AbstractElement;
  * @version    2.0.0a
  */
 
-class Url extends AbstractElement
+class Url extends AbstractInput
 {
+
+    /**
+     * Element attributes
+     * @var array
+     */
+    protected $attributes = ['type' => 'url'];
 
     /**
      * Constructor
@@ -43,12 +47,20 @@ class Url extends AbstractElement
      */
     public function __construct($name, $value = null, $indent = null)
     {
-        $this->type = 'input';
-        parent::__construct($this->type, null, null, false, $indent);
+        parent::__construct($name, $value, $indent);
+        $this->setAttributes(['name' => $name, 'id' => $name, 'value' => $value]);
+    }
 
-        $this->setAttributes(['type' => 'url', 'name' => $name, 'id' => $name, 'value' => $value]);
-        $this->setValue($value);
-        $this->setName($name);
+    /**
+     * Set whether the form element is required.
+     *
+     * @param  boolean $required
+     * @return Url
+     */
+    public function setRequired($required)
+    {
+        $this->setAttribute('required', 'required');
+        return parent::setRequired($required);
     }
 
 }

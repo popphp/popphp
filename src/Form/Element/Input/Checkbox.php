@@ -31,6 +31,13 @@ use Pop\Form\Element\AbstractElement;
 
 class Checkbox extends AbstractElement
 {
+
+    /**
+     * Element type
+     * @var string
+     */
+    protected $type = 'input';
+
     /**
      * Constructor
      *
@@ -51,7 +58,7 @@ class Checkbox extends AbstractElement
         } else {
             $marked = [];
         }
-        $this->type = 'checkbox';
+
         parent::__construct('fieldset', null, null, false, $indent);
         $this->setAttribute('class', 'checkbox-fieldset');
         $this->setMarked($marked);
@@ -59,9 +66,9 @@ class Checkbox extends AbstractElement
         // Create the checkbox elements and related span elements.
         $i = null;
         foreach ($values as $k => $v) {
-            $chk = new Child('input', null, null, false, $indent);
+            $chk = new Child($this->type, null, null, false, $indent);
             $chk->setAttributes([
-                'type'  => $this->type,
+                'type'  => 'checkbox',
                 'class' => 'checkbox',
                 'name'  => ($name . '[]'),
                 'id'    => ($name . $i),

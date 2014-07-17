@@ -50,12 +50,8 @@ class Datalist extends Text
      */
     public function __construct($name, $value = null, $indent = null, array $values = null)
     {
-        $this->type = 'input';
-        parent::__construct($this->type, null, null, false, $indent);
-
-        $this->setAttributes(['type' => 'text', 'name' => $name, 'id' => $name, 'value' => $value, 'list' => $name . '-datalist']);
-        $this->setValue($value);
-        $this->setName($name);
+        parent::__construct($name, $value, $indent);
+        $this->setAttribute('list', $name . '-datalist');
 
         if (null !== $values) {
             $this->datalist = new Child('datalist', null, null, $this->indent);
@@ -67,11 +63,23 @@ class Datalist extends Text
     }
 
     /**
+     * Set whether the form element is required.
+     *
+     * @param  boolean $required
+     * @return Datalist
+     */
+    public function setRequired($required)
+    {
+        $this->setAttribute('required', 'required');
+        return parent::setRequired($required);
+    }
+
+    /**
      * Method to render the child and its child nodes.
      *
      * @param  boolean $ret
-     * @param  int $depth
-     * @param  string $indent
+     * @param  int     $depth
+     * @param  string  $indent
      * @param  string  $errorIndent
      * @return mixed
      */

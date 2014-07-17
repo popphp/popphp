@@ -168,7 +168,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Set whether the form element object is required.
+     * Set whether the form element is required.
      *
      * @param  boolean $required
      * @return AbstractElement
@@ -345,14 +345,32 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Add a validator the form element object.
+     * Add a validator the form element.
      *
      * @param  mixed $validator
+     * @throws Exception
      * @return AbstractElement
      */
     public function addValidator($validator)
     {
+        if (!($validator instanceof \Pop\Validator\AbstractValidator) && !is_callable($validator)) {
+            throw new Exception('Error: The validator must be an instance of Pop\Validator\AbstractValidator or a callable object.');
+        }
         $this->validators[] = $validator;
+        return $this;
+    }
+
+    /**
+     * Add multiple validators the form element.
+     *
+     * @param  array $validators
+     * @return AbstractElement
+     */
+    public function addValidators(array $validators)
+    {
+        foreach ($validators as $validator) {
+            $this->addValidator($validator);
+        }
         return $this;
     }
 
