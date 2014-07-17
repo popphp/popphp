@@ -32,7 +32,7 @@ interface ArchiveInterface
      * Method to instantiate an archive adapter object
      *
      * @param  \Pop\Archive\Archive $archive
-     * @return \Pop\Archive\Adapter\ArchiveInterface
+     * @return ArchiveInterface
      */
     public function __construct(\Pop\Archive\Archive $archive);
 

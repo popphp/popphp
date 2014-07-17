@@ -94,7 +94,7 @@ class Archive
      * @param  string $password
      * @param  string $prefix
      * @throws Exception
-     * @return \Pop\Archive\Archive
+     * @return Archive
      */
     public function __construct($archive, $password = null, $prefix = 'Pop\\Archive\\Adapter\\')
     {
@@ -256,7 +256,7 @@ class Archive
      *
      * @param  string $to
      * @throws Exception
-     * @return \Pop\Archive\Archive
+     * @return Archive
      */
     public function extract($to = null)
     {
@@ -276,7 +276,7 @@ class Archive
      * Method to create an archive file
      *
      * @param  string|array $files
-     * @return \Pop\Archive\Archive
+     * @return Archive
      */
     public function addFiles($files)
     {
@@ -300,7 +300,7 @@ class Archive
      * Method to compress an archive file with Gzip or Bzip2
      *
      * @param  string $ext
-     * @return \Pop\Archive\Archive
+     * @return Archive
      */
     public function compress($ext = 'gz')
     {

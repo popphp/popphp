@@ -50,7 +50,7 @@ class Zip implements ArchiveInterface
      * Method to instantiate an archive adapter object
      *
      * @param  \Pop\Archive\Archive $archive
-     * @return \Pop\Archive\Adapter\Zip
+     * @return Zip
      */
     public function __construct(\Pop\Archive\Archive $archive)
     {

@@ -97,7 +97,7 @@ class Http extends AbstractAdapter
      * @param string $uri
      * @param string $method
      * @throws Exception
-     * @return \Pop\Auth\Adapter\Http
+     * @return Http
      */
     public function __construct($uri, $method = 'GET')
     {

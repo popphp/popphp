@@ -77,7 +77,7 @@ class File extends AbstractAdapter
      *
      * @param string $filename
      * @param array  $options
-     * @return \Pop\Auth\Adapter\File
+     * @return File
      */
     public function __construct($filename, array $options = null)
     {
@@ -141,7 +141,7 @@ class File extends AbstractAdapter
      *
      * @param string $filename
      * @throws Exception
-     * @return \Pop\Auth\Adapter\File
+     * @return File
      */
     public function setFilename($filename)
     {
@@ -157,7 +157,7 @@ class File extends AbstractAdapter
      * Method to set the auth encryption
      *
      * @param string $encryption
-     * @return \Pop\Auth\Adapter\File
+     * @return File
      */
     public function setEncryption($encryption)
     {
@@ -169,7 +169,7 @@ class File extends AbstractAdapter
      * Method to set the auth realm
      *
      * @param string $realm
-     * @return \Pop\Auth\Adapter\File
+     * @return File
      */
     public function setRealm($realm)
     {
@@ -181,7 +181,7 @@ class File extends AbstractAdapter
      * Method to set the auth file delimiter
      *
      * @param string $delimiter
-     * @return \Pop\Auth\Adapter\File
+     * @return File
      */
     public function setDelimiter($delimiter)
     {

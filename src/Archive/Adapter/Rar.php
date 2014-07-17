@@ -52,7 +52,7 @@ class Rar implements ArchiveInterface
      * @param  \Pop\Archive\Archive $archive
      * @param  string               $password
      * @throws Exception
-     * @return \Pop\Archive\Adapter\Rar
+     * @return Rar
      */
     public function __construct(\Pop\Archive\Archive $archive, $password = null)
     {

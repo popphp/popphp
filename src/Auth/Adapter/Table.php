@@ -52,20 +52,15 @@ class Table extends AbstractAdapter
      * Instantiate the Table auth adapter object
      *
      * @param string $table
-     * @param array  $options
-     * @return \Pop\Auth\Adapter\Table
+     * @param string $usernameField
+     * @param string $passwordField
+     * @return Table
      */
-    public function __construct($table, array $options = null)
+    public function __construct($table, $usernameField = 'username', $passwordField = 'password')
     {
         $this->setTable($table);
-        if (null !== $options) {
-            if (isset($options['usernameField'])) {
-                $this->setUsernameField($options['usernameField']);
-            }
-            if (isset($options['passwordField'])) {
-                $this->setPasswordField($options['passwordField']);
-            }
-        }
+        $this->setUsernameField($usernameField);
+        $this->setPasswordField($passwordField);
     }
 
     /**
@@ -102,7 +97,7 @@ class Table extends AbstractAdapter
      * Method to set the table name
      *
      * @param string $table
-     * @return \Pop\Auth\Adapter\Table
+     * @return Table
      */
     public function setTable($table)
     {
@@ -114,9 +109,9 @@ class Table extends AbstractAdapter
      * Method to set the username field
      *
      * @param string $usernameField
-     * @return \Pop\Auth\Adapter\Table
+     * @return Table
      */
-    public function setUsernameField($usernameField)
+    public function setUsernameField($usernameField = 'username')
     {
         $this->usernameField = $usernameField;
         return $this;
@@ -126,9 +121,9 @@ class Table extends AbstractAdapter
      * Method to set the password field
      *
      * @param string $passwordField
-     * @return \Pop\Auth\Adapter\Table
+     * @return Table
      */
-    public function setPasswordField($passwordField)
+    public function setPasswordField($passwordField = 'password')
     {
         $this->passwordField = $passwordField;
         return $this;
@@ -148,7 +143,7 @@ class Table extends AbstractAdapter
             $this->passwordField => $this->password
         ]);
 
-        return (int)(isset($user->{$usernameField}));
+        return (int)(isset($user->{$this->usernameField}));
     }
 
 }

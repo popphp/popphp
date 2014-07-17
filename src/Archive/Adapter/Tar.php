@@ -50,7 +50,7 @@ class Tar implements ArchiveInterface
      * Method to instantiate an archive adapter object
      *
      * @param  \Pop\Archive\Archive $archive
-     * @return \Pop\Archive\Adapter\Tar
+     * @return Tar
      */
     public function __construct(\Pop\Archive\Archive $archive)
     {

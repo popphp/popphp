@@ -58,7 +58,7 @@ class Auth
      * Instantiate the auth object
      *
      * @param Adapter\AbstractAdapter $adapter
-     * @return \Pop\Auth\Auth
+     * @return Auth
      */
     public function __construct(Adapter\AbstractAdapter $adapter)
     {
@@ -68,7 +68,7 @@ class Auth
     /**
      * Method to get the auth adapter
      *
-     * @return \Pop\Auth\Adapter\AbstractAdapter
+     * @return Adapter\AbstractAdapter
      */
     public function adapter()
     {
@@ -92,14 +92,34 @@ class Auth
      */
     public function isValid()
     {
-        return (bool)$this->result;
+        return ($this->result == 1);
+    }
+
+    /**
+     * Method to get the username
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->adapter->getUsername();
+    }
+
+    /**
+     * Method to get the password
+     *
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->adapter->getPassword();
     }
 
     /**
      * Method to set the username
      *
      * @param  string $username
-     * @return \Pop\Auth\Auth
+     * @return Auth
      */
     public function setUsername($username)
     {
@@ -111,7 +131,7 @@ class Auth
      * Method to set the password
      *
      * @param  string $password
-     * @return \Pop\Auth\Auth
+     * @return Auth
      */
     public function setPassword($password)
     {
@@ -122,10 +142,18 @@ class Auth
     /**
      * Method to authenticate
      *
-     * @return \Pop\Auth\Auth
+     * @param  string $username
+     * @param  string $password
+     * @return Auth
      */
-    public function authenticate()
+    public function authenticate($username = null, $password = null)
     {
+        if (null !== $username) {
+            $this->adapter->setUsername($username);
+        }
+        if (null !== $password) {
+            $this->adapter->setPassword($password);
+        }
         $this->result = $this->adapter->authenticate();
         return $this;
     }
