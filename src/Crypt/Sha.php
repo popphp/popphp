@@ -52,7 +52,6 @@ class Sha extends AbstractCrypt
      */
     public function __construct($bits = 512, $rounds = 5000)
     {
-
         $this->setBits($bits);
         $this->setRounds($rounds);
     }

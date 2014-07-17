@@ -48,7 +48,7 @@ class Memcached implements AdapterInterface
      * @param  string $host
      * @param  int    $port
      * @throws Exception
-     * @return \Pop\Cache\Adapter\Memcached
+     * @return Memcached
      */
     public function __construct($host = 'localhost', $port = 11211)
     {

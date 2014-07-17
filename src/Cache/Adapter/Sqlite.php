@@ -73,7 +73,7 @@ class Sqlite implements AdapterInterface
      * @param  string  $table
      * @param  boolean $pdo
      * @throws Exception
-     * @return \Pop\Cache\Adapter\Sqlite
+     * @return Sqlite
      */
     public function __construct($db, $table = 'pop_cache', $pdo = false)
     {
@@ -145,7 +145,7 @@ class Sqlite implements AdapterInterface
      * Method to Set the cache db table.
      *
      * @param  string $table
-     * @return \Pop\Cache\Adapter\Sqlite
+     * @return Sqlite
      */
     public function setTable($table = 'pop_cache')
     {
@@ -269,7 +269,7 @@ class Sqlite implements AdapterInterface
      * Prepare a SQL query.
      *
      * @param  string $sql
-     * @return \Pop\Cache\Adapter\Sqlite
+     * @return Sqlite
      */
     protected function prepare($sql)
     {
@@ -281,7 +281,7 @@ class Sqlite implements AdapterInterface
      * Bind parameters to for a prepared SQL query.
      *
      * @param  array  $params
-     * @return \Pop\Cache\Adapter\Sqlite
+     * @return Sqlite
      */
     protected function bindParams($params)
     {

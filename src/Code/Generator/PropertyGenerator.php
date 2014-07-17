@@ -30,7 +30,7 @@ class PropertyGenerator implements GeneratorInterface
 
     /**
      * Docblock generator object
-     * @var \Pop\Code\Generator\DocblockGenerator
+     * @var DocblockGenerator
      */
     protected $docblock = null;
 
@@ -85,7 +85,7 @@ class PropertyGenerator implements GeneratorInterface
      * @param  string $type
      * @param  mixed  $value
      * @param  string $visibility
-     * @return \Pop\Code\Generator\PropertyGenerator
+     * @return PropertyGenerator
      */
     public function __construct($name, $type, $value = null, $visibility = 'public')
     {
@@ -99,7 +99,7 @@ class PropertyGenerator implements GeneratorInterface
      * Set the property static flag
      *
      * @param  boolean $static
-     * @return \Pop\Code\Generator\PropertyGenerator
+     * @return PropertyGenerator
      */
     public function setStatic($static = false)
     {
@@ -121,7 +121,7 @@ class PropertyGenerator implements GeneratorInterface
      * Set the property description
      *
      * @param  string $desc
-     * @return \Pop\Code\Generator\PropertyGenerator
+     * @return PropertyGenerator
      */
     public function setDesc($desc = null)
     {
@@ -151,7 +151,7 @@ class PropertyGenerator implements GeneratorInterface
      * Set the property indent
      *
      * @param  string $indent
-     * @return \Pop\Code\Generator\PropertyGenerator
+     * @return PropertyGenerator
      */
     public function setIndent($indent = null)
     {
@@ -173,7 +173,7 @@ class PropertyGenerator implements GeneratorInterface
      * Set the property type
      *
      * @param  string $type
-     * @return \Pop\Code\Generator\PropertyGenerator
+     * @return PropertyGenerator
      */
     public function setType($type)
     {
@@ -195,7 +195,7 @@ class PropertyGenerator implements GeneratorInterface
      * Set the property name
      *
      * @param  string $name
-     * @return \Pop\Code\Generator\PropertyGenerator
+     * @return PropertyGenerator
      */
     public function setName($name)
     {
@@ -217,7 +217,7 @@ class PropertyGenerator implements GeneratorInterface
      * Set the property value
      *
      * @param  mixed $value
-     * @return \Pop\Code\Generator\PropertyGenerator
+     * @return PropertyGenerator
      */
     public function setValue($value = null)
     {
@@ -239,7 +239,7 @@ class PropertyGenerator implements GeneratorInterface
      * Set the property visibility
      *
      * @param  string $visibility
-     * @return \Pop\Code\Generator\PropertyGenerator
+     * @return PropertyGenerator
      */
     public function setVisibility($visibility = 'public')
     {
@@ -261,7 +261,7 @@ class PropertyGenerator implements GeneratorInterface
      * Set the docblock generator object
      *
      * @param  DocblockGenerator $docblock
-     * @return \Pop\Code\Generator\PropertyGenerator
+     * @return PropertyGenerator
      */
     public function setDocblock(DocblockGenerator $docblock)
     {
@@ -272,7 +272,7 @@ class PropertyGenerator implements GeneratorInterface
     /**
      * Access the docblock generator object
      *
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function getDocblock()
     {

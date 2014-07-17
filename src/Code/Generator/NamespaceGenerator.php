@@ -42,7 +42,7 @@ class NamespaceGenerator implements GeneratorInterface
 
     /**
      * Docblock generator object
-     * @var \Pop\Code\Generator\DocblockGenerator
+     * @var DocblockGenerator
      */
     protected $docblock = null;
 
@@ -64,7 +64,7 @@ class NamespaceGenerator implements GeneratorInterface
      * Instantiate the property generator object
      *
      * @param  string $namespace
-     * @return \Pop\Code\Generator\NamespaceGenerator
+     * @return NamespaceGenerator
      */
 
     public function __construct($namespace)
@@ -76,7 +76,7 @@ class NamespaceGenerator implements GeneratorInterface
      * Set the namespace
      *
      * @param  string $namespace
-     * @return \Pop\Code\Generator\NamespaceGenerator
+     * @return NamespaceGenerator
      */
     public function setNamespace($namespace)
     {
@@ -99,7 +99,7 @@ class NamespaceGenerator implements GeneratorInterface
      *
      * @param  string $use
      * @param  string $as
-     * @return \Pop\Code\Generator\NamespaceGenerator
+     * @return NamespaceGenerator
      */
     public function setUse($use, $as = null)
     {
@@ -111,7 +111,7 @@ class NamespaceGenerator implements GeneratorInterface
      * Set namespaces to use
      *
      * @param  array $uses
-     * @return \Pop\Code\Generator\NamespaceGenerator
+     * @return NamespaceGenerator
      */
     public function setUses(array $uses)
     {

@@ -47,7 +47,7 @@ class Cache
      *
      * @param  Adapter\AdapterInterface $adapter
      * @param  int                      $lifetime
-     * @return \Pop\Cache\Cache
+     * @return Cache
      */
     public function __construct(Adapter\AdapterInterface $adapter, $lifetime = 0)
     {
@@ -96,7 +96,7 @@ class Cache
      * Method to set the cache lifetime.
      *
      * @param  int $time
-     * @return \Pop\Cache\Cache
+     * @return Cache
      */
     public function setLifetime($time = 0)
     {

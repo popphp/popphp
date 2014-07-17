@@ -40,7 +40,7 @@ class Apc implements AdapterInterface
      * Instantiate the APC cache object
      *
      * @throws Exception
-     * @return \Pop\Cache\Adapter\Apc
+     * @return Apc
      */
     public function __construct()
     {

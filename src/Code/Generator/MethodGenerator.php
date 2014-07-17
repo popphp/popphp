@@ -30,7 +30,7 @@ class MethodGenerator implements GeneratorInterface
 
     /**
      * Docblock generator object
-     * @var \Pop\Code\Generator\DocblockGenerator
+     * @var DocblockGenerator
      */
     protected $docblock = null;
 
@@ -102,7 +102,7 @@ class MethodGenerator implements GeneratorInterface
      * @param  string  $name
      * @param  string  $visibility
      * @param  boolean $static
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function __construct($name, $visibility = 'public', $static = false)
     {
@@ -115,7 +115,7 @@ class MethodGenerator implements GeneratorInterface
      * Set the method static flag
      *
      * @param  boolean $static
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function setStatic($static = false)
     {
@@ -137,7 +137,7 @@ class MethodGenerator implements GeneratorInterface
      * Set the method abstract flag
      *
      * @param  boolean $abstract
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function setAbstract($abstract = false)
     {
@@ -159,7 +159,7 @@ class MethodGenerator implements GeneratorInterface
      * Set the method final flag
      *
      * @param  boolean $final
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function setFinal($final = false)
     {
@@ -181,7 +181,7 @@ class MethodGenerator implements GeneratorInterface
      * Set the method interface flag
      *
      * @param  boolean $interface
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function setInterface($interface = false)
     {
@@ -203,7 +203,7 @@ class MethodGenerator implements GeneratorInterface
      * Set the method description
      *
      * @param  string $desc
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function setDesc($desc = null)
     {
@@ -233,7 +233,7 @@ class MethodGenerator implements GeneratorInterface
      * Set the method indent
      *
      * @param  string $indent
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function setIndent($indent = null)
     {
@@ -255,7 +255,7 @@ class MethodGenerator implements GeneratorInterface
      * Set the method name
      *
      * @param  string $name
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function setName($name)
     {
@@ -278,7 +278,7 @@ class MethodGenerator implements GeneratorInterface
      *
      * @param  string $body
      * @param  boolean $newline
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function setBody($body, $newline = true)
     {
@@ -294,7 +294,7 @@ class MethodGenerator implements GeneratorInterface
      *
      * @param  string  $body
      * @param  boolean $newline
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function appendToBody($body, $newline = true)
     {
@@ -320,7 +320,7 @@ class MethodGenerator implements GeneratorInterface
      * Set the docblock generator object
      *
      * @param  DocblockGenerator $docblock
-     * @return \Pop\Code\Generator\ClassGenerator
+     * @return ClassGenerator
      */
     public function setDocblock(DocblockGenerator $docblock)
     {
@@ -331,7 +331,7 @@ class MethodGenerator implements GeneratorInterface
     /**
      * Access the docblock generator object
      *
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function getDocblock()
     {
@@ -342,7 +342,7 @@ class MethodGenerator implements GeneratorInterface
      * Set the method visibility
      *
      * @param  string $visibility
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function setVisibility($visibility = 'public')
     {
@@ -366,7 +366,7 @@ class MethodGenerator implements GeneratorInterface
      * @param string  $name
      * @param mixed   $value
      * @param string  $type
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function addArgument($name, $value = null, $type = null)
     {
@@ -399,7 +399,7 @@ class MethodGenerator implements GeneratorInterface
      * Add method arguments
      *
      * @param array $args
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function addArguments(array $args)
     {
@@ -417,7 +417,7 @@ class MethodGenerator implements GeneratorInterface
      * @param string  $name
      * @param mixed   $value
      * @param string  $type
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function addParameter($name, $value = null, $type = null)
     {
@@ -429,7 +429,7 @@ class MethodGenerator implements GeneratorInterface
      * Add method arguments (alias method for convenience)
      *
      * @param array $args
-     * @return \Pop\Code\Generator\MethodGenerator
+     * @return MethodGenerator
      */
     public function addParameters(array $args)
     {

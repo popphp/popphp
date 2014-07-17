@@ -59,7 +59,7 @@ class DocblockGenerator implements GeneratorInterface
      *
      * @param  string $desc
      * @param  string $indent
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function __construct($desc = null, $indent = null)
     {
@@ -74,7 +74,7 @@ class DocblockGenerator implements GeneratorInterface
      * @param  string $docblock
      * @param  string $forceIndent
      * @throws Exception
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public static function parse($docblock, $forceIndent = null)
     {
@@ -163,7 +163,7 @@ class DocblockGenerator implements GeneratorInterface
      * Set the docblock description
      *
      * @param  string $desc
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function setDesc($desc = null)
     {
@@ -185,7 +185,7 @@ class DocblockGenerator implements GeneratorInterface
      * Set the docblock indent
      *
      * @param  string $indent
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function setIndent($indent = null)
     {
@@ -208,7 +208,7 @@ class DocblockGenerator implements GeneratorInterface
      *
      * @param  string $name
      * @param  string $desc
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function setTag($name, $desc = null)
     {
@@ -220,7 +220,7 @@ class DocblockGenerator implements GeneratorInterface
      * Add basic tags
      *
      * @param  array $tags
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function setTags(array $tags)
     {
@@ -247,7 +247,7 @@ class DocblockGenerator implements GeneratorInterface
      * @param  string $type
      * @param  string $var
      * @param  string $desc
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function setParam($type, $var = null, $desc = null)
     {
@@ -259,7 +259,7 @@ class DocblockGenerator implements GeneratorInterface
      * Add a param tag
      *
      * @param  array $params
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function setParams(array $params)
     {
@@ -286,7 +286,7 @@ class DocblockGenerator implements GeneratorInterface
      *
      * @param  string $type
      * @param  string $desc
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function setReturn($type, $desc = null)
     {

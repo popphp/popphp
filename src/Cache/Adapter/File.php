@@ -41,7 +41,7 @@ class File implements AdapterInterface
      *
      * @param  string $dir
      * @throws Exception
-     * @return \Pop\Cache\Adapter\File
+     * @return File
      */
     public function __construct($dir)
     {

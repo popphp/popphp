@@ -78,19 +78,19 @@ class Generator
 
     /**
      * Code object
-     * @var \Pop\Code\Generator\ClassGenerator|\Pop\Code\Generator\InterfaceGenerator
+     * @var Generator\ClassGenerator|Generator\InterfaceGenerator
      */
     protected $code = null;
 
     /**
      * Docblock generator object
-     * @var \Pop\Code\Generator\DocblockGenerator
+     * @var Generator\DocblockGenerator
      */
     protected $docblock = null;
 
     /**
      * Namespace generator object
-     * @var \Pop\Code\Generator\NamespaceGenerator
+     * @var Generator\NamespaceGenerator
      */
     protected $namespace = null;
 
@@ -117,9 +117,9 @@ class Generator
      * @var array
      */
     protected $allowed = [
-        'php'    => 'text/plain',
-        'php3'   => 'text/plain',
-        'phtml'  => 'text/plain'
+        'php'   => 'text/plain',
+        'php3'  => 'text/plain',
+        'phtml' => 'text/plain'
     ];
 
     /**
@@ -129,7 +129,7 @@ class Generator
      *
      * @param  string $file
      * @param  int    $type
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function __construct($file, $type = Generator::CREATE_NONE)
     {
@@ -153,7 +153,7 @@ class Generator
     /**
      * Create a class generator object
      *
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function createInterface()
     {
@@ -164,7 +164,7 @@ class Generator
     /**
      * Create a class generator object
      *
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function createClass()
     {
@@ -175,7 +175,7 @@ class Generator
     /**
      * Access the code generator object
      *
-     * @return \Pop\Code\Generator\ClassGenerator|\Pop\Code\Generator\InterfaceGenerator
+     * @return Generator\ClassGenerator|Generator\InterfaceGenerator
      */
     public function code()
     {
@@ -186,7 +186,7 @@ class Generator
      * Set the code close flag
      *
      * @param  boolean $close
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function setClose($close = false)
     {
@@ -198,7 +198,7 @@ class Generator
      * Set the code indent
      *
      * @param  string $indent
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function setIndent($indent = null)
     {
@@ -220,7 +220,7 @@ class Generator
      * Set the namespace generator object
      *
      * @param  Generator\NamespaceGenerator $namespace
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function setNamespace(Generator\NamespaceGenerator $namespace)
     {
@@ -231,7 +231,7 @@ class Generator
     /**
      * Access the namespace generator object
      *
-     * @return \Pop\Code\Generator\NamespaceGenerator
+     * @return Generator\NamespaceGenerator
      */
     public function getNamespace()
     {
@@ -242,7 +242,7 @@ class Generator
      * Set the docblock generator object
      *
      * @param  Generator\DocblockGenerator $docblock
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function setDocblock(Generator\DocblockGenerator $docblock)
     {
@@ -253,7 +253,7 @@ class Generator
     /**
      * Access the docblock generator object
      *
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return Generator\DocblockGenerator
      */
     public function getDocblock()
     {
@@ -265,7 +265,7 @@ class Generator
      *
      * @param  string $body
      * @param  boolean $newline
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function setBody($body, $newline = true)
     {
@@ -282,7 +282,7 @@ class Generator
      *
      * @param  string $body
      * @param  boolean $newline
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function appendToBody($body, $newline = true)
     {
@@ -384,7 +384,7 @@ class Generator
      * Output the code object directly.
      *
      * @param  boolean $download
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function output($download = false)
     {
@@ -412,7 +412,7 @@ class Generator
      *
      * @param  string $to
      * @param  boolean $append
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function save($to = null, $append = false)
     {

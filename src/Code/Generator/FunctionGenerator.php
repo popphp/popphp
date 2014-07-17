@@ -30,7 +30,7 @@ class FunctionGenerator implements GeneratorInterface
 
     /**
      * Docblock generator object
-     * @var \Pop\Code\Generator\DocblockGenerator
+     * @var DocblockGenerator
      */
     protected $docblock = null;
 
@@ -77,7 +77,7 @@ class FunctionGenerator implements GeneratorInterface
      *
      * @param  string $name
      * @param  mixed  $func
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function __construct($name, $func = null)
     {
@@ -91,7 +91,7 @@ class FunctionGenerator implements GeneratorInterface
      * Set the function closure flag
      *
      * @param  boolean $closure
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function setClosure($closure = false)
     {
@@ -113,7 +113,7 @@ class FunctionGenerator implements GeneratorInterface
      * Set the function description
      *
      * @param  string $desc
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function setDesc($desc = null)
     {
@@ -143,7 +143,7 @@ class FunctionGenerator implements GeneratorInterface
      * Set the function indent
      *
      * @param  string $indent
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function setIndent($indent = null)
     {
@@ -165,7 +165,7 @@ class FunctionGenerator implements GeneratorInterface
      * Set the function name
      *
      * @param  string $name
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function setName($name)
     {
@@ -188,7 +188,7 @@ class FunctionGenerator implements GeneratorInterface
      *
      * @param  string $body
      * @param  boolean $newline
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function setBody($body, $newline = true)
     {
@@ -204,7 +204,7 @@ class FunctionGenerator implements GeneratorInterface
      *
      * @param  string  $body
      * @param  boolean $newline
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function appendToBody($body, $newline = true)
     {
@@ -230,7 +230,7 @@ class FunctionGenerator implements GeneratorInterface
      * Set the docblock generator object
      *
      * @param  DocblockGenerator $docblock
-     * @return \Pop\Code\Generator\ClassGenerator
+     * @return ClassGenerator
      */
     public function setDocblock(DocblockGenerator $docblock)
     {
@@ -241,7 +241,7 @@ class FunctionGenerator implements GeneratorInterface
     /**
      * Access the docblock generator object
      *
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function getDocblock()
     {
@@ -254,7 +254,7 @@ class FunctionGenerator implements GeneratorInterface
      * @param string  $name
      * @param mixed   $value
      * @param string  $type
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function addArgument($name, $value = null, $type = null)
     {
@@ -284,7 +284,7 @@ class FunctionGenerator implements GeneratorInterface
      * Add function arguments
      *
      * @param array $args
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function addArguments(array $args)
     {
@@ -302,7 +302,7 @@ class FunctionGenerator implements GeneratorInterface
      * @param string  $name
      * @param mixed   $value
      * @param string  $type
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function addParameter($name, $value = null, $type = null)
     {
@@ -314,7 +314,7 @@ class FunctionGenerator implements GeneratorInterface
      * Add function arguments (alias method for convenience)
      *
      * @param array $args
-     * @return \Pop\Code\Generator\FunctionGenerator
+     * @return FunctionGenerator
      */
     public function addParameters(array $args)
     {

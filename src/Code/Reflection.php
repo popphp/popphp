@@ -38,7 +38,7 @@ class Reflection extends \ReflectionClass
 
     /**
      * Code generator object
-     * @var \Pop\Code\Generator
+     * @var Generator
      */
     protected $generator = null;
 
@@ -48,25 +48,13 @@ class Reflection extends \ReflectionClass
      * Instantiate the code reflection object
      *
      * @param  string  $code
-     * @return \Pop\Code\Reflection
+     * @return Reflection
      */
     public function __construct($code)
     {
         $this->code = $code;
         parent::__construct($code);
         $this->buildGenerator();
-    }
-
-    /**
-     * Static method to instantiate the code reflection object and return itself
-     * to facilitate chaining methods together.
-     *
-     * @param  string  $code
-     * @return \Pop\Code\Reflection
-     */
-    public static function factory($code)
-    {
-        return new self($code);
     }
 
     /**
@@ -82,7 +70,7 @@ class Reflection extends \ReflectionClass
     /**
      * Get the code generator
      *
-     * @return \Pop\Code\Generator
+     * @return Generator
      */
     public function generator()
     {

@@ -30,13 +30,13 @@ class InterfaceGenerator implements GeneratorInterface
 
     /**
      * Docblock generator object
-     * @var \Pop\Code\Generator\DocblockGenerator
+     * @var DocblockGenerator
      */
     protected $docblock = null;
 
     /**
      * Namespace generator object
-     * @var \Pop\Code\Generator\NamespaceGenerator
+     * @var NamespaceGenerator
      */
     protected $namespace = null;
 
@@ -77,7 +77,7 @@ class InterfaceGenerator implements GeneratorInterface
      *
      * @param  string  $name
      * @param  string  $parent
-     * @return \Pop\Code\Generator\InterfaceGenerator
+     * @return InterfaceGenerator
      */
     public function __construct($name, $parent = null)
     {
@@ -89,7 +89,7 @@ class InterfaceGenerator implements GeneratorInterface
      * Set the interface indent
      *
      * @param  string $indent
-     * @return \Pop\Code\Generator\InterfaceGenerator
+     * @return InterfaceGenerator
      */
     public function setIndent($indent = null)
     {
@@ -111,7 +111,7 @@ class InterfaceGenerator implements GeneratorInterface
      * Set the interface name
      *
      * @param  string $name
-     * @return \Pop\Code\Generator\InterfaceGenerator
+     * @return InterfaceGenerator
      */
     public function setName($name)
     {
@@ -133,7 +133,7 @@ class InterfaceGenerator implements GeneratorInterface
      * Set the interface parent
      *
      * @param  string $parent
-     * @return \Pop\Code\Generator\InterfaceGenerator
+     * @return InterfaceGenerator
      */
     public function setParent($parent = null)
     {
@@ -155,7 +155,7 @@ class InterfaceGenerator implements GeneratorInterface
      * Set the namespace generator object
      *
      * @param  NamespaceGenerator $namespace
-     * @return \Pop\Code\Generator\ClassGenerator
+     * @return ClassGenerator
      */
     public function setNamespace(NamespaceGenerator $namespace)
     {
@@ -166,7 +166,7 @@ class InterfaceGenerator implements GeneratorInterface
     /**
      * Access the namespace generator object
      *
-     * @return \Pop\Code\Generator\NamespaceGenerator
+     * @return NamespaceGenerator
      */
     public function getNamespace()
     {
@@ -177,7 +177,7 @@ class InterfaceGenerator implements GeneratorInterface
      * Set the docblock generator object
      *
      * @param  DocblockGenerator $docblock
-     * @return \Pop\Code\Generator\ClassGenerator
+     * @return ClassGenerator
      */
     public function setDocblock(DocblockGenerator $docblock)
     {
@@ -188,7 +188,7 @@ class InterfaceGenerator implements GeneratorInterface
     /**
      * Access the docblock generator object
      *
-     * @return \Pop\Code\Generator\DocblockGenerator
+     * @return DocblockGenerator
      */
     public function getDocblock()
     {
@@ -199,7 +199,7 @@ class InterfaceGenerator implements GeneratorInterface
      * Add a class method
      *
      * @param  MethodGenerator $method
-     * @return \Pop\Code\Generator\ClassGenerator
+     * @return ClassGenerator
      */
     public function addMethod(MethodGenerator $method)
     {
@@ -223,7 +223,7 @@ class InterfaceGenerator implements GeneratorInterface
      * Remove a method property
      *
      * @param  mixed $method
-     * @return \Pop\Code\Generator\ClassGenerator
+     * @return ClassGenerator
      */
     public function removeMethod($method)
     {
