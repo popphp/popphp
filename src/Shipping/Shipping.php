@@ -40,7 +40,7 @@ class Shipping
      * Instantiate the shipping object
      *
      * @param  Adapter\AbstractAdapter $adapter
-     * @return \Pop\Shipping\Shipping
+     * @return Shipping
      */
     public function __construct(Adapter\AbstractAdapter $adapter)
     {
@@ -50,7 +50,7 @@ class Shipping
     /**
      * Access the adapter
      *
-     * @return \Pop\Shipping\Adapter\AbstractAdapter
+     * @return Adapter\AbstractAdapter
      */
     public function adapter()
     {

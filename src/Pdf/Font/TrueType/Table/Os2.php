@@ -52,7 +52,7 @@ class Os2
      * Instantiate a OTF 'OS/2' table object.
      *
      * @param  \Pop\Pdf\Font\TrueType $font
-     * @return \Pop\Pdf\Font\TrueType\Table\Os2
+     * @return Os2
      */
     public function __construct(\Pop\Pdf\Font\TrueType $font)
     {

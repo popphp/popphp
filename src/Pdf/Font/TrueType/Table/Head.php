@@ -40,7 +40,7 @@ class Head
      * Instantiate a TTF 'head' table object.
      *
      * @param  \Pop\Pdf\Font\TrueType $font
-     * @return \Pop\Pdf\Font\TrueType\Table\Head
+     * @return Head
      */
     public function __construct(\Pop\Pdf\Font\TrueType $font)
     {

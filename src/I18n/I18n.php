@@ -62,7 +62,7 @@ class I18n
      *
      * @param  string $lang
      * @param  string $dir
-     * @return \Pop\I18n\I18n
+     * @return I18n
      */
     public function __construct($lang = null, $dir = null)
     {

@@ -40,7 +40,7 @@ class Loca
      * Instantiate a TTF 'loca' table object.
      *
      * @param  \Pop\Pdf\Font\TrueType $font
-     * @return \Pop\Pdf\Font\TrueType\Table\Loca
+     * @return Loca
      */
     public function __construct(\Pop\Pdf\Font\TrueType $font)
     {

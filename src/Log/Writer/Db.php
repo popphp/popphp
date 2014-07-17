@@ -48,7 +48,7 @@ class Db implements WriterInterface
      * @param  \Pop\Db\Sql $sql
      * @param  string      $table
      * @throws Exception
-     * @return \Pop\Log\Writer\Db
+     * @return Db
      */
     public function __construct(\Pop\Db\Sql $sql, $table = null)
     {
@@ -65,7 +65,7 @@ class Db implements WriterInterface
      * Method to write to the log
      *
      * @param  array $logEntry
-     * @return \Pop\Log\Writer\Db
+     * @return Db
      */
     public function writeLog(array $logEntry)
     {

@@ -74,7 +74,7 @@ class Logger
      * Instantiate the logger object.
      *
      * @param  Writer\WriterInterface $writer
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function __construct(Writer\WriterInterface $writer = null)
     {
@@ -87,7 +87,7 @@ class Logger
      * Method to add a log writer
      *
      * @param  Writer\WriterInterface $writer
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function addWriter(Writer\WriterInterface $writer)
     {
@@ -109,7 +109,7 @@ class Logger
      * Method to set timestamp format
      *
      * @param  string $format
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function setTimestamp($format = 'Y-m-d H:i:s')
     {
@@ -133,7 +133,7 @@ class Logger
      * @param  int   $priority
      * @param  mixed $message
      * @param  array $options
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function log($priority, $message, array $options = [])
     {
@@ -156,7 +156,7 @@ class Logger
      *
      * @param  mixed $message
      * @param  array $options
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function emerg($message, array $options = [])
     {
@@ -168,7 +168,7 @@ class Logger
      *
      * @param  mixed $message
      * @param  array $options
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function alert($message, array $options = [])
     {
@@ -180,7 +180,7 @@ class Logger
      *
      * @param  mixed $message
      * @param  array $options
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function crit($message, array $options = [])
     {
@@ -192,7 +192,7 @@ class Logger
      *
      * @param  mixed $message
      * @param  array $options
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function err($message, array $options = [])
     {
@@ -204,7 +204,7 @@ class Logger
      *
      * @param  mixed $message
      * @param  array $options
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function warn($message, array $options = [])
     {
@@ -216,7 +216,7 @@ class Logger
      *
      * @param  mixed $message
      * @param  array $options
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function notice($message, array $options = [])
     {
@@ -228,7 +228,7 @@ class Logger
      *
      * @param  mixed $message
      * @param  array $options
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function info($message, array $options = [])
     {
@@ -240,7 +240,7 @@ class Logger
      *
      * @param  mixed $message
      * @param  array $options
-     * @return \Pop\Log\Logger
+     * @return Logger
      */
     public function debug($message, array $options = [])
     {

@@ -84,7 +84,7 @@ class File implements WriterInterface
      * @param  string $file
      * @param  array $types
      * @throws Exception
-     * @return \Pop\Log\Writer\File
+     * @return File
      */
     public function __construct($file, array $types = null)
     {
@@ -116,7 +116,7 @@ class File implements WriterInterface
      * Method to write to the log
      *
      * @param  array $logEntry
-     * @return \Pop\Log\Writer\File
+     * @return File
      */
     public function writeLog(array $logEntry)
     {

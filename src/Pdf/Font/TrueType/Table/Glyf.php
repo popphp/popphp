@@ -46,7 +46,7 @@ class Glyf
      * Instantiate a TTF 'glyf' table object.
      *
      * @param  \Pop\Pdf\Font\TrueType $font
-     * @return \Pop\Pdf\Font\TrueType\Table\Glyf
+     * @return Glyf
      */
     public function __construct(\Pop\Pdf\Font\TrueType $font)
     {

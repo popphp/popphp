@@ -30,7 +30,7 @@ class Cookie
 
     /**
      * Instance of the cookie object
-     * @var \Pop\Web\Cookie
+     * @var Cookie
      */
     static private $instance;
 
@@ -76,7 +76,7 @@ class Cookie
      * Private method to instantiate the cookie object.
      *
      * @param  array $options
-     * @return \Pop\Web\Cookie
+     * @return Cookie
      */
     private function __construct(array $options = [])
     {
@@ -87,7 +87,7 @@ class Cookie
      * Private method to set options
      *
      * @param  array $options
-     * @return \Pop\Web\Cookie
+     * @return Cookie
      */
     private function setOptions(array $options = [])
     {
@@ -117,7 +117,7 @@ class Cookie
      * already, and instantiate the object if it does not exist.
      *
      * @param  array $options
-     * @return \Pop\Web\Cookie
+     * @return Cookie
      */
     public static function getInstance(array $options = [])
     {
@@ -134,7 +134,7 @@ class Cookie
      * @param  string  $name
      * @param  mixed   $value
      * @param  array   $options
-     * @return \Pop\Web\Cookie
+     * @return Cookie
      */
     public function set($name, $value, array $options = null)
     {

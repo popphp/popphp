@@ -40,7 +40,7 @@ class Maxp
      * Instantiate a TTF 'maxp' table object.
      *
      * @param  \Pop\Pdf\Font\TrueType $font
-     * @return \Pop\Pdf\Font\TrueType\Table\Maxp
+     * @return Maxp
      */
     public function __construct(\Pop\Pdf\Font\TrueType $font)
     {

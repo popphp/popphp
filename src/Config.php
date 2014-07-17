@@ -52,7 +52,7 @@ class Config
      *
      * @param  array   $config
      * @param  boolean $changes
-     * @return \Pop\Config
+     * @return Config
      */
     public function __construct(array $config = [], $changes = false)
     {
@@ -65,7 +65,7 @@ class Config
      *
      * @param  mixed $config
      * @throws \Exception
-     * @return \Pop\Config
+     * @return Config
      */
     public function merge($config)
     {
@@ -74,7 +74,7 @@ class Config
         }
 
         $orig = $this->toArray();
-        $merge = ($config instanceof \Pop\Config) ? $config->toArray() : $config;
+        $merge = ($config instanceof Config) ? $config->toArray() : $config;
 
         $this->setConfig(array_merge_recursive($orig, $merge));
         $this->array = [];

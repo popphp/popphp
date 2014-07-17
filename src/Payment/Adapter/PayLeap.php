@@ -122,7 +122,7 @@ class PayLeap extends AbstractAdapter
      * @param  string  $apiLoginId
      * @param  string  $transKey
      * @param  boolean $test
-     * @return \Pop\Payment\Adapter\PayLeap
+     * @return PayLeap
      */
     public function __construct($apiLoginId, $transKey, $test = false)
     {

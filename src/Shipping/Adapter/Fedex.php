@@ -129,7 +129,7 @@ class Fedex extends AbstractAdapter
      * @param  string $account
      * @param  string $meter
      * @param  string $wsdl
-     * @return \Pop\Shipping\Adapter\Fedex
+     * @return Fedex
      */
     public function __construct($key, $password, $account, $meter, $wsdl)
     {

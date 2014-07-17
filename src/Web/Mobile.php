@@ -142,7 +142,7 @@ class Mobile
      * Instantiate the mobile session object.
      *
      * @param  array $options
-     * @return \Pop\Web\Mobile
+     * @return Mobile
      */
     public function __construct(array $options = [])
     {
@@ -269,7 +269,7 @@ class Mobile
      * Method to set desktop URL
      *
      * @param string $url
-     * @return \Pop\Web\Mobile
+     * @return Mobile
      */
     public function setDesktopUrl($url)
     {
@@ -281,7 +281,7 @@ class Mobile
      * Method to set tablet URL
      *
      * @param string $url
-     * @return \Pop\Web\Mobile
+     * @return Mobile
      */
     public function setTabletUrl($url)
     {
@@ -293,7 +293,7 @@ class Mobile
      * Method to set mobile URL
      *
      * @param string $url
-     * @return \Pop\Web\Mobile
+     * @return Mobile
      */
     public function setMobileUrl($url)
     {
@@ -305,7 +305,7 @@ class Mobile
      * Method to set route flag
      *
      * @param string $route
-     * @return \Pop\Web\Mobile
+     * @return Mobile
      */
     public function setRoute($route)
     {

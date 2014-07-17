@@ -165,7 +165,7 @@ class PayPal extends AbstractAdapter
      * @param  string  $apiPass
      * @param  string  $sign
      * @param  boolean $test
-     * @return \Pop\Payment\Adapter\PayPal
+     * @return PayPal
      */
     public function __construct($apiUser, $apiPass, $sign, $test = false)
     {

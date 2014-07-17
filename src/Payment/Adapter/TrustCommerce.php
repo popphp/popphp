@@ -133,7 +133,7 @@ class TrustCommerce extends AbstractAdapter
      * @param  string  $custId
      * @param  string  $password
      * @param  boolean $test
-     * @return \Pop\Payment\Adapter\TrustCommerce
+     * @return TrustCommerce
      */
     public function __construct($custId, $password, $test = false)
     {

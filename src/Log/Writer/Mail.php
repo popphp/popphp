@@ -48,7 +48,7 @@ class Mail implements WriterInterface
      * @param  mixed $emails
      * @param  array $options
      * @throws Exception
-     * @return \Pop\Log\Writer\Mail
+     * @return Mail
      */
     public function __construct($emails, array $options = [])
     {
@@ -76,7 +76,7 @@ class Mail implements WriterInterface
      * Method to write to the log
      *
      * @param  array $logEntry
-     * @return \Pop\Log\Writer\Mail
+     * @return Mail
      */
     public function writeLog(array $logEntry)
     {

@@ -46,7 +46,7 @@ class Cmap
      * Instantiate a TTF 'cmap' table object.
      *
      * @param  \Pop\Pdf\Font\TrueType $font
-     * @return \Pop\Pdf\Font\TrueType\Table\Cmap
+     * @return Cmap
      */
     public function __construct(\Pop\Pdf\Font\TrueType $font)
     {

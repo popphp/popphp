@@ -47,7 +47,7 @@ class Post
      * Instantiate a TTF 'post' table object.
      *
      * @param  \Pop\Pdf\Font\TrueType $font
-     * @return \Pop\Pdf\Font\TrueType\Table\Post
+     * @return Post
      */
     public function __construct(\Pop\Pdf\Font\TrueType $font)
     {

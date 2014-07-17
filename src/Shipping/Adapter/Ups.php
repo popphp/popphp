@@ -177,7 +177,7 @@ class Ups extends AbstractAdapter
      * @param  string  $accessKey
      * @param  string  $userId
      * @param  string  $password
-     * @return \Pop\Shipping\Adapter\Ups
+     * @return Ups
      */
     public function __construct($accessKey, $userId, $password)
     {

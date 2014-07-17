@@ -52,7 +52,7 @@ class Hhea
      * Instantiate a TTF 'hhea' table object.
      *
      * @param  \Pop\Pdf\Font\TrueType $font
-     * @return \Pop\Pdf\Font\TrueType\Table\Hhea
+     * @return Hhea
      */
     public function __construct(\Pop\Pdf\Font\TrueType $font)
     {

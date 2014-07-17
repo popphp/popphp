@@ -179,7 +179,7 @@ abstract class AbstractFont
      *
      * @param  string $font
      * @throws Exception
-     * @return \Pop\Pdf\Font\AbstractFont
+     * @return AbstractFont
      */
     public function __construct($font)
     {

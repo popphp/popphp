@@ -66,7 +66,7 @@ class Name
      * Instantiate a TTF 'name' table object.
      *
      * @param  \Pop\Pdf\Font\TrueType $font
-     * @return \Pop\Pdf\Font\TrueType\Table\Name
+     * @return Name
      */
     public function __construct(\Pop\Pdf\Font\TrueType $font)
     {

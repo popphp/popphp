@@ -76,7 +76,7 @@ class Info
      * Instantiate a PDF info object.
      *
      * @param  string $str
-     * @return \Pop\Pdf\Object\Info
+     * @return Info
      */
     public function __construct($str = null)
     {

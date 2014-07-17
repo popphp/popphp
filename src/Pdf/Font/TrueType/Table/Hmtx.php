@@ -40,7 +40,7 @@ class Hmtx
      * Instantiate a TTF 'hmtx' table object.
      *
      * @param  \Pop\Pdf\Font\TrueType $font
-     * @return \Pop\Pdf\Font\TrueType\Table\Hmtx
+     * @return Hmtx
      */
     public function __construct(\Pop\Pdf\Font\TrueType $font)
     {

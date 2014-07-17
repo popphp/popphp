@@ -65,7 +65,7 @@ class Import
      *
      * @param  string $pdf
      * @param  int|string|array $pgs
-     * @return \Pop\Pdf\Import
+     * @return Import
      */
     public function __construct($pdf, $pgs = null)
     {

@@ -82,7 +82,7 @@ class Payment
      * Instantiate the payment object
      *
      * @param  Adapter\AbstractAdapter $adapter
-     * @return \Pop\Payment\Payment
+     * @return Payment
      */
     public function __construct(Adapter\AbstractAdapter $adapter)
     {
@@ -92,7 +92,7 @@ class Payment
     /**
      * Access the adapter
      *
-     * @return \Pop\Payment\Adapter\AbstractAdapter
+     * @return Adapter\AbstractAdapter
      */
     public function adapter()
     {
@@ -215,7 +215,7 @@ class Payment
     /**
      * Set the shipping data fields to the same as billing data fields
      *
-     * @return \Pop\Payment\Payment
+     * @return Payment
      */
     public function shippingSameAsBilling()
     {

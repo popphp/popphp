@@ -139,7 +139,7 @@ class UsaEpay extends AbstractAdapter
      *
      * @param  string  $sourceKey
      * @param  boolean $test
-     * @return \Pop\Payment\Adapter\UsaEpay
+     * @return UsaEpay
      */
     public function __construct($sourceKey, $test = false)
     {

@@ -114,7 +114,7 @@ class Usps extends AbstractAdapter
      * @param  string  $username
      * @param  string  $password
      * @param  boolean $test
-     * @return \Pop\Shipping\Adapter\Usps
+     * @return Usps
      */
     public function __construct($username, $password, $test = false)
     {

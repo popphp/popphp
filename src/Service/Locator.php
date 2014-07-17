@@ -74,7 +74,7 @@ class Locator
      *
      * @param  array $services
      * @throws Exception
-     * @return \Pop\Service\Locator
+     * @return Locator
      */
     public function __construct(array $services = null)
     {
@@ -105,7 +105,7 @@ class Locator
      * @param  string $name
      * @param  mixed  $call
      * @param  mixed  $params
-     * @return \Pop\Service\Locator
+     * @return Locator
      */
     public function set($name, $call, $params = null)
     {
@@ -161,7 +161,7 @@ class Locator
      * Remove a service
      *
      * @param  string $name
-     * @return \Pop\Service\Locator
+     * @return Locator
      */
     public function remove($name)
     {
@@ -180,7 +180,7 @@ class Locator
      *
      * @param  string $name
      * @throws Exception
-     * @return \Pop\Service\Locator
+     * @return Locator
      */
     protected function load($name)
     {

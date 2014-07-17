@@ -64,7 +64,7 @@ class TrueType extends AbstractFont
      * Instantiate a TrueType font file object based on a pre-existing font file on disk.
      *
      * @param  string $font
-     * @return \Pop\Pdf\Font\TrueType
+     * @return TrueType
      */
     public function __construct($font)
     {

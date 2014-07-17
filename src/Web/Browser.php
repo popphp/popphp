@@ -105,7 +105,7 @@ class Browser
      *
      * Instantiate the browser session object.
      *
-     * @return \Pop\Web\Browser
+     * @return Browser
      */
     public function __construct()
     {

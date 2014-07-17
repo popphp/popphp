@@ -82,7 +82,7 @@ class Font
      * @param  int     $oi
      * @param  boolean $comp
      * @throws Exception
-     * @return \Pop\Pdf\Parser\Font
+     * @return Font
      */
     public function __construct($fle, $fi, $oi, $comp = false)
     {

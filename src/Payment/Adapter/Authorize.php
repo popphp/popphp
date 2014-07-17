@@ -170,7 +170,7 @@ class Authorize extends AbstractAdapter
      * @param  string  $apiLoginId
      * @param  string  $transKey
      * @param  boolean $test
-     * @return \Pop\Payment\Adapter\Authorize
+     * @return Authorize
      */
     public function __construct($apiLoginId, $transKey, $test = false)
     {
