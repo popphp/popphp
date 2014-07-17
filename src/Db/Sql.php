@@ -84,7 +84,7 @@ class Sql
 
     /**
      * Database object
-     * @var \Pop\Db\Adapter\AdapterInterface
+     * @var Adapter\AdapterInterface
      */
     protected $db = null;
 
@@ -114,7 +114,7 @@ class Sql
 
     /**
      * SQL clause object
-     * @var \Pop\Db\Sql\AbstractSql
+     * @var Sql\AbstractSql
      */
     protected $clause = null;
 
@@ -135,10 +135,10 @@ class Sql
      *
      * Instantiate the SQL object.
      *
-     * @param  \Pop\Db\Adapter\AdapterInterface $db
-     * @param  mixed                            $table
-     * @param  string                           $alias
-     * @return \Pop\Db\Sql
+     * @param  Adapter\AdapterInterface $db
+     * @param  mixed                    $table
+     * @param  string                   $alias
+     * @return Sql
      */
     public function __construct(Adapter\AdapterInterface $db, $table = null, $alias = null)
     {
@@ -150,8 +150,8 @@ class Sql
     /**
      * Set the database adapter object
      *
-     * @param  \Pop\Db\Adapter\AdapterInterface $db
-     * @return \Pop\Db\Sql
+     * @param  Adapter\AdapterInterface $db
+     * @return Sql
      */
     public function setDb(Adapter\AdapterInterface $db)
     {
@@ -191,9 +191,9 @@ class Sql
      * Set the quote ID type
      *
      * @param  string $type
-     * @return \Pop\Db\Sql
+     * @return Sql
      */
-    public function setQuoteId($type = \Pop\Db\Sql::NO_QUOTE)
+    public function setQuoteId($type = Sql::NO_QUOTE)
     {
         $this->quoteIdType = $type;
         return $this;
@@ -203,7 +203,7 @@ class Sql
      * Set current table to operate on.
      *
      * @param  mixed $table
-     * @return \Pop\Db\Sql
+     * @return Sql
      */
     public function setTable($table = null)
     {
@@ -215,7 +215,7 @@ class Sql
      * Set current table to operate on. (alias for setTable)
      *
      * @param  mixed $table
-     * @return \Pop\Db\Sql
+     * @return Sql
      */
     public function from($table = null)
     {
@@ -227,7 +227,7 @@ class Sql
      * Set current table to operate on. (alias for setTable)
      *
      * @param  mixed $table
-     * @return \Pop\Db\Sql
+     * @return Sql
      */
     public function into($table = null)
     {
@@ -239,7 +239,7 @@ class Sql
      * Set alias name
      *
      * @param  string $alias
-     * @return \Pop\Db\Sql
+     * @return Sql
      */
     public function setAlias($alias = null)
     {
@@ -270,7 +270,7 @@ class Sql
     /**
      * Get the current database adapter object.
      *
-     * @return \Pop\Db\Adapter\AdapterInterface
+     * @return Adapter\AdapterInterface
      */
     public function getDb()
     {
@@ -280,7 +280,7 @@ class Sql
     /**
      * Get the current database adapter object (alias method.)
      *
-     * @return \Pop\Db\Adapter\AdapterInterface
+     * @return Adapter\AdapterInterface
      */
     public function db()
     {
@@ -406,11 +406,11 @@ class Sql
      * Create a select statement
      *
      * @param  mixed $columns
-     * @return \Pop\Db\Sql\Select
+     * @return Sql\Select
      */
     public function select($columns = null)
     {
-        if ((null === $this->clause) || !($this->clause instanceof \Pop\Db\Sql\Select)) {
+        if ((null === $this->clause) || !($this->clause instanceof Sql\Select)) {
             $this->clause = new Sql\Select($this, $columns);
         }
 
@@ -422,11 +422,11 @@ class Sql
      *
      * @param  array $columns
      * @throws Exception
-     * @return \Pop\Db\Sql\Insert
+     * @return Sql\Insert
      */
     public function insert(array $columns = null)
     {
-        if ((null === $this->clause) || !($this->clause instanceof \Pop\Db\Sql\Insert)) {
+        if ((null === $this->clause) || !($this->clause instanceof Sql\Insert)) {
             if (null === $columns) {
                 throw new Exception('Error: The columns parameter cannot be null for a new INSERT clause.');
             }
@@ -441,11 +441,11 @@ class Sql
      *
      * @param  array $columns
      * @throws Exception
-     * @return \Pop\Db\Sql\Update
+     * @return Sql\Update
      */
     public function update(array $columns = null)
     {
-        if ((null === $this->clause) || !($this->clause instanceof \Pop\Db\Sql\Update)) {
+        if ((null === $this->clause) || !($this->clause instanceof Sql\Update)) {
             if (null === $columns) {
                 throw new Exception('Error: The columns parameter cannot be null for a new UPDATE clause.');
             }
@@ -458,11 +458,11 @@ class Sql
     /**
      * Create a delete statement
      *
-     * @return \Pop\Db\Sql\Update
+     * @return Sql\Update
      */
     public function delete()
     {
-        if ((null === $this->clause) || !($this->clause instanceof \Pop\Db\Sql\Delete)) {
+        if ((null === $this->clause) || !($this->clause instanceof Sql\Delete)) {
             $this->clause = new Sql\Delete($this);
         }
 

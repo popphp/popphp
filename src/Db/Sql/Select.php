@@ -60,7 +60,7 @@ class Select extends AbstractSql
 
     /**
      * WHERE predicate object
-     * @var \Pop\Db\Sql\Where
+     * @var Where
      */
     protected $where = null;
 
@@ -72,7 +72,7 @@ class Select extends AbstractSql
 
     /**
      * HAVING predicate object
-     * @var \Pop\Db\Sql\Having
+     * @var Having
      */
     protected $having = null;
 
@@ -82,7 +82,7 @@ class Select extends AbstractSql
      * @param  mixed  $foreignTables
      * @param  array  $columns
      * @param  string $typeOfJoin
-     * @return \Pop\Db\Sql\Select
+     * @return Select
      */
     public function join($foreignTables, array $columns, $typeOfJoin = 'LEFT JOIN')
     {
@@ -115,7 +115,7 @@ class Select extends AbstractSql
     /**
      * Set the DISTINCT keyword
      *
-     * @return \Pop\Db\Sql\Select
+     * @return Select
      */
     public function distinct()
     {
@@ -127,7 +127,7 @@ class Select extends AbstractSql
      * Set the WHERE clause
      *
      * @param  mixed $where
-     * @return \Pop\Db\Sql\Select
+     * @return Select
      */
     public function where($where = null)
     {
@@ -153,7 +153,7 @@ class Select extends AbstractSql
      * Set the GROUP BY value
      *
      * @param mixed $by
-     * @return \Pop\Db\Sql\Select
+     * @return Select
      */
     public function groupBy($by)
     {
@@ -184,7 +184,7 @@ class Select extends AbstractSql
      * Set the HAVING clause
      *
      * @param  mixed $having
-     * @return \Pop\Db\Sql\Having
+     * @return Having
      */
     public function having($having = null)
     {

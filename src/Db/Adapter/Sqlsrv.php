@@ -46,8 +46,8 @@ class Sqlsrv extends AbstractAdapter
      * Instantiate the SQLSrv database connection object.
      *
      * @param  array $options
-     * @throws \Pop\Db\Adapter\Exception
-     * @return \Pop\Db\Adapter\Sqlsrv
+     * @throws Exception
+     * @return Sqlsrv
      */
     public function __construct(array $options)
     {
@@ -80,7 +80,7 @@ class Sqlsrv extends AbstractAdapter
     /**
      * Throw an exception upon a database error.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     public function showError()
@@ -95,10 +95,10 @@ class Sqlsrv extends AbstractAdapter
      */
     public function getErrors()
     {
-        $errors = null;
+        $errors   = null;
         $errorAry = sqlsrv_errors();
 
-        foreach ($errorAry as $key => $value) {
+        foreach ($errorAry as $value) {
             $errors .= 'SQLSTATE: ' . $value['SQLSTATE'] . ', CODE: ' . $value['code'] . ' => ' . stripslashes($value['message']) . PHP_EOL;
         }
 
@@ -110,7 +110,7 @@ class Sqlsrv extends AbstractAdapter
      *
      * @param  array  $params
      * @param  mixed  $options
-     * @return \Pop\Db\Adapter\Sqlsrv
+     * @return Sqlsrv
      */
     public function bindParams($params, $options = null)
     {
@@ -138,7 +138,7 @@ class Sqlsrv extends AbstractAdapter
      * Prepare a SQL query.
      *
      * @param  string $sql
-     * @return \Pop\Db\Adapter\Sqlsrv
+     * @return Sqlsrv
      */
     public function prepare($sql)
     {
@@ -168,7 +168,7 @@ class Sqlsrv extends AbstractAdapter
     /**
      * Execute the prepared SQL query.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     public function execute()
@@ -196,7 +196,7 @@ class Sqlsrv extends AbstractAdapter
     /**
      * Return the results array from the results resource.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return array
      */
     public function fetch()
@@ -208,7 +208,7 @@ class Sqlsrv extends AbstractAdapter
                 throw new Exception('Error: The database result resource is not currently set.');
             }
 
-            return new sqlsrv_fetch_array($this->result, SQLSRV_FETCH_ASSOC);
+            return sqlsrv_fetch_array($this->result, SQLSRV_FETCH_ASSOC);
         }
     }
 
@@ -242,7 +242,7 @@ class Sqlsrv extends AbstractAdapter
     /**
      * Return the number of rows in the result.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return int
      */
     public function numberOfRows()
@@ -259,7 +259,7 @@ class Sqlsrv extends AbstractAdapter
     /**
      * Return the number of fields in the result.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return int
      */
     public function numberOfFields()

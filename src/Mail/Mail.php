@@ -42,7 +42,7 @@ class Mail
 
     /**
      * Sending queue
-     * @var \Pop\Mail\Queue
+     * @var Queue
      */
     protected $queue = null;
 
@@ -60,7 +60,7 @@ class Mail
 
     /**
      * Message body
-     * @var \Pop\Mail\Message
+     * @var Message
      */
     protected $message = null;
 
@@ -89,7 +89,7 @@ class Mail
      *
      * @param  string $subj
      * @param  mixed  $rcpts
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function __construct($subj = null, $rcpts = null)
     {
@@ -105,7 +105,7 @@ class Mail
     /**
      * Get the mail queue
      *
-     * @return \Pop\Mail\Queue
+     * @return Queue
      */
     public function getQueue()
     {
@@ -115,7 +115,7 @@ class Mail
     /**
      * Get the mail message
      *
-     * @return \Pop\Mail\Message
+     * @return Message
      */
     public function getMessage()
     {
@@ -218,11 +218,11 @@ class Mail
      *
      * @param  string $email
      * @param  string $name
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function to($email, $name = null)
     {
-        $this->queue->add($email, $name);
+        $this->add($email, $name);
         return $this;
     }
 
@@ -231,7 +231,7 @@ class Mail
      *
      * @param  string $email
      * @param  string $name
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function add($email, $name = null)
     {
@@ -244,7 +244,7 @@ class Mail
      *
      * @param  mixed $rcpts
      * @throws Exception
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function addRecipients($rcpts)
     {
@@ -258,7 +258,7 @@ class Mail
      * @param  string  $email
      * @param  string  $name
      * @param  boolean $replyTo
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function from($email, $name = null, $replyTo = true)
     {
@@ -277,7 +277,7 @@ class Mail
      * @param  string  $email
      * @param  string  $name
      * @param  boolean $from
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function replyTo($email, $name = null, $from = true)
     {
@@ -295,7 +295,7 @@ class Mail
      *
      * @param  string  $email
      * @param  string  $name
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function cc($email, $name = null)
     {
@@ -315,7 +315,7 @@ class Mail
      *
      * @param  string  $email
      * @param  string  $name
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function bcc($email, $name = null)
     {
@@ -335,8 +335,7 @@ class Mail
      *
      * @param  string $name
      * @param  string $value
-     * @throws Exception
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function setHeader($name, $value)
     {
@@ -348,8 +347,7 @@ class Mail
      * Set mail headers
      *
      * @param  array $headers
-     * @throws Exception
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function setHeaders(array $headers)
     {
@@ -364,7 +362,7 @@ class Mail
      * Set the subject
      *
      * @param  string $subj
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function setSubject($subj)
     {
@@ -376,7 +374,7 @@ class Mail
      * Set MIME boundary
      *
      * @param  string $bnd
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function setBoundary($bnd = null)
     {
@@ -388,7 +386,7 @@ class Mail
      * Set EOL
      *
      * @param  string $eol
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function setEol($eol = Mail::CRLF)
     {
@@ -400,7 +398,7 @@ class Mail
      * Set character set
      *
      * @param  string $chr
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function setCharset($chr)
     {
@@ -412,7 +410,7 @@ class Mail
      * Set text part of the message.
      *
      * @param  string $text
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function setText($text)
     {
@@ -424,7 +422,7 @@ class Mail
      * Set HTML part of the message.
      *
      * @param  string $html
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function setHtml($html)
     {
@@ -436,7 +434,7 @@ class Mail
      * Set the send as group flag
      *
      * @param  boolean $group
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function sendAsGroup($group)
     {
@@ -449,7 +447,7 @@ class Mail
      *
      * @param  string $file
      * @throws Exception
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function attachFile($file)
     {
@@ -461,7 +459,7 @@ class Mail
      * Set parameters
      *
      * @param mixed $params
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function setParams($params = null)
     {
@@ -510,8 +508,8 @@ class Mail
 
                 // Replace any set placeholder content within the subject or message.
                 foreach ($rcpt as $key => $value) {
-                    $subject =  str_replace('[{' . $key . '}]', $value, $subject);
-                    $message =  str_replace('[{' . $key . '}]', $value, $message);
+                    $subject = str_replace('[{' . $key . '}]', $value, $subject);
+                    $message = str_replace('[{' . $key . '}]', $value, $message);
                 }
 
                 // Send the email message.
@@ -525,7 +523,7 @@ class Mail
      *
      * @param string $to
      * @param string $format
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function saveTo($to = null, $format = null)
     {
@@ -600,18 +598,18 @@ class Mail
      *
      * @param string  $from
      * @param boolean $delete
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function sendFrom($from = null, $delete = false)
     {
-        $dir = (null !== $from) ? $from : getcwd();
-        $emailDir = new \Pop\File\Dir($dir, true);
-        $emailFiles = $emailDir->getFiles();
+        $dir        = (null !== $from) ? $from : getcwd();
+        $emailFiles = scandir($dir);
+
         if (isset($emailFiles[0])) {
             foreach ($emailFiles as $email) {
-                if (file_exists($email)) {
+                if (file_exists($dir . DIRECTORY_SEPARATOR . $email)) {
                     // Get the email data from the contents
-                    $emailData = $this->getEmailFromFile($email);
+                    $emailData = $this->getEmailFromFile($dir . DIRECTORY_SEPARATOR . $email);
 
                     // Send the email message.
                     mail($emailData['to'], $emailData['subject'], $emailData['message'], $emailData['headers'], $this->params);
@@ -623,6 +621,7 @@ class Mail
                 }
             }
         }
+
         return $this;
     }
 

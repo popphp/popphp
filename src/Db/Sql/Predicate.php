@@ -62,7 +62,7 @@ class Predicate
      * Instantiate the predicate collection object.
      *
      * @param  \Pop\Db\Sql $sql
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function __construct(\Pop\Db\Sql $sql)
     {
@@ -73,7 +73,7 @@ class Predicate
      * Add a predicate from a string
      *
      * @param  mixed $predicate
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function add($predicate)
     {
@@ -159,7 +159,7 @@ class Predicate
     /**
      * Add a nested predicate
      *
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function nest()
     {
@@ -195,7 +195,7 @@ class Predicate
      * @param  string $column
      * @param  string $value
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function equalTo($column, $value, $combine = 'AND')
     {
@@ -213,7 +213,7 @@ class Predicate
      * @param  string $column
      * @param  string $value
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function notEqualTo($column, $value, $combine = 'AND')
     {
@@ -231,7 +231,7 @@ class Predicate
      * @param  string $column
      * @param  string $value
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function greaterThan($column, $value, $combine = 'AND')
     {
@@ -249,7 +249,7 @@ class Predicate
      * @param  string $column
      * @param  string $value
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function greaterThanOrEqualTo($column, $value, $combine = 'AND')
     {
@@ -267,7 +267,7 @@ class Predicate
      * @param  string $column
      * @param  string $value
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function lessThan($column, $value, $combine = 'AND')
     {
@@ -285,7 +285,7 @@ class Predicate
      * @param  string $column
      * @param  string $value
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function lessThanOrEqualTo($column, $value, $combine = 'AND')
     {
@@ -303,7 +303,7 @@ class Predicate
      * @param  string $column
      * @param  string $value
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function like($column, $value, $combine = 'AND')
     {
@@ -321,7 +321,7 @@ class Predicate
      * @param  string $column
      * @param  string $value
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function notLike($column, $value, $combine = 'AND')
     {
@@ -340,7 +340,7 @@ class Predicate
      * @param  string $value1
      * @param  string $value2
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function between($column, $value1, $value2, $combine = 'AND')
     {
@@ -359,7 +359,7 @@ class Predicate
      * @param  string $value1
      * @param  string $value2
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function notBetween($column, $value1, $value2, $combine = 'AND')
     {
@@ -377,7 +377,7 @@ class Predicate
      * @param  string $column
      * @param  mixed  $values
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function in($column, $values, $combine = 'AND')
     {
@@ -395,7 +395,7 @@ class Predicate
      * @param  string $column
      * @param  mixed  $values
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function notIn($column, $values, $combine = 'AND')
     {
@@ -412,7 +412,7 @@ class Predicate
      *
      * @param  string $column
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function isNull($column, $combine = 'AND')
     {
@@ -429,7 +429,7 @@ class Predicate
      *
      * @param  string $column
      * @param  string $combine
-     * @return \Pop\Db\Sql\Predicate
+     * @return Predicate
      */
     public function isNotNull($column, $combine = 'AND')
     {

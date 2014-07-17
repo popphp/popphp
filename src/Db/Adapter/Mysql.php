@@ -34,8 +34,8 @@ class Mysql extends AbstractAdapter
      * Instantiate the Mysql database connection object using mysqli
      *
      * @param  array $options
-     * @throws \Pop\Db\Adapter\Exception
-     * @return \Pop\Db\Adapter\Mysql
+     * @throws Exception
+     * @return Mysql
      */
     public function __construct(array $options)
     {
@@ -58,7 +58,7 @@ class Mysql extends AbstractAdapter
     /**
      * Throw an exception upon a database error.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     public function showError()
@@ -70,7 +70,7 @@ class Mysql extends AbstractAdapter
      * Prepare a SQL query.
      *
      * @param  string $sql
-     * @return \Pop\Db\Adapter\Mysql
+     * @return Mysql
      */
     public function prepare($sql)
     {
@@ -84,7 +84,7 @@ class Mysql extends AbstractAdapter
      * Bind parameters to a prepared SQL query.
      *
      * @param  array  $params
-     * @return \Pop\Db\Adapter\Mysql
+     * @return Mysql
      */
     public function bindParams($params)
     {
@@ -155,7 +155,7 @@ class Mysql extends AbstractAdapter
     /**
      * Execute the prepared SQL query.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     public function execute()
@@ -183,7 +183,7 @@ class Mysql extends AbstractAdapter
     /**
      * Return the results array from the results resource.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return array
      */
     public function fetch()
@@ -223,7 +223,7 @@ class Mysql extends AbstractAdapter
     /**
      * Return the number of rows in the result.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return int
      */
     public function numberOfRows()
@@ -241,7 +241,7 @@ class Mysql extends AbstractAdapter
     /**
      * Return the number of fields in the result.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return int
      */
     public function numberOfFields()

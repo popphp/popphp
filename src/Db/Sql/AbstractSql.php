@@ -65,7 +65,7 @@ abstract class AbstractSql
      *
      * @param  \Pop\Db\Sql $sql
      * @param  mixed       $columns
-     * @return \Pop\Db\Sql\AbstractSql
+     * @return AbstractSql
      */
     public function __construct(\Pop\Db\Sql $sql, $columns = null)
     {
@@ -83,7 +83,7 @@ abstract class AbstractSql
      *
      * @param mixed  $by
      * @param string $order
-     * @return \Pop\Db\Sql\AbstractSql
+     * @return AbstractSql
      */
     public function orderBy($by, $order = 'ASC')
     {
@@ -122,7 +122,7 @@ abstract class AbstractSql
      * Set the LIMIT value
      *
      * @param mixed $limit
-     * @return \Pop\Db\Sql\AbstractSql
+     * @return AbstractSql
      */
     public function limit($limit)
     {
@@ -134,7 +134,7 @@ abstract class AbstractSql
      * Set the OFFSET value
      *
      * @param  int $offset
-     * @return \Pop\Db\Sql\AbstractSql
+     * @return AbstractSql
      */
     public function offset($offset)
     {

@@ -72,7 +72,7 @@ class Table extends AbstractGateway
      * @param  array $params
      * @param  array $options
      * @throws Exception
-     * @return \Pop\Db\Gateway\Table
+     * @return Table
      */
     public function select($set = null, $where = null, array $params = null, array $options = [])
     {
@@ -115,7 +115,7 @@ class Table extends AbstractGateway
      *
      * @param  array $set
      * @throws Exception
-     * @return \Pop\Db\Gateway\Table
+     * @return Table
      */
     public function insert(array $set)
     {
@@ -160,7 +160,7 @@ class Table extends AbstractGateway
      * @param  mixed $where
      * @param  array $pars
      * @throws Exception
-     * @return \Pop\Db\Gateway\Table
+     * @return Table
      */
     public function update(array $set, $where = null, array $pars = [])
     {
@@ -210,7 +210,7 @@ class Table extends AbstractGateway
      * @param  mixed $where
      * @param  array $pars
      * @throws Exception
-     * @return \Pop\Db\Gateway\Table
+     * @return Table
      */
     public function delete($where = null, array $pars = [])
     {

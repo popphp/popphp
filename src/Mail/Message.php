@@ -41,7 +41,7 @@ class Message
 
     /**
      * Mail object
-     * @var \Pop\Mail\Message
+     * @var Message
      */
     protected $mail = null;
 
@@ -87,9 +87,9 @@ class Message
      * Instantiate the message object.
      *
      * @param  Mail $mail
-     * @return \Pop\Mail\Message
+     * @return Message
      */
-    public function __construct(\Pop\Mail\Mail $mail)
+    public function __construct(Mail $mail)
     {
         $this->mail = $mail;
     }
@@ -158,7 +158,7 @@ class Message
      * Set MIME boundary
      *
      * @param  string $bnd
-     * @return \Pop\Mail\Message
+     * @return Message
      */
     public function setBoundary($bnd = null)
     {
@@ -170,7 +170,7 @@ class Message
      * Set EOL
      *
      * @param  string $eol
-     * @return \Pop\Mail\Mail
+     * @return Mail
      */
     public function setEol($eol = Mail::CRLF)
     {
@@ -182,7 +182,7 @@ class Message
      * Set character set
      *
      * @param  string $chr
-     * @return \Pop\Mail\Message
+     * @return Message
      */
     public function setCharset($chr)
     {
@@ -194,7 +194,7 @@ class Message
      * Set text part of the message.
      *
      * @param  string $text
-     * @return \Pop\Mail\Message
+     * @return Message
      */
     public function setText($text)
     {
@@ -206,7 +206,7 @@ class Message
      * Set HTML part of the message.
      *
      * @param  string $html
-     * @return \Pop\Mail\Message
+     * @return Message
      */
     public function setHtml($html)
     {
@@ -218,7 +218,7 @@ class Message
      * Initialize the email message.
      *
      * @throws Exception
-     * @return \Pop\Mail\Message
+     * @return Message
      */
     public function init()
     {

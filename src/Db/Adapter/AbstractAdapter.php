@@ -58,7 +58,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * Instantiate the database adapter object.
      *
      * @param  array $options
-     * @return \Pop\Db\Adapter\AbstractAdapter
+     * @return AbstractAdapter
      */
     abstract public function __construct(array $options);
 
@@ -89,7 +89,7 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Execute the prepared SQL query.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     abstract public function execute();

@@ -58,8 +58,8 @@ class Pgsql extends AbstractAdapter
      * Instantiate the PostgreSQL database connection object.
      *
      * @param  array $options
-     * @throws \Pop\Db\Adapter\Exception
-     * @return \Pop\Db\Adapter\Pgsql
+     * @throws Exception
+     * @return Pgsql
      */
     public function __construct(array $options)
     {
@@ -83,7 +83,7 @@ class Pgsql extends AbstractAdapter
     /**
      * Throw an exception upon a database error.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     public function showError()
@@ -95,7 +95,7 @@ class Pgsql extends AbstractAdapter
      * Prepare a SQL query.
      *
      * @param  string $sql
-     * @return \Pop\Db\Adapter\Pgsql
+     * @return Pgsql
      */
     public function prepare($sql)
     {
@@ -109,7 +109,7 @@ class Pgsql extends AbstractAdapter
      * Bind parameters to for a prepared SQL query.
      *
      * @param  string|array  $params
-     * @return \Pop\Db\Adapter\Pgsql
+     * @return Pgsql
      */
     public function bindParams($params)
     {
@@ -150,7 +150,7 @@ class Pgsql extends AbstractAdapter
     /**
      * Execute the prepared SQL query.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     public function execute()
@@ -183,7 +183,7 @@ class Pgsql extends AbstractAdapter
     /**
      * Return the results array from the results resource.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return array
      */
     public function fetch()
@@ -222,7 +222,7 @@ class Pgsql extends AbstractAdapter
     /**
      * Return the number of rows in the result.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return int
      */
     public function numberOfRows()
@@ -237,7 +237,7 @@ class Pgsql extends AbstractAdapter
     /**
      * Return the number of fields in the result.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return int
      */
     public function numberOfFields()

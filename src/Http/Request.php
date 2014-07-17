@@ -137,7 +137,7 @@ class Request
      *
      * @param  string $uri
      * @param  string $basePath
-     * @return \Pop\Http\Request
+     * @return Request
      */
     public function __construct($uri = null, $basePath = null)
     {
@@ -581,7 +581,7 @@ class Request
      *
      * @param  string $uri
      * @param  string $basePath
-     * @return \Pop\Http\Request
+     * @return Request
      */
     public function setRequestUri($uri = null, $basePath = null)
     {
@@ -646,7 +646,7 @@ class Request
      * Set the base path
      *
      * @param  string $path
-     * @return \Pop\Http\Request
+     * @return Request
      */
     public function setBasePath($path = null)
     {
@@ -659,7 +659,7 @@ class Request
      *
      * @param  string $key
      * @param  string $value
-     * @return \Pop\Http\Request
+     * @return Request
      */
     public function setQuery($key, $value)
     {
@@ -673,7 +673,7 @@ class Request
      *
      * @param  string $key
      * @param  string $value
-     * @return \Pop\Http\Request
+     * @return Request
      */
     public function setPost($key, $value)
     {

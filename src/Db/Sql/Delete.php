@@ -30,7 +30,7 @@ class Delete extends AbstractSql
 
     /**
      * WHERE predicate object
-     * @var \Pop\Db\Sql\Where
+     * @var Where
      */
     protected $where = null;
 
@@ -38,7 +38,7 @@ class Delete extends AbstractSql
      * Set the WHERE clause
      *
      * @param  $where
-     * @return \Pop\Db\Sql\Delete
+     * @return Delete
      */
     public function where($where = null)
     {

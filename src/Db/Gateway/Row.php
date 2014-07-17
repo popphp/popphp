@@ -49,7 +49,7 @@ class Row extends AbstractGateway
      * @param  mixed       $keys
      * @param  string      $table
      * @throws Exception
-     * @return \Pop\Db\Gateway\Row
+     * @return Row
      */
     public function __construct(\Pop\Db\Sql $sql, $keys = null, $table = null)
     {
@@ -73,7 +73,7 @@ class Row extends AbstractGateway
      * Set the columns
      *
      * @param  array $columns
-     * @return \Pop\Db\Gateway\Row
+     * @return Row
      */
     public function setColumns(array $columns = [])
     {
@@ -136,7 +136,7 @@ class Row extends AbstractGateway
      * Save (insert new or update existing) row in the table
      *
      * @throws Exception
-     * @return \Pop\Db\Gateway\Row
+     * @return Row
      */
     public function save()
     {
@@ -216,7 +216,7 @@ class Row extends AbstractGateway
      * Delete row from the table
      *
      * @throws Exception
-     * @return \Pop\Db\Gateway\Row
+     * @return Row
      */
     public function delete()
     {

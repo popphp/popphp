@@ -30,7 +30,7 @@ class Update extends AbstractSql
 
     /**
      * WHERE predicate object
-     * @var \Pop\Db\Sql\Where
+     * @var Where
      */
     protected $where = null;
 
@@ -38,7 +38,7 @@ class Update extends AbstractSql
      * Set the WHERE clause
      *
      * @param  mixed $where
-     * @return \Pop\Db\Sql\Update
+     * @return Update
      */
     public function where($where = null)
     {

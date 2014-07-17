@@ -53,7 +53,7 @@ abstract class AbstractGateway
      *
      * @param  \Pop\Db\Sql $sql
      * @param  string      $table
-     * @return \Pop\Db\Gateway\AbstractGateway
+     * @return AbstractGateway
      */
     public function __construct(\Pop\Db\Sql $sql, $table = null)
     {
@@ -67,7 +67,7 @@ abstract class AbstractGateway
      * Set the table
      *
      * @param  string $table
-     * @return \Pop\Db\Gateway\AbstractGateway
+     * @return AbstractGateway
      */
     public function setTable($table)
     {
@@ -79,7 +79,7 @@ abstract class AbstractGateway
      * Set the primary keys
      *
      * @param  mixed $keys
-     * @return \Pop\Db\Gateway\AbstractGateway
+     * @return AbstractGateway
      */
     public function setPrimaryKeys($keys)
     {

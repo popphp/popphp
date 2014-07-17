@@ -47,7 +47,7 @@ class Attachment
      *
      * @param  string $file
      * @throws Exception
-     * @return \Pop\Mail\Attachment
+     * @return Attachment
      */
     public function __construct($file)
     {

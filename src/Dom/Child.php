@@ -57,11 +57,11 @@ class Child extends AbstractNode
      *
      * Instantiate the form element object
      *
-     * @param  string $name
-     * @param  string $value
-     * @param  mixed  $childNode
+     * @param  string  $name
+     * @param  string  $value
+     * @param  mixed   $childNode
      * @param  boolean $first
-     * @param  string $indent
+     * @param  string  $indent
      * @return Child
      */
     public function __construct($name, $value = null, $childNode = null, $first = false, $indent = null)
@@ -81,10 +81,14 @@ class Child extends AbstractNode
      * Static factory method to create a child object
      *
      * @param  array $c
+     * @throws Exception
      * @return Child
      */
     public static function factory(array $c)
     {
+        if (!isset($c['nodeName'])) {
+            throw new Exception('Error: At least the \'nodeName\' must be set within the child configuration array.');
+        }
         $nodeName   = $c['nodeName'];
         $nodeValue  = (isset($c['nodeValue']) ? $c['nodeValue'] : null);
         $childFirst = (isset($c['childrenFirst']) ? $c['childrenFirst'] : false);

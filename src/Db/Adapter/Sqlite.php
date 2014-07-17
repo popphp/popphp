@@ -46,8 +46,8 @@ class Sqlite extends AbstractAdapter
      * Instantiate the SQLite database connection object.
      *
      * @param  array $options
-     * @throws \Pop\Db\Adapter\Exception
-     * @return \Pop\Db\Adapter\Sqlite
+     * @throws Exception
+     * @return Sqlite
      */
     public function __construct(array $options)
     {
@@ -64,7 +64,7 @@ class Sqlite extends AbstractAdapter
     /**
      * Throw an exception upon a database error.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     public function showError()
@@ -76,7 +76,7 @@ class Sqlite extends AbstractAdapter
      * Prepare a SQL query.
      *
      * @param  string $sql
-     * @return \Pop\Db\Adapter\Sqlite
+     * @return Sqlite
      */
     public function prepare($sql)
     {
@@ -88,7 +88,7 @@ class Sqlite extends AbstractAdapter
      * Bind parameters to for a prepared SQL query.
      *
      * @param  array  $params
-     * @return \Pop\Db\Adapter\Sqlite
+     * @return Sqlite
      */
     public function bindParams($params)
     {
@@ -129,7 +129,7 @@ class Sqlite extends AbstractAdapter
     /**
      * Execute the prepared SQL query.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     public function execute()
@@ -163,7 +163,7 @@ class Sqlite extends AbstractAdapter
     /**
      * Return the results array from the results resource.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return array
      */
     public function fetch()
@@ -221,7 +221,7 @@ class Sqlite extends AbstractAdapter
     /**
      * Return the number of fields in the result.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return int
      */
     public function numberOfFields()

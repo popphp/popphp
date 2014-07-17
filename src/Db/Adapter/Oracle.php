@@ -34,8 +34,8 @@ class Oracle extends AbstractAdapter
      * Instantiate the Oracle database connection object.
      *
      * @param  array $options
-     * @throws \Pop\Db\Adapter\Exception
-     * @return \Pop\Db\Adapter\Oracle
+     * @throws Exception
+     * @return Oracle
      */
     public function __construct(array $options)
     {
@@ -58,7 +58,7 @@ class Oracle extends AbstractAdapter
     /**
      * Throw an exception upon a database error.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     public function showError()
@@ -70,7 +70,7 @@ class Oracle extends AbstractAdapter
      * Prepare a SQL query.
      *
      * @param  string $sql
-     * @return \Pop\Db\Adapter\Oracle
+     * @return Oracle
      */
     public function prepare($sql)
     {
@@ -82,7 +82,7 @@ class Oracle extends AbstractAdapter
      * Bind parameters to for a prepared SQL query.
      *
      * @param  array  $params
-     * @return \Pop\Db\Adapter\Oracle
+     * @return Oracle
      */
     public function bindParams($params)
     {
@@ -122,7 +122,7 @@ class Oracle extends AbstractAdapter
     /**
      * Execute the prepared SQL query.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return void
      */
     public function execute()
@@ -151,7 +151,7 @@ class Oracle extends AbstractAdapter
     /**
      * Return the results array from the results resource.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return array
      */
     public function fetch()
@@ -190,7 +190,7 @@ class Oracle extends AbstractAdapter
     /**
      * Return the number of rows in the result.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return int
      */
     public function numberOfRows()
@@ -205,7 +205,7 @@ class Oracle extends AbstractAdapter
     /**
      * Return the number of fields in the result.
      *
-     * @throws \Pop\Db\Adapter\Exception
+     * @throws Exception
      * @return int
      */
     public function numberOfFields()

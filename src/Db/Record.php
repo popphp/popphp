@@ -36,7 +36,7 @@ class Record
 
     /**
      * SQL Object
-     * @var \Pop\Db\Sql
+     * @var Sql
      */
     protected static $sql = null;
 
@@ -66,13 +66,13 @@ class Record
 
     /**
      * Row gateway
-     * @var \Pop\Db\Gateway\Row
+     * @var Gateway\Row
      */
     protected $rowGateway = null;
 
     /**
      * Table gateway
-     * @var \Pop\Db\Gateway\Table
+     * @var Gateway\Table
      */
     protected $tableGateway = null;
 
@@ -202,7 +202,7 @@ class Record
     /**
      * Get SQL object
      *
-     * @return \Pop\Db\Sql
+     * @return Sql
      */
     public static function getSql()
     {
@@ -212,7 +212,7 @@ class Record
     /**
      * Get SQL object (alias method)
      *
-     * @return \Pop\Db\Sql
+     * @return Sql
      */
     public static function sql()
     {
@@ -253,7 +253,7 @@ class Record
      * Find by ID method
      *
      * @param  mixed $id
-     * @return \Pop\Db\Record
+     * @return Record
      */
     public static function findById($id)
     {
@@ -270,7 +270,7 @@ class Record
      * @param  array $columns
      * @param  array $set
      * @param  array $options
-     * @return \Pop\Db\Record
+     * @return Record
      */
     public static function findBy(array $columns = null, array $set = null, array $options = [])
     {
@@ -295,7 +295,7 @@ class Record
      *
      * @param  array $set
      * @param  array $options
-     * @return \Pop\Db\Record
+     * @return Record
      */
     public static function findAll(array $set = null, array $options = [])
     {
@@ -635,8 +635,8 @@ class Record
                 }
             // Standard operators
             } else {
-                $column          = $operator['column'];
-                $where[]         = $column . ' ' . $operator['op'] . ' ' .  $pHolder;
+                $column  = $operator['column'];
+                $where[] = $column . ' ' . $operator['op'] . ' ' .  $pHolder;
                 if (isset($params[$column])) {
                     if (is_array($params[$column])) {
                         if ($placeholder == ':') {

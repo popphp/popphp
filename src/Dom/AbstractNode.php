@@ -72,7 +72,7 @@ abstract class AbstractNode
      * Add a child to the object.
      *
      * @param  mixed $c
-     * @throws Exception
+     * @throws \InvalidArgumentException
      * @return mixed
      */
     public function addChild($c)
@@ -82,7 +82,7 @@ abstract class AbstractNode
         } else if (is_array($c)) {
             $this->childNodes[] = Child::factory($c);
         } else {
-            throw new Exception('The argument passed is not valid.');
+            throw new \InvalidArgumentException('The argument passed must be an instance of Pop\Dom\Child or a child configuration array.');
         }
 
         return $this;
@@ -118,7 +118,7 @@ abstract class AbstractNode
      * Get the child nodes of the object.
      *
      * @param int $i
-     * @return \Pop\Dom\Child
+     * @return Child
      */
     public function getChild($i)
     {

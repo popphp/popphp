@@ -122,7 +122,7 @@ class Response
      *
      * @param  array $config
      * @throws Exception
-     * @return \Pop\Http\Response
+     * @return Response
      */
     public function __construct(array $config = [])
     {
@@ -148,7 +148,7 @@ class Response
      * @param  array  $context
      * @param  string $mode
      * @throws Exception
-     * @return \Pop\Http\Response
+     * @return Response
      */
     public static function parse($response, array $context = null, $mode = 'r')
     {
@@ -156,7 +156,7 @@ class Response
 
         // If a URL, use a stream to get the header and URL contents
         if ((strtolower(substr($response, 0, 7)) == 'http://') || (strtolower(substr($response, 0, 8)) == 'https://')) {
-            $client = new Client\Stream($response, $context, $mode);
+            $client  = new Client\Stream($response, $context, $mode);
             $code    = $client->getCode();
             $headers = $client->getHeaders();
             $body    = $client->getBody();
@@ -245,7 +245,7 @@ class Response
     public static function getMessageFromCode($code)
     {
         if (!array_key_exists($code, self::$responseCodes)) {
-            throw new Exception('The header code ' . $code . ' is not allowed.');
+            throw new Exception('The header code ' . $code . ' is not valid.');
         }
 
         return self::$responseCodes[$code];
@@ -479,7 +479,7 @@ class Response
      *
      * @param  int $code
      * @throws Exception
-     * @return \Pop\Http\Response
+     * @return Response
      */
     public function setCode($code)
     {
@@ -497,7 +497,7 @@ class Response
      * Set the response message
      *
      * @param  string $message
-     * @return \Pop\Http\Response
+     * @return Response
      */
     public function setMessage($message)
     {
@@ -509,7 +509,7 @@ class Response
      * Set the response body
      *
      * @param  string $body
-     * @return \Pop\Http\Response
+     * @return Response
      */
     public function setBody($body = null)
     {
@@ -523,7 +523,7 @@ class Response
      * @param  string $name
      * @param  string $value
      * @throws Exception
-     * @return \Pop\Http\Response
+     * @return Response
      */
     public function setHeader($name, $value)
     {
@@ -536,7 +536,7 @@ class Response
      *
      * @param  array $headers
      * @throws Exception
-     * @return \Pop\Http\Response
+     * @return Response
      */
     public function setHeaders(array $headers)
     {
@@ -548,9 +548,9 @@ class Response
     }
 
     /**
-     * Set IE SSL headers to fix file cache issues in IE over SSL.
+     * Set SSL headers to fix file cache issues over SSL in certain browsers.
      *
-     * @return \Pop\Http\Response
+     * @return Response
      */
     public function setSslHeaders()
     {

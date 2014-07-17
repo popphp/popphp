@@ -35,7 +35,7 @@ class Queue extends \SplQueue
      *
      * @param  mixed  $email
      * @param  string $name
-     * @return \Pop\Mail\Queue
+     * @return Queue
      */
     public function __construct($email = null, $name = null)
     {
@@ -53,7 +53,7 @@ class Queue extends \SplQueue
      *
      * @param  string $email
      * @param  string $name
-     * @return \Pop\Mail\Queue
+     * @return Queue
      */
     public function add($email, $name = null)
     {
@@ -71,7 +71,7 @@ class Queue extends \SplQueue
      *
      * @param  mixed $rcpts
      * @throws Exception
-     * @return \Pop\Mail\Queue
+     * @return Queue
      */
     public function addRecipients($rcpts)
     {

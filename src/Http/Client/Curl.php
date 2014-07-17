@@ -71,8 +71,9 @@ class Curl extends AbstractClient
      */
     public function setOption($opt, $val)
     {
-        curl_setopt($this->resource, $opt, $val);
+        // Set the protected property to keep track of the cURL options.
         $this->options[$opt] = $val;
+        curl_setopt($this->resource, $opt, $val);
 
         return $this;
     }
@@ -85,12 +86,12 @@ class Curl extends AbstractClient
      */
     public function setOptions($opts)
     {
-        curl_setopt_array($this->resource, $opts);
-
-        // Set the protected property to the cURL options.
+        // Set the protected property to keep track of the cURL options.
         foreach ($opts as $k => $v) {
             $this->options[$k] = $v;
         }
+
+        curl_setopt_array($this->resource, $opts);
 
         return $this;
     }
