@@ -30,7 +30,7 @@ class Reader
 
     /**
      * Feed adapter
-     * @var \Pop\Feed\Format\AbstractFormat
+     * @var Format\AbstractFormat
      */
     protected $adapter = null;
 
@@ -39,8 +39,8 @@ class Reader
      *
      * Instantiate the feed object.
      *
-     * @param \Pop\Feed\Format\AbstractFormat $adapter
-     * @return \Pop\Feed\Reader
+     * @param Format\AbstractFormat $adapter
+     * @return Reader
      */
     public function __construct(Format\AbstractFormat $adapter)
     {
@@ -51,7 +51,7 @@ class Reader
     /**
      * Method to get the adapter object
      *
-     * @return \Pop\Feed\Format\AbstractFormat
+     * @return Format\AbstractFormat
      */
     public function adapter()
     {

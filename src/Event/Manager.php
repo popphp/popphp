@@ -67,7 +67,7 @@ class Manager
      * @param  string $name
      * @param  mixed  $action
      * @param  int    $priority
-     * @return \Pop\Event\Manager
+     * @return Manager
      */
     public function __construct($name = null, $action = null, $priority = 0)
     {
@@ -82,7 +82,7 @@ class Manager
      * @param  string $name
      * @param  mixed  $action
      * @param  int    $priority
-     * @return \Pop\Event\Manager
+     * @return Manager
      */
     public function on($name, $action, $priority = 0)
     {
@@ -99,7 +99,7 @@ class Manager
      *
      * @param  string $name
      * @param  mixed  $action
-     * @return \Pop\Event\Manager
+     * @return Manager
      */
     public function off($name, $action)
     {

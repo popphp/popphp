@@ -34,7 +34,7 @@ class Atom extends AbstractFormat
      * @param  mixed  $options
      * @param  int    $limit
      * @throws Exception
-     * @return \Pop\Feed\Format\Atom
+     * @return Atom
      */
     public function __construct($options, $limit = 0)
     {

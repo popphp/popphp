@@ -34,7 +34,7 @@ class Rss extends AbstractFormat
      * @param  mixed  $options
      * @param  int    $limit
      * @throws Exception
-     * @return \Pop\Feed\Format\Rss
+     * @return Rss
      */
     public function __construct($options, $limit = 0)
     {

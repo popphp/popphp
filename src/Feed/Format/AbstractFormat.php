@@ -93,7 +93,7 @@ abstract class AbstractFormat
      * @param  mixed  $options
      * @param  int    $limit
      * @throws Exception
-     * @return \Pop\Feed\Format\AbstractFormat
+     * @return AbstractFormat
      */
     public function __construct($options, $limit = 0)
     {
@@ -203,7 +203,7 @@ abstract class AbstractFormat
      * Method to set the feed
      *
      * @param  array $feed
-     * @return \Pop\Feed\Format\AbstractFormat
+     * @return AbstractFormat
      */
     public function setFeed(array $feed = [])
     {
