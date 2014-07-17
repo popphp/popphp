@@ -73,8 +73,8 @@ class Dir
      * @param  boolean $full
      * @param  boolean $rec
      * @param  boolean $dirs
-     * @throws \Pop\File\Exception
-     * @return \Pop\File\Dir
+     * @throws Exception
+     * @return Dir
      */
     public function __construct($dir, $full = false, $rec = false, $dirs = true)
     {

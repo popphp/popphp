@@ -90,7 +90,7 @@ class Geo
      * Instantiate the Geo object.
      *
      * @param  array $options
-     * @return \Pop\Geo\Geo
+     * @return Geo
      */
     public function __construct(array $options = [])
     {
@@ -177,9 +177,9 @@ class Geo
     /**
      * Get distance from current Geo object coordinates to another
      *
-     * @param  \Pop\Geo\Geo $dest
-     * @param  int          $round
-     * @param  boolean      $km
+     * @param  Geo     $dest
+     * @param  int     $round
+     * @param  boolean $km
      * @throws Exception
      * @return mixed
      */

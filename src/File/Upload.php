@@ -166,7 +166,7 @@ class Upload
      * @param  string $dir
      * @return string
      */
-    public static function checkDuplicate($file, $dir = null)
+    public static function checkForDuplicate($file, $dir = null)
     {
         if (null === $dir) {
             $dir = getcwd();
