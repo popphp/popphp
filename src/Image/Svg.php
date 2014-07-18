@@ -25,68 +25,8 @@ namespace Pop\Image;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Svg
+class Svg extends AbstractVector
 {
-
-    /**
-     * Linear horizontal gradient type.
-     * @var int
-     */
-    const HORIZONTAL = 1;
-
-    /**
-     * Linear vertical gradient type.
-     * @var int
-     */
-    const VERTICAL = 2;
-
-    /**
-     * Radial gradient type.
-     * @var int
-     */
-    const RADIAL = 3;
-
-    /**
-     * SVG image resource
-     * @var \SimpleXMLElement
-     */
-    protected $resource = null;
-
-    /**
-     * SVG image width
-     * @var int
-     */
-    protected $width = null;
-
-    /**
-     * SVG image height
-     * @var int
-     */
-    protected $height = null;
-
-    /**
-     * SVG image fill color
-     * @var array
-     */
-    protected $fillColor = [0, 0, 0];
-
-    /**
-     * SVG image background color
-     * @var array
-     */
-    protected $backgroundColor = [255, 255, 255];
-
-    /**
-     * SVG image stroke color
-     * @var array
-     */
-    protected $strokeColor = [0, 0, 0];
-
-    /**
-     * SVG image stroke width
-     * @var array
-     */
-    protected $strokeWidth = null;
 
     /**
      * Stroke dash length
@@ -125,12 +65,6 @@ class Svg
     protected $curClippingPath = null;
 
     /**
-     * SVG image color opacity
-     * @var float
-     */
-    protected $opacity = 1.0;
-
-    /**
      * SVG image units
      * @var string
      */
@@ -149,54 +83,6 @@ class Svg
     protected $allowed = ['svg' => 'image/svg+xml'];
 
     /**
-     * Full path of image file, i.e. '/path/to/image.ext'
-     * @var string
-     */
-    protected $fullpath = null;
-
-    /**
-     * Full, absolute directory of the image file, i.e. '/some/dir/'
-     * @var string
-     */
-    protected $dir = null;
-
-    /**
-     * Full basename of image file, i.e. 'image.ext'
-     * @var string
-     */
-    protected $basename = null;
-
-    /**
-     * Full filename of image file, i.e. 'image'
-     * @var string
-     */
-    protected $filename = null;
-
-    /**
-     * Image file extension, i.e. 'ext'
-     * @var string
-     */
-    protected $extension = 'pdf';
-
-    /**
-     * Image file size in bytes
-     * @var int
-     */
-    protected $size = 0;
-
-    /**
-     * Image file mime type
-     * @var string
-     */
-    protected $mime = null;
-
-    /**
-     * Image file output buffer
-     * @var string
-     */
-    protected $output = null;
-
-    /**
      * Constructor
      *
      * Instantiate an SVG image object based on either a pre-existing SVG image
@@ -210,19 +96,7 @@ class Svg
      */
     public function __construct($svg, $w = null, $h = null)
     {
-        $this->fullpath  = $svg;
-        $parts           = pathinfo($svg);
-        $this->size      = (file_exists($svg) ? filesize($svg) : 0);
-        $this->dir       = realpath($parts['dirname']);
-        $this->basename  = $parts['basename'];
-        $this->filename  = $parts['filename'];
-        $this->extension = (isset($parts['extension']) && ($parts['extension'] != '')) ? $parts['extension'] : null;
-
-        if ((null === $this->extension) || (strtolower($this->extension) != 'svg')) {
-            throw new Exception('Error: That SVG file does not have the correct extension.');
-        } else {
-            $this->mime = $this->allowed[strtolower($this->extension)];
-        }
+        parent::__construct($svg, $w, $h);
 
         // If SVG image exists, get image info and store in an array.
         if (file_exists($this->fullpath) && ($this->size > 0)) {
@@ -258,26 +132,6 @@ class Svg
     }
 
     /**
-     * Get the SVG image width.
-     *
-     * @return int
-     */
-    public function getWidth()
-    {
-        return $this->width;
-    }
-
-    /**
-     * Get the SVG image height.
-     *
-     * @return int
-     */
-    public function getHeight()
-    {
-        return $this->height;
-    }
-
-    /**
      * Get the SVG image units.
      *
      * @return string
@@ -297,8 +151,8 @@ class Svg
      */
     public function setFillColor($r = 0, $g = 0, $b = 0)
     {
+        parent::setFillColor($r, $g, $b);
         $this->curGradient = null;
-        $this->fillColor = [(int)$r, (int)$g, (int)$b];
         return $this;
     }
 
@@ -312,7 +166,7 @@ class Svg
      */
     public function setBackgroundColor($r = 0, $g = 0, $b = 0)
     {
-        $this->backgroundColor = [(int)$r, (int)$g, (int)$b];
+        parent::setBackgroundColor($r, $g, $b);
         $rect = $this->resource->addChild('rect');
         $rect->addAttribute('x', '0' . $this->units);
         $rect->addAttribute('y', '0' . $this->units);
@@ -323,37 +177,23 @@ class Svg
     }
 
     /**
-     * Set the stroke color.
-     *
-     * @param  int $r
-     * @param  int $g
-     * @param  int $b
-     * @return Svg
-     */
-    public function setStrokeColor($r = 0, $g = 0, $b = 0)
-    {
-        $this->strokeColor = [(int)$r, (int)$g, (int)$b];
-        return $this;
-    }
-
-    /**
      * Set the stroke width.
      *
      * @param  int $wid
-     * @param  int $dash_len
-     * @param  int $dash_gap
+     * @param  int $dashLength
+     * @param  int $dashGap
      * @return Svg
      */
-    public function setStrokeWidth($wid = null, $dash_len = null, $dash_gap = null)
+    public function setStrokeWidth($wid = null, $dashLength = null, $dashGap = null)
     {
+        parent::setStrokeWidth($wid);
         if ((null === $wid) || ($wid == false) || ($wid == 0)) {
             $this->strokeWidth      = null;
             $this->strokeDashLength = null;
             $this->strokeDashGap    = null;
         } else {
-            $this->strokeWidth      = $wid;
-            $this->strokeDashLength = $dash_len;
-            $this->strokeDashGap    = $dash_gap;
+            $this->strokeDashLength = $dashLength;
+            $this->strokeDashGap    = $dashGap;
         }
 
         return $this;
@@ -367,6 +207,9 @@ class Svg
      */
     public function setOpacity($opac)
     {
+        if ($opac > 1) {
+            $opac = round(($opac / 100), 2);
+        }
         $this->opacity = $opac;
         return $this;
     }
@@ -587,17 +430,19 @@ class Svg
     /**
      * Create text within the an SVG image object.
      *
-     * @param  string     $str
-     * @param  int|string $size
-     * @param  int|string $x
-     * @param  int|string $y
-     * @param  string     $font
-     * @param  int|string $rotate
-     * @param  boolean      $bold
+     * @param  string $str
+     * @param  int    $size
+     * @param  array  $options
      * @return Svg
      */
-    public function text($str, $size, $x, $y, $font = 'Arial', $rotate = null, $bold = false)
+    public function text($str, $size, array $options = [])
     {
+        $x      = (isset($options['x']))      ? $options['x']      : 0;
+        $y      = (isset($options['y']))      ? $options['y']      : 0;
+        $font   = (isset($options['font']))   ? $options['font']   : null;
+        $rotate = (isset($options['rotate'])) ? $options['rotate'] : null;
+        $bold   = (isset($options['bold']))   ? $options['bold']   : false;
+
         $text = $this->resource->addChild('text', $str);
         $text->addAttribute('x', $x . $this->units);
         $text->addAttribute('y', $y . $this->units);
@@ -659,6 +504,7 @@ class Svg
         $rect->addAttribute('y', $y . $this->units);
         $rect->addAttribute('width', $w . $this->units);
         $rect->addAttribute('height', ((null === $h) ? $w : $h) . $this->units);
+        $rect->addAttribute('fill-opacity', $this->opacity);
 
         $rect = $this->setStyles($rect);
 
@@ -695,6 +541,7 @@ class Svg
         $ellipse->addAttribute('cy', $y . $this->units);
         $ellipse->addAttribute('rx', $w . $this->units);
         $ellipse->addAttribute('ry', ((null === $h) ? $w : $h) . $this->units);
+        $ellipse->addAttribute('fill-opacity', $this->opacity);
 
         $ellipse = $this->setStyles($ellipse);
 
@@ -715,6 +562,7 @@ class Svg
         $circle->addAttribute('cx', $x . $this->units);
         $circle->addAttribute('cy', $y . $this->units);
         $circle->addAttribute('r', $w . $this->units);
+        $circle->addAttribute('fill-opacity', $this->opacity);
 
         $circle = $this->setStyles($circle);
 
@@ -847,6 +695,7 @@ class Svg
         }
         $poly = $clip->addChild('polygon');
         $poly->addAttribute('points', implode(' ', $formattedPoints));
+        $poly->addAttribute('fill-opacity', $this->opacity);
 
         $ellipse = $this->resource->addChild('ellipse');
         $ellipse->addAttribute('style', 'clip-path: url(#polyClip' . $stamp .');');
@@ -894,7 +743,6 @@ class Svg
         $rect->addAttribute('width', $this->width . $this->units);
         $rect->addAttribute('height', $this->height . $this->units);
 
-
         $rect->addAttribute('stroke', 'rgb(' . $this->strokeColor[0] . ',' . $this->strokeColor[1] . ',' . $this->strokeColor[2] . ')');
         $rect->addAttribute('stroke-width', ($w * 2) . $this->units);
         if ((null !== $this->strokeDashLength) && (null !== $this->strokeDashGap)) {
@@ -923,10 +771,10 @@ class Svg
 
         // Determine if the force download argument has been passed.
         $attach = ($download) ? 'attachment; ' : null;
-        $headers = array(
+        $headers = [
             'Content-type' => $this->mime,
             'Content-disposition' => $attach . 'filename=' . $this->basename
-        );
+        ];
 
         if ($_SERVER['SERVER_PORT'] == 443) {
             $headers['Expires']       = 0;
@@ -965,6 +813,23 @@ class Svg
     }
 
     /**
+     * Destroy the image object and the related image file directly.
+     *
+     * @param  boolean $delete
+     * @return void
+     */
+    public function destroy($delete = false)
+    {
+        $this->resource = null;
+        $this->output = null;
+
+        // If the $delete flag is passed, delete the image file.
+        if (($delete) && file_exists($this->fullpath)) {
+            unlink($this->fullpath);
+        }
+    }
+
+    /**
      * To string method to output the image
      *
      * @return string
@@ -991,7 +856,7 @@ class Svg
             $obj->addAttribute('fill', 'url(#grad' . $this->curGradient . ')');
         } else if (null !== $this->fillColor) {
             $obj->addAttribute('fill', 'rgb(' . $this->fillColor[0] . ',' . $this->fillColor[1] . ',' . $this->fillColor[2] . ')');
-            if ($this->opacity < 1.0) {
+            if (($this->opacity < 1.0) && !isset($obj['fill-opacity'])) {
                 $obj->addAttribute('fill-opacity', $this->opacity);
             }
         }

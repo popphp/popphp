@@ -25,12 +25,12 @@ namespace Pop\Image;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Gd extends AbstractImage
+class Gd extends AbstractRaster
 {
 
     /**
      * Image color opacity
-     * @var int
+     * @var mixed
      */
     protected $opacity = 0;
 
@@ -38,7 +38,7 @@ class Gd extends AbstractImage
      * Constructor
      *
      * Instantiate an image file object based on either a pre-existing
-     * image file on disk, or a new image file.
+     * image file on disk, or a new image file using the GD extension.
      *
      * @param  string $img
      * @param  int    $w
@@ -155,6 +155,16 @@ class Gd extends AbstractImage
     }
 
     /**
+     * Get the image compression quality
+     *
+     * @return int
+     */
+    public function getCompression()
+    {
+        return $this->quality;
+    }
+
+    /**
      * Set the background color.
      *
      * @param  int $r
@@ -208,7 +218,7 @@ class Gd extends AbstractImage
      * Alias to setQuality()
      *
      * @param  mixed $comp
-     * @return GD
+     * @return Gd
      */
     public function setCompression($comp = null)
     {
@@ -390,17 +400,19 @@ class Gd extends AbstractImage
     /**
      * Create text within the an image object
      *
-     * @param  string     $str
-     * @param  int $size
-     * @param  int $x
-     * @param  int $y
-     * @param  string     $font
-     * @param  int $rotate
-     * @param  boolean    $stroke
+     * @param  string $str
+     * @param  int    $size
+     * @param  array  $options
      * @return Gd
      */
-    public function text($str, $size, $x, $y, $font = null, $rotate = null, $stroke = false)
+    public function text($str, $size, array $options = [])
     {
+        $x      = (isset($options['x']))      ? $options['x']      : 0;
+        $y      = (isset($options['y']))      ? $options['y']      : 0;
+        $font   = (isset($options['font']))   ? $options['font']   : null;
+        $rotate = (isset($options['rotate'])) ? $options['rotate'] : null;
+        $stroke = (isset($options['stroke'])) ? $options['stroke'] : false;
+
         // Set the image resource and color.
         $this->createResource();
         $color = $this->setColor($this->fillColor);
@@ -630,7 +642,7 @@ class Gd extends AbstractImage
      */
     public function drawPolygon($points)
     {
-        $realPoints = array();
+        $realPoints = [];
         foreach ($points as $coord) {
             if (isset($coord['x']) && isset($coord['y'])) {
                 $realPoints[] = $coord['x'];
@@ -732,8 +744,8 @@ class Gd extends AbstractImage
     /**
      * Method to blur the image.
      *
-     * @param  int $amount
-     * @param  int $type
+     * @param  int    $amount
+     * @param  string $type
      * @return Gd
      */
     public function blur($amount, $type = Gd::GAUSSIAN_BLUR)
@@ -754,9 +766,9 @@ class Gd extends AbstractImage
     /**
      * Method to add a border to the image.
      *
-     * @param  int $w
-     * @param  int $h
-     * @param  int $type
+     * @param  int    $w
+     * @param  int    $h
+     * @param  string $type
      * @return Gd
      */
     public function border($w, $h = null, $type = Gd::INNER_BORDER)
@@ -962,7 +974,7 @@ class Gd extends AbstractImage
     public function getColors($format = Gd::HEX)
     {
         // Initialize the colors array and the image resource.
-        $colors = array();
+        $colors = [];
         $this->createResource();
 
         // Loop through each pixel of the image, recording the color result
@@ -1075,10 +1087,10 @@ class Gd extends AbstractImage
     {
         // Determine if the force download argument has been passed.
         $attach = ($download) ? 'attachment; ' : null;
-        $headers = array(
+        $headers = [
             'Content-type'        => $this->mime,
             'Content-disposition' => $attach . 'filename=' . $this->basename
-        );
+        ];
 
         if ($_SERVER['SERVER_PORT'] == 443) {
             $headers['Expires']       = 0;
@@ -1207,7 +1219,7 @@ class Gd extends AbstractImage
     protected function getInfo()
     {
         $gd = gd_info();
-        $gdInfo = array(
+        $gdInfo = [
             'version'             => $gd['GD Version'],
             'freeTypeSupport'     => $gd['FreeType Support'],
             'freeTypeLinkage'     => $gd['FreeType Linkage'],
@@ -1220,7 +1232,7 @@ class Gd extends AbstractImage
             'xpmSupport'          => $gd['XPM Support'],
             'xbmSupport'          => $gd['XBM Support'],
             'japaneseFontSupport' => $gd['JIS-mapped Japanese Font Support']
-        );
+        ];
 
         $this->info = new \ArrayObject($gdInfo, \ArrayObject::ARRAY_AS_PROPS);
     }

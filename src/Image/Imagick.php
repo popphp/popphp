@@ -25,26 +25,44 @@ namespace Pop\Image;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Imagick extends AbstractImage
+class Imagick extends AbstractRaster
 {
 
     /**
-     * Constant for motion blur
+     * Image compression
      * @var int
      */
-    const MOTION_BLUR = 5;
+    protected $compression = null;
 
     /**
-     * Constant for radial blur
+     * Image filter
      * @var int
      */
-    const RADIAL_BLUR = 6;
+    protected $filter = \Imagick::FILTER_LANCZOS;
+
+    /**
+     * Image blur
+     * @var float
+     */
+    protected $blur = 1;
+
+    /**
+     * Image overlay
+     * @var int
+     */
+    protected $overlayStyle = \Imagick::COMPOSITE_ATOP;
+
+    /**
+     * Image color opacity
+     * @var mixed
+     */
+    protected $opacity = 1;
 
     /**
      * Array of allowed file types.
      * @var array
      */
-    protected $allowed = array(
+    protected $allowed = [
         'afm'   => 'application/x-font-afm',
         'ai'    => 'application/postscript',
         'avi'   => 'video/x-msvideo',
@@ -79,53 +97,13 @@ class Imagick extends AbstractImage
         'txt'   => 'text/plain',
         'xhtml' => 'application/xhtml+xml',
         'xml'   => 'application/xml'
-    );
-
-    /**
-     * Image color opacity
-     * @var float
-     */
-    protected $opacity = 1.0;
-
-    /**
-     * Image compression
-     * @var int|string
-     */
-    protected $compression = null;
-
-    /**
-     * Image filter
-     * @var int
-     */
-    protected $filter = \Imagick::FILTER_LANCZOS;
-
-    /**
-     * Image blur
-     * @var int
-     */
-    protected $blur = 1;
-
-    /**
-     * Image overlay
-     * @var int
-     */
-    protected $overlay = \Imagick::COMPOSITE_ATOP;
+    ];
 
     /**
      * Constructor
      *
      * Instantiate an Imagick file object based on either a pre-existing image
-     * file on disk, or a new image file.
-     *
-     * As of July 28th, 2011, stable testing was successful with the
-     * following versions of the required software:
-     *
-     * ImageMagick 6.5.*
-     * Ghostscript 8.70 or 8.71
-     * Imagick PHP Extension 3.0.1
-     *
-     * Any variation in the versions of the required software may contribute to
-     * the Pop\Image\Imagick component not functioning properly.
+     * file on disk, or a new image file using the Imagick extension.
      *
      * @param  string $img
      * @param  int    $w
@@ -151,7 +129,7 @@ class Imagick extends AbstractImage
             $imagickFile = realpath($img);
         }
 
-        parent::__construct($img, $w, $h, $types);
+        parent::__construct($imgFile, $w, $h, $types);
 
         // Check to see if Imagick is installed.
         if (!self::isInstalled()) {
@@ -195,6 +173,46 @@ class Imagick extends AbstractImage
     public static function isInstalled()
     {
         return class_exists('Imagick', false);
+    }
+
+    /**
+     * Get the image compression quality
+     *
+     * @return int
+     */
+    public function getCompression()
+    {
+        return $this->compression;
+    }
+
+    /**
+     * Get the current Imagick filter
+     *
+     * @return int
+     */
+    public function getFilter()
+    {
+        return $this->filter;
+    }
+
+    /**
+     * Get the image blur.
+     *
+     * @return float
+     */
+    public function getBlur()
+    {
+        return $this->blur;
+    }
+
+    /**
+     * Get the image overlay.
+     *
+     * @return int
+     */
+    public function getOverlayStyle()
+    {
+        return $this->overlayStyle;
     }
 
     /**
@@ -250,19 +268,22 @@ class Imagick extends AbstractImage
     /**
      * Set the opacity.
      *
-     * @param  float $opac
+     * @param  mixed $opac
      * @return Imagick
      */
     public function setOpacity($opac)
     {
+        if ($opac > 1) {
+            $opac = round(($opac / 100), 2);
+        }
         $this->opacity = $opac;
         return $this;
     }
 
     /**
-     * Set the image filter.
+     * Set the Imagick filter.
      *
-     * @param  int|string $filter
+     * @param  int $filter
      * @return Imagick
      */
     public function setFilter($filter = null)
@@ -274,7 +295,7 @@ class Imagick extends AbstractImage
     /**
      * Set the image blur.
      *
-     * @param  int|string $blur
+     * @param  float $blur
      * @return Imagick
      */
     public function setBlur($blur = null)
@@ -286,12 +307,12 @@ class Imagick extends AbstractImage
     /**
      * Set the image overlay.
      *
-     * @param  int|string $ovr
+     * @param  int $ovr
      * @return Imagick
      */
-    public function setOverlay($ovr = null)
+    public function setOverlayStyle($ovr = null)
     {
-        $this->overlay = $ovr;
+        $this->overlayStyle = $ovr;
         return $this;
     }
 
@@ -462,19 +483,20 @@ class Imagick extends AbstractImage
     /**
      * Create text within the an image object
      *
-     * @param  string     $str
-     * @param  int|string $size
-     * @param  int|string $x
-     * @param  int|string $y
-     * @param  string     $font
-     * @param  int|string $rotate
-     * @param  boolean    $stroke
+     * @param  string $str
+     * @param  int    $size
+     * @param  array  $options
      * @throws Exception
      * @return Imagick
      */
-    public function text($str, $size, $x, $y, $font = null, $rotate = null, $stroke = false)
+    public function text($str, $size, array $options = [])
     {
-        $draw = new \ImagickDraw();
+        $x      = (isset($options['x']))      ? $options['x']      : 0;
+        $y      = (isset($options['y']))      ? $options['y']      : 0;
+        $font   = (isset($options['font']))   ? $options['font']   : null;
+        $rotate = (isset($options['rotate'])) ? $options['rotate'] : null;
+        $stroke = (isset($options['stroke'])) ? $options['stroke'] : false;
+        $draw   = new \ImagickDraw();
 
         // Set the font if passed
         if (null !== $font) {
@@ -511,6 +533,8 @@ class Imagick extends AbstractImage
         $draw->setFontSize($size);
         $draw->setFillColor($this->setColor($this->fillColor));
 
+        $draw->setFillOpacity($this->opacity);
+
         if (null !== $rotate) {
             $draw->rotate($rotate);
         }
@@ -540,6 +564,7 @@ class Imagick extends AbstractImage
         $draw = new \ImagickDraw();
         $draw->setStrokeColor($this->setColor($this->strokeColor));
         $draw->setStrokeWidth((null === $this->strokeWidth) ? 1 : $this->strokeWidth);
+        $draw->setFillOpacity($this->opacity);
         $draw->line($x1, $y1, $x2, $y2);
         $this->resource->drawImage($draw);
 
@@ -553,9 +578,11 @@ class Imagick extends AbstractImage
      * @param  int $y
      * @param  int $w
      * @param  int $h
+     * @param  int $rx
+     * @param  int $ry
      * @return Imagick
      */
-    public function drawRectangle($x, $y, $w, $h = null)
+    public function drawRectangle($x, $y, $w, $h = null, $rx = null, $ry = null)
     {
         $x2 = $x + $w;
         $y2 = $y + ((null === $h) ? $w : $h);
@@ -563,12 +590,21 @@ class Imagick extends AbstractImage
         $draw = new \ImagickDraw();
         $draw->setFillColor($this->setColor($this->fillColor));
 
-        if (null !== $this->strokeWidth) {
+        if ((null !== $this->strokeColor) && (null !== $this->strokeWidth)) {
             $draw->setStrokeColor($this->setColor($this->strokeColor));
             $draw->setStrokeWidth((null === $this->strokeWidth) ? 1 : $this->strokeWidth);
         }
 
-        $draw->rectangle($x, $y, $x2, $y2);
+        $draw->setFillOpacity($this->opacity);
+
+        if (null !== $rx) {
+            if (null === $ry) {
+                $ry = $rx;
+            }
+            $draw->roundRectangle($x, $y, $x2, $y2, $rx, $ry);
+        } else {
+            $draw->rectangle($x, $y, $x2, $y2);
+        }
         $this->resource->drawImage($draw);
 
         return $this;
@@ -577,14 +613,16 @@ class Imagick extends AbstractImage
     /**
      * Method to add a square to the image.
      *
-     * @param  int     $x
-     * @param  int     $y
-     * @param  int     $w
+     * @param  int $x
+     * @param  int $y
+     * @param  int $w
+     * @param  int $rx
+     * @param  int $ry
      * @return Imagick
      */
-    public function drawSquare($x, $y, $w)
+    public function drawSquare($x, $y, $w, $rx = null, $ry = null)
     {
-        $this->drawRectangle($x, $y, $w, $w);
+        $this->drawRectangle($x, $y, $w, $w, $rx, $ry);
         return $this;
     }
 
@@ -605,10 +643,12 @@ class Imagick extends AbstractImage
         $draw = new \ImagickDraw();
         $draw->setFillColor($this->setColor($this->fillColor));
 
-        if (null !== $this->strokeWidth) {
+        if ((null !== $this->strokeColor) && (null !== $this->strokeWidth)) {
             $draw->setStrokeColor($this->setColor($this->strokeColor));
             $draw->setStrokeWidth((null === $this->strokeWidth) ? 1 : $this->strokeWidth);
         }
+
+        $draw->setFillOpacity($this->opacity);
 
         $draw->ellipse($x, $y, $wid, $hgt, 0, 360);
         $this->resource->drawImage($draw);
@@ -654,18 +694,20 @@ class Imagick extends AbstractImage
         $x2 = $w * cos($end / 180 * pi());
         $y2 = $h * sin($end / 180 * pi());
 
-        $points = array(
-                      array('x' => $x, 'y' => $y),
-                      array('x' => $x + $x1, 'y' => $y + $y1),
-                      array('x' => $x + $x2, 'y' => $y + $y2)
-                  );
+        $points = [
+            ['x' => $x, 'y' => $y],
+            ['x' => $x + $x1, 'y' => $y + $y1],
+            ['x' => $x + $x2, 'y' => $y + $y2]
+        ];
+
+        $draw->setFillOpacity($this->opacity);
 
         $draw->polygon($points);
 
         $draw->ellipse($x, $y, $wid, $hgt, $start, $end);
         $this->resource->drawImage($draw);
 
-        if (null !== $this->strokeWidth) {
+        if ((null !== $this->strokeColor) && (null !== $this->strokeWidth)) {
             $draw = new \ImagickDraw();
 
             $draw->setFillColor($this->setColor($this->fillColor));
@@ -693,10 +735,12 @@ class Imagick extends AbstractImage
         $draw = new \ImagickDraw();
         $draw->setFillColor($this->setColor($this->fillColor));
 
-        if (null !== $this->strokeWidth) {
+        if ((null !== $this->strokeColor) && (null !== $this->strokeWidth)) {
             $draw->setStrokeColor($this->setColor($this->strokeColor));
             $draw->setStrokeWidth((null === $this->strokeWidth) ? 1 : $this->strokeWidth);
         }
+
+        $draw->setFillOpacity($this->opacity);
 
         $draw->polygon($points);
         $this->resource->drawImage($draw);
@@ -829,10 +873,10 @@ class Imagick extends AbstractImage
     /**
      * Method to blur the image.
      *
-     * @param  int $radius
-     * @param  int $sigma
-     * @param  int $angle
-     * @param  int $type
+     * @param  int    $radius
+     * @param  int    $sigma
+     * @param  int    $angle
+     * @param  string $type
      * @return Imagick
      */
     public function blur($radius = 0, $sigma = 0, $angle = 0, $type = Imagick::BLUR)
@@ -858,9 +902,9 @@ class Imagick extends AbstractImage
     /**
      * Method to add a border to the image.
      *
-     * @param  int $w
-     * @param  int $h
-     * @param  int $type
+     * @param  int    $w
+     * @param  int    $h
+     * @param  string $type
      * @return Imagick
      */
     public function border($w, $h = null, $type = Imagick::INNER_BORDER)
@@ -884,19 +928,19 @@ class Imagick extends AbstractImage
     /**
      * Overlay an image onto the current image.
      *
-     * @param  string     $ovr
-     * @param  int|string $x
-     * @param  int|string $y
+     * @param  string $image
+     * @param  int    $x
+     * @param  int    $y
      * @return Imagick
      */
-    public function overlay($ovr, $x = 0, $y = 0)
+    public function overlay($image, $x = 0, $y = 0)
     {
-        $overlayImage = new \Imagick($ovr);
+        $overlayImage = new \Imagick($image);
         if ($this->opacity < 1) {
             $overlayImage->setImageOpacity($this->opacity);
         }
 
-        $this->resource->compositeImage($overlayImage, $this->overlay, $x, $y);
+        $this->resource->compositeImage($overlayImage, $this->overlayStyle, $x, $y);
         return $this;
     }
 
@@ -1107,7 +1151,7 @@ class Imagick extends AbstractImage
     public function getColors($format = Imagick::HEX)
     {
         // Initialize the colors array and the image resource.
-        $colors = array();
+        $colors = [];
 
         // Loop through each pixel of the image, recording the color result
         // in the color array.
@@ -1153,11 +1197,11 @@ class Imagick extends AbstractImage
         }
 
         // Else, save the image as the new type.
-        $old = $this->extension;
+        $old             = $this->extension;
         $this->extension = $type;
-        $this->mime = $this->allowed[strtolower($this->extension)];
-        $this->fullpath = $this->dir . $this->filename . '.' . $this->extension;
-        $this->basename = basename($this->fullpath);
+        $this->mime      = $this->allowed[strtolower($this->extension)];
+        $this->fullpath  = $this->dir . $this->filename . '.' . $this->extension;
+        $this->basename  = basename($this->fullpath);
 
         if (($old == 'psd') || ($old == 'tif') || ($old == 'tiff')) {
             $this->flatten();
@@ -1177,10 +1221,10 @@ class Imagick extends AbstractImage
     {
         // Determine if the force download argument has been passed.
         $attach = ($download) ? 'attachment; ' : null;
-        $headers = array(
+        $headers = [
             'Content-type' => $this->mime,
             'Content-disposition' => $attach . 'filename=' . $this->basename
-        );
+        ];
 
         if ($_SERVER['SERVER_PORT'] == 443) {
             $headers['Expires']       = 0;
@@ -1327,10 +1371,10 @@ class Imagick extends AbstractImage
         $version = substr($versionString, (strpos($versionString, ' ') + 1));
         $version = substr($version, 0, strpos($version, '-'));
 
-        $imInfo = array(
+        $imInfo = [
             'version'       => $version,
             'versionString' => $versionString
-        );
+        ];
 
         $this->info = new \ArrayObject($imInfo, \ArrayObject::ARRAY_AS_PROPS);
     }
