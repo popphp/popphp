@@ -171,6 +171,8 @@ class Captcha
 
         if (isset($options['background']) && is_array($options['background']) && (count($options['background']) == 3)) {
             $this->image->setBackgroundColor((int)$options['background'][0], (int)$options['background'][1], (int)$options['background'][2]);
+        } else {
+            $this->image->setBackgroundColor(255, 255, 255);
         }
     }
 
@@ -604,7 +606,7 @@ class Captcha
                     $this->y = $height - round(($height - $this->size) / 2);
                 }
             }
-            $this->image->text($this->token['value'], $this->size, $this->x, $this->y, $this->font, $this->rotate);
+            $this->image->text($this->token['value'], $this->size, ['x' => $this->x, 'y' => $this->y, 'font' => $this->font, 'rotate' => $this->rotate]);
         // Else, draw text using a system font
         } else {
             // If not defined, calculate the x, y start-point for the text
@@ -617,7 +619,7 @@ class Captcha
                     $this->y = round(($height - 17) / 2);
                 }
             }
-            $this->image->text($this->token['value'], $this->size, $this->x, $this->y);
+            $this->image->text($this->token['value'], $this->size, ['x' => $this->x, 'y' => $this->y]);
         }
 
         if ((null !== $this->swirl) && method_exists($this->image, 'swirl')) {
