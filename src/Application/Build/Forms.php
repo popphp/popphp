@@ -62,18 +62,16 @@ class Forms
             $construct = new MethodGenerator('__construct');
             $construct->setDesc('Constructor method to instantiate the form object');
             $construct->getDocblock()->setReturn('self');
-            $construct->addArguments(
-                array(
-                    array('name' => 'action', 'value' => 'null',   'type' => 'string'),
-                    array('name' => 'method', 'value' => "'post'", 'type' => 'string'),
-                    array('name' => 'fields', 'value' => 'null',   'type' => 'array'),
-                    array('name' => 'indent', 'value' => 'null',   'type' => 'string')
-                )
-            );
+            $construct->addArguments([
+                ['name' => 'action', 'value' => 'null',   'type' => 'string'],
+                ['name' => 'method', 'value' => "'post'", 'type' => 'string'],
+                ['name' => 'fields', 'value' => 'null',   'type' => 'array'],
+                ['name' => 'indent', 'value' => 'null',   'type' => 'string']
+            ]);
 
             // Create the init values array within the constructor
             if (is_array($form) && (count($form) > 0)) {
-                $construct->appendToBody("\$this->initFieldsValues = [");
+                $construct->appendToBody("\$this->fieldConfig = [");
                 $i = 0;
                 foreach ($form as $nm => $field) {
                     $i++;

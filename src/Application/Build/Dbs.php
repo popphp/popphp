@@ -89,7 +89,7 @@ class Dbs
             $files = scandir($dir);
             foreach ($files as $file) {
                 if (strtolower(substr($file, -4)) == '.sql') {
-                    $sqlFiles[] = $file;
+                    $sqlFiles[] = $dir . DIRECTORY_SEPARATOR . $file;
                 }
             }
         }

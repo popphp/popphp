@@ -83,9 +83,9 @@ class Bootstrap
         // Set up any controllers via a router object
         if (isset($build->controllers)) {
             $controllers = $build->controllers->toArray();
-            $ctrls = array();
+            $ctrls = [];
             foreach ($controllers as $key => $value) {
-                $subs = array();
+                $subs = [];
                 foreach ($value as $k => $v) {
                     if (is_array($v)) {
                         $subs[] = $k;

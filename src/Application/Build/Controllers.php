@@ -59,12 +59,12 @@ class Controllers
         if (isset($build->controllers)) {
             $controllers = $build->controllers->toArray();
 
-            self::createControllers($controllers, array(
+            self::createControllers($controllers, [
                 'src'        => realpath($ctrlDir),
                 'view'       => realpath($viewDir),
                 'namespace'  => $build->name . '\Controller',
                 'installDir' => $buildDir
-            ));
+            ]);
         }
     }
 
@@ -130,21 +130,21 @@ class Controllers
 
                     // Set namespace
                     $ns = new NamespaceGenerator($namespace);
-                    $ns->setUses(array(
+                    $ns->setUses([
                         'Pop\Http\Response',
                         'Pop\Http\Request',
-                        array('Pop\Mvc\Controller', 'C'),
+                        ['Pop\Mvc\Controller', 'C'],
                         'Pop\Mvc\View'
-                    ));
+                    ]);
 
                     // Create the constructor
                     $construct = new MethodGenerator('__construct');
                     $construct->setDesc('Constructor method to instantiate the controller object');
-                    $construct->addArguments(array(
-                        array('name' => 'request', 'value' => 'null', 'type' => 'Request'),
-                        array('name' => 'response', 'value' => 'null', 'type' => 'Response'),
-                        array('name' => 'viewPath', 'value' => 'null', 'type' => 'string')
-                    ));
+                    $construct->addArguments([
+                        ['name' => 'request', 'value' => 'null', 'type' => 'Request'],
+                        ['name' => 'response', 'value' => 'null', 'type' => 'Response'],
+                        ['name' => 'viewPath', 'value' => 'null', 'type' => 'string']
+                    ]);
 
                     if ($parent == 'C') {
                         $construct->appendToBody("if (null === \$viewPath) {")

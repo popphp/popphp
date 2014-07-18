@@ -195,7 +195,7 @@ class Application
         } else if ($config instanceof Config) {
             $this->config = $config;
         } else {
-            throw new Exception('The project config must be either an array or an instance of Pop\\Config.');
+            throw new Exception('The project config must be either an array or an instance of Pop\Config.');
         }
 
         return $this;
@@ -216,7 +216,7 @@ class Application
             } else if ($value instanceof Config) {
                 $this->modules[$key] = $value;
             } else {
-                throw new Exception('The module config must be either an array or an instance of Pop\\Config.');
+                throw new Exception('The module config must be either an array or an instance of Pop\Config.');
             }
         }
 
