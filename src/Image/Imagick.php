@@ -147,7 +147,7 @@ class Imagick extends AbstractRaster
             $this->resource = new \Imagick();
 
             if ((null === $w) || (null === $h)) {
-                throw new Exception('Error: You must define a width and height for a new image object.');
+                throw new Exception('Error: That image file does not exist yet, so you must define a width and height for a new image object.');
             }
 
             // Set image object properties.
