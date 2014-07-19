@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Adapter;
+namespace Pop\Image;
 
 /**
  * Image class
@@ -25,7 +25,7 @@ namespace Pop\Image\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Gd extends AbstractAdapter
+class Gd extends AbstractImage
 {
 
     /**
@@ -39,6 +39,12 @@ class Gd extends AbstractAdapter
         'jpeg' => 'image/jpeg',
         'png'  => 'image/png'
     ];
+
+    /**
+     * Image filter object
+     * @var Filter\Gd
+     */
+    protected $filter = null;
 
     /**
      * Constructor
@@ -56,6 +62,8 @@ class Gd extends AbstractAdapter
     public function __construct($img, $w = null, $h = null, $types = null)
     {
         parent::__construct($img, $w, $h, $types);
+
+        $this->filter = new Filter\Gd($this);
 
         // Check to see if GD is installed.
         if (!self::isInstalled()) {
@@ -93,6 +101,16 @@ class Gd extends AbstractAdapter
     public static function isInstalled()
     {
         return function_exists('gd_info');
+    }
+
+    /**
+     * Get the image filter object
+     *
+     * @return Filter\Gd
+     */
+    public function filter()
+    {
+        return $this->filter;
     }
 
     /**

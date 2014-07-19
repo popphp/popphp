@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Adapter;
+namespace Pop\Image\Effect;
 
 /**
  * Image class
@@ -25,7 +25,26 @@ namespace Pop\Image\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Imagick extends AbstractAdapter
+abstract class AbstractEffect implements EffectInterface
 {
+
+    /**
+     * Image object
+     * @var \Pop\Image\AbstractImage
+     */
+    protected $image = null;
+
+    /**
+     * Constructor
+     *
+     * Instantiate an image object
+     *
+     * @param  \Pop\Image\AbstractImage
+     * @return AbstractEffect
+     */
+    public function __construct(\Pop\Image\AbstractImage $image)
+    {
+        $this->image = $image;
+    }
 
 }

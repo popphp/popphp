@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Adapter;
+namespace Pop\Image\Draw;
 
 /**
- * Image exception class
+ * Image class
  *
  * @category   Pop
  * @package    Pop_Image
@@ -25,4 +25,7 @@ namespace Pop\Image\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Exception extends \Exception {}
+class Gmagick extends AbstractDraw
+{
+
+}

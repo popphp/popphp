@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Filter;
+namespace Pop\Image\Transform;
 
 /**
  * Image class
@@ -25,42 +25,26 @@ namespace Pop\Image\Filter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Filter
+abstract class AbstractTransform implements TransformInterface
 {
 
     /**
-     * Image adapter
-     * @var \Pop\Image\Adapter\AbstractAdapter
+     * Image object
+     * @var \Pop\Image\AbstractImage
      */
-    protected $adapter = null;
+    protected $image = null;
 
     /**
      * Constructor
      *
      * Instantiate an image object
      *
-     * @param  \Pop\Image\Adapter\AbstractAdapter
-     * @return Filter
+     * @param  \Pop\Image\AbstractImage
+     * @return AbstractTransform
      */
-    public function __construct(\Pop\Image\Adapter\AbstractAdapter $adapter)
+    public function __construct(\Pop\Image\AbstractImage $image)
     {
-        $this->adapter = $adapter;
-    }
-
-    /**
-     * Blur the image
-     *
-     * @param  int $amount
-     * @param  int $type
-     * @return Filter
-     */
-    public function blur($amount, $type = IMG_FILTER_GAUSSIAN_BLUR)
-    {
-        for ($i = 1; $i <= $amount; $i++) {
-            imagefilter($this->adapter->resource(), $type);
-        }
-
-        return $this;
+        $this->image = $image;
     }
 
 }

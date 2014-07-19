@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Type;
+namespace Pop\Image\Transform;
 
 /**
  * Image class
@@ -25,7 +25,7 @@ namespace Pop\Image\Type;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Type
+class Imagick extends AbstractTransform
 {
 
 }

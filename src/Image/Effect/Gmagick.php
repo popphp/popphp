@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Draw;
+namespace Pop\Image\Effect;
 
 /**
  * Image class
@@ -25,7 +25,7 @@ namespace Pop\Image\Draw;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Draw
+class Gmagick extends AbstractEffect
 {
 
 }

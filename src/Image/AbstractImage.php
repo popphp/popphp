@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Adapter;
+namespace Pop\Image;
 
 /**
  * Image class
@@ -25,7 +25,7 @@ namespace Pop\Image\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-abstract class AbstractAdapter implements AdapterInterface
+abstract class AbstractImage implements ImageInterface
 {
 
     /**
@@ -110,7 +110,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * @param  int    $w
      * @param  int    $h
      * @throws Exception
-     * @return AbstractAdapter
+     * @return AbstractImage
      */
     public function __construct($img, $w = null, $h = null)
     {
@@ -221,7 +221,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * Resize the image object to the width parameter passed.
      *
      * @param  int $w
-     * @return AbstractAdapter
+     * @return AbstractImage
      */
     abstract public function resizeToWidth($w);
 
@@ -229,7 +229,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * Resize the image object to the height parameter passed.
      *
      * @param  int $h
-     * @return AbstractAdapter
+     * @return AbstractImage
      */
     abstract public function resizeToHeight($h);
 
@@ -238,7 +238,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * to the value of the $px argument.
      *
      * @param  int $px
-     * @return AbstractAdapter
+     * @return AbstractImage
      */
     abstract public function resize($px);
 
@@ -247,7 +247,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * proportionally to the value of the $scl argument.
      *
      * @param  float $scale
-     * @return AbstractAdapter
+     * @return AbstractImage
      */
     abstract public function scale($scale);
 
@@ -261,7 +261,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * @param  int $h
      * @param  int $x
      * @param  int $y
-     * @return AbstractAdapter
+     * @return AbstractImage
      */
     abstract public function crop($w, $h, $x = 0, $y = 0);
 
@@ -274,7 +274,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * @param  int $px
      * @param  int $x
      * @param  int $y
-     * @return AbstractAdapter
+     * @return AbstractImage
      */
     abstract public function cropThumb($px, $x = 0, $y = 0);
 

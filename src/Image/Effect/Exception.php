@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Effects;
+namespace Pop\Image\Effect;
 
 /**
  * Image exception class

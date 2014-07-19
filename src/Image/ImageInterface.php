@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Adapter;
+namespace Pop\Image;
 
 /**
  * Image class
@@ -25,7 +25,7 @@ namespace Pop\Image\Adapter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-interface AdapterInterface
+interface ImageInterface
 {
 
     /**
@@ -102,7 +102,7 @@ interface AdapterInterface
      * Resize the image object to the width parameter passed.
      *
      * @param  int $w
-     * @return AdapterInterface
+     * @return ImageInterface
      */
     public function resizeToWidth($w);
 
@@ -110,7 +110,7 @@ interface AdapterInterface
      * Resize the image object to the height parameter passed.
      *
      * @param  int $h
-     * @return AdapterInterface
+     * @return ImageInterface
      */
     public function resizeToHeight($h);
 
@@ -119,7 +119,7 @@ interface AdapterInterface
      * to the value of the $px argument.
      *
      * @param  int $px
-     * @return AdapterInterface
+     * @return ImageInterface
      */
     public function resize($px);
 
@@ -128,7 +128,7 @@ interface AdapterInterface
      * proportionally to the value of the $scl argument.
      *
      * @param  float $scale
-     * @return AdapterInterface
+     * @return ImageInterface
      */
     public function scale($scale);
 
@@ -142,7 +142,7 @@ interface AdapterInterface
      * @param  int $h
      * @param  int $x
      * @param  int $y
-     * @return AdapterInterface
+     * @return ImageInterface
      */
     public function crop($w, $h, $x = 0, $y = 0);
 
@@ -155,7 +155,7 @@ interface AdapterInterface
      * @param  int $px
      * @param  int $x
      * @param  int $y
-     * @return AdapterInterface
+     * @return ImageInterface
      */
     public function cropThumb($px, $x = 0, $y = 0);
     
