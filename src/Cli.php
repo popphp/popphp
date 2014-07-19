@@ -180,7 +180,7 @@ class Cli
      */
     protected function help()
     {
-        echo '   ./pop check             ' . 'Check the current configuration for required dependencies' . PHP_EOL;
+        echo '   ./pop check             ' . 'Check the current environment for dependencies' . PHP_EOL;
         echo '   ./pop help              ' . 'Display this help' . PHP_EOL;
         echo '   ./pop build file.php    ' . 'Build an application based on the build file specified' . PHP_EOL;
         echo '   ./pop show              ' . 'Show project build instructions' . PHP_EOL;

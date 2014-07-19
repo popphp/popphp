@@ -126,6 +126,7 @@ class Version
                 'geoip' => (function_exists('geoip_db_get_all_info')),
                 'image' => [
                     'gd'       => (function_exists('getimagesize')),
+                    'gmagick'  => (class_exists('Gmagick', false)),
                     'imagick'  => (class_exists('Imagick', false))
                 ],
                 'mcrypt'   => (function_exists('mcrypt_encrypt')),
