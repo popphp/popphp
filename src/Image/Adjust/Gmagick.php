@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Draw;
+namespace Pop\Image\Adjust;
 
 /**
  * Image class
@@ -25,7 +25,39 @@ namespace Pop\Image\Draw;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Gmagick extends AbstractDraw
+class Gmagick extends AbstractAdjust
 {
+
+    /**
+     * Adjust the image brightness
+     *
+     * @param  int $amount
+     * @return Gmagick
+     */
+    public function brightness($amount)
+    {
+        return $this;
+    }
+
+    /**
+     * Adjust the image contrast
+     *
+     * @param  int $amount
+     * @return Gmagick
+     */
+    public function contrast($amount)
+    {
+        return $this;
+    }
+
+    /**
+     * Adjust the image desaturate
+     *
+     * @return Gmagick
+     */
+    public function desaturate()
+    {
+        return $this;
+    }
 
 }

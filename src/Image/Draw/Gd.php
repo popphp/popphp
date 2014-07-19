@@ -28,4 +28,115 @@ namespace Pop\Image\Draw;
 class Gd extends AbstractDraw
 {
 
+    /**
+     * Draw a line on the image.
+     *
+     * @param  int $x1
+     * @param  int $y1
+     * @param  int $x2
+     * @param  int $y2
+     * @return Gd
+     */
+    public function line($x1, $y1, $x2, $y2)
+    {
+        return $this;
+    }
+
+    /**
+     * Draw a rectangle on the image.
+     *
+     * @param  int $x
+     * @param  int $y
+     * @param  int $w
+     * @param  int $h
+     * @return Gd
+     */
+    public function rectangle($x, $y, $w, $h = null)
+    {
+        return $this;
+    }
+
+    /**
+     * Draw a square on the image.
+     *
+     * @param  int     $x
+     * @param  int     $y
+     * @param  int     $w
+     * @return Gd
+     */
+    public function square($x, $y, $w)
+    {
+        return $this->rectangle($x, $y, $w, $w);
+    }
+
+    /**
+     * Draw an ellipse on the image.
+     *
+     * @param  int $x
+     * @param  int $y
+     * @param  int $w
+     * @param  int $h
+     * @return Gd
+     */
+    public function ellipse($x, $y, $w, $h = null)
+    {
+        return $this;
+    }
+
+    /**
+     * Method to add a circle to the image.
+     *
+     * @param  int     $x
+     * @param  int     $y
+     * @param  int     $w
+     * @return Gd
+     */
+    public function circle($x, $y, $w)
+    {
+        return $this->ellipse($x, $y, $w, $w);
+    }
+
+    /**
+     * Draw an arc on the image.
+     *
+     * @param  int $x
+     * @param  int $y
+     * @param  int $start
+     * @param  int $end
+     * @param  int $w
+     * @param  int $h
+     * @return Gd
+     */
+    public function arc($x, $y, $start, $end, $w, $h = null)
+    {
+        return $this;
+    }
+
+    /**
+     * Draw a chord on the image.
+     *
+     * @param  int $x
+     * @param  int $y
+     * @param  int $start
+     * @param  int $end
+     * @param  int $w
+     * @param  int $h
+     * @return Gd
+     */
+    public function chord($x, $y, $start, $end, $w, $h = null)
+    {
+        return $this;
+    }
+
+    /**
+     * Draw a polygon on the image.
+     *
+     * @param  array $points
+     * @return Gd
+     */
+    public function polygon($points)
+    {
+
+    }
+
 }

@@ -28,4 +28,15 @@ namespace Pop\Image\Type;
 class Imagick extends AbstractType
 {
 
+    /**
+     * Set and apply the text on the image
+     *
+     * @param  string $string
+     * @return Imagick
+     */
+    public function text($string)
+    {
+        return $this;
+    }
+
 }

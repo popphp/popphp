@@ -41,10 +41,46 @@ class Gd extends AbstractImage
     ];
 
     /**
+     * Image adjust object
+     * @var Adjust\Gd
+     */
+    protected $adjust = null;
+
+    /**
+     * Image draw object
+     * @var Adjust\Gd
+     */
+    protected $draw = null;
+
+    /**
+     * Image effect object
+     * @var Effect\Gd
+     */
+    protected $effect = null;
+
+    /**
      * Image filter object
      * @var Filter\Gd
      */
     protected $filter = null;
+
+    /**
+     * Image layer object
+     * @var Layer\Gd
+     */
+    protected $layer = null;
+
+    /**
+     * Image transform object
+     * @var Transform\Gd
+     */
+    protected $transform = null;
+
+    /**
+     * Image type object
+     * @var Type\Gd
+     */
+    protected $type = null;
 
     /**
      * Constructor
@@ -62,8 +98,6 @@ class Gd extends AbstractImage
     public function __construct($img, $w = null, $h = null, $types = null)
     {
         parent::__construct($img, $w, $h, $types);
-
-        $this->filter = new Filter\Gd($this);
 
         // Check to see if GD is installed.
         if (!self::isInstalled()) {
@@ -104,13 +138,152 @@ class Gd extends AbstractImage
     }
 
     /**
+     * Get the allowed image formats
+     *
+     * @return array
+     */
+    public static function getFormats()
+    {
+        return (new self('i.jpg', 1, 1))->getAllowedTypes();
+    }
+
+    /**
+     * Get the image adjust object
+     *
+     * @return Adjust\Gd
+     */
+    public function adjust()
+    {
+        if (null === $this->adjust) {
+            $this->adjust = new Adjust\Gd($this);
+        }
+        return $this->adjust;
+    }
+
+    /**
+     * Get the image draw object
+     *
+     * @return Draw\Gd
+     */
+    public function draw()
+    {
+        if (null === $this->draw) {
+            $this->draw = new Draw\Gd($this);
+        }
+        return $this->draw;
+    }
+
+    /**
+     * Get the image effect object
+     *
+     * @return Effect\Gd
+     */
+    public function effect()
+    {
+        if (null === $this->effect) {
+            $this->effect = new Effect\Gd($this);
+        }
+        return $this->effect;
+    }
+
+    /**
      * Get the image filter object
      *
      * @return Filter\Gd
      */
     public function filter()
     {
+        if (null === $this->filter) {
+            $this->filter = new Filter\Gd($this);
+        }
         return $this->filter;
+    }
+
+    /**
+     * Get the image layer object
+     *
+     * @return Layer\Gd
+     */
+    public function layer()
+    {
+        if (null === $this->layer) {
+            $this->layer = new Layer\Gd($this);
+        }
+        return $this->layer;
+    }
+
+    /**
+     * Get the image transform object
+     *
+     * @return Transform\Gd
+     */
+    public function transform()
+    {
+        if (null === $this->transform) {
+            $this->transform = new Transform\Gd($this);
+        }
+        return $this->transform;
+    }
+
+    /**
+     * Get the image type object
+     *
+     * @return Type\Gd
+     */
+    public function type()
+    {
+        if (null === $this->type) {
+            $this->type = new Type\Gd($this);
+        }
+        return $this->type;
+    }
+
+    /**
+     * Set the image opacity.
+     *
+     * @param  int $opacity
+     * @return Gd
+     */
+    public function setOpacity($opacity)
+    {
+        $this->opacity = round((127 - (127 * ($opacity / 100))));
+        return $this;
+    }
+
+    /**
+     * Set the image quality.
+     *
+     * @param  int $quality
+     * @return Gd
+     */
+    public function setQuality($quality)
+    {
+        switch ($this->mime) {
+            case 'image/png':
+                $this->quality = ($quality < 10) ? 9 : 10 - round(($quality / 10), PHP_ROUND_HALF_DOWN);
+                break;
+            case 'image/jpeg':
+                $this->quality = round($quality);
+                break;
+            default:
+                $this->quality = 100;
+        }
+
+        $this->compression = $this->quality;
+
+        return $this;
+    }
+
+    /**
+     * Set the image compression (for Gd, an alias to setQuality())
+     *
+     * @param  int $compression
+     * @return Gd
+     */
+    public function setCompression($compression)
+    {
+        $this->setQuality($compression);
+        return $this;
     }
 
     /**
@@ -121,6 +294,11 @@ class Gd extends AbstractImage
      */
     public function resizeToWidth($w)
     {
+        $scale        = $w / $this->width;
+        $h            = round($this->height * $scale);
+        $this->output = imagecreatetruecolor($w, $h);
+
+        $this->copyImage($w, $h);
         return $this;
     }
 
@@ -132,6 +310,11 @@ class Gd extends AbstractImage
      */
     public function resizeToHeight($h)
     {
+        $scale        = $h / $this->height;
+        $w            = round($this->width * $scale);
+        $this->output = imagecreatetruecolor($w, $h);
+
+        $this->copyImage($w, $h);
         return $this;
     }
 
@@ -144,6 +327,12 @@ class Gd extends AbstractImage
      */
     public function resize($px)
     {
+        $scale        = ($this->width > $this->height) ? ($px / $this->width) : ($px / $this->height);
+        $w            = round($this->width * $scale);
+        $h            = round($this->height * $scale);
+        $this->output = imagecreatetruecolor($w, $h);
+
+        $this->copyImage($w, $h);
         return $this;
     }
 
@@ -156,6 +345,11 @@ class Gd extends AbstractImage
      */
     public function scale($scale)
     {
+        $w = round($this->width * $scale);
+        $h = round($this->height * $scale);
+        $this->output = imagecreatetruecolor($w, $h);
+
+        $this->copyImage($w, $h);
         return $this;
     }
 
@@ -173,6 +367,8 @@ class Gd extends AbstractImage
      */
     public function crop($w, $h, $x = 0, $y = 0)
     {
+        $this->output = imagecreatetruecolor($w, $h);
+        $this->copyImage($this->width, $this->height, $x, $y);
         return $this;
     }
 
@@ -189,6 +385,12 @@ class Gd extends AbstractImage
      */
     public function cropThumb($px, $x = 0, $y = 0)
     {
+        $scale        = ($this->width > $this->height) ? ($px / $this->height) : ($px / $this->width);
+        $w            = round($this->width * $scale);
+        $h            = round($this->height * $scale);
+        $this->output = imagecreatetruecolor($px, $px);
+
+        $this->copyImage($w, $h, $x, $y);
         return $this;
     }
 

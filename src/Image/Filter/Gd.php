@@ -44,4 +44,50 @@ class Gd extends AbstractFilter
         return $this;
     }
 
+    /**
+     * Sharpen the image.
+     *
+     * @param  int $amount
+     * @return Gd
+     */
+    public function sharpen($amount)
+    {
+        imagefilter($this->image->resource(), IMG_FILTER_SMOOTH, (0 - $amount));
+        return $this;
+    }
+
+    /**
+     * Create a negative of the image
+     *
+     * @return Gd
+     */
+    public function negative()
+    {
+        imagefilter($this->image->resource(), IMG_FILTER_NEGATE);
+        return $this;
+    }
+
+    /**
+     * Pixelate the image
+     *
+     * @param  int $px
+     * @return Gd
+     */
+    public function pixelate($px)
+    {
+        imagefilter($this->image->resource(), IMG_FILTER_PIXELATE, $px, true);
+        return $this;
+    }
+
+    /**
+     * Apply a pencil/sketch effect to the image
+     *
+     * @return Gd
+     */
+    public function pencil()
+    {
+        imagefilter($this->image->resource(), IMG_FILTER_MEAN_REMOVAL);
+        return $this;
+    }
+
 }

@@ -28,4 +28,29 @@ namespace Pop\Image\Effect;
 class Imagick extends AbstractEffect
 {
 
+    /**
+     * Draw a border around the image.
+     *
+     * @param  int    $w
+     * @param  int    $h
+     * @return Imagick
+     */
+    public function border($w, $h = null)
+    {
+        return $this;
+    }
+
+    /**
+     * Flood the image with a color fill.
+     *
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
+     * @return Imagick
+     */
+    public function fill($r, $g, $b)
+    {
+        return $this;
+    }
+
 }

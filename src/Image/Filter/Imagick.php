@@ -28,4 +28,57 @@ namespace Pop\Image\Filter;
 class Imagick extends AbstractFilter
 {
 
+    /**
+     * Blur the image
+     *
+     * @param  int $amount
+     * @return Imagick
+     */
+    public function blur($amount)
+    {
+        return $this;
+    }
+
+    /**
+     * Sharpen the image
+     *
+     * @param  int $amount
+     * @return Imagick
+     */
+    public function sharpen($amount)
+    {
+        return $this;
+    }
+
+    /**
+     * Create a negative of the image
+     *
+     * @return Imagick
+     */
+    public function negative()
+    {
+        return $this;
+    }
+
+    /**
+     * Pixelate the image
+     *
+     * @param  int $px
+     * @return Imagick
+     */
+    public function pixelate($px)
+    {
+        return $this;
+    }
+
+    /**
+     * Apply a pencil/sketch effect to the image
+     *
+     * @return Imagick
+     */
+    public function pencil()
+    {
+        return $this;
+    }
+
 }

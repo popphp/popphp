@@ -28,4 +28,35 @@ namespace Pop\Image\Transform;
 class Gmagick extends AbstractTransform
 {
 
+    /**
+     * Rotate the image object
+     *
+     * @param  int $degrees
+     * @return Gmagick
+     */
+    public function rotate($degrees)
+    {
+        return $this;
+    }
+
+    /**
+     * Flip the image over the x-axis.
+     *
+     * @return Gmagick
+     */
+    public function flip()
+    {
+        return $this;
+    }
+
+    /**
+     * Flip the image over the y-axis.
+     *
+     * @return Gmagick
+     */
+    public function flop()
+    {
+        return $this;
+    }
+
 }

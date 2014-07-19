@@ -28,4 +28,35 @@ namespace Pop\Image\Transform;
 class Gd extends AbstractTransform
 {
 
+    /**
+     * Rotate the image object
+     *
+     * @param  int $degrees
+     * @return Gd
+     */
+    public function rotate($degrees)
+    {
+        return $this;
+    }
+
+    /**
+     * Flip the image over the x-axis.
+     *
+     * @return Gd
+     */
+    public function flip()
+    {
+        return $this;
+    }
+
+    /**
+     * Flip the image over the y-axis.
+     *
+     * @return Gd
+     */
+    public function flop()
+    {
+        return $this;
+    }
+
 }

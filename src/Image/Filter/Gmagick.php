@@ -28,4 +28,57 @@ namespace Pop\Image\Filter;
 class Gmagick extends AbstractFilter
 {
 
+    /**
+     * Blur the image
+     *
+     * @param  int $amount
+     * @return Gmagick
+     */
+    public function blur($amount)
+    {
+        return $this;
+    }
+
+    /**
+     * Sharpen the image
+     *
+     * @param  int $amount
+     * @return Gmagick
+     */
+    public function sharpen($amount)
+    {
+        return $this;
+    }
+
+    /**
+     * Create a negative of the image
+     *
+     * @return Gmagick
+     */
+    public function negative()
+    {
+        return $this;
+    }
+
+    /**
+     * Pixelate the image
+     *
+     * @param  int $px
+     * @return Gmagick
+     */
+    public function pixelate($px)
+    {
+        return $this;
+    }
+
+    /**
+     * Apply a pencil/sketch effect to the image
+     *
+     * @return Gmagick
+     */
+    public function pencil()
+    {
+        return $this;
+    }
+
 }

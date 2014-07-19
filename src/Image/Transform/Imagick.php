@@ -28,4 +28,35 @@ namespace Pop\Image\Transform;
 class Imagick extends AbstractTransform
 {
 
+    /**
+     * Rotate the image object
+     *
+     * @param  int $degrees
+     * @return Imagick
+     */
+    public function rotate($degrees)
+    {
+        return $this;
+    }
+
+    /**
+     * Flip the image over the x-axis.
+     *
+     * @return Imagick
+     */
+    public function flip()
+    {
+        return $this;
+    }
+
+    /**
+     * Flip the image over the y-axis.
+     *
+     * @return Imagick
+     */
+    public function flop()
+    {
+        return $this;
+    }
+
 }

@@ -28,4 +28,15 @@ namespace Pop\Image\Type;
 class Gmagick extends AbstractType
 {
 
+    /**
+     * Set and apply the text on the image
+     *
+     * @param  string $string
+     * @return Gmagick
+     */
+    public function text($string)
+    {
+        return $this;
+    }
+
 }

@@ -29,6 +29,76 @@ interface ImageInterface
 {
 
     /**
+     * Check if the required image library extension is installed.
+     *
+     * @return boolean
+     */
+    public static function isInstalled();
+
+    /**
+     * Get the allowed image formats
+     *
+     * @return array
+     */
+    public static function getFormats();
+
+    /**
+     * Get the image adjust object
+     *
+     * @return mixed
+     */
+    public function adjust();
+
+    /**
+     * Get the image draw object
+     *
+     * @return mixed
+     */
+    public function draw();
+
+    /**
+     * Get the image effect object
+     *
+     * @return mixed
+     */
+    public function effect();
+
+    /**
+     * Get the image filter object
+     *
+     * @return mixed
+     */
+    public function filter();
+
+    /**
+     * Get the image layer object
+     *
+     * @return mixed
+     */
+    public function layer();
+
+    /**
+     * Get the image transform object
+     *
+     * @return mixed
+     */
+    public function transform();
+
+    /**
+     * Get the image type object
+     *
+     * @return mixed
+     */
+    public function type();
+
+    /**
+     * Get the image resource
+     *
+     * @return resource
+     */
+    public function getAllowedTypes();
+
+    /**
      * Get the image resource
      *
      * @return resource
@@ -97,6 +167,51 @@ interface ImageInterface
      * @return int
      */
     public function getHeight();
+
+    /**
+     * Get the image opacity.
+     *
+     * @return int
+     */
+    public function getOpacity();
+
+    /**
+     * Get the image quality.
+     *
+     * @return int
+     */
+    public function getQuality();
+
+    /**
+     * Get the image compression.
+     *
+     * @return int
+     */
+    public function getCompression();
+
+    /**
+     * Set the image opacity.
+     *
+     * @param  int $opacity
+     * @return ImageInterface
+     */
+    public function setOpacity($opacity);
+
+    /**
+     * Set the image quality.
+     *
+     * @param  int $quality
+     * @return ImageInterface
+     */
+    public function setQuality($quality);
+
+    /**
+     * Set the image compression.
+     *
+     * @param  int $compression
+     * @return ImageInterface
+     */
+    public function setCompression($compression);
 
     /**
      * Resize the image object to the width parameter passed.

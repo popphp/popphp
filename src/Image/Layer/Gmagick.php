@@ -28,4 +28,28 @@ namespace Pop\Image\Layer;
 class Gmagick extends AbstractLayer
 {
 
+    /**
+     * Set the opacity of the overlay layer.
+     *
+     * @param  int $opacity
+     * @return Gmagick
+     */
+    public function opacity($opacity)
+    {
+        return $this;
+    }
+
+    /**
+     * Overlay an image onto the current image.
+     *
+     * @param  string $image
+     * @param  int    $x
+     * @param  int    $y
+     * @return Gmagick
+     */
+    public function overlay($image, $x = 0, $y = 0)
+    {
+        return $this;
+    }
+
 }

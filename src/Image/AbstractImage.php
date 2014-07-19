@@ -95,6 +95,24 @@ abstract class AbstractImage implements ImageInterface
     protected $height = null;
 
     /**
+     * Image opacity
+     * @var int
+     */
+    protected $opacity = null;
+
+    /**
+     * Image quality
+     * @var int
+     */
+    protected $quality = null;
+
+    /**
+     * Image compression
+     * @var int
+     */
+    protected $compression = null;
+
+    /**
      * Array of allowed image types.
      * @var array
      */
@@ -115,6 +133,16 @@ abstract class AbstractImage implements ImageInterface
     public function __construct($img, $w = null, $h = null)
     {
         $this->setImage($img);
+    }
+
+    /**
+     * Get the allowed image types
+     *
+     * @return array
+     */
+    public function getAllowedTypes()
+    {
+        return $this->allowed;
     }
 
     /**
@@ -216,6 +244,109 @@ abstract class AbstractImage implements ImageInterface
     {
         return $this->height;
     }
+
+    /**
+     * Get the image opacity.
+     *
+     * @return int
+     */
+    public function getOpacity()
+    {
+        return $this->opacity;
+    }
+
+    /**
+     * Get the image quality.
+     *
+     * @return int
+     */
+    public function getQuality()
+    {
+        return $this->quality;
+    }
+
+    /**
+     * Get the image compression.
+     *
+     * @return int
+     */
+    public function getCompression()
+    {
+        return $this->compression;
+    }
+
+    /**
+     * Get the image adjust object
+     *
+     * @return mixed
+     */
+    abstract public function adjust();
+
+    /**
+     * Get the image draw object
+     *
+     * @return mixed
+     */
+    abstract public function draw();
+
+    /**
+     * Get the image effect object
+     *
+     * @return mixed
+     */
+    abstract public function effect();
+
+    /**
+     * Get the image filter object
+     *
+     * @return mixed
+     */
+    abstract public function filter();
+
+    /**
+     * Get the image layer object
+     *
+     * @return mixed
+     */
+    abstract public function layer();
+
+    /**
+     * Get the image transform object
+     *
+     * @return mixed
+     */
+    abstract public function transform();
+
+    /**
+     * Get the image type object
+     *
+     * @return mixed
+     */
+    abstract public function type();
+
+    /**
+     * Set the image opacity.
+     *
+     * @param  int $opacity
+     * @return AbstractImage
+     */
+    abstract public function setOpacity($opacity);
+
+    /**
+     * Set the image quality.
+     *
+     * @param  int $quality
+     * @return AbstractImage
+     */
+    abstract public function setQuality($quality);
+
+    /**
+     * Set the image compression.
+     *
+     * @param  int $compression
+     * @return AbstractImage
+     */
+    abstract public function setCompression($compression);
 
     /**
      * Resize the image object to the width parameter passed.

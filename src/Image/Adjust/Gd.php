@@ -28,4 +28,36 @@ namespace Pop\Image\Adjust;
 class Gd extends AbstractAdjust
 {
 
+    /**
+     * Adjust the image brightness
+     *
+     * @param  int $amount
+     * @return Gd
+     */
+    public function brightness($amount)
+    {
+        return $this;
+    }
+
+    /**
+     * Adjust the image contrast
+     *
+     * @param  int $amount
+     * @return Gd
+     */
+    public function contrast($amount)
+    {
+        return $this;
+    }
+
+    /**
+     * Adjust the image desaturate
+     *
+     * @return Gd
+     */
+    public function desaturate()
+    {
+        return $this;
+    }
+
 }

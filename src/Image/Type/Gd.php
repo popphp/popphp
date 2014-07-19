@@ -28,4 +28,15 @@ namespace Pop\Image\Type;
 class Gd extends AbstractType
 {
 
+    /**
+     * Set and apply the text on the image
+     *
+     * @param  string $string
+     * @return Gd
+     */
+    public function text($string)
+    {
+        return $this;
+    }
+
 }
