@@ -97,12 +97,12 @@ class Gd extends AbstractImage
      */
     public function __construct($img, $w = null, $h = null, $types = null)
     {
-        parent::__construct($img, $w, $h, $types);
-
         // Check to see if GD is installed.
         if (!self::isInstalled()) {
             throw new Exception('Error: The GD library extension must be installed to use the Gd adapter.');
         }
+
+        parent::__construct($img, $w, $h, $types);
 
         // If image exists
         if (file_exists($this->fullpath) && ($this->size > 0)) {
@@ -125,6 +125,23 @@ class Gd extends AbstractImage
             $this->resource = ($this->mime == 'image/gif') ? imagecreate($w, $h) : imagecreatetruecolor($w, $h);
             $this->output   = $this->resource;
         }
+
+        // Get the extension info
+        $gd = gd_info();
+        $this->info = new \ArrayObject([
+            'version'             => $gd['GD Version'],
+            'freeTypeSupport'     => $gd['FreeType Support'],
+            'freeTypeLinkage'     => $gd['FreeType Linkage'],
+            't1LibSupport'        => $gd['T1Lib Support'],
+            'gifReadSupport'      => $gd['GIF Read Support'],
+            'gifCreateSupport'    => $gd['GIF Create Support'],
+            'jpegSupport'         => $gd['JPEG Support'],
+            'pngSupport'          => $gd['PNG Support'],
+            'wbmpSupport'         => $gd['WBMP Support'],
+            'xpmSupport'          => $gd['XPM Support'],
+            'xbmSupport'          => $gd['XBM Support'],
+            'japaneseFontSupport' => $gd['JIS-mapped Japanese Font Support']
+        ], \ArrayObject::ARRAY_AS_PROPS);
     }
 
     /**
@@ -462,12 +479,64 @@ class Gd extends AbstractImage
     /**
      * Destroy the image object and the related image file directly.
      *
-     * @param  boolean $file
+     * @param  boolean $delete
      * @return void
      */
-    public function destroy($file = false)
+    public function destroy($delete = false)
     {
+        // Destroy the image resource.
+        if (null !== $this->resource) {
+            if (!is_string($this->resource) && is_resource($this->resource)) {
+                imagedestroy($this->resource);
+            }
+            $this->resource = null;
+        }
 
+        // Destroy the image output resource.
+        if (null !== $this->output) {
+            if (!is_string($this->output) && is_resource($this->output)) {
+                imagedestroy($this->output);
+            }
+            $this->output = null;
+        }
+
+        clearstatcache();
+
+        // If the $delete flag is passed, delete the image file.
+        if (($delete) && file_exists($this->fullpath)) {
+            unlink($this->fullpath);
+        }
+    }
+
+    /**
+     * Create and return a color.
+     *
+     * @param  array   $color
+     * @param  boolean $alpha
+     * @throws Exception
+     * @return mixed
+     */
+    public function getColor(array $color, $alpha = true)
+    {
+        if (null === $this->resource) {
+            throw new Exception('Error: The image resource has not been created.');
+        }
+
+        $opacity = (null === $this->opacity) ? 0 : $this->opacity;
+
+        if (count($color) == 3) {
+            $r = (int)$color[0];
+            $g = (int)$color[1];
+            $b = (int)$color[2];
+        } else {
+            $r = 0;
+            $g = 0;
+            $b = 0;
+        }
+
+        return ($alpha) ?
+            imagecolorallocatealpha($this->resource, (int)$r, (int)$g, (int)$b, $opacity) :
+            imagecolorallocate($this->resource, (int)$r, (int)$g, (int)$b);
     }
 
     /**

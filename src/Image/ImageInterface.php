@@ -106,6 +106,20 @@ interface ImageInterface
     public function resource();
 
     /**
+     * Get the image extension info
+     *
+     * @return \ArrayObject
+     */
+    public function info();
+
+    /**
+     * Get the image extension version
+     *
+     * @return string
+     */
+    public function version();
+
+    /**
      * Get the image full path
      *
      * @return string
@@ -293,9 +307,18 @@ interface ImageInterface
     /**
      * Destroy the image object and the related image file directly.
      *
-     * @param  boolean $file
+     * @param  boolean $delete
      * @return void
      */
-    public function destroy($file = false);
+    public function destroy($delete = false);
+
+    /**
+     * Create and return a color.
+     *
+     * @param  array   $color
+     * @throws Exception
+     * @return mixed
+     */
+    public function getColor(array $color);
 
 }

@@ -35,6 +35,12 @@ abstract class AbstractImage implements ImageInterface
     protected $resource = null;
 
     /**
+     * Image extension info
+     * @var \ArrayObject
+     */
+    protected $info = null;
+
+    /**
      * Full path of image file, i.e. '/path/to/image.ext'
      * @var string
      */
@@ -153,6 +159,26 @@ abstract class AbstractImage implements ImageInterface
     public function resource()
     {
         return $this->resource;
+    }
+
+    /**
+     * Get the image extension info
+     *
+     * @return \ArrayObject
+     */
+    public function info()
+    {
+        return $this->info;
+    }
+
+    /**
+     * Get the image extension version
+     *
+     * @return string
+     */
+    public function version()
+    {
+        return $this->info->version;
     }
 
     /**
@@ -428,11 +454,20 @@ abstract class AbstractImage implements ImageInterface
     /**
      * Destroy the image object and the related image file directly.
      *
-     * @param  boolean $file
+     * @param  boolean $delete
      * @return void
      */
-    abstract public function destroy($file = false);
-    
+    abstract public function destroy($delete = false);
+
+    /**
+     * Create and return a color.
+     *
+     * @param  array   $color
+     * @throws Exception
+     * @return mixed
+     */
+    abstract public function getColor(array $color);
+
     /**
      * Set the image properties
      *
