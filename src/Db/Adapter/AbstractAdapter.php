@@ -53,6 +53,74 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $tables = [];
 
     /**
+     * Get the available database adapters
+     *
+     * @return array
+     */
+    public static function getAvailableAdapters()
+    {
+        $pdoDrivers = (class_exists('Pdo', false)) ? \PDO::getAvailableDrivers() : [];
+
+        return [
+            'mysqli' => (class_exists('mysqli', false)),
+            'oracle' => (function_exists('oci_connect')),
+            'pdo'    => [
+                'mysql'  => (in_array('mysql', $pdoDrivers)),
+                'pgsql'  => (in_array('pgsql', $pdoDrivers)),
+                'sqlite' => (in_array('sqlite', $pdoDrivers)),
+                'sqlsrv' => (in_array('sqlsrv', $pdoDrivers))
+            ],
+            'pgsql'  => (function_exists('pg_connect')),
+            'sqlite' => (class_exists('Sqlite3', false)),
+            'sqlsrv' => (function_exists('sqlsrv_connect'))
+        ];
+    }
+
+    /**
+     * Get the available image library adapters
+     *
+     * @param  string $adapter
+     * @return boolean
+     */
+    public static function isAvailable($adapter)
+    {
+        $adapter = strtolower($adapter);
+        $result  = false;
+        $type    = null;
+
+        $pdoDrivers = (class_exists('Pdo', false)) ? \PDO::getAvailableDrivers() : [];
+        if (strpos($adapter, 'pdo_') !== false) {
+            $type    = substr($adapter, 4);
+            $adapter = 'pdo';
+        }
+
+        switch ($adapter) {
+            case 'mysql':
+            case 'mysqli':
+                $result = (class_exists('mysqli', false));
+                break;
+            case 'oci':
+            case 'oracle':
+                $result = (function_exists('oci_connect'));
+                break;
+            case 'pdo':
+                $result = (in_array($type, $pdoDrivers));
+                break;
+            case 'pgsql':
+                $result = (function_exists('pg_connect'));
+                break;
+            case 'sqlite':
+                $result = (class_exists('Sqlite3', false));
+                break;
+            case 'sqlsrv':
+                $result = (function_exists('sqlsrv_connect'));
+                break;
+        }
+
+        return $result;
+    }
+
+    /**
      * Constructor
      *
      * Instantiate the database adapter object.

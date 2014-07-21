@@ -142,6 +142,47 @@ abstract class AbstractImage implements ImageInterface
     }
 
     /**
+     * Get the available image library adapters
+     *
+     * @return array
+     */
+    public static function getAvailableAdapters()
+    {
+        return [
+            'gd'      => function_exists('gd_info'),
+            'gmagick' => (class_exists('Gmagick', false)),
+            'imagick' => (class_exists('Imagick', false))
+        ];
+    }
+
+    /**
+     * Get the available image library adapters
+     *
+     * @param  string $adapter
+     * @return boolean
+     */
+    public static function isAvailable($adapter)
+    {
+        $result = false;
+
+        switch (strtolower($adapter)) {
+            case 'gd':
+                $result = function_exists('gd_info');
+                break;
+            case 'graphicsmagick':
+            case 'gmagick':
+                $result = (class_exists('Gmagick', false));
+                break;
+            case 'imagemagick':
+            case 'imagick':
+                $result = (class_exists('Imagick', false));
+                break;
+        }
+
+        return $result;
+    }
+
+    /**
      * Get the allowed image types
      *
      * @return array

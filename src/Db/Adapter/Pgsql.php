@@ -81,6 +81,16 @@ class Pgsql extends AbstractAdapter
     }
 
     /**
+     * Check if Pgsql is installed.
+     *
+     * @return boolean
+     */
+    public static function isInstalled()
+    {
+        return self::isAvailable('pgsql');
+    }
+
+    /**
      * Throw an exception upon a database error.
      *
      * @throws Exception

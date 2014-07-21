@@ -62,6 +62,16 @@ class Sqlite extends AbstractAdapter
     }
 
     /**
+     * Check if Sqlite is installed.
+     *
+     * @return boolean
+     */
+    public static function isInstalled()
+    {
+        return self::isAvailable('sqlite');
+    }
+
+    /**
      * Throw an exception upon a database error.
      *
      * @throws Exception

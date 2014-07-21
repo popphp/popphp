@@ -56,6 +56,16 @@ class Oracle extends AbstractAdapter
     }
 
     /**
+     * Check if Oracle is installed.
+     *
+     * @return boolean
+     */
+    public static function isInstalled()
+    {
+        return self::isAvailable('oracle');
+    }
+
+    /**
      * Throw an exception upon a database error.
      *
      * @throws Exception

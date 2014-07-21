@@ -151,7 +151,7 @@ class Gd extends AbstractImage
      */
     public static function isInstalled()
     {
-        return function_exists('gd_info');
+        return self::isAvailable('gd');
     }
 
     /**

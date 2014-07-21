@@ -78,6 +78,16 @@ class Sqlsrv extends AbstractAdapter
     }
 
     /**
+     * Check if Sqlarv is installed.
+     *
+     * @return boolean
+     */
+    public static function isInstalled()
+    {
+        return self::isAvailable('sqlsrv');
+    }
+
+    /**
      * Throw an exception upon a database error.
      *
      * @throws Exception

@@ -60,26 +60,32 @@ class Cache
      *
      * @return array
      */
-    public static function getAdapters()
+    public static function getAvailableAdapters()
     {
-        $adapters = [];
-
-        if (function_exists('apc_cache_info')) {
-            $adapters[] = 'Apc';
-        }
-
-        $adapters[] = 'File';
-
-        if (class_exists('Memcache', false)) {
-            $adapters[] = 'Memcached';
-        }
-
         $pdoDrivers = (class_exists('Pdo', false)) ? \PDO::getAvailableDrivers() : [];
         if (class_exists('Sqlite3') || in_array('sqlite', $pdoDrivers)) {
             $adapters[] = 'Sqlite';
         }
 
-        return $adapters;
+        return [
+            'apc'       => (function_exists('apc_cache_info')),
+            'file'      => true,
+            'memcached' => (class_exists('Memcache', false)),
+            'sqlite'    => (class_exists('Sqlite3') || in_array('sqlite', $pdoDrivers))
+        ];
+    }
+
+    /**
+     * Static method to determine if an adapter is available
+     *
+     * @param  string $adapter
+     * @return boolean
+     */
+    public static function isAvailable($adapter)
+    {
+        $adapter  = strtolower($adapter);
+        $adapters = self::getAvailableAdapters();
+        return (isset($adapters[$adapter]) && ($adapters[$adapter]));
     }
 
     /**

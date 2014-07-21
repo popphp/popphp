@@ -97,6 +97,21 @@ class Pdo extends AbstractAdapter
     }
 
     /**
+     * Check if PDO is installed.
+     *
+     * @param  string $type
+     * @return boolean
+     */
+    public static function isInstalled($type = null)
+    {
+        if (null === $type) {
+            return (class_exists('Pdo', false));
+        } else {
+            return self::isAvailable('pdo_' . $type);
+        }
+    }
+
+    /**
      * Get PDO DSN
      *
      * @return string

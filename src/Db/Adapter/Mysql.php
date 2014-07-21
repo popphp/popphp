@@ -56,6 +56,16 @@ class Mysql extends AbstractAdapter
     }
 
     /**
+     * Check if Mysqli is installed.
+     *
+     * @return boolean
+     */
+    public static function isInstalled()
+    {
+        return self::isAvailable('mysqli');
+    }
+
+    /**
      * Throw an exception upon a database error.
      *
      * @throws Exception
