@@ -45,51 +45,58 @@ interface ImageInterface
     /**
      * Get the image adjust object
      *
-     * @return mixed
+     * @param  Adjust\AdjustInterface $adjust
+     * @return Adjust\AdjustInterface
      */
-    public function adjust();
+    public function adjust(Adjust\AdjustInterface $adjust = null);
 
     /**
      * Get the image draw object
      *
-     * @return mixed
+     * @param  Draw\DrawInterface $draw
+     * @return Draw\DrawInterface
      */
-    public function draw();
+    public function draw(Draw\DrawInterface $draw = null);
 
     /**
      * Get the image effect object
      *
-     * @return mixed
+     * @param  Effect\EffectInterface $effect
+     * @return Effect\EffectInterface
      */
-    public function effect();
+    public function effect(Effect\EffectInterface $effect);
 
     /**
      * Get the image filter object
      *
-     * @return mixed
+     * @param  Filter\FilterInterface $filter
+     * @return Filter\FilterInterface
      */
-    public function filter();
+    public function filter(Filter\FilterInterface $filter = null);
 
     /**
      * Get the image layer object
      *
-     * @return mixed
+     * @param  Layer\LayerInterface $layer
+     * @return Layer\LayerInterface
      */
-    public function layer();
+    public function layer(Layer\LayerInterface $layer = null);
 
     /**
      * Get the image transform object
      *
-     * @return mixed
+     * @param  Transform\TransformInterface $transform
+     * @return Transform\TransformInterface
      */
-    public function transform();
+    public function transform(Transform\TransformInterface $transform = null);
 
     /**
      * Get the image type object
      *
-     * @return mixed
+     * @param  Type\TypeInterface $type
+     * @return Type\TypeInterface
      */
-    public function type();
+    public function type(Type\TypeInterface $type = null);
 
     /**
      * Get the image resource

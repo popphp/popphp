@@ -125,6 +125,48 @@ abstract class AbstractImage implements ImageInterface
     protected $allowed = [];
 
     /**
+     * Image adjust object
+     * @var Adjust\AdjustInterface
+     */
+    protected $adjust = null;
+
+    /**
+     * Image draw object
+     * @var Draw\DrawInterface
+     */
+    protected $draw = null;
+
+    /**
+     * Image effect object
+     * @var Effect\EffectInterface
+     */
+    protected $effect = null;
+
+    /**
+     * Image filter object
+     * @var Filter\FilterInterface
+     */
+    protected $filter = null;
+
+    /**
+     * Image layer object
+     * @var Layer\LayerInterface
+     */
+    protected $layer = null;
+
+    /**
+     * Image transform object
+     * @var Transform\TransformInterface
+     */
+    protected $transform = null;
+
+    /**
+     * Image type object
+     * @var Type\TypeInterface
+     */
+    protected $type = null;
+
+    /**
      * Constructor
      *
      * Instantiate an image object based on either a pre-existing image
@@ -345,51 +387,58 @@ abstract class AbstractImage implements ImageInterface
     /**
      * Get the image adjust object
      *
-     * @return mixed
+     * @param  Adjust\AdjustInterface $adjust
+     * @return Adjust\AdjustInterface
      */
-    abstract public function adjust();
+    abstract public function adjust(Adjust\AdjustInterface $adjust = null);
 
     /**
      * Get the image draw object
      *
-     * @return mixed
+     * @param  Draw\DrawInterface $draw
+     * @return Draw\DrawInterface
      */
-    abstract public function draw();
+    abstract public function draw(Draw\DrawInterface $draw = null);
 
     /**
      * Get the image effect object
      *
-     * @return mixed
+     * @param  Effect\EffectInterface $effect
+     * @return Effect\EffectInterface
      */
-    abstract public function effect();
+    abstract public function effect(Effect\EffectInterface $effect);
 
     /**
      * Get the image filter object
      *
-     * @return mixed
+     * @param  Filter\FilterInterface $filter
+     * @return Filter\FilterInterface
      */
-    abstract public function filter();
+    abstract public function filter(Filter\FilterInterface $filter = null);
 
     /**
      * Get the image layer object
      *
-     * @return mixed
+     * @param  Layer\LayerInterface $layer
+     * @return Layer\LayerInterface
      */
-    abstract public function layer();
+    abstract public function layer(Layer\LayerInterface $layer = null);
 
     /**
      * Get the image transform object
      *
-     * @return mixed
+     * @param  Transform\TransformInterface $transform
+     * @return Transform\TransformInterface
      */
-    abstract public function transform();
+    abstract public function transform(Transform\TransformInterface $transform = null);
 
     /**
      * Get the image type object
      *
-     * @return mixed
+     * @param  Type\TypeInterface $type
+     * @return Type\TypeInterface
      */
-    abstract public function type();
+    abstract public function type(Type\TypeInterface $type = null);
 
     /**
      * Set the image opacity.

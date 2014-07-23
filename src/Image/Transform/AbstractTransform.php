@@ -42,9 +42,33 @@ abstract class AbstractTransform implements TransformInterface
      * @param  \Pop\Image\AbstractImage
      * @return AbstractTransform
      */
-    public function __construct(\Pop\Image\AbstractImage $image)
+    public function __construct(\Pop\Image\AbstractImage $image = null)
+    {
+        if (null !== $image) {
+            $this->setImage($image);
+        }
+    }
+
+    /**
+     * Get the image object
+     *
+     * @return \Pop\Image\AbstractImage
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * Set the image object
+     *
+     * @param  \Pop\Image\AbstractImage
+     * @return AbstractTransform
+     */
+    public function setImage(\Pop\Image\AbstractImage $image)
     {
         $this->image = $image;
+        return $this;
     }
 
 }

@@ -41,48 +41,6 @@ class Gd extends AbstractImage
     ];
 
     /**
-     * Image adjust object
-     * @var Adjust\Gd
-     */
-    protected $adjust = null;
-
-    /**
-     * Image draw object
-     * @var Adjust\Gd
-     */
-    protected $draw = null;
-
-    /**
-     * Image effect object
-     * @var Effect\Gd
-     */
-    protected $effect = null;
-
-    /**
-     * Image filter object
-     * @var Filter\Gd
-     */
-    protected $filter = null;
-
-    /**
-     * Image layer object
-     * @var Layer\Gd
-     */
-    protected $layer = null;
-
-    /**
-     * Image transform object
-     * @var Transform\Gd
-     */
-    protected $transform = null;
-
-    /**
-     * Image type object
-     * @var Type\Gd
-     */
-    protected $type = null;
-
-    /**
      * Constructor
      *
      * Instantiate an image file object based on either a pre-existing
@@ -167,25 +125,40 @@ class Gd extends AbstractImage
     /**
      * Get the image adjust object
      *
-     * @return Adjust\Gd
+     * @param  Adjust\AdjustInterface $adjust
+     * @return Adjust\AdjustInterface
      */
-    public function adjust()
+    public function adjust(Adjust\AdjustInterface $adjust = null)
     {
+        if (null !== $adjust) {
+            $this->adjust = $adjust;
+        }
         if (null === $this->adjust) {
             $this->adjust = new Adjust\Gd($this);
         }
+        if (null === $this->adjust->getImage()) {
+            $this->adjust->setImage($this);
+        }
+
         return $this->adjust;
     }
 
     /**
      * Get the image draw object
      *
-     * @return Draw\Gd
+     * @param  Draw\DrawInterface $draw
+     * @return Draw\DrawInterface
      */
-    public function draw()
+    public function draw(Draw\DrawInterface $draw = null)
     {
+        if (null !== $draw) {
+            $this->draw = $draw;
+        }
         if (null === $this->draw) {
             $this->draw = new Draw\Gd($this);
+        }
+        if (null === $this->draw->getImage()) {
+            $this->draw->setImage($this);
         }
         return $this->draw;
     }
@@ -193,12 +166,19 @@ class Gd extends AbstractImage
     /**
      * Get the image effect object
      *
-     * @return Effect\Gd
+     * @param  Effect\EffectInterface $effect
+     * @return Effect\EffectInterface
      */
-    public function effect()
+    public function effect(Effect\EffectInterface $effect)
     {
+        if (null !== $effect) {
+            $this->effect = $effect;
+        }
         if (null === $this->effect) {
             $this->effect = new Effect\Gd($this);
+        }
+        if (null === $this->effect->getImage()) {
+            $this->effect->setImage($this);
         }
         return $this->effect;
     }
@@ -206,12 +186,19 @@ class Gd extends AbstractImage
     /**
      * Get the image filter object
      *
-     * @return Filter\Gd
+     * @param  Filter\FilterInterface $filter
+     * @return Filter\FilterInterface
      */
-    public function filter()
+    public function filter(Filter\FilterInterface $filter = null)
     {
+        if (null !== $filter) {
+            $this->filter = $filter;
+        }
         if (null === $this->filter) {
             $this->filter = new Filter\Gd($this);
+        }
+        if (null === $this->filter->getImage()) {
+            $this->filter->setImage($this);
         }
         return $this->filter;
     }
@@ -219,12 +206,19 @@ class Gd extends AbstractImage
     /**
      * Get the image layer object
      *
-     * @return Layer\Gd
+     * @param  Layer\LayerInterface $layer
+     * @return Layer\LayerInterface
      */
-    public function layer()
+    public function layer(Layer\LayerInterface $layer = null)
     {
+        if (null !== $layer) {
+            $this->layer = $layer;
+        }
         if (null === $this->layer) {
             $this->layer = new Layer\Gd($this);
+        }
+        if (null === $this->layer->getImage()) {
+            $this->layer->setImage($this);
         }
         return $this->layer;
     }
@@ -232,12 +226,19 @@ class Gd extends AbstractImage
     /**
      * Get the image transform object
      *
-     * @return Transform\Gd
+     * @param  Transform\TransformInterface $transform
+     * @return Transform\TransformInterface
      */
-    public function transform()
+    public function transform(Transform\TransformInterface $transform = null)
     {
+        if (null !== $transform) {
+            $this->transform = $transform;
+        }
         if (null === $this->transform) {
             $this->transform = new Transform\Gd($this);
+        }
+        if (null === $this->transform->getImage()) {
+            $this->transform->setImage($this);
         }
         return $this->transform;
     }
@@ -245,12 +246,19 @@ class Gd extends AbstractImage
     /**
      * Get the image type object
      *
-     * @return Type\Gd
+     * @param  Type\TypeInterface $type
+     * @return Type\TypeInterface
      */
-    public function type()
+    public function type(Type\TypeInterface $type = null)
     {
+        if (null !== $type) {
+            $this->type = $type;
+        }
         if (null === $this->type) {
             $this->type = new Type\Gd($this);
+        }
+        if (null === $this->type->getImage()) {
+            $this->type->setImage($this);
         }
         return $this->type;
     }
