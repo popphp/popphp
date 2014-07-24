@@ -175,12 +175,24 @@ abstract class AbstractImage implements ImageInterface
      * @param  string $img
      * @param  int    $w
      * @param  int    $h
-     * @throws Exception
      * @return AbstractImage
      */
-    public function __construct($img, $w = null, $h = null)
+    public function __construct($img = null, $w = null, $h = null)
     {
-        $this->setImage($img);
+        // If the arguments passed are $img, $w, $h
+        if ((null !== $img) && !is_numeric($img) && is_string($img)) {
+            $this->setImage($img);
+            if ((null !== $w) && (null !== $h) && is_numeric($w) && is_numeric($h)) {
+                $this->width  = $w;
+                $this->height = $h;
+            }
+        // Else, if the arguments passed are $w, $h, $img
+        } else if ((null !== $img) && (null !== $w) && is_numeric($img) && is_numeric($w)) {
+            $this->width  = $img;
+            $this->height = $w;
+            $imgName      = ((null !== $h) && !is_numeric($h) && is_string($h)) ? $h : 'pop-image-' . time() . '.jpg';
+            $this->setImage($imgName);
+        }
     }
 
     /**
@@ -385,60 +397,156 @@ abstract class AbstractImage implements ImageInterface
     }
 
     /**
-     * Get the image adjust object
+     * Set the image adjust object
      *
      * @param  Adjust\AdjustInterface $adjust
+     * @return AbstractImage
+     */
+    public function setAdjust(Adjust\AdjustInterface $adjust)
+    {
+        $this->adjust = $adjust;
+        return $this;
+    }
+
+    /**
+     * Set the image draw object
+     *
+     * @param  Draw\DrawInterface $draw
+     * @return AbstractImage
+     */
+    public function setDraw(Draw\DrawInterface $draw)
+    {
+        $this->draw = $draw;
+        return $this;
+    }
+
+    /**
+     * Set the image effect object
+     *
+     * @param  Effect\EffectInterface $effect
+     * @return AbstractImage
+     */
+    public function setEffect(Effect\EffectInterface $effect)
+    {
+        $this->effect = $effect;
+        return $this;
+    }
+
+    /**
+     * Set the image filter object
+     *
+     * @param  Filter\FilterInterface $filter
+     * @return AbstractImage
+     */
+    public function setFilter(Filter\FilterInterface $filter)
+    {
+        $this->filter = $filter;
+        return $this;
+    }
+
+    /**
+     * Set the image layer object
+     *
+     * @param  Layer\LayerInterface $layer
+     * @return AbstractImage
+     */
+    public function setLayer(Layer\LayerInterface $layer)
+    {
+        $this->layer = $layer;
+        return $this;
+    }
+
+    /**
+     * Set the image transform object
+     *
+     * @param  Transform\TransformInterface $transform
+     * @return AbstractImage
+     */
+    public function setTransform(Transform\TransformInterface $transform)
+    {
+        $this->transform = $transform;
+        return $this;
+    }
+
+    /**
+     * Set the image type object
+     *
+     * @param  Type\TypeInterface $type
+     * @return AbstractImage
+     */
+    public function setType(Type\TypeInterface $type)
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * Create a new image resource
+     *
+     * @param  int    $width
+     * @param  int    $height
+     * @param  string $image
+     * @return AbstractImage
+     */
+    abstract public function create($width, $height, $image = null);
+
+    /**
+     * Load an existing image as a resource
+     *
+     * @param  string $image
+     * @throws Exception
+     * @return AbstractImage
+     */
+    abstract public function load($image);
+
+    /**
+     * Get the image adjust object
+     *
      * @return Adjust\AdjustInterface
      */
-    abstract public function adjust(Adjust\AdjustInterface $adjust = null);
+    abstract public function adjust();
 
     /**
      * Get the image draw object
      *
-     * @param  Draw\DrawInterface $draw
      * @return Draw\DrawInterface
      */
-    abstract public function draw(Draw\DrawInterface $draw = null);
+    abstract public function draw();
 
     /**
      * Get the image effect object
      *
-     * @param  Effect\EffectInterface $effect
      * @return Effect\EffectInterface
      */
-    abstract public function effect(Effect\EffectInterface $effect);
+    abstract public function effect();
 
     /**
      * Get the image filter object
      *
-     * @param  Filter\FilterInterface $filter
      * @return Filter\FilterInterface
      */
-    abstract public function filter(Filter\FilterInterface $filter = null);
+    abstract public function filter();
 
     /**
      * Get the image layer object
      *
-     * @param  Layer\LayerInterface $layer
      * @return Layer\LayerInterface
      */
-    abstract public function layer(Layer\LayerInterface $layer = null);
+    abstract public function layer();
 
     /**
      * Get the image transform object
      *
-     * @param  Transform\TransformInterface $transform
      * @return Transform\TransformInterface
      */
-    abstract public function transform(Transform\TransformInterface $transform = null);
+    abstract public function transform();
 
     /**
      * Get the image type object
      *
-     * @param  Type\TypeInterface $type
      * @return Type\TypeInterface
      */
-    abstract public function type(Type\TypeInterface $type = null);
+    abstract public function type();
 
     /**
      * Set the image opacity.

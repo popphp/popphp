@@ -59,7 +59,72 @@ class Gd extends AbstractEffect
     }
 
     /**
-     * Flood the image with a color fill.
+     * Flood the image with a vertical color gradient.
+     *
+     * @param  array   $color1
+     * @param  array   $color2
+     * @return Gd
+     */
+    public function radialGradient(array $color1, array $color2)
+    {
+        if ($this->image->getHeight() > $this->image->getWidth()) {
+            $tween = $this->image->getHeight();
+            $tween = round($tween * ($this->image->getHeight() / $this->image->getWidth()));
+        } else if ($this->image->getWidth() > $this->image->getHeight()) {
+            $tween = $this->image->getWidth();
+            $tween = round($tween * ($this->image->getWidth() / $this->image->getHeight()));
+        } else {
+            $tween = $this->image->getWidth();
+            $tween = round($tween * 1.5);
+        }
+        $blend = $this->getBlend($color1, $color2, $tween);
+
+        $x = round($this->image->getWidth() / 2);
+        $y = round($this->image->getHeight() / 2);
+        $w = $tween;
+        $h = $tween;
+
+        foreach ($blend['r'] as $i => $v) {
+            $r = $v;
+            $g = $blend['g'][$i];
+            $b = $blend['b'][$i];
+            $color = ($this->image->getMime() == 'image/gif') ? $this->image->getColor([$r, $g, $b], false) :
+                $this->image->getColor([$r, $g, $b]);
+
+            imagefilledellipse($this->image->resource(), $x, $y, $w, $h, $color);
+            $w--;
+            $h--;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Flood the image with a vertical color gradient.
+     *
+     * @param  array   $color1
+     * @param  array   $color2
+     * @return Gd
+     */
+    public function verticalGradient(array $color1, array $color2)
+    {
+        return $this->linearGradient($color1, $color2, true);
+    }
+
+    /**
+     * Flood the image with a vertical color gradient.
+     *
+     * @param  array   $color1
+     * @param  array   $color2
+     * @return Gd
+     */
+    public function horizontalGradient(array $color1, array $color2)
+    {
+        return $this->linearGradient($color1, $color2, false);
+    }
+
+    /**
+     * Flood the image with a color gradient.
      *
      * @param  array   $color1
      * @param  array   $color2
@@ -69,109 +134,13 @@ class Gd extends AbstractEffect
      */
     public function linearGradient(array $color1, array $color2, $vertical = true)
     {
-        if ((count($color1) != 3) || (count($color2) != 3)) {
-            throw new Exception('Error: The color arrays for the gradient are not correct.');
-        }
+        $tween = ($vertical) ? $this->image->getHeight() : $this->image->getWidth();
+        $blend = $this->getBlend($color1, $color2, $tween);
 
-        $step  = ($vertical) ? $this->image->getHeight() : $this->image->getWidth();
-        $steps = ['r' => [], 'g' => [], 'b' => []];
-
-        if ($color1[0] > $color2[0]) {
-            $rDiff  = $color1[0] - $color2[0];
-            if ($rDiff == 0) {
-                $rDiff++;
-            }
-            $rStep  = round(($step / $rDiff));
-            $rStart = $color1[0];
-            $rEnd   = $color2[0];
-        } else {
-            $rDiff  = $color2[0] - $color1[0];
-            if ($rDiff == 0) {
-                $rDiff++;
-            }
-            $rStep  = round(($step / $rDiff));
-            $rStart = $color2[0];
-            $rEnd   = $color1[0];
-        }
-
-        while ($rStart > $rEnd) {
-            $steps['r'][] = $rStart;
-            $rStart -= $rStep;
-        }
-
-        if (count($steps['r']) == 0) {
-            $steps['r'] = array_pad($steps['r'], $step, $rStart);
-        } else if (count($steps['r']) < $step) {
-            $steps['r'] = array_pad($steps['r'], $step, $steps['r'][count($steps['r']) - 1]);
-        } else if (count($steps['r']) > $step) {
-            $steps['r'] = array_slice($steps['r'], 0, $step);
-        }
-
-        if ($color1[1] > $color2[1]) {
-            $gDiff  = $color1[1] - $color2[1];
-            if ($gDiff == 0) {
-                $gDiff++;
-            }
-            $gStep  = round(($step / $gDiff));
-            $gStart = $color1[1];
-            $gEnd   = $color2[1];
-        } else {
-            $gDiff  = $color2[1] - $color1[1];
-            if ($gDiff == 0) {
-                $gDiff++;
-            }
-            $gStep  = round(($step / $gDiff));
-            $gStart = $color2[1];
-            $gEnd   = $color1[1];
-        }
-
-        while ($gStart > $gEnd) {
-            $steps['g'][] = $gStart;
-            $gStart -= $gStep;
-        }
-
-        if (count($steps['g']) == 0) {
-            $steps['g'] = array_pad($steps['g'], $step, $gStart);
-        } else if (count($steps['g']) < $step) {
-            $steps['g'] = array_pad($steps['g'], $step, $steps['g'][count($steps['g']) - 1]);
-        } else if (count($steps['g']) > $step) {
-            $steps['g'] = array_slice($steps['g'], 0, $step);
-        }
-
-        if ($color1[2] > $color2[2]) {
-            $bDiff  = $color1[2] - $color2[2];
-            if ($bDiff == 0) {
-                $bDiff++;
-            }
-            $bStep  = round(($step / $bDiff));
-            $bStart = $color1[2];
-            $bEnd   = $color2[2];
-        } else {
-            $bDiff  = $color2[2] - $color1[2];
-            if ($bDiff == 0) {
-                $bDiff++;
-            }
-            $bStep  = round(($step / $bDiff));
-            $bStart = $color2[2];
-            $bEnd   = $color1[2];
-        }
-
-        while ($bStart > $bEnd) {
-            $steps['b'][] = $bStart;
-            $bStart -= $bStep;
-        }
-
-        if (count($steps['b']) == 0) {
-            $steps['b'] = array_pad($steps['b'], $step, $bStart);
-        } else if (count($steps['b']) < $step) {
-            $steps['b'] = array_pad($steps['b'], $step, $steps['b'][count($steps['b']) - 1]);
-        } else if (count($steps['b']) > $step) {
-            $steps['b'] = array_slice($steps['b'], 0, $step);
-        }
-
-        foreach ($steps['r'] as $i => $r) {
-            $g = $steps['g'][$i];
-            $b = $steps['b'][$i];
+        foreach ($blend['r'] as $i => $v) {
+            $r = $v;
+            $g = $blend['g'][$i];
+            $b = $blend['b'][$i];
             $color = ($this->image->getMime() == 'image/gif') ? $this->image->getColor([$r, $g, $b], false) :
                 $this->image->getColor([$r, $g, $b]);
             if ($vertical) {

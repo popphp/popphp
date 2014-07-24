@@ -43,60 +43,128 @@ interface ImageInterface
     public static function getFormats();
 
     /**
-     * Get the image adjust object
+     * Create a new image resource
+     *
+     * @param  int    $width
+     * @param  int    $height
+     * @param  string $image
+     * @return ImageInterface
+     */
+    public function create($width, $height, $image = null);
+
+    /**
+     * Load an existing image as a resource
+     *
+     * @param  string $image
+     * @throws Exception
+     * @return ImageInterface
+     */
+    public function load($image);
+
+    /**
+     * Set the image adjust object
      *
      * @param  Adjust\AdjustInterface $adjust
+     * @return ImageInterface
+     */
+    public function setAdjust(Adjust\AdjustInterface $adjust);
+
+    /**
+     * Set the image draw object
+     *
+     * @param  Draw\DrawInterface $draw
+     * @return ImageInterface
+     */
+    public function setDraw(Draw\DrawInterface $draw);
+
+    /**
+     * Set the image effect object
+     *
+     * @param  Effect\EffectInterface $effect
+     * @return ImageInterface
+     */
+    public function setEffect(Effect\EffectInterface $effect);
+
+    /**
+     * Set the image filter object
+     *
+     * @param  Filter\FilterInterface $filter
+     * @return ImageInterface
+     */
+    public function setFilter(Filter\FilterInterface $filter);
+
+    /**
+     * Set the image layer object
+     *
+     * @param  Layer\LayerInterface $layer
+     * @return ImageInterface
+     */
+    public function setLayer(Layer\LayerInterface $layer);
+
+    /**
+     * Set the image transform object
+     *
+     * @param  Transform\TransformInterface $transform
+     * @return ImageInterface
+     */
+    public function setTransform(Transform\TransformInterface $transform);
+
+    /**
+     * Set the image type object
+     *
+     * @param  Type\TypeInterface $type
+     * @return ImageInterface
+     */
+    public function setType(Type\TypeInterface $type);
+
+    /**
+     * Get the image adjust object
+     *
      * @return Adjust\AdjustInterface
      */
-    public function adjust(Adjust\AdjustInterface $adjust = null);
+    public function adjust();
 
     /**
      * Get the image draw object
      *
-     * @param  Draw\DrawInterface $draw
      * @return Draw\DrawInterface
      */
-    public function draw(Draw\DrawInterface $draw = null);
+    public function draw();
 
     /**
      * Get the image effect object
      *
-     * @param  Effect\EffectInterface $effect
      * @return Effect\EffectInterface
      */
-    public function effect(Effect\EffectInterface $effect);
+    public function effect();
 
     /**
      * Get the image filter object
      *
-     * @param  Filter\FilterInterface $filter
      * @return Filter\FilterInterface
      */
-    public function filter(Filter\FilterInterface $filter = null);
+    public function filter();
 
     /**
      * Get the image layer object
      *
-     * @param  Layer\LayerInterface $layer
      * @return Layer\LayerInterface
      */
-    public function layer(Layer\LayerInterface $layer = null);
+    public function layer();
 
     /**
      * Get the image transform object
      *
-     * @param  Transform\TransformInterface $transform
      * @return Transform\TransformInterface
      */
-    public function transform(Transform\TransformInterface $transform = null);
+    public function transform();
 
     /**
      * Get the image type object
      *
-     * @param  Type\TypeInterface $type
      * @return Type\TypeInterface
      */
-    public function type(Type\TypeInterface $type = null);
+    public function type();
 
     /**
      * Get the image resource

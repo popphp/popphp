@@ -49,40 +49,28 @@ class Gd extends AbstractImage
      * @param  string $img
      * @param  int    $w
      * @param  int    $h
-     * @param  array  $types
      * @throws Exception
      * @return Gd
      */
-    public function __construct($img, $w = null, $h = null, $types = null)
+    public function __construct($img = null, $w = null, $h = null)
     {
         // Check to see if GD is installed.
         if (!self::isInstalled()) {
             throw new Exception('Error: The GD library extension must be installed to use the Gd adapter.');
         }
 
-        parent::__construct($img, $w, $h, $types);
+        parent::__construct($img, $w, $h);
 
         // If image exists
         if (file_exists($this->fullpath) && ($this->size > 0)) {
-            $imgSize = getimagesize($img);
-
-            // Set image object properties.
-            $this->width  = $imgSize[0];
-            $this->height = $imgSize[1];
-
-            $this->createResource();
+            $this->load($img);
         // Else, if image does not exists
-        } else {
-            if ((null === $w) || (null === $h)) {
-                throw new Exception('Error: That image file does not exist yet, so you must define a width and height for a new image object.');
-            }
-
-            // Set image object properties.
-            $this->width    = $w;
-            $this->height   = $h;
-            $this->resource = ($this->mime == 'image/gif') ? imagecreate($w, $h) : imagecreatetruecolor($w, $h);
-            $this->output   = $this->resource;
+        } else if ((null !== $this->width) && (null !== $this->height)) {
+            $this->create($this->width, $this->height);
         }
+
+        // Set a default quality
+        $this->setQuality(80);
 
         // Get the extension info
         $gd = gd_info();
@@ -119,20 +107,58 @@ class Gd extends AbstractImage
      */
     public static function getFormats()
     {
-        return (new self('i.jpg', 1, 1))->getAllowedTypes();
+        return (new self())->getAllowedTypes();
+    }
+
+    /**
+     * Create a new image resource
+     *
+     * @param  int    $width
+     * @param  int    $height
+     * @param  string $image
+     * @return Gd
+     */
+    public function create($width, $height, $image = null)
+    {
+        $this->width    = $width;
+        $this->height   = $height;
+        $this->resource = ($this->mime == 'image/gif') ? imagecreate($width, $height) : imagecreatetruecolor($width, $height);
+        $this->output   = $this->resource;
+
+        return $this;
+    }
+
+    /**
+     * Load an existing image as a resource
+     *
+     * @param  string $image
+     * @throws Exception
+     * @return Gd
+     */
+    public function load($image)
+    {
+        if (!file_exists($image)) {
+            throw new Exception('Error: That image file does not exist.');
+        }
+        $imgSize = getimagesize($image);
+
+        // Set image object properties.
+        $this->width  = $imgSize[0];
+        $this->height = $imgSize[1];
+
+        $this->setImage($image);
+        $this->createResource();
+
+        return $this;
     }
 
     /**
      * Get the image adjust object
      *
-     * @param  Adjust\AdjustInterface $adjust
      * @return Adjust\AdjustInterface
      */
-    public function adjust(Adjust\AdjustInterface $adjust = null)
+    public function adjust()
     {
-        if (null !== $adjust) {
-            $this->adjust = $adjust;
-        }
         if (null === $this->adjust) {
             $this->adjust = new Adjust\Gd($this);
         }
@@ -146,14 +172,10 @@ class Gd extends AbstractImage
     /**
      * Get the image draw object
      *
-     * @param  Draw\DrawInterface $draw
      * @return Draw\DrawInterface
      */
-    public function draw(Draw\DrawInterface $draw = null)
+    public function draw()
     {
-        if (null !== $draw) {
-            $this->draw = $draw;
-        }
         if (null === $this->draw) {
             $this->draw = new Draw\Gd($this);
         }
@@ -166,14 +188,10 @@ class Gd extends AbstractImage
     /**
      * Get the image effect object
      *
-     * @param  Effect\EffectInterface $effect
      * @return Effect\EffectInterface
      */
-    public function effect(Effect\EffectInterface $effect)
+    public function effect()
     {
-        if (null !== $effect) {
-            $this->effect = $effect;
-        }
         if (null === $this->effect) {
             $this->effect = new Effect\Gd($this);
         }
@@ -186,14 +204,10 @@ class Gd extends AbstractImage
     /**
      * Get the image filter object
      *
-     * @param  Filter\FilterInterface $filter
      * @return Filter\FilterInterface
      */
-    public function filter(Filter\FilterInterface $filter = null)
+    public function filter()
     {
-        if (null !== $filter) {
-            $this->filter = $filter;
-        }
         if (null === $this->filter) {
             $this->filter = new Filter\Gd($this);
         }
@@ -206,14 +220,10 @@ class Gd extends AbstractImage
     /**
      * Get the image layer object
      *
-     * @param  Layer\LayerInterface $layer
      * @return Layer\LayerInterface
      */
-    public function layer(Layer\LayerInterface $layer = null)
+    public function layer()
     {
-        if (null !== $layer) {
-            $this->layer = $layer;
-        }
         if (null === $this->layer) {
             $this->layer = new Layer\Gd($this);
         }
@@ -226,14 +236,10 @@ class Gd extends AbstractImage
     /**
      * Get the image transform object
      *
-     * @param  Transform\TransformInterface $transform
      * @return Transform\TransformInterface
      */
-    public function transform(Transform\TransformInterface $transform = null)
+    public function transform()
     {
-        if (null !== $transform) {
-            $this->transform = $transform;
-        }
         if (null === $this->transform) {
             $this->transform = new Transform\Gd($this);
         }
@@ -246,14 +252,10 @@ class Gd extends AbstractImage
     /**
      * Get the image type object
      *
-     * @param  Type\TypeInterface $type
      * @return Type\TypeInterface
      */
-    public function type(Type\TypeInterface $type = null)
+    public function type()
     {
-        if (null !== $type) {
-            $this->type = $type;
-        }
         if (null === $this->type) {
             $this->type = new Type\Gd($this);
         }
@@ -435,7 +437,7 @@ class Gd extends AbstractImage
             $this->output = $this->resource;
         }
 
-        $this->createImage($this->output, ((null === $to) ? $this->fullpath : $to), 100);
+        $this->createImage($this->output, ((null === $to) ? $this->fullpath : $to), $this->quality);
         clearstatcache();
 
         $this->setImage((null === $to) ? $this->fullpath : $to);
@@ -450,6 +452,7 @@ class Gd extends AbstractImage
      * Output the image object directly.
      *
      * @param  boolean $download
+     * @throws Exception
      * @return void
      */
     public function output($download = false)
@@ -475,13 +478,17 @@ class Gd extends AbstractImage
             $this->output = $this->resource;
         }
 
+        if (null === $this->output) {
+            throw new Exception('Error: The image resource has not been properly created.');
+        }
+
         // Send the headers and output the image
         header('HTTP/1.1 200 OK');
         foreach ($headers as $name => $value) {
             header($name . ": " . $value);
         }
 
-        $this->createImage($this->output, null, 100);
+        $this->createImage($this->output, null, $this->quality);
     }
 
     /**
@@ -615,8 +622,9 @@ class Gd extends AbstractImage
     protected function copyImage($w, $h, $x = 0, $y = 0)
     {
         imagecopyresampled($this->output, $this->resource, 0, 0, $x, $y, $w, $h, $this->width, $this->height);
-        $this->width  = imagesx($this->output);
-        $this->height = imagesy($this->output);
+        $this->width    = imagesx($this->output);
+        $this->height   = imagesy($this->output);
+        $this->resource = $this->output;
     }
 
 }

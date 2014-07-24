@@ -61,7 +61,7 @@ class Gd extends AbstractFilter
      *
      * @return Gd
      */
-    public function negative()
+    public function negate()
     {
         imagefilter($this->image->resource(), IMG_FILTER_NEGATE);
         return $this;

@@ -36,6 +36,7 @@ class Gd extends AbstractAdjust
      */
     public function brightness($amount)
     {
+        imagefilter($this->image->resource(), IMG_FILTER_BRIGHTNESS, $amount);
         return $this;
     }
 
@@ -47,6 +48,7 @@ class Gd extends AbstractAdjust
      */
     public function contrast($amount)
     {
+        imagefilter($this->image->resource(), IMG_FILTER_CONTRAST, (0 - $amount));
         return $this;
     }
 
@@ -57,6 +59,7 @@ class Gd extends AbstractAdjust
      */
     public function desaturate()
     {
+        imagefilter($this->image->resource(), IMG_FILTER_GRAYSCALE);
         return $this;
     }
 
