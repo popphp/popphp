@@ -131,6 +131,12 @@ class Request
     protected $headers = [];
 
     /**
+     * Raw data
+     * @var string
+     */
+    protected $rawData = null;
+
+    /**
      * Constructor
      *
      * Instantiate the request object.
@@ -150,9 +156,7 @@ class Request
         $this->env    = (isset($_ENV))    ? $_ENV    : [];
 
         if (isset($_SERVER['REQUEST_METHOD'])) {
-            if ($this->isPut() || $this->isPatch() || $this->isDelete()) {
-                $this->parseData();
-            }
+            $this->parseData();
         }
 
         // Get any possible request headers
@@ -577,6 +581,16 @@ class Request
     }
 
     /**
+     * Get the raw data
+     *
+     * @return string
+     */
+    public function getRawData()
+    {
+        return $this->rawData;
+    }
+
+    /**
      * Set the request URI
      *
      * @param  string $uri
@@ -692,19 +706,18 @@ class Request
         $input = fopen('php://input', 'r');
 
         $paramData = [];
-        $pData     = null;
 
         while ($data = fread($input, 1024)) {
-            $pData .= $data;
+            $this->rawData .= $data;
         }
 
         // If the content-type is JSON
         if (isset($_SERVER['CONTENT_TYPE']) && (stripos($_SERVER['CONTENT_TYPE'], 'json') !== false)) {
-            $paramData = json_decode($pData, true);
+            $paramData = json_decode($this->rawData, true);
         // Else, if the content-type is XML
         } else if (isset($_SERVER['CONTENT_TYPE']) && (stripos($_SERVER['CONTENT_TYPE'], 'xml') !== false)) {
             $matches = [];
-            preg_match_all('/<!\[cdata\[(.*?)\]\]>/is', $pData, $matches);
+            preg_match_all('/<!\[cdata\[(.*?)\]\]>/is', $this->rawData, $matches);
 
             foreach ($matches[0] as $match) {
                 $strip = str_replace(
@@ -712,12 +725,12 @@ class Request
                     ['', '', '&lt;', '&gt;'],
                     $match
                 );
-                $pData = str_replace($match, $strip, $pData);
+                $this->rawData = str_replace($match, $strip, $this->rawData);
             }
-            $paramData = json_decode(json_encode((array) simplexml_load_string($pData)), true);
+            $paramData = json_decode(json_encode((array)simplexml_load_string($this->rawData)), true);
         // Else, default to a regular URL-encoded string
         } else {
-            parse_str($pData, $paramData);
+            parse_str($this->rawData, $paramData);
         }
 
         switch (strtoupper($this->getMethod())) {
