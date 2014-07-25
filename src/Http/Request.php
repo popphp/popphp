@@ -137,6 +137,12 @@ class Request
     protected $rawData = null;
 
     /**
+     * Parsed data
+     * @var mixed
+     */
+    protected $parsedData = null;
+
+    /**
      * Constructor
      *
      * Instantiate the request object.
@@ -591,6 +597,16 @@ class Request
     }
 
     /**
+     * Get the parsed data
+     *
+     * @return mixed
+     */
+    public function getParsedData()
+    {
+        return $this->parsedData;
+    }
+
+    /**
      * Set the request URI
      *
      * @param  string $uri
@@ -703,17 +719,19 @@ class Request
      */
     protected function parseData()
     {
-        $input = fopen('php://input', 'r');
 
-        $paramData = [];
-
-        while ($data = fread($input, 1024)) {
-            $this->rawData .= $data;
+        if (strtoupper($this->getMethod()) == 'GET') {
+            $this->rawData = rawurldecode($_SERVER['QUERY_STRING']);
+        } else {
+            $input = fopen('php://input', 'r');
+            while ($data = fread($input, 1024)) {
+                $this->rawData .= $data;
+            }
         }
 
         // If the content-type is JSON
         if (isset($_SERVER['CONTENT_TYPE']) && (stripos($_SERVER['CONTENT_TYPE'], 'json') !== false)) {
-            $paramData = json_decode($this->rawData, true);
+            $this->parsedData = json_decode($this->rawData, true);
         // Else, if the content-type is XML
         } else if (isset($_SERVER['CONTENT_TYPE']) && (stripos($_SERVER['CONTENT_TYPE'], 'xml') !== false)) {
             $matches = [];
@@ -727,23 +745,24 @@ class Request
                 );
                 $this->rawData = str_replace($match, $strip, $this->rawData);
             }
-            $paramData = json_decode(json_encode((array)simplexml_load_string($this->rawData)), true);
+
+            $this->parsedData = json_decode(json_encode((array)simplexml_load_string($this->rawData)), true);
         // Else, default to a regular URL-encoded string
         } else {
-            parse_str($this->rawData, $paramData);
+            parse_str($this->rawData, $this->parsedData);
         }
 
         switch (strtoupper($this->getMethod())) {
             case 'PUT':
-                $this->put = $paramData;
+                $this->put = $this->parsedData;
                 break;
 
             case 'PATCH':
-                $this->patch = $paramData;
+                $this->patch = $this->parsedData;
                 break;
 
             case 'DELETE':
-                $this->delete = $paramData;
+                $this->delete = $this->parsedData;
                 break;
         }
     }
