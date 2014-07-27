@@ -5,7 +5,7 @@
  * @link       https://github.com/popphp/popphp2
  * @category   Pop
  * @package    Pop_Pdf
- * @author     Nick Sagona, III <info@popphp.org>
+ * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
@@ -20,7 +20,7 @@ namespace Pop\Pdf\Object;
  *
  * @category   Pop
  * @package    Pop_Pdf
- * @author     Nick Sagona, III <info@popphp.org>
+ * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
@@ -166,7 +166,7 @@ class Info
                 $prod = substr($prod, strpos($prod, '('));
                 $prod = substr($prod, 0, strpos($prod, ')'));
                 $prod =  str_replace('(', '', $prod);
-                $str =  str_replace($prod, 'Moc 10 PDF', $str);
+                $str =  str_replace($prod, 'Pop PDF', $str);
             } else {
                 $str =  str_replace('>>', '/Producer(Pop PDF)>>', $str);
             }
