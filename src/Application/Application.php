@@ -345,7 +345,7 @@ class Application
             $this->start = time();
 
             // Trigger any pre-route events, route, then trigger any post-route events
-            $this->events->trigger('route.pre', ['router' => $this->router]);
+            $this->events->trigger('route.pre', ['application' => $this]);
 
             // If still alive after 'route.pre'
             if ($this->events->alive()) {
@@ -353,13 +353,13 @@ class Application
 
                 // If still alive after 'route'
                 if ($this->events->alive()) {
-                    $this->events->trigger('route.post', ['router' => $this->router]);
+                    $this->events->trigger('route.post', ['application' => $this]);
 
                     // If still alive after 'route.post' and if a controller was properly
                     // routed and created, then dispatch it
                     if (($this->events->alive()) && (null !== $this->router->controller())) {
                         // Trigger any pre-dispatch events
-                        $this->events->trigger('dispatch.pre', ['router' => $this->router]);
+                        $this->events->trigger('dispatch.pre', ['application' => $this]);
 
                         // If still alive after 'dispatch.pre'
                         if ($this->events->alive()) {
@@ -372,18 +372,18 @@ class Application
                             } else if (method_exists($this->router->controller(), $this->router->controller()->getErrorAction())) {
                                 $this->router->controller()->dispatch($this->router->controller()->getErrorAction());
                             } else {
-                                $this->events->trigger('dispatch.error', ['router' => $this->router]);
+                                $this->events->trigger('dispatch.error', ['application' => $this]);
                             }
                             // If still alive after 'dispatch'
                             if ($this->events->alive()) {
                                 // Trigger any post-dispatch events
-                                $this->events->trigger('dispatch.post', ['router' => $this->router]);
+                                $this->events->trigger('dispatch.post', ['application' => $this]);
                             }
                         }
                     }
                 } else {
                     // Trigger any route error events
-                    $this->events->trigger('route.error', ['router' => $this->router]);
+                    $this->events->trigger('route.error', ['application' => $this]);
                 }
             }
         }
