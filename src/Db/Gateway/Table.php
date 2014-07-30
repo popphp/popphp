@@ -83,7 +83,7 @@ class Table extends AbstractGateway
         $this->sql->from($this->table)->select($set);
 
         if (null !== $where) {
-            $this->sql->select()->where($where);
+            $this->sql->select()->where((new \Pop\Db\Sql\Where($this->sql))->add($where));
         }
 
         if (isset($options['limit'])) {
@@ -188,7 +188,7 @@ class Table extends AbstractGateway
         $this->sql->setTable($this->table)->update($columns);
 
         if (null !== $where) {
-            $this->sql->update()->where($where);
+            $this->sql->update()->where((new \Pop\Db\Sql\Where($this->sql))->add($where));
         }
 
         if (count($pars) > 0) {
@@ -223,7 +223,7 @@ class Table extends AbstractGateway
         $this->sql->from($this->table)->delete();
 
         if (null !== $where) {
-            $this->sql->delete()->where($where);
+            $this->sql->delete()->where((new \Pop\Db\Sql\Where($this->sql))->add($where));
         }
 
         if (count($pars) > 0) {

@@ -147,8 +147,16 @@ class Row extends AbstractGateway
         $columns = [];
         $params  = [];
 
+        $exists = true;
+
+        foreach ($this->primaryKeys as $k) {
+            if (!isset($this->columns[$k])) {
+                $exists = false;
+            }
+        }
+
         // If the row was found and exists, then update
-        if ((count($this->primaryValues) > 0) && (count($this->columns) > 0)) {
+        if ($exists) {
             $i = 1;
             foreach ($this->columns as $column => $value) {
                 if (!in_array($column, $this->primaryKeys)) {
@@ -176,7 +184,13 @@ class Row extends AbstractGateway
                     $placeholder .= $i;
                 }
                 $this->sql->update()->where->equalTo($primaryKey, $placeholder);
-                $params[$key] = $this->primaryValues[$key];
+                if (isset($this->primaryValues[$key])) {
+                    $params[$key] = $this->primaryValues[$key];
+                } else if (isset($this->columns[$this->primaryKeys[$key]])) {
+                    $params[$key] = $this->columns[$this->primaryKeys[$key]];
+                } else {
+                    throw new Exception('Error: The value of \'' . $key . '\' is not set');
+                }
                 $i++;
             }
 
