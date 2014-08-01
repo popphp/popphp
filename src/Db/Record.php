@@ -54,7 +54,7 @@ class Record
 
     /**
      * Result rows
-     * @var string
+     * @var array
      */
     protected $rows = [];
 
@@ -418,6 +418,16 @@ class Record
     }
 
     /**
+     * Get the columns as a single array object
+     *
+     * @return \ArrayObject
+     */
+    public function getColumnsAsObject()
+    {
+        return new \ArrayObject($this->columns, \ArrayObject::ARRAY_AS_PROPS);
+    }
+
+    /**
      * Get the rows
      *
      * @return array
@@ -425,6 +435,20 @@ class Record
     public function getRows()
     {
         return $this->rows;
+    }
+
+    /**
+     * Get the rows as an array of array objects
+     *
+     * @return array
+     */
+    public function getRowsAsObjects()
+    {
+        $objects = [];
+        foreach ($this->rows as $row) {
+            $objects[] = new \ArrayObject($row, \ArrayObject::ARRAY_AS_PROPS);
+        }
+        return $objects;
     }
 
     /**

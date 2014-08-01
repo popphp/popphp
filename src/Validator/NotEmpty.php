@@ -46,7 +46,7 @@ class NotEmpty extends AbstractValidator
             $this->message = 'The value must not be empty.';
         }
 
-        return (!empty($this->input) == $this->value);
+        return (!empty($this->input));
     }
 
 }
