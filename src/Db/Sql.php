@@ -410,6 +410,9 @@ class Sql
      */
     public function select($columns = null)
     {
+        if ($columns instanceof Sql\Select) {
+            $this->clause = $columns;
+        }
         if ((null === $this->clause) || !($this->clause instanceof Sql\Select)) {
             $this->clause = new Sql\Select($this, $columns);
         }
@@ -420,12 +423,15 @@ class Sql
     /**
      * Create a insert statement
      *
-     * @param  array $columns
+     * @param  mixed$columns
      * @throws Exception
      * @return Sql\Insert
      */
-    public function insert(array $columns = null)
+    public function insert($columns = null)
     {
+        if ($columns instanceof Sql\Insert) {
+            $this->clause = $columns;
+        }
         if ((null === $this->clause) || !($this->clause instanceof Sql\Insert)) {
             if (null === $columns) {
                 throw new Exception('Error: The columns parameter cannot be null for a new INSERT clause.');
@@ -439,12 +445,15 @@ class Sql
     /**
      * Create a update statement
      *
-     * @param  array $columns
+     * @param  $columns
      * @throws Exception
      * @return Sql\Update
      */
-    public function update(array $columns = null)
+    public function update($columns = null)
     {
+        if ($columns instanceof Sql\Update) {
+            $this->clause = $columns;
+        }
         if ((null === $this->clause) || !($this->clause instanceof Sql\Update)) {
             if (null === $columns) {
                 throw new Exception('Error: The columns parameter cannot be null for a new UPDATE clause.');
@@ -458,10 +467,14 @@ class Sql
     /**
      * Create a delete statement
      *
+     * @param  Sql\Delete
      * @return Sql\Update
      */
-    public function delete()
+    public function delete($delete = null)
     {
+        if (null !== $delete) {
+            $this->clause = $delete;
+        }
         if ((null === $this->clause) || !($this->clause instanceof Sql\Delete)) {
             $this->clause = new Sql\Delete($this);
         }

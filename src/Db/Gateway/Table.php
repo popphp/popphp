@@ -80,7 +80,7 @@ class Table extends AbstractGateway
             throw new Exception('Error: The table has not been set');
         }
 
-        $this->sql->from($this->table)->select($set);
+        $this->sql->from($this->table)->select(new \Pop\Db\Sql\Select($this->sql, $set));
 
         if (null !== $where) {
             $this->sql->select()->where((new \Pop\Db\Sql\Where($this->sql))->add($where));
@@ -144,7 +144,7 @@ class Table extends AbstractGateway
                 $i++;
             }
 
-            $this->sql->into($this->table)->insert($columns);
+            $this->sql->into($this->table)->insert(new \Pop\Db\Sql\Insert($this->sql, $columns));
             $this->sql->db()->prepare((string)$this->sql)
                             ->bindParams($params)
                             ->execute();
@@ -185,7 +185,7 @@ class Table extends AbstractGateway
             $i++;
         }
 
-        $this->sql->setTable($this->table)->update($columns);
+        $this->sql->setTable($this->table)->update(new \Pop\Db\Sql\Update($this->sql, $columns));
 
         if (null !== $where) {
             $this->sql->update()->where((new \Pop\Db\Sql\Where($this->sql))->add($where));
@@ -220,7 +220,7 @@ class Table extends AbstractGateway
 
         $params  = [];
 
-        $this->sql->from($this->table)->delete();
+        $this->sql->from($this->table)->delete(new \Pop\Db\Sql\Delete($this->sql));
 
         if (null !== $where) {
             $this->sql->delete()->where((new \Pop\Db\Sql\Where($this->sql))->add($where));

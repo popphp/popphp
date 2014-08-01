@@ -107,14 +107,12 @@ class Record
         }
 
         // Set the table name from the class name
-        if ((null === static::$table) || (strtolower(static::$table) == 'record')) {
-            if (strpos($class, '_') !== false) {
-                $class = substr($class, (strrpos($class, '_') + 1));
-            } else if (strpos($class, '\\') !== false) {
-                $class = substr($class, (strrpos($class, '\\') + 1));
-            }
-            static::$table = static::$prefix . static::camelCaseToUnderscore($class);
+        if (strpos($class, '_') !== false) {
+            $class = substr($class, (strrpos($class, '_') + 1));
+        } else if (strpos($class, '\\') !== false) {
+            $class = substr($class, (strrpos($class, '\\') + 1));
         }
+        static::$table = static::$prefix . static::camelCaseToUnderscore($class);
 
         $this->rowGateway   = new Gateway\Row(static::getSql(), $this->primaryKeys, static::$table);
         $this->tableGateway = new Gateway\Table(static::getSql(), static::$table);
@@ -461,9 +459,11 @@ class Record
         if (null === $columns) {
             $this->rg()->setColumns($this->columns);
             $this->rg()->save();
+            $this->setRows([$this->rg()->getColumns()]);
         // Else, save multiple rows
         } else {
             $this->tg()->insert($columns);
+            $this->setRows($this->tg()->getRows());
         }
     }
 

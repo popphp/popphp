@@ -104,7 +104,7 @@ class Row extends AbstractGateway
             throw new Exception('Error: The table has not been set');
         }
 
-        $this->sql->from($this->table)->select();
+        $this->sql->from($this->table)->select(new \Pop\Db\Sql\Select($this->sql));
         $params = [];
 
         foreach ($this->primaryKeys as $i => $primaryKey) {
@@ -173,7 +173,7 @@ class Row extends AbstractGateway
                 }
             }
 
-            $this->sql->from($this->table)->update($columns);
+            $this->sql->from($this->table)->update(new \Pop\Db\Sql\Update($this->sql, $columns));
 
             foreach ($this->primaryKeys as $key => $primaryKey) {
                 $placeholder = $this->sql->getPlaceholder();
@@ -212,7 +212,7 @@ class Row extends AbstractGateway
                 $params[$column]  = $value;
                 $i++;
             }
-            $this->sql->from($this->table)->insert($columns);
+            $this->sql->from($this->table)->insert(new \Pop\Db\Sql\Insert($this->sql, $columns));
 
             $this->sql->db()->prepare((string)$this->sql)
                             ->bindParams($params)
@@ -246,7 +246,7 @@ class Row extends AbstractGateway
             throw new Exception('Error: The table has not been set');
         }
 
-        $this->sql->from($this->table)->delete();
+        $this->sql->from($this->table)->delete(new \Pop\Db\Sql\Delete($this->sql));
         $params = [];
 
         foreach ($this->primaryKeys as $i => $primaryKey) {

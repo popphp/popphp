@@ -69,13 +69,35 @@ abstract class AbstractSql
      */
     public function __construct(\Pop\Db\Sql $sql, $columns = null)
     {
-        $this->sql = $sql;
+        $this->setSql($sql);
         if (null !== $columns) {
             if (!is_array($columns)) {
                 $columns = [$columns];
             }
             $this->columns = $columns;
         }
+    }
+
+    /**
+     * Get the SQL object
+     *
+     * @param \Pop\Db\Sql $sql
+     * @return AbstractSql
+     */
+    public function setSql(\Pop\Db\Sql $sql)
+    {
+        $this->sql = $sql;
+        return $this;
+    }
+
+    /**
+     * Set the SQL object
+     *
+     * @return \Pop\Db\Sql
+     */
+    public function getSql()
+    {
+        return $this->sql;
     }
 
     /**
