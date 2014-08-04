@@ -53,10 +53,16 @@ class Record
     protected static $prefix = null;
 
     /**
-     * Result rows
+     * Result rows (an array of arrays)
      * @var array
      */
     protected $rows = [];
+
+    /**
+     * Result rows as objects (an array of ArrayObjects)
+     * @var array
+     */
+    protected $rowObjects = [];
 
     /**
      * Columns of the first result row
@@ -389,11 +395,15 @@ class Record
     {
         // If null, clear the rows.
         if (null === $rows) {
-            $this->columns = [];
-            $this->rows    = [];
+            $this->columns    = [];
+            $this->rows       = [];
+            $this->rowObjects = [];
         } else {
             $this->columns = (isset($rows[0])) ? (array)$rows[0] : [];
             $this->rows    = $rows;
+            foreach ($this->rows as $row) {
+                $this->rowObjects[] = new \ArrayObject($row, \ArrayObject::ARRAY_AS_PROPS);
+            }
         }
     }
 
@@ -442,13 +452,9 @@ class Record
      *
      * @return array
      */
-    public function getRowsAsObjects()
+    public function getRowObjects()
     {
-        $objects = [];
-        foreach ($this->rows as $row) {
-            $objects[] = new \ArrayObject($row, \ArrayObject::ARRAY_AS_PROPS);
-        }
-        return $objects;
+        return $this->rowObjects;
     }
 
     /**
