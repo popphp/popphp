@@ -365,37 +365,19 @@ class Record
     public static function getTotal(array $columns = null)
     {
         $record = new static();
-        $db     = static::getDb();
-        $sql    = static::getSql();
-        $sql->from($record->getTable())->select(['total_count' => 'COUNT(1)']);
+        $params = null;
+        $where  = null;
 
         if (null !== $columns) {
-            $params      = [];
-            $placeholder = $sql->getPlaceholder();
-            $i           = 1;
-
-            foreach ($columns as $column => $value) {
-                if ($placeholder == ':') {
-                    $placeholder .= $column;
-                } else if ($placeholder == '$') {
-                    $placeholder .= $i;
-                }
-                $sql->select()->where->equalTo($column, $placeholder);
-                $params[$column]  = $value;
-                $i++;
-            }
-
-            $db->prepare((string)$sql)
-               ->bindParams($params)
-               ->execute();
-            $rows = $db->fetchResult();
-            $row  = (isset($rows[0]) ? $rows[0] : []);
-        } else {
-            $db->query($sql);
-            $row = $db->fetch();
+            $parsedColumns = static::parseColumns($columns, $record->sql()->getPlaceholder());
+            $params = $parsedColumns['params'];
+            $where  = $parsedColumns['where'];
         }
 
-        return (isset($row['total_count']) ? $row['total_count'] : 0);
+        $record->tg()->select(['total_count' => 'COUNT(1)'], $where, $params);
+        $record->setRows($record->tg()->rows());
+
+        return (int)$record->total_count;
     }
 
     /**
