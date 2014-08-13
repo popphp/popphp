@@ -71,12 +71,12 @@ class Form extends Child
      *
      * Instantiate the form object
      *
+     * @param  array  $fields
      * @param  string $action
      * @param  string $method
-     * @param  array  $fields
      * @return Form
      */
-    public function __construct($action = null, $method = 'post', array $fields = null)
+    public function __construct(array $fields = null, $action = null, $method = 'post')
     {
         parent::__construct('form');
 
