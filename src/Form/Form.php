@@ -87,6 +87,7 @@ class Form extends Child
 
         if (null !== $fields) {
             $this->setFieldConfig($fields);
+            $this->setFieldValues();
         }
     }
 
@@ -421,6 +422,16 @@ class Form extends Child
     }
 
     /**
+     * Alias method to getElements())
+     *
+     * @return array
+     */
+    public function elements()
+    {
+        return $this->getElements();
+    }
+
+    /**
      * Get the elements of the form object.
      *
      * @return array
@@ -437,6 +448,17 @@ class Form extends Child
         }
 
         return $elements;
+    }
+
+    /**
+     * Alias method to getElement()
+     *
+     * @param string $elementName
+     * @return Element\AbstractElement
+     */
+    public function element($elementName)
+    {
+        return $this->getElement($elementName);
     }
 
     /**
