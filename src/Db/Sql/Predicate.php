@@ -108,46 +108,46 @@ class Predicate
             if (count($predicate) >= 2) {
                 switch ($predicate[1]) {
                     case '>=':
-                        $this->greaterThanOrEqualTo($predicate[0], $predicate[2]);
+                        $this->greaterThanOrEqualTo($predicate[0], $predicate[2], $predicate[3]);
                         break;
                     case '<=':
-                        $this->lessThanOrEqualTo($predicate[0], $predicate[2]);
+                        $this->lessThanOrEqualTo($predicate[0], $predicate[2], $predicate[3]);
                         break;
                     case '!=':
-                        $this->notEqualTo($predicate[0], $predicate[2]);
+                        $this->notEqualTo($predicate[0], $predicate[2], $predicate[3]);
                         break;
                     case '=':
-                        $this->equalTo($predicate[0], $predicate[2]);
+                        $this->equalTo($predicate[0], $predicate[2], $predicate[3]);
                         break;
                     case '>':
-                        $this->greaterThan($predicate[0], $predicate[2]);
+                        $this->greaterThan($predicate[0], $predicate[2], $predicate[3]);
                         break;
                     case '<':
-                        $this->lessThan($predicate[0], $predicate[2]);
+                        $this->lessThan($predicate[0], $predicate[2], $predicate[3]);
                         break;
                     case 'NOT LIKE':
-                        $this->notLike($predicate[0], $predicate[2]);
+                        $this->notLike($predicate[0], $predicate[2], $predicate[3]);
                         break;
                     case 'LIKE':
-                        $this->like($predicate[0], $predicate[2]);
+                        $this->like($predicate[0], $predicate[2], $predicate[3]);
                         break;
                     case 'NOT BETWEEN':
-                        $this->notBetween($predicate[0], $predicate[2][0], $predicate[2][1]);
+                        $this->notBetween($predicate[0], $predicate[2][0], $predicate[2][1], $predicate[3]);
                         break;
                     case 'BETWEEN':
-                        $this->between($predicate[0], $predicate[2][0], $predicate[2][1]);
+                        $this->between($predicate[0], $predicate[2][0], $predicate[2][1], $predicate[3]);
                         break;
                     case 'NOT IN':
-                        $this->notIn($predicate[0], $predicate[2]);
+                        $this->notIn($predicate[0], $predicate[2], $predicate[3]);
                         break;
                     case 'IN':
-                        $this->in($predicate[0], $predicate[2]);
+                        $this->in($predicate[0], $predicate[2], $predicate[3]);
                         break;
                     case 'IS NOT NULL':
-                        $this->isNotNull($predicate[0]);
+                        $this->isNotNull($predicate[0], $predicate[3]);
                         break;
                     case 'IS NULL':
-                        $this->isNull($predicate[0]);
+                        $this->isNull($predicate[0], $predicate[3]);
                         break;
                 }
             }
@@ -579,6 +579,14 @@ class Predicate
                     $value = str_replace(', ', ',', $value);
                     $value = explode(',', $value);
                 }
+
+                if (substr($value, -3) == ' OR') {
+                    $value   = substr($value, 0, -3);
+                    $combine = 'OR';
+                } else {
+                    $combine = 'AND';
+                }
+
                 if (is_numeric($value)) {
                     if (strpos($value, '.') !== false) {
                         $value = (float)$value;
@@ -596,7 +604,7 @@ class Predicate
                         }
                     }
                 }
-                $pred = [$column, $op, $value];
+                $pred = [$column, $op, $value, $combine];
             }
 
         }
