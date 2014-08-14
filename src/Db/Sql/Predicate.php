@@ -92,14 +92,28 @@ class Predicate
             foreach ($predicate as $pred) {
                 $key = current(array_keys($pred));
                 if (is_string($key) && !is_numeric($key)) {
-                    $predicates[] = [$key, '=', $pred[$key]];
+                    $val = $pred[$key];
+                    if (substr($val, -3) == ' OR') {
+                        $val   = substr($val, 0, -3);
+                        $combine = 'OR';
+                    } else {
+                        $combine = 'AND';
+                    }
+                    $predicates[] = [$key, '=', $val, $combine];
                 }
             }
         // If the predicate is a single associative array, i.e., ['id' => 1]
         } else {
             $key = current(array_keys($predicate));
             if (is_string($key) && !is_numeric($key)) {
-                $predicates[] = [$key, '=', $predicate[$key]];
+                $val = $predicate[$key];
+                if (substr($val, -3) == ' OR') {
+                    $val   = substr($val, 0, -3);
+                    $combine = 'OR';
+                } else {
+                    $combine = 'AND';
+                }
+                $predicates[] = [$key, '=', $val, $combine];
             }
         }
 
@@ -543,8 +557,9 @@ class Predicate
         foreach ($this->operators as $op) {
             // If operator IS NULL or IS NOT NULL
             if ((strpos($op, 'NULL') !== false) && (strpos($predicate, $op) !== false)) {
-                $value  = null;
-                $column = trim(substr($predicate, 0, strpos($predicate, ' ')));
+                $combine = (substr($op, -3) == ' OR') ? 'OR' : 'AND';
+                $value   = null;
+                $column  = trim(substr($predicate, 0, strpos($predicate, ' ')));
                 // Remove any quotes from the column
                 if (((substr($column, 0, 1) == '"') && (substr($column, -1) == '"')) ||
                     ((substr($column, 0, 1) == "'") && (substr($column, -1) == "'")) ||
@@ -552,7 +567,8 @@ class Predicate
                     $column = substr($column, 1);
                     $column = substr($column, 0, -1);
                 }
-                $pred = [$column, $op, $value];
+
+                $pred = [$column, $op, $value, $combine];
             } else if ((strpos($predicate, ' ' . $op . ' ') !== false) && ((strpos($predicate, ' NOT ' . $op . ' ') === false))) {
                 $ary    = explode($op, $predicate);
                 $column = trim($ary[0]);
