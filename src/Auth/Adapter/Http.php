@@ -17,7 +17,7 @@ namespace Pop\Auth\Adapter;
 
 
 /**
- * File auth adapter class
+ * Http auth adapter class
  *
  * @category   Pop
  * @package    Pop_Auth
@@ -409,4 +409,5 @@ class Http extends AbstractAdapter
 
         return $decoded;
     }
+
 }
