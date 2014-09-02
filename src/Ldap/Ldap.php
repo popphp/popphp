@@ -298,6 +298,16 @@ class Ldap
     }
 
     /**
+     * Get Ldap error message
+     *
+     * @return string
+     */
+    public function error()
+    {
+        return (is_resource($this->resource)) ? ldap_errno($this->resource) . ': ' . ldap_error($this->resource) : null;
+    }
+
+    /**
      * Bind to the Ldap resource
      *
      * @return Ldap
