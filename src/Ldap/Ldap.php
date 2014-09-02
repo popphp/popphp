@@ -298,13 +298,33 @@ class Ldap
     }
 
     /**
+     * Get Ldap error number and message
+     *
+     * @return string
+     */
+    public function getError()
+    {
+        return (is_resource($this->resource)) ? ldap_errno($this->resource) . ': ' . ldap_error($this->resource) : null;
+    }
+
+    /**
+     * Get Ldap error number
+     *
+     * @return string
+     */
+    public function getErrorNumber()
+    {
+        return (is_resource($this->resource)) ? ldap_errno($this->resource) : null;
+    }
+
+    /**
      * Get Ldap error message
      *
      * @return string
      */
-    public function error()
+    public function getErrorMessage()
     {
-        return (is_resource($this->resource)) ? ldap_errno($this->resource) . ': ' . ldap_error($this->resource) : null;
+        return (is_resource($this->resource)) ? ldap_error($this->resource) : null;
     }
 
     /**
