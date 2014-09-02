@@ -29,6 +29,30 @@ class Ldap
 {
 
     /**
+     * Ldap username (rdn or dn)
+     * @var string
+     */
+    protected $username = null;
+
+    /**
+     * Ldap password
+     * @var string
+     */
+    protected $password = null;
+
+    /**
+     * Ldap host
+     * @var string
+     */
+    protected $host = null;
+
+    /**
+     * Ldap post
+     * @var string
+     */
+    protected $port = null;
+
+    /**
      * Ldap options
      * @var array
      */
@@ -41,27 +65,198 @@ class Ldap
     protected $resource = null;
 
     /**
+     * Ldap result
+     * @var resource
+     */
+    protected $result = null;
+
+    /**
+     * Ldap bind result
+     * @var boolean
+     */
+    protected $bindResult = false;
+
+    /**
      * Constructor
      *
      * Instantiate the Ldap object.
      *
+     * @param  array   $options
+     * @param  boolean $auto
+     * @return Ldap
+     */
+    public function __construct(array $options = [], $auto = true)
+    {
+        $this->setOptions($options);
+
+        if ($auto) {
+            $this->bind();
+        }
+    }
+
+    /**
+     * Set the username
+     *
+     * @param  string $username
+     * @return Ldap
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * Set the password
+     *
+     * @param  string $password
+     * @return Ldap
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    /**
+     * Set the host
+     *
+     * @param  string $host
+     * @return Ldap
+     */
+    public function setHost($host)
+    {
+        $this->host = $host;
+        return $this;
+    }
+
+    /**
+     * Set the port
+     *
+     * @param  string $port
+     * @return Ldap
+     */
+    public function setPort($port)
+    {
+        $this->port = $port;
+        return $this;
+    }
+
+    /**
+     * Set an option
+     *
+     * @param  mixed $option
+     * @param  mixed $value
+     * @return Ldap
+     */
+    public function setOption($option, $value)
+    {
+        switch ($option) {
+            case 'username':
+                $this->setUsername($value);
+                break;
+            case 'password':
+                $this->setPassword($value);
+                break;
+            case 'host':
+                $this->setHost($value);
+                break;
+            case 'port':
+                $this->setPort($value);
+                break;
+            default:
+                $this->options[$option] = $value;
+                if (is_resource($this->resource)) {
+                    ldap_set_option($this->resource, $option, $value);
+                }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set an option
+     *
      * @param  array $options
      * @return Ldap
      */
-    public function __construct(array $options = [])
+    public function setOptions(array $options)
     {
-        $this->options = $options;
+        foreach ($options as $option => $value) {
+            $this->setOption($option, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the username
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * Get the password
+     *
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * Get the host
+     *
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * Get the port
+     *
+     * @return string
+     */
+    public function getPort()
+    {
+        return $this->port;
     }
 
     /**
      * Get an option
      *
-     * @param  string $name
+     * @param  mixed $option
      * @return mixed
      */
-    public function getOption($name)
+    public function getOption($option)
     {
-        return (isset($this->options[$name])) ? $this->options[$name] : null;
+        $value = null;
+
+        switch ($option) {
+            case 'username':
+                $value = $this->getUsername();
+                break;
+            case 'password':
+                $value = $this->getPassword();
+                break;
+            case 'host':
+                $value = $this->getHost();
+                break;
+            case 'port':
+                $value = $this->getPort();
+                break;
+            default:
+                $value = (isset($this->options[$option])) ? $this->options[$option] : null;
+        }
+
+        return $value;
     }
 
     /**
@@ -75,13 +270,31 @@ class Ldap
     }
 
     /**
+     * Get the Ldap resource
+     *
+     * @return resource
+     */
+    public function resource()
+    {
+        return $this->resource;
+    }
+
+    /**
      * Connect to the Ldap resource
      *
+     * @throws Exception
      * @return Ldap
      */
     public function connect()
     {
+        if (null === $this->host) {
+            throw new Exception('Error: The LDAP host has not been set.');
+        }
 
+        $host = (null !== $this->port) ? $this->host . ':' . $this->port : $this->host;
+        $this->resource = ldap_connect($host);
+
+        return $this;
     }
 
     /**
@@ -91,7 +304,102 @@ class Ldap
      */
     public function bind()
     {
+        if (!is_resource($this->resource)) {
+            $this->connect();
+        }
 
+        // Bind with user/pass
+        if ((null !== $this->username) && (null !== $this->password)) {
+            $this->bindResult = ldap_bind($this->resource, $this->username, $this->password);
+        // Else, bind anonymously
+        } else {
+            $this->bindResult = ldap_bind($this->resource);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Perform Ldap search
+     *
+     * @param  string $base
+     * @param  string $filter
+     * @param  array  $options
+     * @throws Exception
+     * @return Ldap
+     */
+    public function search($base, $filter, array $options = null)
+    {
+        if (!is_resource($this->resource)) {
+            throw new Exception('Error: The LDAP resource has not been set.');
+        }
+
+        if (null !== $options) {
+            if (isset($options['attributes']) && isset($options['attrsonly']) && isset($options['sizelimit']) && isset($options['timelimit']) && isset($options['deref'])) {
+                $this->result = ldap_search($this->resource, $base, $filter, $options['attributes'], $options['attrsonly'], $options['sizelimit'], $options['timelimit'], $options['deref']);
+            } else if (isset($options['attributes']) && isset($options['attrsonly']) && isset($options['sizelimit']) && isset($options['timelimit'])) {
+                $this->result = ldap_search($this->resource, $base, $filter, $options['attributes'], $options['attrsonly'], $options['sizelimit'], $options['timelimit']);
+            } else if (isset($options['attributes']) && isset($options['attrsonly']) && isset($options['sizelimit'])) {
+                $this->result = ldap_search($this->resource, $base, $filter, $options['attributes'], $options['attrsonly'], $options['sizelimit']);
+            } else if (isset($options['attributes']) && isset($options['attrsonly'])) {
+                $this->result = ldap_search($this->resource, $base, $filter, $options['attributes'], $options['attrsonly']);
+            } else if (isset($options['attributes'])) {
+                $this->result = ldap_search($this->resource, $base, $filter, $options['attributes']);
+            }
+        } else {
+            $this->result = ldap_search($this->resource, $base, $filter);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get Ldap entries
+     *
+     * @throws Exception
+     * @return array
+     */
+    public function getEntries()
+    {
+        if (!is_resource($this->resource)) {
+            throw new Exception('Error: The LDAP resource has not been set.');
+        }
+        if (!is_resource($this->result)) {
+            throw new Exception('Error: The LDAP result has not been set.');
+        }
+
+        return ldap_get_entries($this->resource, $this->result);
+    }
+
+    /**
+     * Unbind to the Ldap resource
+     *
+     * @return Ldap
+     */
+    public function unbind()
+    {
+        $this->bindResult = !(ldap_unbind($this->resource));
+        return $this;
+    }
+
+    /**
+     * Get whether or not currently connected
+     *
+     * @return boolean
+     */
+    public function isConnected()
+    {
+        return is_resource($this->resource);
+    }
+
+    /**
+     * Get the current bind result
+     *
+     * @return boolean
+     */
+    public function isBound()
+    {
+        return $this->bindResult;
     }
 
     /**
@@ -101,7 +409,9 @@ class Ldap
      */
     public function disconnect()
     {
-
+        $this->unbind();
+        $this->resource = null;
+        return $this;
     }
 
 }
