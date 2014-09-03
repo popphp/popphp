@@ -11,6 +11,7 @@ As of July 17, 2014
 * New
     - Application (replaces Project)
     - Acl (separated from Auth)
+    - Ldap component
     - Row Gateway and Table Gateway classes in the Db component
 * Revised
     - Acl
