@@ -312,7 +312,7 @@ class Ldap
      *
      * @return string
      */
-    public function getErrorNumber()
+    public function getErrorCode()
     {
         return (is_resource($this->resource)) ? ldap_errno($this->resource) : null;
     }
@@ -340,10 +340,10 @@ class Ldap
 
         // Bind with user/pass
         if ((null !== $this->username) && (null !== $this->password)) {
-            $this->bindResult = ldap_bind($this->resource, $this->username, $this->password);
+            $this->bindResult = @ldap_bind($this->resource, $this->username, $this->password);
         // Else, bind anonymously
         } else {
-            $this->bindResult = ldap_bind($this->resource);
+            $this->bindResult = @ldap_bind($this->resource);
         }
 
         return $this;
@@ -364,23 +364,73 @@ class Ldap
             throw new Exception('Error: The LDAP resource has not been set.');
         }
 
+        if (isset($options['scope']) && ($options['scope'] == 'single')) {
+            $ldapFunc = 'ldap_list';
+        } else if (isset($options['scope']) && ($options['scope'] == 'base')) {
+            $ldapFunc = 'ldap_read';
+        } else {
+            $ldapFunc = 'ldap_search';
+        }
+
         if (null !== $options) {
             if (isset($options['attributes']) && isset($options['attrsonly']) && isset($options['sizelimit']) && isset($options['timelimit']) && isset($options['deref'])) {
-                $this->result = ldap_search($this->resource, $base, $filter, $options['attributes'], $options['attrsonly'], $options['sizelimit'], $options['timelimit'], $options['deref']);
+                $this->result = $ldapFunc($this->resource, $base, $filter, $options['attributes'], $options['attrsonly'], $options['sizelimit'], $options['timelimit'], $options['deref']);
             } else if (isset($options['attributes']) && isset($options['attrsonly']) && isset($options['sizelimit']) && isset($options['timelimit'])) {
-                $this->result = ldap_search($this->resource, $base, $filter, $options['attributes'], $options['attrsonly'], $options['sizelimit'], $options['timelimit']);
+                $this->result = $ldapFunc($this->resource, $base, $filter, $options['attributes'], $options['attrsonly'], $options['sizelimit'], $options['timelimit']);
             } else if (isset($options['attributes']) && isset($options['attrsonly']) && isset($options['sizelimit'])) {
-                $this->result = ldap_search($this->resource, $base, $filter, $options['attributes'], $options['attrsonly'], $options['sizelimit']);
+                $this->result = $ldapFunc($this->resource, $base, $filter, $options['attributes'], $options['attrsonly'], $options['sizelimit']);
             } else if (isset($options['attributes']) && isset($options['attrsonly'])) {
-                $this->result = ldap_search($this->resource, $base, $filter, $options['attributes'], $options['attrsonly']);
+                $this->result = $ldapFunc($this->resource, $base, $filter, $options['attributes'], $options['attrsonly']);
             } else if (isset($options['attributes'])) {
-                $this->result = ldap_search($this->resource, $base, $filter, $options['attributes']);
+                $this->result = $ldapFunc($this->resource, $base, $filter, $options['attributes']);
             }
         } else {
-            $this->result = ldap_search($this->resource, $base, $filter);
+            $this->result = $ldapFunc($this->resource, $base, $filter);
         }
 
         return $this;
+    }
+
+    /**
+     * Get whether or not the current Ldap connection has a result set
+     *
+     * @return boolean
+     */
+    public function hasResult()
+    {
+        return (is_resource($this->result));
+    }
+
+    /**
+     * Get whether or not the current Ldap connection has entries in the result set
+     *
+     * @return boolean
+     */
+    public function hasEntries()
+    {
+        $count = 0;
+
+        if (is_resource($this->resource) && is_resource($this->result)) {
+            $count = ldap_count_entries($this->resource, $this->result);
+        }
+
+        return ($count > 0);
+    }
+
+    /**
+     * Get the current count of entries in the result set
+     *
+     * @return int
+     */
+    public function getCount()
+    {
+        $count = 0;
+
+        if (is_resource($this->resource) && is_resource($this->result)) {
+            $count = ldap_count_entries($this->resource, $this->result);
+        }
+
+        return $count;
     }
 
     /**
@@ -399,6 +449,39 @@ class Ldap
         }
 
         return ldap_get_entries($this->resource, $this->result);
+    }
+
+    /**
+     * Add an entry to the Ldap resource
+     *
+     * @return Ldap
+     */
+    public function add()
+    {
+        // ldap_add()
+        return $this;
+    }
+
+    /**
+     * Modify an entry to the Ldap resource
+     *
+     * @return Ldap
+     */
+    public function modify()
+    {
+        // ldap_modify()
+        return $this;
+    }
+
+    /**
+     * Delete an entry to the Ldap resource
+     *
+     * @return Ldap
+     */
+    public function delete()
+    {
+        // ldap_delete()
+        return $this;
     }
 
     /**
