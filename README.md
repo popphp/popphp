@@ -21,6 +21,7 @@ COMPONENTS
  - Auth [ _Db_ ]
  - Cache
  - Code
+ - Color
  - Crypt
  - Data
  - Db

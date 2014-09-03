@@ -42,7 +42,6 @@ As of July 17, 2014
     - Pdf
         + Font component moved under Pdf
 * Removed
-    - Color
     - Compress
     - Curl (moved under the Http component)
     - Db\Adapter\Mysql (renamed old Mysqli adapter class to Mysql)
