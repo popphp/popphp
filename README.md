@@ -36,6 +36,7 @@ COMPONENTS
  - Http
  - I18n
  - Image
+ - Ldap
  - Log [ _Db, Mail_ ]
  - Mail
  - Mvc [ _Http_ ]
