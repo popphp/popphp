@@ -298,36 +298,6 @@ class Ldap
     }
 
     /**
-     * Get Ldap error number and message
-     *
-     * @return string
-     */
-    public function getError()
-    {
-        return (is_resource($this->resource)) ? ldap_errno($this->resource) . ': ' . ldap_error($this->resource) : null;
-    }
-
-    /**
-     * Get Ldap error number
-     *
-     * @return string
-     */
-    public function getErrorCode()
-    {
-        return (is_resource($this->resource)) ? ldap_errno($this->resource) : null;
-    }
-
-    /**
-     * Get Ldap error message
-     *
-     * @return string
-     */
-    public function getErrorMessage()
-    {
-        return (is_resource($this->resource)) ? ldap_error($this->resource) : null;
-    }
-
-    /**
      * Bind to the Ldap resource
      *
      * @return Ldap
@@ -525,6 +495,36 @@ class Ldap
         $this->unbind();
         $this->resource = null;
         return $this;
+    }
+
+    /**
+     * Get Ldap error number and message
+     *
+     * @return string
+     */
+    public function getError()
+    {
+        return (is_resource($this->resource)) ? ldap_errno($this->resource) . ': ' . ldap_error($this->resource) : null;
+    }
+
+    /**
+     * Get Ldap error number
+     *
+     * @return string
+     */
+    public function getErrorCode()
+    {
+        return (is_resource($this->resource)) ? ldap_errno($this->resource) : null;
+    }
+
+    /**
+     * Get Ldap error message
+     *
+     * @return string
+     */
+    public function getErrorMessage()
+    {
+        return (is_resource($this->resource)) ? ldap_error($this->resource) : null;
     }
 
 }
