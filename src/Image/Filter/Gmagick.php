@@ -55,7 +55,7 @@ class Gmagick extends AbstractFilter
      *
      * @return Gmagick
      */
-    public function negative()
+    public function negate()
     {
         return $this;
     }

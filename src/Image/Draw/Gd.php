@@ -39,6 +39,14 @@ class Gd extends AbstractDraw
      */
     public function line($x1, $y1, $x2, $y2)
     {
+
+        $strokeColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->strokeColor, false) :
+            $this->image->getColor($this->strokeColor);
+
+        // Draw the line.
+        imagesetthickness($this->image->resource(), (($this->strokeWidth == 0) ? 1 : $this->strokeWidth));
+        imageline($this->image->resource(), $x1, $y1, $x2, $y2, $strokeColor);
+
         return $this;
     }
 
@@ -53,6 +61,22 @@ class Gd extends AbstractDraw
      */
     public function rectangle($x, $y, $w, $h = null)
     {
+        $x2 = $x + $w;
+        $y2 = $y + ((null === $h) ? $w : $h);
+
+        $fillColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->fillColor, false) :
+            $this->image->getColor($this->fillColor);
+
+
+        imagefilledrectangle($this->image->resource(), $x, $y, $x2, $y2, $fillColor);
+
+        if ($this->strokeWidth > 0) {
+            $strokeColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->strokeColor, false) :
+                $this->image->getColor($this->strokeColor);
+            imagesetthickness($this->image->resource(), $this->strokeWidth);
+            imagerectangle($this->image->resource(), $x, $y, $x2, $y2, $strokeColor);
+        }
+
         return $this;
     }
 
@@ -136,7 +160,7 @@ class Gd extends AbstractDraw
      */
     public function polygon($points)
     {
-
+        return $this;
     }
 
 }

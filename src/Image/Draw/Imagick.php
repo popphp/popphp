@@ -136,7 +136,7 @@ class Imagick extends AbstractDraw
      */
     public function polygon($points)
     {
-
+        return $this;
     }
 
 }

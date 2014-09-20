@@ -35,6 +35,24 @@ abstract class AbstractDraw implements DrawInterface
     protected $image = null;
 
     /**
+     * Fill color
+     * @var array
+     */
+    protected $fillColor = [0, 0, 0];
+
+    /**
+     * Stroke color
+     * @var array
+     */
+    protected $strokeColor = [0, 0, 0];
+
+    /**
+     * Stroke width
+     * @var int
+     */
+    protected $strokeWidth = 0;
+
+    /**
      * Constructor
      *
      * Instantiate an image object
@@ -60,6 +78,36 @@ abstract class AbstractDraw implements DrawInterface
     }
 
     /**
+     * Get fill color
+     *
+     * @return array
+     */
+    public function getFillColor()
+    {
+        return $this->fillColor;
+    }
+
+    /**
+     * Get stroke color
+     *
+     * @return array
+     */
+    public function getStrokeColor()
+    {
+        return $this->strokeColor;
+    }
+
+    /**
+     * Get stroke width
+     *
+     * @return int
+     */
+    public function getStrokeWidth()
+    {
+        return $this->strokeWidth;
+    }
+
+    /**
      * Set the image object
      *
      * @param  \Pop\Image\AbstractImage
@@ -68,6 +116,46 @@ abstract class AbstractDraw implements DrawInterface
     public function setImage(\Pop\Image\AbstractImage $image)
     {
         $this->image = $image;
+        return $this;
+    }
+
+    /**
+     * Set fill color
+     *
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
+     * @return AbstractDraw
+     */
+    public function setFillColor($r, $g, $b)
+    {
+        $this->fillColor = [(int)$r, (int)$g, (int)$b];
+        return $this;
+    }
+
+    /**
+     * Set stroke color
+     *
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
+     * @return AbstractDraw
+     */
+    public function setStrokeColor($r, $g, $b)
+    {
+        $this->strokeColor = [(int)$r, (int)$g, (int)$b];
+        return $this;
+    }
+
+    /**
+     * Get stroke width
+     *
+     * @param int $w
+     * @return AbstractDraw
+     */
+    public function setStrokeWidth($w)
+    {
+        $this->strokeWidth = (int)$w;
         return $this;
     }
 

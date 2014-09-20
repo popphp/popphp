@@ -136,7 +136,7 @@ class Gmagick extends AbstractDraw
      */
     public function polygon($points)
     {
-
+        return $this;
     }
 
 }

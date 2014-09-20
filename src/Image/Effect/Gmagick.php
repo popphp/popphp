@@ -53,4 +53,54 @@ class Gmagick extends AbstractEffect
         return $this;
     }
 
+    /**
+     * Flood the image with a vertical color gradient.
+     *
+     * @param  array   $color1
+     * @param  array   $color2
+     * @return Gmagick
+     */
+    public function radialGradient(array $color1, array $color2)
+    {
+        return $this;
+    }
+
+    /**
+     * Flood the image with a vertical color gradient.
+     *
+     * @param  array   $color1
+     * @param  array   $color2
+     * @return Gmagick
+     */
+    public function verticalGradient(array $color1, array $color2)
+    {
+        return $this;
+    }
+
+    /**
+     * Flood the image with a vertical color gradient.
+     *
+     * @param  array   $color1
+     * @param  array   $color2
+     * @return Gmagick
+     */
+    public function horizontalGradient(array $color1, array $color2)
+    {
+        return $this;
+    }
+
+    /**
+     * Flood the image with a color gradient.
+     *
+     * @param  array   $color1
+     * @param  array   $color2
+     * @param  boolean $vertical
+     * @throws Exception
+     * @return Gmagick
+     */
+    public function linearGradient(array $color1, array $color2, $vertical = true)
+    {
+        return $this;
+    }
+
 }

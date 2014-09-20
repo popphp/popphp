@@ -55,7 +55,7 @@ class Imagick extends AbstractFilter
      *
      * @return Imagick
      */
-    public function negative()
+    public function negate()
     {
         return $this;
     }

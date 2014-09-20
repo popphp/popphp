@@ -555,6 +555,17 @@ class Gd extends AbstractImage
     }
 
     /**
+     * Output the image
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $this->output();
+        return '';
+    }
+
+    /**
      * Create a new image resource based on the current image type
      * of the image object.
      *
