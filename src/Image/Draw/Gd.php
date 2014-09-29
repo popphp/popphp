@@ -67,7 +67,6 @@ class Gd extends AbstractDraw
         $fillColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->fillColor, false) :
             $this->image->getColor($this->fillColor);
 
-
         imagefilledrectangle($this->image->resource(), $x, $y, $x2, $y2, $fillColor);
 
         if ($this->strokeWidth > 0) {
@@ -104,6 +103,21 @@ class Gd extends AbstractDraw
      */
     public function ellipse($x, $y, $w, $h = null)
     {
+        $wid = $w;
+        $hgt = (null === $h) ? $w : $h;
+
+        $fillColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->fillColor, false) :
+            $this->image->getColor($this->fillColor);
+
+        if ($this->strokeWidth > 0) {
+            $strokeColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->strokeColor, false) :
+                $this->image->getColor($this->strokeColor);
+
+            imagefilledellipse($this->image->resource(), $x, $y, ($wid + $this->strokeWidth), ($hgt + $this->strokeWidth), $strokeColor);
+        }
+
+        imagefilledellipse($this->image->resource(), $x, $y, $wid, $hgt, $fillColor);
+
         return $this;
     }
 
@@ -133,6 +147,19 @@ class Gd extends AbstractDraw
      */
     public function arc($x, $y, $start, $end, $w, $h = null)
     {
+        if ($this->strokeWidth == 0) {
+            $this->setStrokeWidth(1);
+        }
+
+        $wid = $w;
+        $hgt = (null === $h) ? $w : $h;
+
+        $strokeColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->strokeColor, false) :
+            $this->image->getColor($this->strokeColor);
+
+        imagesetthickness($this->image->resource(), $this->strokeWidth);
+        imagearc($this->image->resource(), $x, $y, $wid, $hgt, $start, $end, $strokeColor);
+
         return $this;
     }
 
@@ -149,6 +176,38 @@ class Gd extends AbstractDraw
      */
     public function chord($x, $y, $start, $end, $w, $h = null)
     {
+        $wid = $w;
+        $hgt = (null === $h) ? $w : $h;
+
+        $fillColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->fillColor, false) :
+            $this->image->getColor($this->fillColor);
+
+        imagefilledarc($this->image->resource(), $x, $y, $wid, $hgt, $start, $end, $fillColor, IMG_ARC_EDGED|IMG_ARC_CHORD|IMG_ARC_NOFILL);
+
+        return $this;
+    }
+
+    /**
+     * Draw a slice on the image.
+     *
+     * @param  int $x
+     * @param  int $y
+     * @param  int $start
+     * @param  int $end
+     * @param  int $w
+     * @param  int $h
+     * @return Gd
+     */
+    public function pie($x, $y, $start, $end, $w, $h = null)
+    {
+        $wid = $w;
+        $hgt = (null === $h) ? $w : $h;
+
+        $fillColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->fillColor, false) :
+            $this->image->getColor($this->fillColor);
+
+        imagefilledarc($this->image->resource(), $x, $y, $wid, $hgt, $start, $end, $fillColor, IMG_ARC_EDGED|IMG_ARC_PIE|IMG_ARC_NOFILL);
+
         return $this;
     }
 

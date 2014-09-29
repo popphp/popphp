@@ -481,6 +481,20 @@ abstract class AbstractImage implements ImageInterface
     }
 
     /**
+     * Set the image adjust object
+     *
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
+     * @return AbstractImage
+     */
+    public function setBackgroundColor($r, $g, $b)
+    {
+        $this->effect()->fill($r, $g, $b);
+        return $this;
+    }
+
+    /**
      * Create a new image resource
      *
      * @param  int    $width
