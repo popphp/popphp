@@ -47,6 +47,18 @@ abstract class AbstractType implements TypeInterface
     protected $font = null;
 
     /**
+     * Fill color
+     * @var array
+     */
+    protected $fillColor = [0, 0, 0];
+
+    /**
+     * Stroke color
+     * @var array
+     */
+    protected $strokeColor = null;
+
+    /**
      * Type X-position
      * @var int
      */
@@ -65,10 +77,10 @@ abstract class AbstractType implements TypeInterface
     protected $rotation = 0;
 
     /**
-     * Flag to stroke the type
-     * @var boolean
+     * Opacity
+     * @var int
      */
-    protected $stroke = false;
+    protected $opacity = 0;
 
     /**
      * Constructor
@@ -96,6 +108,36 @@ abstract class AbstractType implements TypeInterface
     }
 
     /**
+     * Get the opacity
+     *
+     * @return int
+     */
+    public function getOpacity()
+    {
+        return $this->opacity;
+    }
+
+    /**
+     * Get fill color
+     *
+     * @return mixed
+     */
+    public function getFillColor()
+    {
+        return $this->fillColor;
+    }
+
+    /**
+     * Get stroke color
+     *
+     * @return array
+     */
+    public function getStrokeColor()
+    {
+        return $this->strokeColor;
+    }
+
+    /**
      * Set the image object
      *
      * @param  \Pop\Image\AbstractImage
@@ -104,6 +146,46 @@ abstract class AbstractType implements TypeInterface
     public function setImage(\Pop\Image\AbstractImage $image)
     {
         $this->image = $image;
+        return $this;
+    }
+
+    /**
+     * Set the opacity
+     *
+     * @param  int $opacity
+     * @return AbstractType
+     */
+    public function setOpacity($opacity)
+    {
+        $this->opacity = (int)round((127 - (127 * ($opacity / 100))));
+        return $this;
+    }
+
+    /**
+     * Set fill color
+     *
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
+     * @return AbstractType
+     */
+    public function setFillColor($r, $g, $b)
+    {
+        $this->fillColor = [(int)$r, (int)$g, (int)$b];
+        return $this;
+    }
+
+    /**
+     * Set stroke color
+     *
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
+     * @return AbstractType
+     */
+    public function setStrokeColor($r, $g, $b)
+    {
+        $this->strokeColor = [(int)$r, (int)$g, (int)$b];
         return $this;
     }
 
@@ -178,18 +260,6 @@ abstract class AbstractType implements TypeInterface
     public function rotate($degrees)
     {
         $this->rotation = (int)$degrees;
-        return $this;
-    }
-
-    /**
-     * Set the stroke of the text
-     *
-     * @param  boolean $stroke
-     * @return AbstractType
-     */
-    public function stroke($stroke)
-    {
-        $this->stroke = (bool)$stroke;
         return $this;
     }
 

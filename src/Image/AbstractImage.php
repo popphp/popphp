@@ -101,12 +101,6 @@ abstract class AbstractImage implements ImageInterface
     protected $height = null;
 
     /**
-     * Image opacity
-     * @var int
-     */
-    protected $opacity = null;
-
-    /**
      * Image quality
      * @var int
      */
@@ -367,16 +361,6 @@ abstract class AbstractImage implements ImageInterface
     }
 
     /**
-     * Get the image opacity.
-     *
-     * @return int
-     */
-    public function getOpacity()
-    {
-        return $this->opacity;
-    }
-
-    /**
      * Get the image quality.
      *
      * @return int
@@ -514,6 +498,14 @@ abstract class AbstractImage implements ImageInterface
     abstract public function load($image);
 
     /**
+     * Load an existing image resource
+     *
+     * @param  resource $resource
+     * @return Gd
+     */
+    abstract public function loadResource($resource);
+
+    /**
      * Get the image adjust object
      *
      * @return Adjust\AdjustInterface
@@ -561,14 +553,6 @@ abstract class AbstractImage implements ImageInterface
      * @return Type\TypeInterface
      */
     abstract public function type();
-
-    /**
-     * Set the image opacity.
-     *
-     * @param  int $opacity
-     * @return AbstractImage
-     */
-    abstract public function setOpacity($opacity);
 
     /**
      * Set the image quality.
@@ -646,6 +630,30 @@ abstract class AbstractImage implements ImageInterface
      * @return AbstractImage
      */
     abstract public function cropThumb($px, $x = 0, $y = 0);
+
+    /**
+     * Rotate the image object
+     *
+     * @param  int   $degrees
+     * @param  array $bgColor
+     * @throws Exception
+     * @return Gd
+     */
+    abstract public function rotate($degrees, array $bgColor = [255, 255, 255]);
+
+    /**
+     * Method to flip the image over the x-axis.
+     *
+     * @return Gd
+     */
+    abstract public function flip();
+
+    /**
+     * Method to flip the image over the y-axis.
+     *
+     * @return Gd
+     */
+    abstract public function flop();
 
     /**
      * Save the image object to disk.

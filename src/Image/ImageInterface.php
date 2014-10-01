@@ -62,6 +62,14 @@ interface ImageInterface
     public function load($image);
 
     /**
+     * Load an existing image resource
+     *
+     * @param  resource $resource
+     * @return Gd
+     */
+    public function loadResource($resource);
+
+    /**
      * Set the image adjust object
      *
      * @param  Adjust\AdjustInterface $adjust
@@ -258,13 +266,6 @@ interface ImageInterface
     public function getHeight();
 
     /**
-     * Get the image opacity.
-     *
-     * @return int
-     */
-    public function getOpacity();
-
-    /**
      * Get the image quality.
      *
      * @return int
@@ -277,14 +278,6 @@ interface ImageInterface
      * @return int
      */
     public function getCompression();
-
-    /**
-     * Set the image opacity.
-     *
-     * @param  int $opacity
-     * @return ImageInterface
-     */
-    public function setOpacity($opacity);
 
     /**
      * Set the image quality.
@@ -362,6 +355,30 @@ interface ImageInterface
      * @return ImageInterface
      */
     public function cropThumb($px, $x = 0, $y = 0);
+
+    /**
+     * Rotate the image object
+     *
+     * @param  int   $degrees
+     * @param  array $bgColor
+     * @throws Exception
+     * @return Gd
+     */
+    public function rotate($degrees, array $bgColor = [255, 255, 255]);
+
+    /**
+     * Method to flip the image over the x-axis.
+     *
+     * @return Gd
+     */
+    public function flip();
+
+    /**
+     * Method to flip the image over the y-axis.
+     *
+     * @return Gd
+     */
+    public function flop();
 
     /**
      * Save the image object to disk.

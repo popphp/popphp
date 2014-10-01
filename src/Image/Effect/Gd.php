@@ -31,12 +31,28 @@ class Gd extends AbstractEffect
     /**
      * Draw a border around the image.
      *
-     * @param  int    $w
-     * @param  int    $h
+     * @param  array $color
+     * @param  int $w
+     * @param  int $h
+     * @throws Exception
      * @return Gd
      */
-    public function border($w, $h = null)
+    public function border(array $color, $w, $h = null)
     {
+        if (count($color) != 3) {
+            throw new Exception('The color parameter must be an array of 3 integers.');
+        }
+
+        $h = (null === $h) ? $w : $h;
+        $width  = $this->image->getWidth();
+        $height = $this->image->getHeight();
+
+        $this->image->draw()->setFillColor((int)$color[0], (int)$color[1], (int)$color[2]);
+        $this->image->draw()->rectangle(0, 0, $width, $h);
+        $this->image->draw()->rectangle(0, ($height - $h), $width, $height);
+        $this->image->draw()->rectangle(0, 0, $w, $height);
+        $this->image->draw()->rectangle(($width - $w), 0, $width, $height);
+
         return $this;
     }
 

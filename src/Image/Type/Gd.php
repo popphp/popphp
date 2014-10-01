@@ -36,6 +36,29 @@ class Gd extends AbstractType
      */
     public function text($string)
     {
+        $fillColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->fillColor, false) :
+            $this->image->getColor($this->fillColor, true, $this->opacity);
+
+        if ((null !== $this->font) && function_exists('imagettftext')) {
+            if (null !== $this->strokeColor) {
+                $strokeColor = ($this->image->getMime() == 'image/gif') ? $this->image->getColor($this->strokeColor, false) :
+                    $this->image->getColor($this->strokeColor, true, $this->opacity);
+                imagettftext($this->image->resource(), $this->size, $this->rotation, $this->x, ($this->y - 1), $strokeColor, $this->font, $string);
+                imagettftext($this->image->resource(), $this->size, $this->rotation, $this->x, ($this->y + 1), $strokeColor, $this->font, $string);
+                imagettftext($this->image->resource(), $this->size, $this->rotation, ($this->x - 1), $this->y, $strokeColor, $this->font, $string);
+                imagettftext($this->image->resource(), $this->size, $this->rotation, ($this->x + 1), $this->y, $strokeColor, $this->font, $string);
+            }
+            imagettftext($this->image->resource(), $this->size, $this->rotation, $this->x, $this->y, $fillColor, $this->font, $string);
+        } else {
+            // Cap the system font size between 1 and 5
+            if ($this->size > 5) {
+                $this->size = 5;
+            } else if ($this->size < 1) {
+                $this->size = 1;
+            }
+            imagestring($this->image->resource(), $this->size, $this->x, $this->y,  $string, $fillColor);
+        }
+
         return $this;
     }
 

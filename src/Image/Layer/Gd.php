@@ -29,26 +29,37 @@ class Gd extends AbstractLayer
 {
 
     /**
-     * Set the opacity of the overlay layer.
-     *
-     * @param  int $opacity
-     * @return Gd
-     */
-    public function opacity($opacity)
-    {
-        return $this;
-    }
-
-    /**
      * Overlay an image onto the current image.
      *
      * @param  string $image
      * @param  int    $x
      * @param  int    $y
+     * @throws Exception
      * @return Gd
      */
     public function overlay($image, $x = 0, $y = 0)
     {
+        imagealphablending($this->image->resource(), true);
+
+        // Create an image resource from the overlay image.
+        if (stripos($image, '.gif') !== false) {
+            $overlay = imagecreatefromgif($image);
+        } else if (stripos($image, '.png') !== false) {
+            $overlay = imagecreatefrompng($image);
+        } else if (stripos($image, '.jp') !== false) {
+            $overlay = imagecreatefromjpeg($image);
+        } else {
+            throw new Exception('Error: The overlay image must be either a JPG, GIF or PNG.');
+        }
+
+        if ($this->opacity > 0) {
+            if ($this->opacity == 100) {
+                imagecopy($this->image->resource(), $overlay, $x, $y, 0, 0, imagesx($overlay), imagesy($overlay));
+            } else{
+                imagecopymerge($this->image->resource(), $overlay, $x, $y, 0, 0, imagesx($overlay), imagesy($overlay), $this->opacity);
+            }
+        }
+
         return $this;
     }
 

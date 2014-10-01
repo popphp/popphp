@@ -68,6 +68,20 @@ class Gd extends AbstractFilter
     }
 
     /**
+     * Colorize the image
+     *
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
+     * @return Gd
+     */
+    public function colorize($r, $g, $b)
+    {
+        imagefilter($this->image->resource(), IMG_FILTER_COLORIZE, (int)$r, (int)$g, (int)$b);
+        return $this;
+    }
+
+    /**
      * Pixelate the image
      *
      * @param  int $px

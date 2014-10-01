@@ -153,6 +153,18 @@ class Gd extends AbstractImage
     }
 
     /**
+     * Load an existing image resource
+     *
+     * @param  resource $resource
+     * @return Gd
+     */
+    public function loadResource($resource)
+    {
+        $this->resource = $resource;
+        return $this;
+    }
+
+    /**
      * Get the image adjust object
      *
      * @return Adjust\AdjustInterface
@@ -422,6 +434,74 @@ class Gd extends AbstractImage
     }
 
     /**
+     * Rotate the image object
+     *
+     * @param  int   $degrees
+     * @param  array $bgColor
+     * @throws Exception
+     * @return Gd
+     */
+    public function rotate($degrees, array $bgColor = [255, 255, 255])
+    {
+        if (count($bgColor) != 3) {
+            throw new Exception('The background color array must contain 3 integers.');
+        }
+
+        $this->resource = imagerotate($this->resource, $degrees, $this->getColor($bgColor));
+        return $this;
+    }
+
+    /**
+     * Method to flip the image over the x-axis.
+     *
+     * @return Gd
+     */
+    public function flip()
+    {
+        // Create a new image output resource.
+        $this->createResource();
+        $this->output = imagecreatetruecolor($this->width, $this->height);
+
+        // Calculate the new dimensions
+        $curWidth  = $this->width;
+        $curHeight = $this->height;
+        $srcX = 0;
+        $srcY = $this->height - 1; // Compensate for a 1-pixel space on the flipped image
+        $this->height = 0 - $this->height;
+
+        // Copy newly sized image to the output resource.
+        $this->copyImage($curWidth, $curHeight, $srcX , $srcY);
+        $this->height = abs($this->height);
+
+        return $this;
+    }
+
+    /**
+     * Method to flip the image over the y-axis.
+     *
+     * @return Gd
+     */
+    public function flop()
+    {
+        // Create a new image output resource.
+        $this->createResource();
+        $this->output = imagecreatetruecolor($this->width, $this->height);
+
+        // Calculate the new dimensions
+        $curWidth  = $this->width;
+        $curHeight = $this->height;
+        $srcX = $this->width - 1; // Compensate for a 1-pixel space on the flipped image
+        $srcY = 0;
+        $this->width = 0 - $this->width;
+
+        // Copy newly sized image to the output resource.
+        $this->copyImage($curWidth, $curHeight, $srcX , $srcY);
+        $this->width = abs($this->width);
+
+        return $this;
+    }
+
+    /**
      * Save the image object to disk.
      *
      * @param  string $to
@@ -528,16 +608,15 @@ class Gd extends AbstractImage
      *
      * @param  array   $color
      * @param  boolean $alpha
+     * @param  int     $opacity
      * @throws Exception
      * @return mixed
      */
-    public function getColor(array $color, $alpha = true)
+    public function getColor(array $color, $alpha = true, $opacity = 0)
     {
         if (null === $this->resource) {
             throw new Exception('Error: The image resource has not been created.');
         }
-
-        $opacity = (null === $this->opacity) ? 0 : $this->opacity;
 
         if (count($color) == 3) {
             $r = (int)$color[0];
@@ -550,7 +629,7 @@ class Gd extends AbstractImage
         }
 
         return ($alpha) ?
-            imagecolorallocatealpha($this->resource, (int)$r, (int)$g, (int)$b, $opacity) :
+            imagecolorallocatealpha($this->resource, (int)$r, (int)$g, (int)$b, (int)$opacity) :
             imagecolorallocate($this->resource, (int)$r, (int)$g, (int)$b);
     }
 
@@ -630,8 +709,12 @@ class Gd extends AbstractImage
      * @param  int $y
      * @return void
      */
-    protected function copyImage($w, $h, $x = 0, $y = 0)
+    public function copyImage($w, $h, $x = 0, $y = 0)
     {
+        if ((null === $this->output) && (null !== $this->resource)) {
+            $this->output = $this->resource;
+        }
+
         imagecopyresampled($this->output, $this->resource, 0, 0, $x, $y, $w, $h, $this->width, $this->height);
         $this->width    = imagesx($this->output);
         $this->height   = imagesy($this->output);
