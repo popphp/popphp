@@ -66,7 +66,7 @@ class Gd extends AbstractImage
             $this->load($img);
         // Else, if image does not exists
         } else if ((null !== $this->width) && (null !== $this->height)) {
-            $this->create($this->width, $this->height);
+            $this->create($this->width, $this->height, $this->basename);
         }
 
         // Set a default quality
@@ -125,6 +125,10 @@ class Gd extends AbstractImage
         $this->resource = ($this->mime == 'image/gif') ? imagecreate($width, $height) : imagecreatetruecolor($width, $height);
         $this->output   = $this->resource;
 
+        if (null !== $image) {
+            $this->setImage($image);
+        }
+
         return $this;
     }
 
@@ -147,20 +151,9 @@ class Gd extends AbstractImage
         $this->height = $imgSize[1];
 
         $this->setImage($image);
+        $this->setQuality(80);
         $this->createResource();
 
-        return $this;
-    }
-
-    /**
-     * Load an existing image resource
-     *
-     * @param  resource $resource
-     * @return Gd
-     */
-    public function loadResource($resource)
-    {
-        $this->resource = $resource;
         return $this;
     }
 
@@ -243,22 +236,6 @@ class Gd extends AbstractImage
             $this->layer->setImage($this);
         }
         return $this->layer;
-    }
-
-    /**
-     * Get the image transform object
-     *
-     * @return Transform\TransformInterface
-     */
-    public function transform()
-    {
-        if (null === $this->transform) {
-            $this->transform = new Transform\Gd($this);
-        }
-        if (null === $this->transform->getImage()) {
-            $this->transform->setImage($this);
-        }
-        return $this->transform;
     }
 
     /**
@@ -413,23 +390,35 @@ class Gd extends AbstractImage
 
     /**
      * Crop the image object to a square image whose dimensions are based on the
-     * value of the $px argument. The optional $x and $y arguments allow for the
+     * value of the $px argument. The optional $offset argument allows for the
      * adjustment of the crop to select a certain area of the image to be
      * cropped.
      *
      * @param  int $px
-     * @param  int $x
-     * @param  int $y
+     * @param  int $offset
      * @return Gd
      */
-    public function cropThumb($px, $x = 0, $y = 0)
+    public function cropThumb($px, $offset = null)
     {
+        $xOffset = 0;
+        $yOffset = 0;
+
+        if (null !== $offset) {
+            if ($this->width > $this->height) {
+                $xOffset = $offset;
+                $yOffset = 0;
+            } else if ($this->width < $this->height) {
+                $xOffset = 0;
+                $yOffset = $offset;
+            }
+        }
+
         $scale        = ($this->width > $this->height) ? ($px / $this->height) : ($px / $this->width);
         $w            = round($this->width * $scale);
         $h            = round($this->height * $scale);
         $this->output = imagecreatetruecolor($px, $px);
 
-        $this->copyImage($w, $h, $x, $y);
+        $this->copyImage($w, $h, $xOffset, $yOffset);
         return $this;
     }
 
@@ -502,6 +491,76 @@ class Gd extends AbstractImage
     }
 
     /**
+     * Convert the image object to another format.
+     *
+     * @param  string $type
+     * @throws Exception
+     * @return Gd
+     */
+    public function convert($type)
+    {
+        $type = strtolower($type);
+
+        // Check if the requested image type is supported.
+        if (!array_key_exists($type, $this->allowed)) {
+            throw new Exception('Error: That image type is not supported.');
+            // Check if the image is already the requested image type.
+        } else if (strtolower($this->extension) == $type) {
+            throw new Exception('Error: This image file is already a ' . strtoupper($type) . ' image file.');
+        }
+
+        // Open a new image, maintaining the GIF image's palette and
+        // transparency where applicable.
+        if ($this->mime == 'image/gif') {
+            $this->createResource();
+            imageinterlace($this->resource, 0);
+
+            // Change the type of the image object to the new,
+            // requested image type.
+            $this->extension = $type;
+            $this->mime = $this->allowed[$this->extension];
+
+            // Redefine the image object properties with the new values.
+            $this->fullpath = $this->dir . $this->filename . '.' . $this->extension;
+            $this->basename = basename($this->fullpath);
+            // Else, open a new true color image.
+        } else {
+            if ($type == 'gif') {
+                $this->createResource();
+
+                // Change the type of the image object to the new,
+                // requested image type.
+                $this->extension = $type;
+                $this->mime      = $this->allowed[$this->extension];
+
+                // Redefine the image object properties with the new values.
+                $this->fullpath = $this->dir . DIRECTORY_SEPARATOR . $this->filename . '.' . $this->extension;
+                $this->basename = basename($this->fullpath);
+            } else {
+                $new = imagecreatetruecolor($this->width, $this->height);
+
+                // Create a new, blank image file and copy the image over.
+                $this->createResource();
+
+                // Change the type of the image object to the new,
+                // requested image type.
+                $this->extension = $type;
+                $this->mime = $this->allowed[$this->extension];
+
+                // Redefine the image object properties with the new values.
+                $this->fullpath = $this->dir . DIRECTORY_SEPARATOR . $this->filename . '.' . $this->extension;
+                $this->basename = basename($this->fullpath);
+
+                // Create and save the image in it's new, proper format.
+                imagecopyresampled($new, $this->resource, 0, 0, 0, 0, $this->width, $this->height, $this->width, $this->height);
+                $this->setQuality(80);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Save the image object to disk.
      *
      * @param  string $to
@@ -524,8 +583,8 @@ class Gd extends AbstractImage
         $imgSize = getimagesize($this->fullpath);
 
         // Set image object properties.
-        $this->width    = $imgSize[0];
-        $this->height   = $imgSize[1];
+        $this->width  = $imgSize[0];
+        $this->height = $imgSize[1];
     }
 
     /**
@@ -544,7 +603,7 @@ class Gd extends AbstractImage
             'Content-disposition' => $attach . 'filename=' . $this->basename
         ];
 
-        if ($_SERVER['SERVER_PORT'] == 443) {
+        if (isset($_SERVER['SERVER_PORT']) && ($_SERVER['SERVER_PORT'] == 443)) {
             $headers['Expires']       = 0;
             $headers['Cache-Control'] = 'private, must-revalidate';
             $headers['Pragma']        = 'cache';
@@ -563,9 +622,11 @@ class Gd extends AbstractImage
         }
 
         // Send the headers and output the image
-        header('HTTP/1.1 200 OK');
-        foreach ($headers as $name => $value) {
-            header($name . ": " . $value);
+        if (!headers_sent()) {
+            header('HTTP/1.1 200 OK');
+            foreach ($headers as $name => $value) {
+                header($name . ": " . $value);
+            }
         }
 
         $this->createImage($this->output, null, $this->quality);
@@ -584,7 +645,6 @@ class Gd extends AbstractImage
             if (!is_string($this->resource) && is_resource($this->resource)) {
                 imagedestroy($this->resource);
             }
-            $this->resource = null;
         }
 
         // Destroy the image output resource.
@@ -592,8 +652,10 @@ class Gd extends AbstractImage
             if (!is_string($this->output) && is_resource($this->output)) {
                 imagedestroy($this->output);
             }
-            $this->output = null;
         }
+
+        $this->resource = null;
+        $this->output   = null;
 
         clearstatcache();
 

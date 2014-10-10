@@ -62,14 +62,6 @@ interface ImageInterface
     public function load($image);
 
     /**
-     * Load an existing image resource
-     *
-     * @param  resource $resource
-     * @return Gd
-     */
-    public function loadResource($resource);
-
-    /**
      * Set the image adjust object
      *
      * @param  Adjust\AdjustInterface $adjust
@@ -108,14 +100,6 @@ interface ImageInterface
      * @return ImageInterface
      */
     public function setLayer(Layer\LayerInterface $layer);
-
-    /**
-     * Set the image transform object
-     *
-     * @param  Transform\TransformInterface $transform
-     * @return ImageInterface
-     */
-    public function setTransform(Transform\TransformInterface $transform);
 
     /**
      * Set the image type object
@@ -159,13 +143,6 @@ interface ImageInterface
      * @return Layer\LayerInterface
      */
     public function layer();
-
-    /**
-     * Get the image transform object
-     *
-     * @return Transform\TransformInterface
-     */
-    public function transform();
 
     /**
      * Get the image type object
@@ -345,16 +322,15 @@ interface ImageInterface
 
     /**
      * Crop the image object to a square image whose dimensions are based on the
-     * value of the $px argument. The optional $x and $y arguments allow for the
+     * value of the $px argument. The optional $offset argument allows for the
      * adjustment of the crop to select a certain area of the image to be
      * cropped.
      *
      * @param  int $px
-     * @param  int $x
-     * @param  int $y
+     * @param  int $offset
      * @return ImageInterface
      */
-    public function cropThumb($px, $x = 0, $y = 0);
+    public function cropThumb($px, $offset = null);
 
     /**
      * Rotate the image object
@@ -362,23 +338,32 @@ interface ImageInterface
      * @param  int   $degrees
      * @param  array $bgColor
      * @throws Exception
-     * @return Gd
+     * @return ImageInterface
      */
     public function rotate($degrees, array $bgColor = [255, 255, 255]);
 
     /**
      * Method to flip the image over the x-axis.
      *
-     * @return Gd
+     * @return ImageInterface
      */
     public function flip();
 
     /**
      * Method to flip the image over the y-axis.
      *
-     * @return Gd
+     * @return ImageInterface
      */
     public function flop();
+
+    /**
+     * Convert the image object to another format.
+     *
+     * @param  string $type
+     * @throws Exception
+     * @return ImageInterface
+     */
+    public function convert($type);
 
     /**
      * Save the image object to disk.
