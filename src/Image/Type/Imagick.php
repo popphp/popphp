@@ -32,10 +32,60 @@ class Imagick extends AbstractType
      * Set and apply the text on the image
      *
      * @param  string $string
+     * @throws Exception
      * @return Imagick
      */
     public function text($string)
     {
+        $draw = new \ImagickDraw();
+
+        // Set the font if passed
+        if (null !== $this->font) {
+            if (!$draw->setFont($this->font)) {
+                throw new Exception('Error: That font is not recognized by the Imagick extension.');
+            }
+            // Else, attempt to set a basic, default system font
+        } else {
+            $fonts = $this->image->resource()->queryFonts();
+            if (in_array('Arial', $fonts)) {
+                $this->font = 'Arial';
+            } else if (in_array('Helvetica', $fonts)) {
+                $this->font = 'Helvetica';
+            } else if (in_array('Tahoma', $fonts)) {
+                $this->font = 'Tahoma';
+            } else if (in_array('Verdana', $fonts)) {
+                $this->font = 'Verdana';
+            } else if (in_array('System', $fonts)) {
+                $this->font = 'System';
+            } else if (in_array('Fixed', $fonts)) {
+                $this->font = 'Fixed';
+            } else if (in_array('system', $fonts)) {
+                $this->font = 'system';
+            } else if (in_array('fixed', $fonts)) {
+                $this->font = 'fixed';
+            } else if (isset($fonts[0])) {
+                $this->font = $fonts[0];
+            } else {
+                throw new Exception('Error: No default font could be found by the Imagick extension.');
+            }
+        }
+
+        $draw->setFont($this->font);
+        $draw->setFontSize($this->size);
+        $draw->setFillColor($this->image->getColor($this->fillColor));
+
+        if (null !== $this->rotation) {
+            $draw->rotate($this->rotation);
+        }
+
+        if (null !== $this->strokeColor) {
+            $draw->setStrokeColor($this->image->getColor($this->strokeColor));
+            $draw->setStrokeWidth((int)$this->strokeWidth);
+        }
+
+        $draw->annotation($this->x, $this->y, $string);
+        $this->image->resource()->drawImage($draw);
+
         return $this;
     }
 

@@ -29,13 +29,36 @@ class Imagick extends AbstractLayer
 {
 
     /**
-     * Set the opacity of the overlay layer.
+     * Opacity
+     * @var mixed
+     */
+    protected $opacity = 1.0;
+
+    /**
+     * Overlay style
+     * @var int
+     */
+    protected $overlay = \Imagick::COMPOSITE_ATOP;
+
+    /**
+     * Get the overlay
      *
-     * @param  int $opacity
+     * @return int
+     */
+    public function getOverlay()
+    {
+        return $this->overlay;
+    }
+
+    /**
+     * Get the overlay
+     *
+     * @param  int $overlay
      * @return Imagick
      */
-    public function opacity($opacity)
+    public function setOverlay($overlay)
     {
+        $this->overlay = $overlay;
         return $this;
     }
 
@@ -49,6 +72,24 @@ class Imagick extends AbstractLayer
      */
     public function overlay($image, $x = 0, $y = 0)
     {
+        $overlayImage = new \Imagick($image);
+        if ($this->opacity < 1) {
+            $overlayImage->setImageOpacity($this->opacity);
+        }
+
+        $this->image->resource()->compositeImage($overlayImage, $this->overlay, $x, $y);
+        return $this;
+    }
+
+    /**
+     * Flatten the image layers
+     *
+     * @param  int $method
+     * @return Imagick
+     */
+    public function flatten($method = \Imagick::LAYERMETHOD_FLATTEN)
+    {
+        $this->image->resource()->mergeImageLayers($method);
         return $this;
     }
 

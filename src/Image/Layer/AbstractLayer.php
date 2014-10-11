@@ -36,7 +36,7 @@ abstract class AbstractLayer implements LayerInterface
 
     /**
      * Opacity
-     * @var int
+     * @var mixed
      */
     protected $opacity = 100;
 
@@ -68,7 +68,7 @@ abstract class AbstractLayer implements LayerInterface
     /**
      * Get the opacity
      *
-     * @return int
+     * @return mixed
      */
     public function getOpacity()
     {
@@ -90,12 +90,12 @@ abstract class AbstractLayer implements LayerInterface
     /**
      * Set the opacity
      *
-     * @param  int $opacity
+     * @param  mixed $opacity
      * @return AbstractLayer
      */
     public function setOpacity($opacity)
     {
-        $this->opacity = (int)$opacity;
+        $this->opacity = $opacity;
         return $this;
     }
 

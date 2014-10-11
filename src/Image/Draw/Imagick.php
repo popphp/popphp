@@ -29,6 +29,12 @@ class Imagick extends AbstractDraw
 {
 
     /**
+     * Opacity
+     * @var int
+     */
+    protected $opacity = 1;
+
+    /**
      * Draw a line on the image.
      *
      * @param  int $x1
@@ -39,6 +45,12 @@ class Imagick extends AbstractDraw
      */
     public function line($x1, $y1, $x2, $y2)
     {
+        $draw = new \ImagickDraw();
+        $draw->setStrokeColor($this->image->getColor($this->strokeColor, $this->opacity));
+        $draw->setStrokeWidth((null === $this->strokeWidth) ? 1 : $this->strokeWidth);
+        $draw->line($x1, $y1, $x2, $y2);
+        $this->image->resource()->drawImage($draw);
+
         return $this;
     }
 
@@ -53,6 +65,24 @@ class Imagick extends AbstractDraw
      */
     public function rectangle($x, $y, $w, $h = null)
     {
+        $x2 = $x + $w;
+        $y2 = $y + ((null === $h) ? $w : $h);
+
+        $draw = new \ImagickDraw();
+
+
+        if (null !== $this->fillColor) {
+            $draw->setFillColor($this->image->getColor($this->fillColor, $this->opacity));
+        }
+
+        if ($this->strokeWidth > 0) {
+            $draw->setStrokeColor($this->image->getColor($this->strokeColor, $this->opacity));
+            $draw->setStrokeWidth($this->strokeWidth);
+        }
+
+        $draw->rectangle($x, $y, $x2, $y2);
+        $this->image->resource()->drawImage($draw);
+
         return $this;
     }
 
@@ -80,6 +110,22 @@ class Imagick extends AbstractDraw
      */
     public function ellipse($x, $y, $w, $h = null)
     {
+        $wid = $w;
+        $hgt = (null === $h) ? $w : $h;
+
+        $draw = new \ImagickDraw();
+        if (null !== $this->fillColor) {
+            $draw->setFillColor($this->image->getColor($this->fillColor, $this->opacity));
+        }
+
+        if ($this->strokeWidth > 0) {
+            $draw->setStrokeColor($this->image->getColor($this->strokeColor, $this->opacity));
+            $draw->setStrokeWidth($this->strokeWidth);
+        }
+
+        $draw->ellipse($x, $y, $wid, $hgt, 0, 360);
+        $this->image->resource()->drawImage($draw);
+
         return $this;
     }
 
@@ -109,6 +155,21 @@ class Imagick extends AbstractDraw
      */
     public function arc($x, $y, $start, $end, $w, $h = null)
     {
+        if ($this->strokeWidth == 0) {
+            $this->setStrokeWidth(1);
+        }
+
+        $wid = $w;
+        $hgt = (null === $h) ? $w : $h;
+
+        $draw = new \ImagickDraw();
+        $draw->setStrokeColor($this->image->getColor($this->strokeColor, $this->opacity));
+        $draw->setStrokeWidth($this->strokeWidth);
+
+        $draw->arc($x, $y, $x + $wid, $y + $hgt, $start, $end);
+
+        $this->image->resource()->drawImage($draw);
+
         return $this;
     }
 
@@ -125,6 +186,23 @@ class Imagick extends AbstractDraw
      */
     public function chord($x, $y, $start, $end, $w, $h = null)
     {
+        $wid = $w;
+        $hgt = (null === $h) ? $w : $h;
+
+        $draw = new \ImagickDraw();
+        if (null !== $this->fillColor) {
+            $draw->setFillColor($this->image->getColor($this->fillColor, $this->opacity));
+        }
+        if ($this->strokeWidth > 0) {
+            $draw->setStrokeColor($this->image->getColor($this->strokeColor, $this->opacity));
+            $draw->setStrokeWidth($this->strokeWidth);
+        }
+
+        $draw->ellipse($x, $y, $wid, $hgt, $start, $end);
+
+        $this->image->resource()->drawImage($draw);
+
+        return $this;
         return $this;
     }
 
@@ -136,6 +214,19 @@ class Imagick extends AbstractDraw
      */
     public function polygon($points)
     {
+        $draw = new \ImagickDraw();
+        if (null !== $this->fillColor) {
+            $draw->setFillColor($this->image->getColor($this->fillColor, $this->opacity));
+        }
+
+        if ($this->strokeWidth > 0) {
+            $draw->setStrokeColor($this->image->getColor($this->strokeColor, $this->opacity));
+            $draw->setStrokeWidth($this->strokeWidth);
+        }
+
+        $draw->polygon($points);
+        $this->image->resource()->drawImage($draw);
+
         return $this;
     }
 

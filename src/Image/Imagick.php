@@ -60,13 +60,13 @@ class Imagick extends AbstractImage
      * Image filter
      * @var int
      */
-    protected $filter = \Imagick::FILTER_LANCZOS;
+    protected $imageFilter = \Imagick::FILTER_LANCZOS;
 
     /**
      * Image blur
      * @var int
      */
-    protected $blur = 1;
+    protected $imageBlur = 1;
 
     /**
      * Constructor
@@ -324,7 +324,7 @@ class Imagick extends AbstractImage
      */
     public function setImageFilter($filter)
     {
-        $this->filter = $filter;
+        $this->imageFilter = $filter;
         return $this;
     }
 
@@ -336,7 +336,7 @@ class Imagick extends AbstractImage
      */
     public function setImageBlur($blur)
     {
-        $this->blur = (int)$blur;
+        $this->imageBlur = (int)$blur;
         return $this;
     }
 
@@ -352,7 +352,7 @@ class Imagick extends AbstractImage
         $this->width  = $w;
         $this->height = round($this->height * $scale);
 
-        $this->resource->resizeImage($this->width, $this->height, $this->filter, $this->blur);
+        $this->resource->resizeImage($this->width, $this->height, $this->imageFilter, $this->imageBlur);
         return $this;
     }
 
@@ -368,7 +368,7 @@ class Imagick extends AbstractImage
         $this->height = $h;
         $this->width  = round($this->width * $scale);
 
-        $this->resource->resizeImage($this->width, $this->height, $this->filter, $this->blur);
+        $this->resource->resizeImage($this->width, $this->height, $this->imageFilter, $this->imageBlur);
         return $this;
     }
 
@@ -385,7 +385,7 @@ class Imagick extends AbstractImage
         $this->width  = round($this->width * $scale);
         $this->height = round($this->height * $scale);
 
-        $this->resource->resizeImage($this->width, $this->height, $this->filter, $this->blur);
+        $this->resource->resizeImage($this->width, $this->height, $this->imageFilter, $this->imageBlur);
 
         return $this;
     }
@@ -402,7 +402,7 @@ class Imagick extends AbstractImage
         $this->width  = round($this->width * $scale);
         $this->height = round($this->height * $scale);
 
-        $this->resource->resizeImage($this->width, $this->height, $this->filter, $this->blur);
+        $this->resource->resizeImage($this->width, $this->height, $this->imageFilter, $this->imageBlur);
         return $this;
     }
 
@@ -458,7 +458,7 @@ class Imagick extends AbstractImage
 
         // Create a new image output resource.
         if (null !== $offset) {
-            $this->resource->resizeImage($wid, $hgt, $this->filter, $this->blur);
+            $this->resource->resizeImage($wid, $hgt, $this->imageFilter, $this->imageBlur);
             $this->resource->cropImage($px, $px, $xOffset, $yOffset);
         } else {
             $this->resource->cropThumbnailImage($px, $px);
@@ -511,17 +511,6 @@ class Imagick extends AbstractImage
     }
 
     /**
-     * Flatten the image layers
-     *
-     * @return Imagick
-     */
-    public function flatten()
-    {
-        $this->resource = $this->resource->mergeImageLayers(\Imagick::LAYERMETHOD_FLATTEN);
-        return $this;
-    }
-
-    /**
      * Convert the image object to another format.
      *
      * @param  string $type
@@ -547,7 +536,7 @@ class Imagick extends AbstractImage
         $this->basename  = basename($this->fullpath);
 
         if (($old == 'psd') || ($old == 'tif') || ($old == 'tiff')) {
-            $this->flatten();
+            $this->layer()->flatten();
         }
 
         $this->resource->setImageFormat($type);

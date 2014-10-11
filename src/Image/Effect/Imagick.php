@@ -31,12 +31,20 @@ class Imagick extends AbstractEffect
     /**
      * Draw a border around the image.
      *
-     * @param  int    $w
-     * @param  int    $h
-     * @return Imagick
+     * @param  array $color
+     * @param  int   $w
+     * @param  int   $h
+     * @throws Exception
+     * @return Gd
      */
-    public function border($w, $h = null)
+    public function border(array $color, $w = 1, $h = null)
     {
+        if (count($color) != 3) {
+            throw new Exception('The color parameter must be an array of 3 integers.');
+        }
+
+        $h = (null === $h) ? $w : $h;
+        $this->image->resource()->borderImage($this->image->getColor($color), $w, $h);
         return $this;
     }
 
@@ -50,6 +58,10 @@ class Imagick extends AbstractEffect
      */
     public function fill($r, $g, $b)
     {
+        $draw = new \ImagickDraw();
+        $draw->setFillColor($this->image->getColor([(int)$r, (int)$g, (int)$b]));
+        $draw->rectangle(0, 0, $this->image->getWidth(), $this->image->getHeight());
+        $this->image->resource()->drawImage($draw);
         return $this;
     }
 
@@ -62,6 +74,15 @@ class Imagick extends AbstractEffect
      */
     public function radialGradient(array $color1, array $color2)
     {
+        $im = new \Imagick();
+        $width  = round($this->image->getWidth() * 1.25);
+        $height = round($this->image->getHeight() * 1.25);
+        $im->newPseudoImage($width, $height, 'radial-gradient:#' . $this->getHex($color1) . '-#' . $this->getHex($color2));
+        $this->image->resource()->compositeImage(
+            $im, \Imagick::COMPOSITE_ATOP,
+            0 - round(($width - $this->image->getWidth()) / 2),
+            0 - round(($height - $this->image->getHeight()) / 2)
+        );
         return $this;
     }
 
@@ -74,6 +95,9 @@ class Imagick extends AbstractEffect
      */
     public function verticalGradient(array $color1, array $color2)
     {
+        $im = new \Imagick();
+        $im->newPseudoImage($this->image->getWidth(), $this->image->getHeight(), 'gradient:#' . $this->getHex($color1) . '-#' . $this->getHex($color2));
+        $this->image->resource()->compositeImage($im, \Imagick::COMPOSITE_ATOP, 0, 0);
         return $this;
     }
 
@@ -86,6 +110,10 @@ class Imagick extends AbstractEffect
      */
     public function horizontalGradient(array $color1, array $color2)
     {
+        $im = new \Imagick();
+        $im->newPseudoImage($this->image->getHeight(), $this->image->getWidth(), 'gradient:#' . $this->getHex($color1) . '-#' . $this->getHex($color2));
+        $im->rotateImage('rgb(255, 255, 255)', -90);
+        $this->image->resource()->compositeImage($im, \Imagick::COMPOSITE_ATOP, 0, 0);
         return $this;
     }
 
@@ -100,6 +128,12 @@ class Imagick extends AbstractEffect
      */
     public function linearGradient(array $color1, array $color2, $vertical = true)
     {
+        if ($vertical) {
+            $this->verticalGradient($color1, $color2);
+        } else {
+            $this->horizontalGradient($color1, $color2);
+        }
+
         return $this;
     }
 

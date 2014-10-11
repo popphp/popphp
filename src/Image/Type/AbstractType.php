@@ -59,6 +59,12 @@ abstract class AbstractType implements TypeInterface
     protected $strokeColor = null;
 
     /**
+     * Stroke width
+     * @var int
+     */
+    protected $strokeWidth = 1;
+
+    /**
      * Type X-position
      * @var int
      */
@@ -138,6 +144,16 @@ abstract class AbstractType implements TypeInterface
     }
 
     /**
+     * Get stroke width
+     *
+     * @return int
+     */
+    public function getStrokeWidth()
+    {
+        return $this->strokeWidth;
+    }
+
+    /**
      * Set the image object
      *
      * @param  \Pop\Image\AbstractImage
@@ -186,6 +202,18 @@ abstract class AbstractType implements TypeInterface
     public function setStrokeColor($r, $g, $b)
     {
         $this->strokeColor = [(int)$r, (int)$g, (int)$b];
+        return $this;
+    }
+
+    /**
+     * Set stroke width
+     *
+     * @param  int $w
+     * @return AbstractType
+     */
+    public function setStrokeWidth($w)
+    {
+        $this->strokeWidth = $w;
         return $this;
     }
 

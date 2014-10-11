@@ -123,4 +123,15 @@ abstract class AbstractEffect implements EffectInterface
         return ($end * ($curStep / $totalSteps)) + $start;
     }
 
+    /**
+     * Get the hex value from a color array
+     *
+     * @param  array $color
+     * @return string
+     */
+    protected function getHex(array $color)
+    {
+        return sprintf('%02x', $color[0]) . sprintf('%02x', $color[1]) . sprintf('%02x', $color[2]);
+    }
+
 }
