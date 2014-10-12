@@ -29,6 +29,18 @@ class Gd extends AbstractLayer
 {
 
     /**
+     * Set the image opacity.
+     *
+     * @param  int $opacity
+     * @return Gd
+     */
+    public function setOpacity($opacity)
+    {
+        $this->opacity = round((127 - (127 * ($opacity / 100))));
+        return $this;
+    }
+
+    /**
      * Overlay an image onto the current image.
      *
      * @param  string $image

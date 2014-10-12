@@ -31,12 +31,20 @@ class Gmagick extends AbstractEffect
     /**
      * Draw a border around the image.
      *
-     * @param  int    $w
-     * @param  int    $h
+     * @param  array $color
+     * @param  int   $w
+     * @param  int   $h
+     * @throws Exception
      * @return Gmagick
      */
-    public function border($w, $h = null)
+    public function border(array $color, $w = 1, $h = null)
     {
+        if (count($color) != 3) {
+            throw new Exception('The color parameter must be an array of 3 integers.');
+        }
+
+        $h = (null === $h) ? $w : $h;
+        $this->image->resource()->borderImage($this->image->getColor($color), $w, $h);
         return $this;
     }
 
@@ -50,56 +58,10 @@ class Gmagick extends AbstractEffect
      */
     public function fill($r, $g, $b)
     {
-        return $this;
-    }
-
-    /**
-     * Flood the image with a vertical color gradient.
-     *
-     * @param  array   $color1
-     * @param  array   $color2
-     * @return Gmagick
-     */
-    public function radialGradient(array $color1, array $color2)
-    {
-        return $this;
-    }
-
-    /**
-     * Flood the image with a vertical color gradient.
-     *
-     * @param  array   $color1
-     * @param  array   $color2
-     * @return Gmagick
-     */
-    public function verticalGradient(array $color1, array $color2)
-    {
-        return $this;
-    }
-
-    /**
-     * Flood the image with a vertical color gradient.
-     *
-     * @param  array   $color1
-     * @param  array   $color2
-     * @return Gmagick
-     */
-    public function horizontalGradient(array $color1, array $color2)
-    {
-        return $this;
-    }
-
-    /**
-     * Flood the image with a color gradient.
-     *
-     * @param  array   $color1
-     * @param  array   $color2
-     * @param  boolean $vertical
-     * @throws Exception
-     * @return Gmagick
-     */
-    public function linearGradient(array $color1, array $color2, $vertical = true)
-    {
+        $draw = new \GmagickDraw();
+        $draw->setFillColor($this->image->getColor([(int)$r, (int)$g, (int)$b]));
+        $draw->rectangle(0, 0, $this->image->getWidth(), $this->image->getHeight());
+        $this->image->resource()->drawImage($draw);
         return $this;
     }
 

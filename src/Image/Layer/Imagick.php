@@ -63,6 +63,18 @@ class Imagick extends AbstractLayer
     }
 
     /**
+     * Set the opacity
+     *
+     * @param  mixed $opacity
+     * @return AbstractLayer
+     */
+    public function setOpacity($opacity)
+    {
+        $this->opacity = $opacity;
+        return $this;
+    }
+
+    /**
      * Overlay an image onto the current image.
      *
      * @param  string $image

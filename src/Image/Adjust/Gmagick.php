@@ -29,6 +29,30 @@ class Gmagick extends AbstractAdjust
 {
 
     /**
+     * Method to adjust the hue of the image.
+     *
+     * @param  int $amount
+     * @return Gmagick
+     */
+    public function hue($amount)
+    {
+        $this->image->resource()->modulateImage(100, 100, $amount);
+        return $this;
+    }
+
+    /**
+     * Method to adjust the saturation of the image.
+     *
+     * @param  int $amount
+     * @return Gmagick
+     */
+    public function saturation($amount)
+    {
+        $this->image->resource()->modulateImage(100, $amount, 100);
+        return $this;
+    }
+
+    /**
      * Adjust the image brightness
      *
      * @param  int $amount
@@ -36,6 +60,35 @@ class Gmagick extends AbstractAdjust
      */
     public function brightness($amount)
     {
+        $this->image->resource()->modulateImage($amount, 100, 100);
+        return $this;
+    }
+
+    /**
+     * Method to adjust the HSB of the image altogether.
+     *
+     * @param  int $h
+     * @param  int $s
+     * @param  int $b
+     * @return Gmagick
+     */
+    public function hsb($h, $s, $b)
+    {
+        $this->image->resource()->modulateImage($h, $s, $b);
+        return $this;
+    }
+
+    /**
+     * Method to adjust the levels of the image using a 0 - 255 range.
+     *
+     * @param  int   $black
+     * @param  float $gamma
+     * @param  int   $white
+     * @return Gmagick
+     */
+    public function level($black, $gamma, $white)
+    {
+        $this->image->resource()->levelImage($black, $gamma, $white);
         return $this;
     }
 
@@ -47,6 +100,12 @@ class Gmagick extends AbstractAdjust
      */
     public function contrast($amount)
     {
+        if ($amount > 0) {
+            for ($i = 1; $i <= $amount; $i++) {
+                $this->image->resource()->normalizeImage(\Gmagick::CHANNEL_ALL);
+            }
+        }
+
         return $this;
     }
 
@@ -57,6 +116,7 @@ class Gmagick extends AbstractAdjust
      */
     public function desaturate()
     {
+        $this->image->resource()->modulateImage(100, 0, 100);
         return $this;
     }
 

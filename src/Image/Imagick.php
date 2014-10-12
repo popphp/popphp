@@ -278,21 +278,7 @@ class Imagick extends AbstractImage
         return $this->type;
     }
 
-
-
-    /**
-     * Set the image opacity.
-     *
-     * @param  int $opacity
-     * @return Imagick
-     */
-    public function setOpacity($opacity)
-    {
-        $this->opacity = round((127 - (127 * ($opacity / 100))));
-        return $this;
-    }
-
-    /**
+   /**
      * Set the image quality.
      *
      * @param  int $quality
@@ -674,7 +660,6 @@ class Imagick extends AbstractImage
         $this->output();
         return '';
     }
-
 
     /**
      * Set the image formats based on what's supported by Imagick

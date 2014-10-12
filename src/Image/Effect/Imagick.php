@@ -35,7 +35,7 @@ class Imagick extends AbstractEffect
      * @param  int   $w
      * @param  int   $h
      * @throws Exception
-     * @return Gd
+     * @return Imagick
      */
     public function border(array $color, $w = 1, $h = null)
     {
