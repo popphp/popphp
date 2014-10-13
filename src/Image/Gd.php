@@ -16,7 +16,7 @@
 namespace Pop\Image;
 
 /**
- * Image class
+ * GD image adapter class
  *
  * @category   Pop
  * @package    Pop_Image
