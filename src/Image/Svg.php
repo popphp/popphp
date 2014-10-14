@@ -181,6 +181,24 @@ class Svg
     protected $allowedUnits = ['em', 'ex', 'px', 'pt', 'pc', 'cm', 'mm', 'in', '%'];
 
     /**
+     * Image draw object
+     * @var Draw\DrawInterface
+     */
+    protected $draw = null;
+
+    /**
+     * Image effect object
+     * @var Effect\EffectInterface
+     */
+    protected $effect = null;
+
+    /**
+     * Image type object
+     * @var Type\TypeInterface
+     */
+    protected $type = null;
+
+    /**
      * Constructor
      *
      * Instantiate an SVG image file object based on either a pre-existing
@@ -253,6 +271,7 @@ class Svg
 
         return $this;
     }
+
     /**
      * Get the image resource
      *
@@ -351,6 +370,157 @@ class Svg
     public function getHeight()
     {
         return $this->height;
+    }
+    /**
+     * Get the SVG image units.
+     *
+     * @return string
+     */
+    public function getUnits()
+    {
+        return $this->units;
+    }
+
+    /**
+     * Get the image draw object
+     *
+     * @return Draw\DrawInterface
+     */
+    public function draw()
+    {
+        if (null === $this->draw) {
+            $this->draw = new Draw\Svg($this);
+        }
+        if (null === $this->draw->getImage()) {
+            $this->draw->setImage($this);
+        }
+        return $this->draw;
+    }
+
+    /**
+     * Get the image effect object
+     *
+     * @return Effect\EffectInterface
+     */
+    public function effect()
+    {
+        if (null === $this->effect) {
+            $this->effect = new Effect\Svg($this);
+        }
+        if (null === $this->effect->getImage()) {
+            $this->effect->setImage($this);
+        }
+        return $this->effect;
+    }
+
+    /**
+     * Get the image type object
+     *
+     * @return Type\TypeInterface
+     */
+    public function type()
+    {
+        if (null === $this->type) {
+            $this->type = new Type\Svg($this);
+        }
+        if (null === $this->type->getImage()) {
+            $this->type->setImage($this);
+        }
+        return $this->type;
+    }
+
+    /**
+     * Save the image object to disk.
+     *
+     * @param  string $to
+     * @return void
+     */
+    public function save($to = null)
+    {
+        $dom = new \DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput       = true;
+        $dom->loadXML($this->resource->asXML());
+
+        $this->output = $dom->saveXML();
+
+        $saveTo = ((null === $to) ? $this->fullpath : $to);
+
+        file_put_contents($saveTo, $this->output);
+    }
+
+    /**
+     * Output the image object directly.
+     *
+     * @param  boolean $download
+     * @throws Exception
+     * @return void
+     */
+    public function output($download = false)
+    {
+        // Determine if the force download argument has been passed.
+        $attach = ($download) ? 'attachment; ' : null;
+        $headers = [
+            'Content-type'        => $this->mime,
+            'Content-disposition' => $attach . 'filename=' . $this->basename
+        ];
+
+        if (isset($_SERVER['SERVER_PORT']) && ($_SERVER['SERVER_PORT'] == 443)) {
+            $headers['Expires']       = 0;
+            $headers['Cache-Control'] = 'private, must-revalidate';
+            $headers['Pragma']        = 'cache';
+        }
+
+        $dom = new \DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput       = true;
+        $dom->loadXML($this->resource->asXML());
+
+        $this->output = $dom->saveXML();
+
+        if (null === $this->output) {
+            throw new Exception('Error: The image resource has not been properly created.');
+        }
+
+        // Send the headers and output the image
+        if (!headers_sent()) {
+            header('HTTP/1.1 200 OK');
+            foreach ($headers as $name => $value) {
+                header($name . ": " . $value);
+            }
+        }
+
+        echo $this->output;
+    }
+
+    /**
+     * Destroy the image object and the related image file directly.
+     *
+     * @param  boolean $delete
+     * @return void
+     */
+    public function destroy($delete = false)
+    {
+        $this->resource = null;
+        $this->output   = null;
+
+        clearstatcache();
+
+        // If the $delete flag is passed, delete the image file.
+        if (($delete) && file_exists($this->fullpath)) {
+            unlink($this->fullpath);
+        }
+    }
+
+    /**
+     * To string method to output the image
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $this->output();
+        return '';
     }
 
     /**
