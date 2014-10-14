@@ -559,10 +559,11 @@ class Svg
      * Output the image object directly.
      *
      * @param  boolean $download
+     * @param  boolean $sendHeaders
      * @throws Exception
      * @return void
      */
-    public function output($download = false)
+    public function output($download = false, $sendHeaders = true)
     {
         // Determine if the force download argument has been passed.
         $attach = ($download) ? 'attachment; ' : null;
@@ -589,7 +590,7 @@ class Svg
         }
 
         // Send the headers and output the image
-        if (!headers_sent()) {
+        if (!headers_sent() && ($sendHeaders)) {
             header('HTTP/1.1 200 OK');
             foreach ($headers as $name => $value) {
                 header($name . ": " . $value);
