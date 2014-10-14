@@ -65,8 +65,8 @@ class Gmagick extends AbstractLayer
     /**
      * Set the opacity
      *
-     * @param  mixed $opacity
-     * @return AbstractLayer
+     * @param  float $opacity
+     * @return Gmagick
      */
     public function setOpacity($opacity)
     {

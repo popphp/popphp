@@ -25,7 +25,7 @@ namespace Pop\Image;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Imagick extends AbstractImage
+class Imagick extends AbstractRasterImage
 {
 
     /**
@@ -55,6 +55,12 @@ class Imagick extends AbstractImage
         'tif'   => 'image/tiff',
         'tiff'  => 'image/tiff'
     ];
+
+    /**
+     * Image compression
+     * @var int
+     */
+    protected $compression = null;
 
     /**
      * Image filter
@@ -182,6 +188,16 @@ class Imagick extends AbstractImage
     }
 
     /**
+     * Get the image compression.
+     *
+     * @return int
+     */
+    public function getCompression()
+    {
+        return $this->compression;
+    }
+
+    /**
      * Get the image adjust object
      *
      * @return Adjust\AdjustInterface
@@ -298,7 +314,7 @@ class Imagick extends AbstractImage
      */
     public function setCompression($compression)
     {
-        $this->compression = (int)$compression;
+        $this->compression = $compression;
         return $this;
     }
 

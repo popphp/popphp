@@ -29,6 +29,24 @@ class Imagick extends AbstractType
 {
 
     /**
+     * Opacity
+     * @var float
+     */
+    protected $opacity = 1.0;
+
+    /**
+     * Set the opacity
+     *
+     * @param  float $opacity
+     * @return Imagick
+     */
+    public function setOpacity($opacity)
+    {
+        $this->opacity = $opacity;
+        return $this;
+    }
+
+    /**
      * Set and apply the text on the image
      *
      * @param  string $string
@@ -72,14 +90,14 @@ class Imagick extends AbstractType
 
         $draw->setFont($this->font);
         $draw->setFontSize($this->size);
-        $draw->setFillColor($this->image->getColor($this->fillColor));
+        $draw->setFillColor($this->image->getColor($this->fillColor, $this->opacity));
 
         if (null !== $this->rotation) {
             $draw->rotate($this->rotation);
         }
 
         if (null !== $this->strokeColor) {
-            $draw->setStrokeColor($this->image->getColor($this->strokeColor));
+            $draw->setStrokeColor($this->image->getColor($this->strokeColor, $this->opacity));
             $draw->setStrokeWidth((int)$this->strokeWidth);
         }
 

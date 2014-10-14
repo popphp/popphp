@@ -30,9 +30,21 @@ class Imagick extends AbstractDraw
 
     /**
      * Opacity
-     * @var int
+     * @var float
      */
-    protected $opacity = 1;
+    protected $opacity = 1.0;
+
+    /**
+     * Set the opacity
+     *
+     * @param  float $opacity
+     * @return Gmagick
+     */
+    public function setOpacity($opacity)
+    {
+        $this->opacity = $opacity;
+        return $this;
+    }
 
     /**
      * Draw a line on the image.

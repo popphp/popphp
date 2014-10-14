@@ -29,6 +29,24 @@ class Gd extends AbstractDraw
 {
 
     /**
+     * Opacity
+     * @var int
+     */
+    protected $opacity = 0;
+
+    /**
+     * Set the opacity
+     *
+     * @param  int $opacity
+     * @return Gd
+     */
+    public function setOpacity($opacity)
+    {
+        $this->opacity = (int)round((127 - (127 * ($opacity / 100))));
+        return $this;
+    }
+
+    /**
      * Draw a line on the image.
      *
      * @param  int $x1

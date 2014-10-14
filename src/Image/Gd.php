@@ -25,7 +25,7 @@ namespace Pop\Image;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Gd extends AbstractImage
+class Gd extends AbstractRasterImage
 {
 
     /**
@@ -273,20 +273,6 @@ class Gd extends AbstractImage
                 $this->quality = 100;
         }
 
-        $this->compression = $this->quality;
-
-        return $this;
-    }
-
-    /**
-     * Set the image compression (for Gd, an alias to setQuality())
-     *
-     * @param  int $compression
-     * @return Gd
-     */
-    public function setCompression($compression)
-    {
-        $this->setQuality($compression);
         return $this;
     }
 

@@ -84,9 +84,9 @@ abstract class AbstractType implements TypeInterface
 
     /**
      * Opacity
-     * @var int
+     * @var mixed
      */
-    protected $opacity = 0;
+    protected $opacity = null;
 
     /**
      * Constructor
@@ -116,7 +116,7 @@ abstract class AbstractType implements TypeInterface
     /**
      * Get the opacity
      *
-     * @return int
+     * @return mixed
      */
     public function getOpacity()
     {
@@ -162,18 +162,6 @@ abstract class AbstractType implements TypeInterface
     public function setImage(\Pop\Image\AbstractImage $image)
     {
         $this->image = $image;
-        return $this;
-    }
-
-    /**
-     * Set the opacity
-     *
-     * @param  int $opacity
-     * @return AbstractType
-     */
-    public function setOpacity($opacity)
-    {
-        $this->opacity = (int)round((127 - (127 * ($opacity / 100))));
         return $this;
     }
 
@@ -290,5 +278,13 @@ abstract class AbstractType implements TypeInterface
         $this->rotation = (int)$degrees;
         return $this;
     }
+
+    /**
+     * Set the opacity
+     *
+     * @param  mixed $opacity
+     * @return AbstractType
+     */
+    abstract public function setOpacity($opacity);
 
 }

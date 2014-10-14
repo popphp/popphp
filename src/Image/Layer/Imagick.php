@@ -30,7 +30,7 @@ class Imagick extends AbstractLayer
 
     /**
      * Opacity
-     * @var mixed
+     * @var float
      */
     protected $opacity = 1.0;
 
@@ -65,8 +65,8 @@ class Imagick extends AbstractLayer
     /**
      * Set the opacity
      *
-     * @param  mixed $opacity
-     * @return AbstractLayer
+     * @param  float $opacity
+     * @return Imagick
      */
     public function setOpacity($opacity)
     {

@@ -35,12 +35,6 @@ abstract class AbstractImage implements ImageInterface
     protected $resource = null;
 
     /**
-     * Image extension info
-     * @var \ArrayObject
-     */
-    protected $info = null;
-
-    /**
      * Full path of image file, i.e. '/path/to/image.ext'
      * @var string
      */
@@ -101,28 +95,10 @@ abstract class AbstractImage implements ImageInterface
     protected $height = null;
 
     /**
-     * Image quality
-     * @var int
-     */
-    protected $quality = null;
-
-    /**
-     * Image compression
-     * @var int
-     */
-    protected $compression = null;
-
-    /**
      * Array of allowed image types.
      * @var array
      */
     protected $allowed = [];
-
-    /**
-     * Image adjust object
-     * @var Adjust\AdjustInterface
-     */
-    protected $adjust = null;
 
     /**
      * Image draw object
@@ -135,18 +111,6 @@ abstract class AbstractImage implements ImageInterface
      * @var Effect\EffectInterface
      */
     protected $effect = null;
-
-    /**
-     * Image filter object
-     * @var Filter\FilterInterface
-     */
-    protected $filter = null;
-
-    /**
-     * Image layer object
-     * @var Layer\LayerInterface
-     */
-    protected $layer = null;
 
     /**
      * Image type object
@@ -184,57 +148,6 @@ abstract class AbstractImage implements ImageInterface
     }
 
     /**
-     * Get the available image library adapters
-     *
-     * @return array
-     */
-    public static function getAvailableAdapters()
-    {
-        return [
-            'gd'      => function_exists('gd_info'),
-            'gmagick' => (class_exists('Gmagick', false)),
-            'imagick' => (class_exists('Imagick', false))
-        ];
-    }
-
-    /**
-     * Get the available image library adapters
-     *
-     * @param  string $adapter
-     * @return boolean
-     */
-    public static function isAvailable($adapter)
-    {
-        $result = false;
-
-        switch (strtolower($adapter)) {
-            case 'gd':
-                $result = function_exists('gd_info');
-                break;
-            case 'graphicsmagick':
-            case 'gmagick':
-                $result = (class_exists('Gmagick', false));
-                break;
-            case 'imagemagick':
-            case 'imagick':
-                $result = (class_exists('Imagick', false));
-                break;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Get the allowed image types
-     *
-     * @return array
-     */
-    public function getAllowedTypes()
-    {
-        return $this->allowed;
-    }
-
-    /**
      * Get the image resource
      *
      * @return resource
@@ -242,26 +155,6 @@ abstract class AbstractImage implements ImageInterface
     public function resource()
     {
         return $this->resource;
-    }
-
-    /**
-     * Get the image extension info
-     *
-     * @return \ArrayObject
-     */
-    public function info()
-    {
-        return $this->info;
-    }
-
-    /**
-     * Get the image extension version
-     *
-     * @return string
-     */
-    public function version()
-    {
-        return $this->info->version;
     }
 
     /**
@@ -355,38 +248,6 @@ abstract class AbstractImage implements ImageInterface
     }
 
     /**
-     * Get the image quality.
-     *
-     * @return int
-     */
-    public function getQuality()
-    {
-        return $this->quality;
-    }
-
-    /**
-     * Get the image compression.
-     *
-     * @return int
-     */
-    public function getCompression()
-    {
-        return $this->compression;
-    }
-
-    /**
-     * Set the image adjust object
-     *
-     * @param  Adjust\AdjustInterface $adjust
-     * @return AbstractImage
-     */
-    public function setAdjust(Adjust\AdjustInterface $adjust)
-    {
-        $this->adjust = $adjust;
-        return $this;
-    }
-
-    /**
      * Set the image draw object
      *
      * @param  Draw\DrawInterface $draw
@@ -411,30 +272,6 @@ abstract class AbstractImage implements ImageInterface
     }
 
     /**
-     * Set the image filter object
-     *
-     * @param  Filter\FilterInterface $filter
-     * @return AbstractImage
-     */
-    public function setFilter(Filter\FilterInterface $filter)
-    {
-        $this->filter = $filter;
-        return $this;
-    }
-
-    /**
-     * Set the image layer object
-     *
-     * @param  Layer\LayerInterface $layer
-     * @return AbstractImage
-     */
-    public function setLayer(Layer\LayerInterface $layer)
-    {
-        $this->layer = $layer;
-        return $this;
-    }
-
-    /**
      * Set the image type object
      *
      * @param  Type\TypeInterface $type
@@ -447,18 +284,25 @@ abstract class AbstractImage implements ImageInterface
     }
 
     /**
-     * Set the image adjust object
+     * Get the image draw object
      *
-     * @param  int $r
-     * @param  int $g
-     * @param  int $b
-     * @return AbstractImage
+     * @return Draw\DrawInterface
      */
-    public function setBackgroundColor($r, $g, $b)
-    {
-        $this->effect()->fill($r, $g, $b);
-        return $this;
-    }
+    abstract public function draw();
+
+    /**
+     * Get the image effect object
+     *
+     * @return Effect\EffectInterface
+     */
+    abstract public function effect();
+
+    /**
+     * Get the image type object
+     *
+     * @return Type\TypeInterface
+     */
+    abstract public function type();
 
     /**
      * Create a new image resource
@@ -478,157 +322,6 @@ abstract class AbstractImage implements ImageInterface
      * @return AbstractImage
      */
     abstract public function load($image);
-
-    /**
-     * Get the image adjust object
-     *
-     * @return Adjust\AdjustInterface
-     */
-    abstract public function adjust();
-
-    /**
-     * Get the image draw object
-     *
-     * @return Draw\DrawInterface
-     */
-    abstract public function draw();
-
-    /**
-     * Get the image effect object
-     *
-     * @return Effect\EffectInterface
-     */
-    abstract public function effect();
-
-    /**
-     * Get the image filter object
-     *
-     * @return Filter\FilterInterface
-     */
-    abstract public function filter();
-
-    /**
-     * Get the image layer object
-     *
-     * @return Layer\LayerInterface
-     */
-    abstract public function layer();
-
-    /**
-     * Get the image type object
-     *
-     * @return Type\TypeInterface
-     */
-    abstract public function type();
-
-    /**
-     * Set the image quality.
-     *
-     * @param  int $quality
-     * @return AbstractImage
-     */
-    abstract public function setQuality($quality);
-
-    /**
-     * Set the image compression.
-     *
-     * @param  int $compression
-     * @return AbstractImage
-     */
-    abstract public function setCompression($compression);
-
-    /**
-     * Resize the image object to the width parameter passed.
-     *
-     * @param  int $w
-     * @return AbstractImage
-     */
-    abstract public function resizeToWidth($w);
-
-    /**
-     * Resize the image object to the height parameter passed.
-     *
-     * @param  int $h
-     * @return AbstractImage
-     */
-    abstract public function resizeToHeight($h);
-
-    /**
-     * Resize the image object, allowing for the largest dimension to be scaled
-     * to the value of the $px argument.
-     *
-     * @param  int $px
-     * @return AbstractImage
-     */
-    abstract public function resize($px);
-
-    /**
-     * Scale the image object, allowing for the dimensions to be scaled
-     * proportionally to the value of the $scl argument.
-     *
-     * @param  float $scale
-     * @return AbstractImage
-     */
-    abstract public function scale($scale);
-
-    /**
-     * Crop the image object to a image whose dimensions are based on the
-     * value of the $wid and $hgt argument. The optional $x and $y arguments
-     * allow for the adjustment of the crop to select a certain area of the
-     * image to be cropped.
-     *
-     * @param  int $w
-     * @param  int $h
-     * @param  int $x
-     * @param  int $y
-     * @return AbstractImage
-     */
-    abstract public function crop($w, $h, $x = 0, $y = 0);
-
-    /**
-     * Crop the image object to a square image whose dimensions are based on the
-     * value of the $px argument. The optional $offset argument allows for the
-     * adjustment of the crop to select a certain area of the image to be
-     * cropped.
-     *
-     * @param  int $px
-     * @param  int $offset
-     * @return AbstractImage
-     */
-    abstract public function cropThumb($px, $offset = null);
-
-    /**
-     * Rotate the image object
-     *
-     * @param  int   $degrees
-     * @param  array $bgColor
-     * @throws Exception
-     * @return AbstractImage
-     */
-    abstract public function rotate($degrees, array $bgColor = [255, 255, 255]);
-
-    /**
-     * Method to flip the image over the x-axis.
-     *
-     * @return AbstractImage
-     */
-    abstract public function flip();
-
-    /**
-     * Method to flip the image over the y-axis.
-     *
-     * @return AbstractImage
-     */
-    abstract public function flop();
-
-    /**
-     * Convert the image object to another format.
-     *
-     * @param  string $type
-     * @throws Exception
-     * @return AbstractImage
-     */
-    abstract public function convert($type);
 
     /**
      * Save the image object to disk.
@@ -653,15 +346,6 @@ abstract class AbstractImage implements ImageInterface
      * @return void
      */
     abstract public function destroy($delete = false);
-
-    /**
-     * Create and return a color.
-     *
-     * @param  array   $color
-     * @throws Exception
-     * @return mixed
-     */
-    abstract public function getColor(array $color);
 
     /**
      * Set the image properties

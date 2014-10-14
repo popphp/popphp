@@ -25,7 +25,7 @@ namespace Pop\Image;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Gmagick extends AbstractImage
+class Gmagick extends AbstractRasterImage
 {
 
     /**
@@ -55,6 +55,12 @@ class Gmagick extends AbstractImage
         'tif'   => 'image/tiff',
         'tiff'  => 'image/tiff'
     ];
+
+    /**
+     * Image compression
+     * @var int
+     */
+    protected $compression = null;
 
     /**
      * Image filter
@@ -179,6 +185,16 @@ class Gmagick extends AbstractImage
         $this->setImage($image);
 
         return $this;
+    }
+
+    /**
+     * Get the image compression.
+     *
+     * @return int
+     */
+    public function getCompression()
+    {
+        return $this->compression;
     }
 
     /**

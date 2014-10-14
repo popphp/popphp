@@ -25,38 +25,14 @@ namespace Pop\Image\Draw;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Svg implements DrawInterface
+class Svg extends AbstractDraw
 {
-
-    /**
-     * Image object
-     * @var \Pop\Image\AbstractImage
-     */
-    protected $image = null;
 
     /**
      * Opacity
      * @var float
      */
     protected $opacity = 1.0;
-
-    /**
-     * Fill color
-     * @var array
-     */
-    protected $fillColor = null;
-
-    /**
-     * Stroke color
-     * @var array
-     */
-    protected $strokeColor = null;
-
-    /**
-     * Stroke width
-     * @var int
-     */
-    protected $strokeWidth = 0;
 
     /**
      * Stroke dash length
@@ -87,83 +63,6 @@ class Svg implements DrawInterface
      * @var int
      */
     protected $clippingObject = null;
-
-    /**
-     * Constructor
-     *
-     * Instantiate an image object
-     *
-     * @param  \Pop\Image\Svg
-     * @return Svg
-     */
-    public function __construct(\Pop\Image\Svg $image = null)
-    {
-        if (null !== $image) {
-            $this->setImage($image);
-        }
-    }
-
-    /**
-     * Get the image object
-     *
-     * @return \Pop\Image\AbstractImage
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * Get the opacity
-     *
-     * @return int
-     */
-    public function getOpacity()
-    {
-        return $this->opacity;
-    }
-
-    /**
-     * Get fill color
-     *
-     * @return mixed
-     */
-    public function getFillColor()
-    {
-        return $this->fillColor;
-    }
-
-    /**
-     * Get stroke color
-     *
-     * @return array
-     */
-    public function getStrokeColor()
-    {
-        return $this->strokeColor;
-    }
-
-    /**
-     * Get stroke width
-     *
-     * @return int
-     */
-    public function getStrokeWidth()
-    {
-        return $this->strokeWidth;
-    }
-
-    /**
-     * Set the image object
-     *
-     * @param  \Pop\Image\Svg
-     * @return Svg
-     */
-    public function setImage(\Pop\Image\Svg $image)
-    {
-        $this->image = $image;
-        return $this;
-    }
 
     /**
      * Set the opacity
@@ -215,7 +114,7 @@ class Svg implements DrawInterface
      */
     public function setStrokeWidth($w, $dashLength = null, $dashGap = null)
     {
-        $this->strokeWidth      = (int)$w;
+        parent::setStrokeWidth($w);
         $this->strokeDashLength = $dashLength;
         $this->strokeDashGap    = $dashGap;
         return $this;

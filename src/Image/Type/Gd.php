@@ -29,6 +29,24 @@ class Gd extends AbstractType
 {
 
     /**
+     * Opacity
+     * @var int
+     */
+    protected $opacity = 0;
+
+    /**
+     * Set the opacity
+     *
+     * @param  int $opacity
+     * @return Gd
+     */
+    public function setOpacity($opacity)
+    {
+        $this->opacity = (int)round((127 - (127 * ($opacity / 100))));
+        return $this;
+    }
+
+    /**
      * Set and apply the text on the image
      *
      * @param  string $string

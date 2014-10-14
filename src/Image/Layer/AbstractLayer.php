@@ -38,7 +38,7 @@ abstract class AbstractLayer implements LayerInterface
      * Opacity
      * @var mixed
      */
-    protected $opacity = 100;
+    protected $opacity = null;
 
     /**
      * Constructor
@@ -76,6 +76,18 @@ abstract class AbstractLayer implements LayerInterface
     }
 
     /**
+     * Set the image opacity.
+     *
+     * @param  int $opacity
+     * @return Gd
+     */
+    public function setOpacity($opacity)
+    {
+        $this->opacity = $opacity;
+        return $this;
+    }
+
+    /**
      * Set the image object
      *
      * @param  \Pop\Image\AbstractImage
@@ -86,13 +98,5 @@ abstract class AbstractLayer implements LayerInterface
         $this->image = $image;
         return $this;
     }
-
-    /**
-     * Set the opacity
-     *
-     * @param  mixed $opacity
-     * @return AbstractLayer
-     */
-    abstract public function setOpacity($opacity);
 
 }

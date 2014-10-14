@@ -36,9 +36,9 @@ abstract class AbstractDraw implements DrawInterface
 
     /**
      * Opacity
-     * @var int
+     * @var mixed
      */
-    protected $opacity = 0;
+    protected $opacity = null;
 
     /**
      * Fill color
@@ -50,7 +50,7 @@ abstract class AbstractDraw implements DrawInterface
      * Stroke color
      * @var array
      */
-    protected $strokeColor = [0, 0, 0];
+    protected $strokeColor = null;
 
     /**
      * Stroke width
@@ -86,7 +86,7 @@ abstract class AbstractDraw implements DrawInterface
     /**
      * Get the opacity
      *
-     * @return int
+     * @return mixed
      */
     public function getOpacity()
     {
@@ -132,18 +132,6 @@ abstract class AbstractDraw implements DrawInterface
     public function setImage(\Pop\Image\AbstractImage $image)
     {
         $this->image = $image;
-        return $this;
-    }
-
-    /**
-     * Set the opacity
-     *
-     * @param  int $opacity
-     * @return AbstractDraw
-     */
-    public function setOpacity($opacity)
-    {
-        $this->opacity = (int)round((127 - (127 * ($opacity / 100))));
         return $this;
     }
 

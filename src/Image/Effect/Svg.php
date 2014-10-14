@@ -25,193 +25,20 @@ namespace Pop\Image\Effect;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Svg implements EffectInterface
+class Svg extends AbstractEffect
 {
-
-    /**
-     * Image object
-     * @var \Pop\Image\Svg
-     */
-    protected $image = null;
-
-    /**
-     * Opacity
-     * @var int
-     */
-    protected $opacity = 0;
-
-    /**
-     * Fill color
-     * @var array
-     */
-    protected $fillColor = null;
-
-    /**
-     * Stroke color
-     * @var array
-     */
-    protected $strokeColor = null;
-
-    /**
-     * Stroke width
-     * @var int
-     */
-    protected $strokeWidth = 0;
-
-    /**
-     * Stroke dash length
-     * @var int
-     */
-    protected $strokeDashLength = null;
-
-    /**
-     * Stroke dash gap
-     * @var int
-     */
-    protected $strokeDashGap = null;
-
-    /**
-     * Constructor
-     *
-     * Instantiate an image object
-     *
-     * @param  \Pop\Image\Svg
-     * @return Svg
-     */
-    public function __construct(\Pop\Image\Svg $image = null)
-    {
-        if (null !== $image) {
-            $this->setImage($image);
-        }
-    }
-
-    /**
-     * Get the image object
-     *
-     * @return \Pop\Image\Svg
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * Get the opacity
-     *
-     * @return int
-     */
-    public function getOpacity()
-    {
-        return $this->opacity;
-    }
-
-    /**
-     * Get fill color
-     *
-     * @return mixed
-     */
-    public function getFillColor()
-    {
-        return $this->fillColor;
-    }
-
-    /**
-     * Get stroke color
-     *
-     * @return array
-     */
-    public function getStrokeColor()
-    {
-        return $this->strokeColor;
-    }
-
-    /**
-     * Get stroke width
-     *
-     * @return int
-     */
-    public function getStrokeWidth()
-    {
-        return $this->strokeWidth;
-    }
-
-    /**
-     * Set the image object
-     *
-     * @param  \Pop\Image\Svg
-     * @return Svg
-     */
-    public function setImage(\Pop\Image\Svg $image)
-    {
-        $this->image = $image;
-        return $this;
-    }
-
-    /**
-     * Set the opacity
-     *
-     * @param  int $opacity
-     * @return Svg
-     */
-    public function setOpacity($opacity)
-    {
-        $this->opacity = (int)round((127 - (127 * ($opacity / 100))));
-        return $this;
-    }
-
-    /**
-     * Set fill color
-     *
-     * @param  int $r
-     * @param  int $g
-     * @param  int $b
-     * @return Svg
-     */
-    public function setFillColor($r, $g, $b)
-    {
-        $this->fillColor = [(int)$r, (int)$g, (int)$b];
-        return $this;
-    }
-
-    /**
-     * Set stroke color
-     *
-     * @param  int $r
-     * @param  int $g
-     * @param  int $b
-     * @return Svg
-     */
-    public function setStrokeColor($r, $g, $b)
-    {
-        $this->strokeColor = [(int)$r, (int)$g, (int)$b];
-        return $this;
-    }
-
-    /**
-     * Get stroke width
-     *
-     * @param int $w
-     * @param int $dashLength
-     * @param int $dashGap
-     * @return Svg
-     */
-    public function setStrokeWidth($w, $dashLength = null, $dashGap = null)
-    {
-        $this->strokeWidth      = (int)$w;
-        $this->strokeDashLength = $dashLength;
-        $this->strokeDashGap    = $dashGap;
-        return $this;
-    }
 
     /**
      * Draw a border around the image.
      *
      * @param  array $color
-     * @param  int $w
+     * @param  int   $w
+     * @param  int   $dashLen
+     * @param  int   $dashGap
      * @throws Exception
      * @return Svg
      */
-    public function border(array $color, $w)
+    public function border(array $color, $w, $dashLen = null, $dashGap = null)
     {
         if (count($color) != 3) {
             throw new Exception('The color parameter must be an array of 3 integers.');
@@ -226,8 +53,8 @@ class Svg implements EffectInterface
 
         $rect->addAttribute('stroke', 'rgb(' . $color[0] . ',' . $color[1] . ',' . $color[2] . ')');
         $rect->addAttribute('stroke-width', ($w * 2) . $this->image->getUnits());
-        if ((null !== $this->strokeDashLength) && (null !== $this->strokeDashGap)) {
-            $rect->addAttribute('stroke-dasharray', $this->strokeDashLength . $this->image->getUnits() . ',' . $this->strokeDashGap . $this->image->getUnits());
+        if ((null !== $dashLen) && (null !== $dashGap)) {
+            $rect->addAttribute('stroke-dasharray', $dashLen . $this->image->getUnits() . ',' . $dashGap . $this->image->getUnits());
         }
 
         $rect->addAttribute('fill', 'none');
