@@ -35,18 +35,6 @@ class Svg implements EffectInterface
     protected $image = null;
 
     /**
-     * SVG image available gradients
-     * @var array
-     */
-    protected $gradients = [];
-
-    /**
-     * Current gradient to use.
-     * @var int
-     */
-    protected $curGradient = null;
-
-    /**
      * Opacity
      * @var int
      */
@@ -62,7 +50,7 @@ class Svg implements EffectInterface
      * Stroke color
      * @var array
      */
-    protected $strokeColor = [0, 0, 0];
+    protected $strokeColor = null;
 
     /**
      * Stroke width
@@ -272,34 +260,17 @@ class Svg implements EffectInterface
      *
      * @param  array $color1
      * @param  array $color2
-     * @param  int   $opacity
+     * @param  float $opacity
      * @throws Exception
      * @return Svg
      */
-    public function radialGradient(array $color1, array $color2, $opacity = 1)
+    public function radialGradient(array $color1, array $color2, $opacity = 1.0)
     {
         if ((count($color1) != 3) || (count($color2) != 3)) {
             throw new Exception('The color parameters must be arrays of 3 integers.');
         }
 
-        $this->curGradient = count($this->gradients);
-        $defs = $this->image->resource()->addChild('defs');
-
-        $grad = $defs->addChild('radialGradient');
-        $grad->addAttribute('id', 'grad' . $this->curGradient);
-        $grad->addAttribute('cx', '50%');
-        $grad->addAttribute('cy', '50%');
-        $grad->addAttribute('r', '50%');
-        $grad->addAttribute('fx', '50%');
-        $grad->addAttribute('fy', '50%');
-
-        $stop1 = $grad->addChild('stop');
-        $stop1->addAttribute('offset', '0%');
-        $stop1->addAttribute('style', 'stop-color: ' . 'rgb(' . $color1[0] . ',' . $color1[1] . ',' . $color1[2] . ')' . '; stop-opacity: ' . $opacity . ';');
-
-        $stop2 = $grad->addChild('stop');
-        $stop2->addAttribute('offset', '100%');
-        $stop2->addAttribute('style', 'stop-color: ' . 'rgb(' . $color2[0] . ',' . $color2[1] . ',' . $color2[2] . ')' . '; stop-opacity: ' . $opacity . ';');
+        $this->image->addRadialGradient($color1, $color2, $opacity);
 
         $rect = $this->image->resource()->addChild('rect');
         $rect->addAttribute('x', '0' . $this->image->getUnits());
@@ -307,7 +278,7 @@ class Svg implements EffectInterface
         $rect->addAttribute('width', $this->image->getWidth());
         $rect->addAttribute('height', $this->image->getHeight());
 
-        $rect->addAttribute('fill', 'url(#grad' . $this->curGradient . ')');
+        $rect->addAttribute('fill', 'url(#grad' . $this->image->getCurGradient() . ')');
 
         return $this;
     }
@@ -315,25 +286,27 @@ class Svg implements EffectInterface
     /**
      * Flood the image with a vertical color gradient.
      *
-     * @param  array   $color1
-     * @param  array   $color2
+     * @param  array $color1
+     * @param  array $color2
+     * @param  float $opacity
      * @return Gd
      */
-    public function verticalGradient(array $color1, array $color2)
+    public function verticalGradient(array $color1, array $color2, $opacity = 1.0)
     {
-        return $this->linearGradient($color1, $color2, true);
+        return $this->linearGradient($color1, $color2, $opacity, true);
     }
 
     /**
      * Flood the image with a vertical color gradient.
      *
-     * @param  array   $color1
-     * @param  array   $color2
+     * @param  array $color1
+     * @param  array $color2
+     * @param  float $opacity
      * @return Gd
      */
-    public function horizontalGradient(array $color1, array $color2)
+    public function horizontalGradient(array $color1, array $color2, $opacity = 1.0)
     {
-        return $this->linearGradient($color1, $color2, false);
+        return $this->linearGradient($color1, $color2, $opacity, false);
     }
 
     /**
@@ -341,15 +314,31 @@ class Svg implements EffectInterface
      *
      * @param  array   $color1
      * @param  array   $color2
+     * @param  float   $opacity
      * @param  boolean $vertical
      * @throws Exception
      * @return Gd
      */
-    public function linearGradient(array $color1, array $color2, $vertical = true)
+    public function linearGradient(array $color1, array $color2, $opacity = 1.0, $vertical = true)
     {
         if ((count($color1) != 3) || (count($color2) != 3)) {
             throw new Exception('The color parameters must be arrays of 3 integers.');
         }
+
+        if ($vertical) {
+            $this->image->addLinearGradient($color1, $color2, $opacity, true);
+        } else {
+            $this->image->addLinearGradient($color1, $color2, $opacity, false);
+        }
+
+        $rect = $this->image->resource()->addChild('rect');
+        $rect->addAttribute('x', '0' . $this->image->getUnits());
+        $rect->addAttribute('y', '0' . $this->image->getUnits());
+        $rect->addAttribute('width', $this->image->getWidth());
+        $rect->addAttribute('height', $this->image->getHeight());
+
+        $rect->addAttribute('fill', 'url(#grad' . $this->image->getCurGradient() . ')');
+
         return $this;
     }
 

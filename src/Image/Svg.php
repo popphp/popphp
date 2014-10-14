@@ -151,18 +151,6 @@ class Svg
     protected $curGradient = null;
 
     /**
-     * SVG image available clipping paths
-     * @var array
-     */
-    protected $clippingPaths = [];
-
-    /**
-     * Current clipping path to use.
-     * @var int
-     */
-    protected $curClippingPath = null;
-
-    /**
      * SVG image color opacity
      * @var float
      */
@@ -371,6 +359,7 @@ class Svg
     {
         return $this->height;
     }
+
     /**
      * Get the SVG image units.
      *
@@ -379,6 +368,125 @@ class Svg
     public function getUnits()
     {
         return $this->units;
+    }
+
+    /**
+     * Add a gradient
+     *
+     * @param  array  $color1
+     * @param  array  $color2
+     * @param  float  $opacity
+     * @return Svg
+     */
+    public function addRadialGradient(array $color1, array $color2, $opacity = 1.0)
+    {
+        $this->curGradient = count($this->gradients);
+        $this->gradients[] = $this->curGradient;
+        $defs = $this->resource->addChild('defs');
+
+        $grad = $defs->addChild('radialGradient');
+        $grad->addAttribute('id', 'grad' . $this->curGradient);
+        $grad->addAttribute('cx', '50%');
+        $grad->addAttribute('cy', '50%');
+        $grad->addAttribute('r', '50%');
+        $grad->addAttribute('fx', '50%');
+        $grad->addAttribute('fy', '50%');
+
+        $stop1 = $grad->addChild('stop');
+        $stop1->addAttribute('offset', '0%');
+        $stop1->addAttribute('style', 'stop-color: rgb(' . $color1[0] . ',' . $color1[1] . ',' . $color1[2] . '); stop-opacity: ' . $opacity . ';');
+
+        $stop2 = $grad->addChild('stop');
+        $stop2->addAttribute('offset', '100%');
+        $stop2->addAttribute('style', 'stop-color: rgb(' . $color2[0] . ',' . $color2[1] . ',' . $color2[2] . '); stop-opacity: ' . $opacity . ';');
+
+        return $this;
+    }
+
+    /**
+     * Add a gradient
+     *
+     * @param  array   $color1
+     * @param  array   $color2
+     * @param  float   $opacity
+     * @param  boolean $vertical
+     * @return Svg
+     */
+    public function addLinearGradient(array $color1, array $color2, $opacity = 1.0, $vertical = true)
+    {
+        $this->curGradient = count($this->gradients);
+        $this->gradients[] = $this->curGradient;
+        $defs = $this->resource->addChild('defs');
+
+        if ($vertical) {
+            $grad = $defs->addChild('linearGradient');
+            $grad->addAttribute('id', 'grad' . $this->curGradient);
+            $grad->addAttribute('x1', '0%');
+            $grad->addAttribute('y1', '0%');
+            $grad->addAttribute('x2', '0%');
+            $grad->addAttribute('y2', '100%');
+        } else {
+            $grad = $defs->addChild('linearGradient');
+            $grad->addAttribute('id', 'grad' . $this->curGradient);
+            $grad->addAttribute('x1', '0%');
+            $grad->addAttribute('y1', '0%');
+            $grad->addAttribute('x2', '100%');
+            $grad->addAttribute('y2', '0%');
+        }
+
+        $stop1 = $grad->addChild('stop');
+        $stop1->addAttribute('offset', '0%');
+        $stop1->addAttribute('style', 'stop-color: rgb(' . $color1[0] . ',' . $color1[1] . ',' . $color1[2] . '); stop-opacity: ' . $opacity . ';');
+
+        $stop2 = $grad->addChild('stop');
+        $stop2->addAttribute('offset', '100%');
+        $stop2->addAttribute('style', 'stop-color: rgb(' . $color2[0] . ',' . $color2[1] . ',' . $color2[2] . '); stop-opacity: ' . $opacity . ';');
+
+        return $this;
+    }
+
+    /**
+     * Get the gradients
+     *
+     * @return array
+     */
+    public function getGradients()
+    {
+        return $this->gradients;
+    }
+
+    /**
+     * Get the number of gradients
+     *
+     * @return int
+     */
+    public function getNumberOfGradients()
+    {
+        return count($this->gradients);
+    }
+
+    /**
+     * Get the current gradient index
+     *
+     * @return mixed
+     */
+    public function getCurGradient()
+    {
+        return $this->curGradient;
+    }
+
+    /**
+     * Get the current gradient index
+     *
+     * @param  mixed $grad
+     * @return Svg
+     */
+    public function setCurGradient($grad)
+    {
+        if (in_array($grad, $this->gradients) || (null === $grad)) {
+            $this->curGradient = $grad;
+        }
+        return $this;
     }
 
     /**
@@ -444,9 +552,7 @@ class Svg
 
         $this->output = $dom->saveXML();
 
-        $saveTo = ((null === $to) ? $this->fullpath : $to);
-
-        file_put_contents($saveTo, $this->output);
+        file_put_contents(((null === $to) ? $this->fullpath : $to), $this->output);
     }
 
     /**
