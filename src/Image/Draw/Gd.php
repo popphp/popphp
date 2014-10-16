@@ -16,7 +16,7 @@
 namespace Pop\Image\Draw;
 
 /**
- * Image class
+ * Draw class for Gd
  *
  * @category   Pop
  * @package    Pop_Image

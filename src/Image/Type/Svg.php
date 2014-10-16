@@ -16,7 +16,7 @@
 namespace Pop\Image\Type;
 
 /**
- * Image class
+ * Type class for Svg
  *
  * @category   Pop
  * @package    Pop_Image

@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Filter;
+namespace Pop\Image\Factory;
 
 /**
- * Filter interface
+ * Abstract factory class
  *
  * @category   Pop
  * @package    Pop_Image
@@ -25,7 +25,25 @@ namespace Pop\Image\Filter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-interface FilterInterface
+abstract class AbstractFactory implements FactoryInterface
 {
+
+    /**
+     * Load an existing image as a resource and return the image object
+     *
+     * @param  string $image
+     * @return mixed
+     */
+    abstract public function load($image);
+
+    /**
+     * Create a new image resource and return the image object
+     *
+     * @param  int    $width
+     * @param  int    $height
+     * @param  string $image
+     * @return mixed
+     */
+    abstract public function create($width, $height, $image = null);
 
 }

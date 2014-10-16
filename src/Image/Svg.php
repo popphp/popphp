@@ -16,7 +16,7 @@
 namespace Pop\Image;
 
 /**
- * SVG image class
+ * SVG image adapter class
  *
  * @category   Pop
  * @package    Pop_Image

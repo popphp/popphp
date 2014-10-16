@@ -16,7 +16,7 @@
 namespace Pop\Image\Draw;
 
 /**
- * Image exception class
+ * Draw exception class
  *
  * @category   Pop
  * @package    Pop_Image

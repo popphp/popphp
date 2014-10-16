@@ -16,7 +16,7 @@
 namespace Pop\Image;
 
 /**
- * Abstract image class
+ * Abstract raster image class
  *
  * @category   Pop
  * @package    Pop_Image

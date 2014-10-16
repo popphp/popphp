@@ -16,7 +16,7 @@
 namespace Pop\Image;
 
 /**
- * Image interface
+ * Raster image interface
  *
  * @category   Pop
  * @package    Pop_Image

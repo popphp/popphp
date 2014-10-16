@@ -16,7 +16,7 @@
 namespace Pop\Image\Adjust;
 
 /**
- * Image class
+ * Adjust class for Imagick
  *
  * @category   Pop
  * @package    Pop_Image

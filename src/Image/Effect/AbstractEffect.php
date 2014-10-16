@@ -16,7 +16,7 @@
 namespace Pop\Image\Effect;
 
 /**
- * Image class
+ * Abstract effect class
  *
  * @category   Pop
  * @package    Pop_Image

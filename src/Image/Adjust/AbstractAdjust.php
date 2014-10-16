@@ -16,7 +16,7 @@
 namespace Pop\Image\Adjust;
 
 /**
- * Image class
+ * Adjust abstract class
  *
  * @category   Pop
  * @package    Pop_Image

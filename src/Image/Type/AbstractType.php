@@ -16,7 +16,7 @@
 namespace Pop\Image\Type;
 
 /**
- * Image class
+ * Type abstract class
  *
  * @category   Pop
  * @package    Pop_Image

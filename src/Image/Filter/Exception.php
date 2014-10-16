@@ -16,7 +16,7 @@
 namespace Pop\Image\Filter;
 
 /**
- * Image exception class
+ * Filter exception class
  *
  * @category   Pop
  * @package    Pop_Image

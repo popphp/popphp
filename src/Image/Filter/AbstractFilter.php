@@ -16,7 +16,7 @@
 namespace Pop\Image\Filter;
 
 /**
- * Image class
+ * Abstract filter class
  *
  * @category   Pop
  * @package    Pop_Image

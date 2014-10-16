@@ -16,7 +16,7 @@
 namespace Pop\Image\Layer;
 
 /**
- * Image class
+ * Layer class for Gd
  *
  * @category   Pop
  * @package    Pop_Image

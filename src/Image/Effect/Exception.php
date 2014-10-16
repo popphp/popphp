@@ -16,7 +16,7 @@
 namespace Pop\Image\Effect;
 
 /**
- * Image exception class
+ * Effect exception class
  *
  * @category   Pop
  * @package    Pop_Image

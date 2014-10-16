@@ -16,7 +16,7 @@
 namespace Pop\Image\Effect;
 
 /**
- * Image class
+ * Effect class for Gmagick
  *
  * @category   Pop
  * @package    Pop_Image

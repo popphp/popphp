@@ -16,7 +16,7 @@
 namespace Pop\Image\Filter;
 
 /**
- * Image class
+ * Filter class for Gmagick
  *
  * @category   Pop
  * @package    Pop_Image

@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Filter;
+namespace Pop\Image\Factory;
 
 /**
- * Filter interface
+ * GD image factory class
  *
  * @category   Pop
  * @package    Pop_Image
@@ -25,7 +25,31 @@ namespace Pop\Image\Filter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-interface FilterInterface
+class Gd extends AbstractFactory
 {
+
+    /**
+     * Load an existing image as a resource and return the Gd image object
+     *
+     * @param  string $image
+     * @return \Pop\Image\Gd
+     */
+    public function load($image)
+    {
+        return new \Pop\Image\Gd($image);
+    }
+
+    /**
+     * Create a new image resource and return the Gd image object
+     *
+     * @param  int    $width
+     * @param  int    $height
+     * @param  string $image
+     * @return \Pop\Image\Gd
+     */
+    public function create($width, $height, $image = null)
+    {
+        return new \Pop\Image\Gd($width, $height, $image);
+    }
 
 }

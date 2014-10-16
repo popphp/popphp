@@ -16,7 +16,7 @@
 namespace Pop\Image\Type;
 
 /**
- * Image class
+ * Type class for Gmagick
  *
  * @category   Pop
  * @package    Pop_Image

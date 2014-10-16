@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Adjust;
+namespace Pop\Image\Factory;
 
 /**
- * Adjust class for Gd
+ * Gmagick image factory class
  *
  * @category   Pop
  * @package    Pop_Image
@@ -25,42 +25,31 @@ namespace Pop\Image\Adjust;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Gd extends AbstractAdjust
+class Gmagick extends AbstractFactory
 {
 
     /**
-     * Adjust the image brightness
+     * Load an existing image as a resource and return the Gmagick image object
      *
-     * @param  int $amount
-     * @return Gd
+     * @param  string $image
+     * @return \Pop\Image\Gmagick
      */
-    public function brightness($amount)
+    public function load($image)
     {
-        imagefilter($this->image->resource(), IMG_FILTER_BRIGHTNESS, $amount);
-        return $this;
+        return new \Pop\Image\Gmagick($image);
     }
 
     /**
-     * Adjust the image contrast
+     * Create a new image resource and return the Gmagick image object
      *
-     * @param  int $amount
-     * @return Gd
+     * @param  int    $width
+     * @param  int    $height
+     * @param  string $image
+     * @return \Pop\Image\Gmagick
      */
-    public function contrast($amount)
+    public function create($width, $height, $image = null)
     {
-        imagefilter($this->image->resource(), IMG_FILTER_CONTRAST, (0 - $amount));
-        return $this;
-    }
-
-    /**
-     * Adjust the image desaturate
-     *
-     * @return Gd
-     */
-    public function desaturate()
-    {
-        imagefilter($this->image->resource(), IMG_FILTER_GRAYSCALE);
-        return $this;
+        return new \Pop\Image\Gmagick($width, $height, $image);
     }
 
 }

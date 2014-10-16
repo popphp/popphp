@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Image\Filter;
+namespace Pop\Image\Factory;
 
 /**
- * Filter interface
+ * Factory interface
  *
  * @category   Pop
  * @package    Pop_Image
@@ -25,7 +25,25 @@ namespace Pop\Image\Filter;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-interface FilterInterface
+interface FactoryInterface
 {
+
+    /**
+     * Load an existing image as a resource and return the image object
+     *
+     * @param  string $image
+     * @return mixed
+     */
+    public function load($image);
+
+    /**
+     * Create a new image resource and return the image object
+     *
+     * @param  int    $width
+     * @param  int    $height
+     * @param  string $image
+     * @return mixed
+     */
+    public function create($width, $height, $image = null);
 
 }

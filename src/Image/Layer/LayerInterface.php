@@ -16,7 +16,7 @@
 namespace Pop\Image\Layer;
 
 /**
- * Image class
+ * Layer interface
  *
  * @category   Pop
  * @package    Pop_Image

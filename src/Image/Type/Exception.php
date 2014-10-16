@@ -16,7 +16,7 @@
 namespace Pop\Image\Type;
 
 /**
- * Image exception class
+ * Type exception class
  *
  * @category   Pop
  * @package    Pop_Image

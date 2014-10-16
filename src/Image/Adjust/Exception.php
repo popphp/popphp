@@ -16,7 +16,7 @@
 namespace Pop\Image\Adjust;
 
 /**
- * Image exception class
+ * Adjust exception class
  *
  * @category   Pop
  * @package    Pop_Image

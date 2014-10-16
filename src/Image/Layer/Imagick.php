@@ -16,7 +16,7 @@
 namespace Pop\Image\Layer;
 
 /**
- * Image class
+ * Layer class for Imagick
  *
  * @category   Pop
  * @package    Pop_Image

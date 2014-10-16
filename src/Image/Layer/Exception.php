@@ -16,7 +16,7 @@
 namespace Pop\Image\Layer;
 
 /**
- * Image exception class
+ * Layer exception class
  *
  * @category   Pop
  * @package    Pop_Image

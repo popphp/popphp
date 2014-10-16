@@ -16,7 +16,7 @@
 namespace Pop\Image\Draw;
 
 /**
- * Image class
+ * Draw class for Gmagick
  *
  * @category   Pop
  * @package    Pop_Image
