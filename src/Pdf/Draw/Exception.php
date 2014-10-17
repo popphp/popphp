@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font\TrueType\Table;
+namespace Pop\Pdf\Draw;
 
 /**
- * MAXP table class
+ * Pdf draw exception class
  *
  * @category   Pop
  * @package    Pop_Pdf
@@ -25,28 +25,4 @@ namespace Pop\Pdf\Font\TrueType\Table;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Maxp
-{
-
-    /**
-     * Number of glyphs
-     * @var int
-     */
-    public $numberOfGlyphs = 0;
-
-    /**
-     * Constructor
-     *
-     * Instantiate a TTF 'maxp' table object.
-     *
-     * @param  \Pop\Pdf\Font\TrueType $font
-     * @return Maxp
-     */
-    public function __construct(\Pop\Pdf\Font\TrueType $font)
-    {
-        $bytePos = $font->tableInfo['maxp']->offset + 4;
-        $ary     = unpack('nnumberOfGlyphs/', $font->read($bytePos, 2));
-        $this->numberOfGlyphs = $ary['numberOfGlyphs'];
-    }
-
-}
+class Exception extends \Exception {}

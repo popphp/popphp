@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font\TrueType\Table;
+namespace Pop\Pdf\Type\Font\TrueType\Table;
 
 /**
  * HEAD table class
@@ -39,10 +39,10 @@ class Head
      *
      * Instantiate a TTF 'head' table object.
      *
-     * @param  \Pop\Pdf\Font\TrueType $font
+     * @param  \Pop\Pdf\Type\Font\TrueType $font
      * @return Head
      */
-    public function __construct(\Pop\Pdf\Font\TrueType $font)
+    public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['head']->offset;
 

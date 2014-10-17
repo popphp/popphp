@@ -56,13 +56,13 @@ class Info
      * PDF info creation date
      * @var string
      */
-    public $create_date = null;
+    public $createDate = null;
 
     /**
      * PDF info mod date
      * @var string
      */
-    public $mod_date = null;
+    public $modDate = null;
 
     /**
      * PDF info object data
@@ -82,8 +82,8 @@ class Info
     {
         // Use default settings for a new PDF object and its info object.
         if (null === $str) {
-            $this->create_date = date('D, M j, Y h:i A');
-            $this->mod_date = date('D, M j, Y h:i A');
+            $this->createDate = date('D, M j, Y h:i A');
+            $this->modDate = date('D, M j, Y h:i A');
             $this->data = "3 0 obj\n<</Creator(Pop PDF)/CreationDate([{pdf_create_date}])/ModDate([{pdf_mod_date}])/Author([{pdf_author}])/Title([{pdf_title}])/Subject([{pdf_subject}])/Producer(Pop PDF)>>\nendobj\n";
         } else {
             // Else, determine the info object index.
@@ -107,7 +107,7 @@ class Info
                 $dt = substr($dt, 0, strpos($dt, ')'));
                 $dt =  str_replace('(', '', $dt);
                 $str =  str_replace($dt, '[{pdf_create_date}]', $str);
-                $this->create_date = $dt;
+                $this->createDate = $dt;
             } else {
                 $str =  str_replace('>>', '/CreationDate([{pdf_create_date}])>>', $str);
             }
@@ -119,7 +119,7 @@ class Info
                 $dt = substr($dt, 0, strpos($dt, ')'));
                 $dt =  str_replace('(', '', $dt);
                 $str =  str_replace($dt, '[{pdf_mod_date}]', $str);
-                $this->mod_date = $dt;
+                $this->modDate = $dt;
             } else {
                 $str =  str_replace('>>', '/ModDate([{pdf_mod_date}])>>', $str);
             }
@@ -183,16 +183,16 @@ class Info
     public function __toString()
     {
         // Set the CreationDate and the ModDate if they are null.
-        if (null === $this->create_date) {
-            $this->create_date = date('D, M j, Y h:i A');
+        if (null === $this->createDate) {
+            $this->createDate = date('D, M j, Y h:i A');
         }
-        if (null === $this->mod_date) {
-            $this->mod_date = date('D, M j, Y h:i A');
+        if (null === $this->modDate) {
+            $this->modDate = date('D, M j, Y h:i A');
         }
 
         // Swap out the placeholders.
-        $data = str_replace('[{pdf_mod_date}]', $this->mod_date, $this->data);
-        $data = str_replace('[{pdf_create_date}]', $this->create_date, $data);
+        $data = str_replace('[{pdf_mod_date}]', $this->modDate, $this->data);
+        $data = str_replace('[{pdf_create_date}]', $this->createDate, $data);
         $data = str_replace('[{pdf_author}]', $this->author, $data);
         $data = str_replace('[{pdf_title}]', $this->title, $data);
         $data = str_replace('[{pdf_subject}]', $this->subject, $data);

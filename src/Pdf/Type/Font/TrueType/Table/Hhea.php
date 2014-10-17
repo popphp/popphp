@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font\TrueType\Table;
+namespace Pop\Pdf\Type\Font\TrueType\Table;
 
 /**
  * HHEA table class
@@ -51,10 +51,10 @@ class Hhea
      *
      * Instantiate a TTF 'hhea' table object.
      *
-     * @param  \Pop\Pdf\Font\TrueType $font
+     * @param  \Pop\Pdf\Type\Font\TrueType $font
      * @return Hhea
      */
-    public function __construct(\Pop\Pdf\Font\TrueType $font)
+    public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['hhea']->offset + 4;
 

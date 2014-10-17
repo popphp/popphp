@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font\TrueType;
+namespace Pop\Pdf\Type\Font\TrueType;
 
 /**
  * OpenType font class
@@ -25,7 +25,7 @@ namespace Pop\Pdf\Font\TrueType;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class OpenType extends \Pop\Pdf\Font\TrueType
+class OpenType extends \Pop\Pdf\Type\Font\TrueType
 {
 
     /**

@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font\TrueType\Table;
+namespace Pop\Pdf\Type\Font\TrueType\Table;
 
 /**
  * OS/2 table class
@@ -51,10 +51,10 @@ class Os2
      *
      * Instantiate a OTF 'OS/2' table object.
      *
-     * @param  \Pop\Pdf\Font\TrueType $font
+     * @param  \Pop\Pdf\Type\Font\TrueType $font
      * @return Os2
      */
-    public function __construct(\Pop\Pdf\Font\TrueType $font)
+    public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
         $this->flags = new \ArrayObject([
             'isFixedPitch'  => false,

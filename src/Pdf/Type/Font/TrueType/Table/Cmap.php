@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font\TrueType\Table;
+namespace Pop\Pdf\Type\Font\TrueType\Table;
 
 /**
  * CMAP table class
@@ -45,10 +45,10 @@ class Cmap
      *
      * Instantiate a TTF 'cmap' table object.
      *
-     * @param  \Pop\Pdf\Font\TrueType $font
+     * @param  \Pop\Pdf\Type\Font\TrueType $font
      * @return Cmap
      */
-    public function __construct(\Pop\Pdf\Font\TrueType $font)
+    public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['cmap']->offset;
 
@@ -65,10 +65,10 @@ class Cmap
     /**
      * Method to parse the CMAP sub-tables.
      *
-     * @param  \Pop\Pdf\Font\TrueType $font
+     * @param  \Pop\Pdf\Type\Font\TrueType $font
      * @return void
      */
-    protected function parseSubTables(\Pop\Pdf\Font\TrueType $font)
+    protected function parseSubTables(\Pop\Pdf\Type\Font\TrueType $font)
     {
         $bytePos = $font->tableInfo['cmap']->offset + 4;
 

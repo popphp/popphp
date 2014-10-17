@@ -82,7 +82,7 @@ class Object
      * Instantiate a PDF object.
      *
      * @param  int|string $i
-     * @return Object
+     * @return \Pop\Pdf\Object\Object
      */
     public function __construct($i)
     {
@@ -132,7 +132,8 @@ class Object
         $stream = (null !== $this->stream) ? "stream" . $this->stream . "endstream\n" : '';
 
         // Set up the Length definition.
-        if ((strpos($this->def, '/Length ') !== false) && (strpos($this->def, '/Length1') === false) && (strpos($this->def, '/Image') === false)) {
+        if ((strpos($this->def, '/Length ') !== false) && (strpos($this->def, '/Length1') === false) &&
+            (strpos($this->def, '/Image') === false)) {
             preg_match('/\/Length\s\d*/', $this->def, $matches);
             if (isset($matches[0])) {
                 $len = $matches[0];
@@ -145,7 +146,9 @@ class Object
         }
 
         // Calculate the byte length of the content stream and swap out the placeholders.
-        $byteLength = (($this->compress) && (function_exists('gzcompress')) && (strpos($this->def, ' /Image') === false) && (strpos($this->def, '/FlateDecode') === false)) ? $this->calcByteLength($this->stream) . " /Filter /FlateDecode" : $this->calcByteLength($this->stream);
+        $byteLength = (($this->compress) && (function_exists('gzcompress')) && (strpos($this->def, ' /Image') === false) &&
+            (strpos($this->def, '/FlateDecode') === false)) ?
+            $this->calcByteLength($this->stream) . " /Filter /FlateDecode" : $this->calcByteLength($this->stream);
         $data = str_replace('[{obj_index}]', $this->index, $this->data);
         $data = str_replace('[{obj_stream}]', $stream, $data);
         $data = str_replace('[{obj_def}]', $this->def, $data);

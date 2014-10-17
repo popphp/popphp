@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font\TrueType\Table\Cmap;
+namespace Pop\Pdf\Type;
 
 /**
- * CMAP byte-encoding class
+ * Pdf draw exception class
  *
  * @category   Pop
  * @package    Pop_Pdf
@@ -25,28 +25,4 @@ namespace Pop\Pdf\Font\TrueType\Table\Cmap;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class ByteEncoding
-{
-
-    /**
-     * Method to parse the Byte Encoding (Format 0) CMAP data
-     *
-     * @param  string $data
-     * @return array
-     */
-    public static function parseData($data)
-    {
-        $ary = array();
-
-        for ($i = 0; $i < strlen($data); $i++) {
-            $ary[$i] = new \ArrayObject(array(
-                'hex'   => bin2hex($data[$i]),
-                'ascii' => ord($data[$i]),
-                'char'  => chr(ord($data[$i]))
-            ), \ArrayObject::ARRAY_AS_PROPS);
-        }
-
-        return $ary;
-    }
-
-}
+class Exception extends \Exception {}

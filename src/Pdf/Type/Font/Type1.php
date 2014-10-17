@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font;
+namespace Pop\Pdf\Type\Font;
 
 /**
  * Type1 font class

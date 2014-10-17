@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font\TrueType\Table;
+namespace Pop\Pdf\Type\Font\TrueType\Table;
 
 /**
  * NAME table class
@@ -65,10 +65,10 @@ class Name
      *
      * Instantiate a TTF 'name' table object.
      *
-     * @param  \Pop\Pdf\Font\TrueType $font
+     * @param  \Pop\Pdf\Type\Font\TrueType $font
      * @return Name
      */
-    public function __construct(\Pop\Pdf\Font\TrueType $font)
+    public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
         $font->tableInfo['name']->header = new \ArrayObject(
             unpack(

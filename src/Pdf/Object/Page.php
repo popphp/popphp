@@ -349,8 +349,8 @@ class Page
     public function __toString()
     {
         // Format the content objects.
-        $content_objs = implode(" 0 R ", $this->content);
-        $content_objs .= " 0 R";
+        $contentObjs = implode(" 0 R ", $this->content);
+        $contentObjs .= " 0 R";
 
         // Format the annotations.
         if (count($this->annots) > 0) {
@@ -401,7 +401,7 @@ class Page
             $obj = str_replace('[{fonts}]', $fonts, $obj);
         }
 
-        $obj = str_replace('[{content_objects}]', $content_objs, $obj);
+        $obj = str_replace('[{content_objects}]', $contentObjs, $obj);
 
         return $obj;
     }

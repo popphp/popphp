@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font\TrueType\Table\Cmap;
+namespace Pop\Pdf\Type\Font\TrueType\Table\Cmap;
 
 /**
- * CMAP trimmed-table class
+ * Font true type CMAP table exception class
  *
  * @category   Pop
  * @package    Pop_Pdf
@@ -25,32 +25,4 @@ namespace Pop\Pdf\Font\TrueType\Table\Cmap;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class TrimmedTable
-{
-
-    /**
-     * Method to parse the Trimmed Table (Format 6) CMAP data
-     *
-     * @param  string $data
-     * @return array
-     */
-    public static function parseData($data)
-    {
-        $ary = unpack(
-            'nfirstCode/' .
-            'nentryCount', substr($data, 0, 4)
-        );
-
-        $ary['glyphId'] = array();
-
-        $bytePos = 4;
-        for ($i = 0; $i < $ary['entryCount']; $i++) {
-            $ar = unpack('nglyphIndex', substr($data, $bytePos, 2));
-            $ary['glyphId'][$i] = $ar['glyphIndex'];
-            $bytePos += 2;
-        }
-
-        return $ary;
-    }
-
-}
+class Exception extends \Exception {}

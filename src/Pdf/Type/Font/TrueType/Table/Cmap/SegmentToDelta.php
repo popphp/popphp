@@ -13,7 +13,7 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Font\TrueType\Table\Cmap;
+namespace Pop\Pdf\Type\Font\TrueType\Table\Cmap;
 
 /**
  * CMAP segment-to-delta table class

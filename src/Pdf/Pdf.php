@@ -70,7 +70,7 @@ class Pdf
      * Current PDF page.
      * @var int
      */
-    protected $curPage = null;
+    protected $currentPage = null;
 
     /**
      * PDF text parameters.
@@ -284,13 +284,13 @@ class Pdf
     public function import($pdf, $pg = null)
     {
         // Create a new PDF Import object.
-        $pdfi = new Import($pdf, $pg);
+        $import = new Import($pdf, $pg);
 
         // Shift the imported objects indices based on existing indices in this PDF.
-        $pdfi->shiftObjects(($this->lastIndex($this->objects) + 1));
+        $import->shiftObjects(($this->lastIndex($this->objects) + 1));
 
         // Fetch the imported objects.
-        $importedObjs = $pdfi->returnObjects($this->parent);
+        $importedObjs = $import->returnObjects($this->parent);
 
         // Loop through the imported objects, adding the pages or objects as applicable.
         foreach($importedObjs as $key => $value) {
@@ -299,8 +299,8 @@ class Pdf
                 $this->objects[$key] = new Object\Page($value['data']);
 
                 // Finalize related page variables and objects.
-                $this->curPage = (null === $this->curPage) ? 0 : ($this->lastIndex($this->pages) + 1);
-                $this->pages[$this->curPage] = $key;
+                $this->currentPage = (null === $this->currentPage) ? 0 : ($this->lastIndex($this->pages) + 1);
+                $this->pages[$this->currentPage] = $key;
                 $this->objects[$this->parent]->count += 1;
             } else {
                 // Else, add the content object.
@@ -308,7 +308,7 @@ class Pdf
             }
         }
 
-        foreach ($pdfi->pages as $value) {
+        foreach ($import->getPages() as $value) {
             $this->objects[$this->parent]->kids[] = $value;
         }
 
@@ -339,8 +339,8 @@ class Pdf
         $this->objects[$ci] = new Object\Object($ci);
 
         // Finalize related page variables and objects.
-        $this->curPage = (null === $this->curPage) ? 0 : ($this->lastIndex($this->pages) + 1);
-        $this->pages[$this->curPage] = $pi;
+        $this->currentPage = (null === $this->currentPage) ? 0 : ($this->lastIndex($this->pages) + 1);
+        $this->pages[$this->currentPage] = $pi;
         $this->objects[$this->parent]->count += 1;
         $this->objects[$this->parent]->kids[] = $pi;
 
@@ -379,8 +379,8 @@ class Pdf
         }
 
         // Finalize related page variables and objects.
-        $this->curPage = (null === $this->curPage) ? 0 : ($this->lastIndex($this->pages) + 1);
-        $this->pages[$this->curPage] = $pi;
+        $this->currentPage = (null === $this->currentPage) ? 0 : ($this->lastIndex($this->pages) + 1);
+        $this->pages[$this->currentPage] = $pi;
         $this->objects[$this->parent]->count += 1;
         $this->objects[$this->parent]->kids[] = $pi;
 
@@ -407,11 +407,11 @@ class Pdf
         // Determine the page index and related data.
         $pi = $this->pages[$key];
         $ki =  array_search($pi, $this->objects[$this->parent]->kids);
-        $content_objs = $this->objects[$pi]->content;
+        $contentObjs = $this->objects[$pi]->content;
 
         // Remove the page's content objects.
-        if (count($content_objs) != 0) {
-            foreach ($content_objs as $value) {
+        if (count($contentObjs) != 0) {
+            foreach ($contentObjs as $value) {
                 unset($this->objects[$value]);
             }
         }
@@ -484,9 +484,9 @@ class Pdf
      *
      * @return int
      */
-    public function curPage()
+    public function getCurrentPage()
     {
-        return ($this->curPage + 1);
+        return ($this->currentPage + 1);
     }
 
     /**
@@ -494,7 +494,7 @@ class Pdf
      *
      * @return int
      */
-    public function numPages()
+    public function getNumberOfPages()
     {
         return count($this->pages);
     }
@@ -535,9 +535,9 @@ class Pdf
      * @param  boolean $comp
      * @return Pdf
      */
-    public function setCompression($comp = false)
+    public function setCompression($comp)
     {
-        $this->compress = $comp;
+        $this->compress = (bool)$comp;
         return $this;
     }
 
@@ -556,7 +556,7 @@ class Pdf
         if (!array_key_exists($key, $this->pages)) {
             throw new Exception('Error: That page does not exist.');
         }
-        $this->curPage = $pg - 1;
+        $this->currentPage = $pg - 1;
 
         return $this;
     }
@@ -617,7 +617,7 @@ class Pdf
      */
     public function setCreateDate($dt)
     {
-        $this->objects[$this->info]->create_date = $dt;
+        $this->objects[$this->info]->createDate = $dt;
         return $this;
     }
 
@@ -629,7 +629,7 @@ class Pdf
      */
     public function setModDate($dt)
     {
-        $this->objects[$this->info]->mod_date = $dt;
+        $this->objects[$this->info]->modDate = $dt;
         return $this;
     }
 
@@ -659,8 +659,9 @@ class Pdf
     {
         $this->fillColor = [(int)$r, (int)$g, (int)$b];
 
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n" . $this->convertColor((int)$r) . " " . $this->convertColor((int)$g) . " " . $this->convertColor((int)$b) . " rg\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\n" . $this->convertColor((int)$r) . " " .
+            $this->convertColor((int)$g) . " " . $this->convertColor((int)$b) . " rg\n");
 
         return $this;
     }
@@ -677,8 +678,9 @@ class Pdf
     {
         $this->strokeColor = [(int)$r, (int)$g, (int)$b];
 
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n" . $this->convertColor((int)$r) . " " . $this->convertColor((int)$g) . " " . $this->convertColor((int)$b) . " RG\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\n" . $this->convertColor((int)$r) . " " .
+            $this->convertColor((int)$g) . " " . $this->convertColor((int)$b) . " RG\n");
 
         return $this;
     }
@@ -687,31 +689,31 @@ class Pdf
      * Method to set the width and dash properties of paths in the PDF.
      *
      * @param  int $w
-     * @param  int $dash_len
-     * @param  int $dash_gap
+     * @param  int $dashLength
+     * @param  int $dashGap
      * @return Pdf
      */
-    public function setStrokeWidth($w = null, $dash_len = null, $dash_gap = null)
+    public function setStrokeWidth($w = null, $dashLength = null, $dashGap = null)
     {
         if ((null === $w) || ($w == false) || ($w == 0)) {
-            $this->stroke = false;
-            $this->strokeWidth = null;
+            $this->stroke           = false;
+            $this->strokeWidth      = null;
             $this->strokeDashLength = null;
-            $this->strokeDashGap = null;
+            $this->strokeDashGap    = null;
         } else {
-            $this->stroke = true;
-            $this->strokeWidth = $w;
-            $this->strokeDashLength = $dash_len;
-            $this->strokeDashGap = $dash_gap;
+            $this->stroke           = true;
+            $this->strokeWidth      = $w;
+            $this->strokeDashLength = $dashLength;
+            $this->strokeDashGap    = $dashGap;
 
             // Set stroke to the $w argument, or else default it to 1pt.
-            $new_str = "\n{$w} w\n";
+            $newString = "\n{$w} w\n";
 
             // Set the dash properties of the stroke, or else default it to a solid line.
-            $new_str .= ((null !== $dash_len) && (null !== $dash_gap)) ? "[{$dash_len} {$dash_gap}] 0 d\n" : "[] 0 d\n";
+            $newString .= ((null !== $dashLength) && (null !== $dashGap)) ? "[{$dashLength} {$dashGap}] 0 d\n" : "[] 0 d\n";
 
-            $co_index = $this->getContentObject();
-            $this->objects[$co_index]->setStream($new_str);
+            $coIndex = $this->getContentObject();
+            $this->objects[$coIndex]->setStream($newString);
         }
 
         return $this;
@@ -742,11 +744,11 @@ class Pdf
         }
 
         // Set the text parameters.
-        $this->textParams['c'] = $c;
-        $this->textParams['w'] = $w;
-        $this->textParams['h'] = $h;
-        $this->textParams['v'] = $v;
-        $this->textParams['rot'] = $rot;
+        $this->textParams['c']    = $c;
+        $this->textParams['w']    = $w;
+        $this->textParams['h']    = $h;
+        $this->textParams['v']    = $v;
+        $this->textParams['rot']  = $rot;
         $this->textParams['rend'] = $rend;
 
         return $this;
@@ -764,7 +766,8 @@ class Pdf
     {
         // Embed the font file.
         if (file_exists($font)) {
-            $fontIndex = (count($this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts) == 0) ? 1 : count($this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts) + 1;
+            $fontIndex = (count($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts) == 0) ? 1 :
+                count($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts) + 1;
             $objectIndex = $this->lastIndex($this->objects) + 1;
 
             $fontParser = new Parser\Font($font, $fontIndex, $objectIndex, $this->compress);
@@ -773,7 +776,7 @@ class Pdf
                 throw new Exception('Error: The font license does not allow for it to be embedded.');
             }
 
-            $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts[$fontParser->getFontName()] = $fontParser->getFontRef();
+            $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$fontParser->getFontName()] = $fontParser->getFontRef();
             $fontObjects = $fontParser->getObjects();
 
             foreach ($fontObjects as $key => $value) {
@@ -788,14 +791,15 @@ class Pdf
                 throw new Exception('Error: That font is not contained within the standard PDF fonts.');
             }
             // Set the font index.
-            $ft_index = (count($this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts) == 0) ? 1 : count($this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts) + 1;
+            $fontIndex = (count($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts) == 0) ? 1 :
+                count($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts) + 1;
 
             // Set the font name and the next object index.
-            $f = 'MF' . $ft_index;
+            $f = 'MF' . $fontIndex;
             $i = $this->lastIndex($this->objects) + 1;
 
             // Add the font to the current page's fonts and add the font to _objects array.
-            $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts[$font] = "/{$f} {$i} 0 R";
+            $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font] = "/{$f} {$i} 0 R";
             $this->objects[$i] = new Object\Object("{$i} 0 obj\n<<\n    /Type /Font\n    /Subtype /Type1\n    /Name /{$f}\n    /BaseFont /{$font}\n    /Encoding /WinAnsiEncoding\n>>\nendobj\n\n");
 
             $this->lastFontName = $font;
@@ -836,27 +840,27 @@ class Pdf
 
         foreach ($this->pages as $value) {
             if (array_key_exists($font, $this->objects[$value]->fonts)) {
-                $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts[$font] = $this->objects[$value]->fonts[$font];
-                $fontObj = substr($this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts[$font], 1, (strpos(' ', $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts[$font]) + 3));
+                $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font] = $this->objects[$value]->fonts[$font];
+                $fontObj = substr($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font], 1, (strpos(' ', $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font]) + 3));
                 $fontExists = true;
             }
         }
 
         // If the font does not already exist, add it.
         if (!$fontExists) {
-            if (isset($this->pages[$this->curPage]) &&
-                isset($this->objects[$this->pages[$this->curPage]]) &&
-                isset($this->objects[$this->objects[$this->pages[$this->curPage]]->index]) &&
-                (array_key_exists($font, $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts))) {
-                $fontObj = substr($this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts[$font], 1, (strpos(' ', $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->fonts[$font]) + 3));
+            if (isset($this->pages[$this->currentPage]) &&
+                isset($this->objects[$this->pages[$this->currentPage]]) &&
+                isset($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]) &&
+                (array_key_exists($font, $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts))) {
+                $fontObj = substr($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font], 1, (strpos(' ', $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font]) + 3));
             } else {
                 throw new Exception('Error: The font \'' . $font . '\' has not been added to the PDF.');
             }
         }
 
         // Add the text to the current page's content stream.
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\nBT\n    /{$fontObj} {$size} Tf\n    " . $this->calcTextMatrix() . " {$x} {$y} Tm\n    " . $this->textParams['c'] . " Tc " . $this->textParams['w'] . " Tw " . $this->textParams['rend'] . " Tr\n    ({$str})Tj\nET\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\nBT\n    /{$fontObj} {$size} Tf\n    " . $this->calcTextMatrix() . " {$x} {$y} Tm\n    " . $this->textParams['c'] . " Tc " . $this->textParams['w'] . " Tw " . $this->textParams['rend'] . " Tr\n    ({$str})Tj\nET\n");
 
         return $this;
     }
@@ -898,8 +902,8 @@ class Pdf
      */
     public function drawLine($x1, $y1, $x2, $y2)
     {
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n{$x1} {$y1} m\n{$x2} {$y2} l\nS\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\n{$x1} {$y1} m\n{$x2} {$y2} l\nS\n");
 
         return $this;
     }
@@ -920,8 +924,8 @@ class Pdf
             $h = $w;
         }
 
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n{$x} {$y} {$w} {$h} re\n" . $this->setStyle($fill) . "\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\n{$x} {$y} {$w} {$h} re\n" . $this->setStyle($fill) . "\n");
 
         return $this;
     }
@@ -970,31 +974,31 @@ class Pdf
         $y4 = $y + $h;
 
         // Calculate coordinate number one's 2 bezier points.
-        $coor1_bez1_x = $x1;
-        $coor1_bez1_y = (round(0.55 * ($y2 - $y1))) + $y1;
-        $coor1_bez2_x = $x1;
-        $coor1_bez2_y = (round(0.45 * ($y1 - $y4))) + $y4;
+        $coor1Bez1X = $x1;
+        $coor1Bez1Y = (round(0.55 * ($y2 - $y1))) + $y1;
+        $coor1Bez2X = $x1;
+        $coor1Bez2Y = (round(0.45 * ($y1 - $y4))) + $y4;
 
         // Calculate coordinate number two's 2 bezier points.
-        $coor2_bez1_x = (round(0.45 * ($x2 - $x1))) + $x1;
-        $coor2_bez1_y = $y2;
-        $coor2_bez2_x = (round(0.55 * ($x3 - $x2))) + $x2;
-        $coor2_bez2_y = $y2;
+        $coor2Bez1X = (round(0.45 * ($x2 - $x1))) + $x1;
+        $coor2Bez1Y = $y2;
+        $coor2Bez2X = (round(0.55 * ($x3 - $x2))) + $x2;
+        $coor2Bez2Y = $y2;
 
         // Calculate coordinate number three's 2 bezier points.
-        $coor3_bez1_x = $x3;
-        $coor3_bez1_y = (round(0.55 * ($y2 - $y3))) + $y3;
-        $coor3_bez2_x = $x3;
-        $coor3_bez2_y = (round(0.45 * ($y3 - $y4))) + $y4;
+        $coor3Bez1X = $x3;
+        $coor3Bez1Y = (round(0.55 * ($y2 - $y3))) + $y3;
+        $coor3Bez2X = $x3;
+        $coor3Bez2Y = (round(0.45 * ($y3 - $y4))) + $y4;
 
         // Calculate coordinate number four's 2 bezier points.
-        $coor4_bez1_x = (round(0.55 * ($x3 - $x4))) + $x4;
-        $coor4_bez1_y = $y4;
-        $coor4_bez2_x = (round(0.45 * ($x4 - $x1))) + $x1;
-        $coor4_bez2_y = $y4;
+        $coor4Bez1X = (round(0.55 * ($x3 - $x4))) + $x4;
+        $coor4Bez1Y = $y4;
+        $coor4Bez2X = (round(0.45 * ($x4 - $x1))) + $x1;
+        $coor4Bez2Y = $y4;
 
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n{$x1} {$y1} m\n{$coor1_bez1_x} {$coor1_bez1_y} {$coor2_bez1_x} {$coor2_bez1_y} {$x2} {$y2} c\n{$coor2_bez2_x} {$coor2_bez2_y} {$coor3_bez1_x} {$coor3_bez1_y} {$x3} {$y3} c\n{$coor3_bez2_x} {$coor3_bez2_y} {$coor4_bez1_x} {$coor4_bez1_y} {$x4} {$y4} c\n{$coor4_bez2_x} {$coor4_bez2_y} {$coor1_bez2_x} {$coor1_bez2_y} {$x1} {$y1} c\n" . $this->setStyle($fill) . "\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\n{$x1} {$y1} m\n{$coor1Bez1X} {$coor1Bez1Y} {$coor2Bez1X} {$coor2Bez1Y} {$x2} {$y2} c\n{$coor2Bez2X} {$coor2Bez2Y} {$coor3Bez1X} {$coor3Bez1Y} {$x3} {$y3} c\n{$coor3Bez2X} {$coor3Bez2Y} {$coor4Bez1X} {$coor4Bez1Y} {$x4} {$y4} c\n{$coor4Bez2X} {$coor4Bez2Y} {$coor1Bez2X} {$coor1Bez2Y} {$x1} {$y1} c\n" . $this->setStyle($fill) . "\n");
 
         return $this;
     }
@@ -1160,8 +1164,8 @@ class Pdf
         }
         $polygon .= "h\n";
 
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n{$polygon}\n" . $this->setStyle($fill) . "\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\n{$polygon}\n" . $this->setStyle($fill) . "\n");
 
         return $this;
     }
@@ -1174,8 +1178,8 @@ class Pdf
      */
     public function openLayer()
     {
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\nq\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\nq\n");
 
         return $this;
     }
@@ -1188,8 +1192,8 @@ class Pdf
      */
     public function closeLayer()
     {
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\nQ\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\nQ\n");
 
         return $this;
     }
@@ -1215,8 +1219,8 @@ class Pdf
         $this->setStrokeWidth(false);
 
         $h = (null === $h) ? $w : $h;
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n{$x} {$y} {$w} {$h} re\nW\nF\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\n{$x} {$y} {$w} {$h} re\nW\nF\n");
 
         $this->setFillColor($oldFillColor);
         if (null !== $oldStrokeColor) {
@@ -1278,31 +1282,31 @@ class Pdf
         $y4 = $y + $h;
 
         // Calculate coordinate number one's 2 bezier points.
-        $coor1_bez1_x = $x1;
-        $coor1_bez1_y = (round(0.55 * ($y2 - $y1))) + $y1;
-        $coor1_bez2_x = $x1;
-        $coor1_bez2_y = (round(0.45 * ($y1 - $y4))) + $y4;
+        $coor1Bez1X = $x1;
+        $coor1Bez1Y = (round(0.55 * ($y2 - $y1))) + $y1;
+        $coor1Bez2X = $x1;
+        $coor1Bez2Y = (round(0.45 * ($y1 - $y4))) + $y4;
 
         // Calculate coordinate number two's 2 bezier points.
-        $coor2_bez1_x = (round(0.45 * ($x2 - $x1))) + $x1;
-        $coor2_bez1_y = $y2;
-        $coor2_bez2_x = (round(0.55 * ($x3 - $x2))) + $x2;
-        $coor2_bez2_y = $y2;
+        $coor2Bez1X = (round(0.45 * ($x2 - $x1))) + $x1;
+        $coor2Bez1Y = $y2;
+        $coor2Bez2X = (round(0.55 * ($x3 - $x2))) + $x2;
+        $coor2Bez2Y = $y2;
 
         // Calculate coordinate number three's 2 bezier points.
-        $coor3_bez1_x = $x3;
-        $coor3_bez1_y = (round(0.55 * ($y2 - $y3))) + $y3;
-        $coor3_bez2_x = $x3;
-        $coor3_bez2_y = (round(0.45 * ($y3 - $y4))) + $y4;
+        $coor3Bez1X = $x3;
+        $coor3Bez1Y = (round(0.55 * ($y2 - $y3))) + $y3;
+        $coor3Bez2X = $x3;
+        $coor3Bez2Y = (round(0.45 * ($y3 - $y4))) + $y4;
 
         // Calculate coordinate number four's 2 bezier points.
-        $coor4_bez1_x = (round(0.55 * ($x3 - $x4))) + $x4;
-        $coor4_bez1_y = $y4;
-        $coor4_bez2_x = (round(0.45 * ($x4 - $x1))) + $x1;
-        $coor4_bez2_y = $y4;
+        $coor4Bez1X = (round(0.55 * ($x3 - $x4))) + $x4;
+        $coor4Bez1Y = $y4;
+        $coor4Bez2X = (round(0.45 * ($x4 - $x1))) + $x1;
+        $coor4Bez2Y = $y4;
 
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n{$x1} {$y1} m\n{$coor1_bez1_x} {$coor1_bez1_y} {$coor2_bez1_x} {$coor2_bez1_y} {$x2} {$y2} c\n{$coor2_bez2_x} {$coor2_bez2_y} {$coor3_bez1_x} {$coor3_bez1_y} {$x3} {$y3} c\n{$coor3_bez2_x} {$coor3_bez2_y} {$coor4_bez1_x} {$coor4_bez1_y} {$x4} {$y4} c\n{$coor4_bez2_x} {$coor4_bez2_y} {$coor1_bez2_x} {$coor1_bez2_y} {$x1} {$y1} c\nW\nF\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\n{$x1} {$y1} m\n{$coor1Bez1X} {$coor1Bez1Y} {$coor2Bez1X} {$coor2Bez1Y} {$x2} {$y2} c\n{$coor2Bez2X} {$coor2Bez2Y} {$coor3Bez1X} {$coor3Bez1Y} {$x3} {$y3} c\n{$coor3Bez2X} {$coor3Bez2Y} {$coor4Bez1X} {$coor4Bez1Y} {$x4} {$y4} c\n{$coor4Bez2X} {$coor4Bez2Y} {$coor1Bez2X} {$coor1Bez2Y} {$x1} {$y1} c\nW\nF\n");
 
         $this->setFillColor($oldFillColor);
         if (null !== $oldStrokeColor) {
@@ -1358,8 +1362,8 @@ class Pdf
         $polygon .= "h\n";
         $polygon .= "W\n";
 
-        $co_index = $this->getContentObject();
-        $this->objects[$co_index]->setStream("\n{$polygon}\nF\n");
+        $coIndex = $this->getContentObject();
+        $this->objects[$coIndex]->setStream("\n{$polygon}\nF\n");
 
         $this->setFillColor($oldFillColor);
         if (null !== $oldStrokeColor) {
@@ -1387,8 +1391,8 @@ class Pdf
 
         $i = $this->lastIndex($this->objects) + 1;
 
-        // Add the annotation index to the current page's annotations and add the annotation to _objects array.
-        $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->annots[] = $i;
+        // Add the annotation index to the current page's annotations and add the annotation to objects array.
+        $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->annots[] = $i;
         $this->objects[$i] = new Object\Object("{$i} 0 obj\n<<\n    /Type /Annot\n    /Subtype /Link\n    /Rect [{$x} {$y} {$x2} {$y2}]\n    /Border [0 0 0]\n    /A <</S /URI /URI ({$url})>>\n>>\nendobj\n\n");
 
         return $this;
@@ -1423,11 +1427,11 @@ class Pdf
             $d = $this->objects[$this->pages[$dest - 1]]->index;
         // Else, set the destination to the current page.
         } else {
-            $d = $this->objects[$this->pages[$this->curPage]]->index;
+            $d = $this->objects[$this->pages[$this->currentPage]]->index;
         }
 
-        // Add the annotation index to the current page's annotations and add the annotation to _objects array.
-        $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->annots[] = $i;
+        // Add the annotation index to the current page's annotations and add the annotation to objects array.
+        $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->annots[] = $i;
         $this->objects[$i] = new Object\Object("{$i} 0 obj\n<<\n    /Type /Annot\n    /Subtype /Link\n    /Rect [{$x} {$y} {$x2} {$y2}]\n    /Border [0 0 0]\n    /Dest [{$d} 0 R /XYZ {$X} {$Y} {$Z}]\n>>\nendobj\n\n");
 
         return $this;
@@ -1448,7 +1452,7 @@ class Pdf
     {
         if (array_key_exists($image, $this->images) && ($preserveRes)) {
             $i = $this->lastIndex($this->objects) + 1;
-            $co_index = $this->images[$image]['index'];
+            $coIndex = $this->images[$image]['index'];
             if (null !== $scl) {
                 $dims = Parser\Image::getScaledDimensions($scl, $this->images[$image]['origW'], $this->images[$image]['origH']);
                 $imgWidth = $dims['w'];
@@ -1457,8 +1461,8 @@ class Pdf
                 $imgWidth = $this->images[$image]['origW'];
                 $imgHeight = $this->images[$image]['origH'];
             }
-            $this->objects[$this->objects[$this->pages[$this->curPage]]->curContent]->setStream("\nq\n" . $imgWidth . " 0 0 " . $imgHeight. " {$x} {$y} cm\n/I{$co_index} Do\nQ\n");
-            $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->xobjs[] = $this->images[$image]['xobj'];
+            $this->objects[$this->objects[$this->pages[$this->currentPage]]->curContent]->setStream("\nq\n" . $imgWidth . " 0 0 " . $imgHeight. " {$x} {$y} cm\n/I{$coIndex} Do\nQ\n");
+            $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->xobjs[] = $this->images[$image]['xobj'];
         } else {
             // Create image parser object
             $i = $this->lastIndex($this->objects) + 1;
@@ -1471,10 +1475,10 @@ class Pdf
             }
 
             // Add the image to the current page's xobject array and content stream.
-            $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->xobjs[] = $imageParser->getXObject();
+            $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->xobjs[] = $imageParser->getXObject();
 
-            $co_index = $this->getContentObject();
-            $this->objects[$co_index]->setStream($imageParser->getStream());
+            $coIndex = $this->getContentObject();
+            $this->objects[$coIndex]->setStream($imageParser->getStream());
             if ($preserveRes) {
                 $this->images[$image] = [
                     'index' => $i,
@@ -1594,14 +1598,14 @@ class Pdf
     protected function getContentObject()
     {
         // If the page's current content object index is not set, create one.
-        if (null === $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->curContent) {
+        if (null === $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->curContent) {
             $coi = $this->lastIndex($this->objects) + 1;
-            $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->content[] = $coi;
-            $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->curContent = $coi;
+            $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->content[] = $coi;
+            $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->curContent = $coi;
             $this->objects[$coi] = new Object\Object($coi);
         // Else, set and return the page's current content object index.
         } else {
-            $coi = $this->objects[$this->objects[$this->pages[$this->curPage]]->index]->curContent;
+            $coi = $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->curContent;
         }
 
         return $coi;

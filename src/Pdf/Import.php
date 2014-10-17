@@ -32,13 +32,13 @@ class Import
      * PDF imported objects
      * @var array
      */
-    public $objects = [];
+    protected $objects = [];
 
     /**
      * PDF imported page objects
      * @var array
      */
-    public $pages = [];
+    protected $pages = [];
 
     /**
      * PDF imported data
@@ -80,7 +80,7 @@ class Import
         }
 
         // Get the PDF objects.
-        $this->getObjects($this->data);
+        $this->parseObjects($this->data);
         $this->pages = $this->kids;
 
         // If the page argument was passed, parse out the desired page(s), removing any unwanted pages and their content.
@@ -111,7 +111,7 @@ class Import
                     $content = str_replace(' 0 R', '|', $content);
                     $content = str_replace(' ', '', $content);
                     $content = substr($content, 0, -1);
-                    $content_objs = explode('|', $content);
+                    $contentObjs = explode('|', $content);
 
                     unset($this->objects[$value]);
 
@@ -120,7 +120,7 @@ class Import
                         unset($this->kids[$k]);
                     }
 
-                    foreach ($content_objs as $val) {
+                    foreach ($contentObjs as $val) {
                         unset($this->objects[$val]);
                     }
                 }
@@ -214,56 +214,75 @@ class Import
     }
 
     /**
+     * Method to return the parsed objects
+     *
+     * @return array
+     */
+    public function getObjects()
+    {
+        return $this->objects;
+    }
+
+    /**
+     * Method to return the parsed page objects
+     *
+     * @return array
+     */
+    public function getPages()
+    {
+        return $this->pages;
+    }
+
+    /**
      * Method to search and return the objects within in the imported data.
      *
      * @param  string $data
      * @return void
      */
-    protected function getObjects($data)
+    protected function parseObjects($data)
     {
         // Grab object start points.
         preg_match_all('/\d*\s\d*\sobj/', $data, $matches, PREG_OFFSET_CAPTURE);
 
         if (isset($matches[0])) {
-            $obj_start = $matches[0];
+            $objStart = $matches[0];
 
             // Start parsing through the object data.
-            for ($i = 0; $i < count($obj_start); $i++) {
-                $type = '';
+            for ($i = 0; $i < count($objStart); $i++) {
                 $j = $i + 1;
-                $index = substr($obj_start[$i][0], 0, strpos($obj_start[$i][0], ' '));
+                $index = substr($objStart[$i][0], 0, strpos($objStart[$i][0], ' '));
 
-                if (array_key_exists($j, $obj_start)) {
-                    $obj_data = substr($data, $obj_start[$i][1], ($obj_start[$j][1] - $obj_start[$i][1]));
+                if (array_key_exists($j, $objStart)) {
+                    $objData = substr($data, $objStart[$i][1], ($objStart[$j][1] - $objStart[$i][1]));
                 } else {
-                    $obj_data = substr($data, $obj_start[$i][1], (strrpos($data, 'endobj') - $obj_start[$i][1] + 6));
+                    $objData = substr($data, $objStart[$i][1], (strrpos($data, 'endobj') - $objStart[$i][1] + 6));
                 }
 
                 // Add all relevant objects, striping away any linearized code, hint codes or metadata, as the order and size of the PDF and its objects may change.
-                if ((strpos($obj_data, '/Linearized') === false) && (strpos($obj_data, '/Type/Metadata') === false)) {
-                    if ((strpos($obj_data, '/Catalog') !== false) && (strpos($obj_data, '/Pages') !== false)) {
+                if ((strpos($objData, '/Linearized') === false) && (strpos($objData, '/Type/Metadata') === false)) {
+                    if ((strpos($objData, '/Catalog') !== false) && (strpos($objData, '/Pages') !== false)) {
                         // Strip away any metadata references.
-                        $metadata = substr($obj_data, strpos($obj_data, 'Metadata'));
+                        $metadata = substr($objData, strpos($objData, 'Metadata'));
                         $metadata = '/' . substr($metadata, 0, strpos($metadata, '/'));
-                        $obj_data = str_replace($metadata, '', $obj_data);
+                        $objData = str_replace($metadata, '', $objData);
                         $type = 'root';
-                    } else if ((strpos($obj_data, '/Creator') !== false) || (strpos($obj_data, '/Producer') !== false)) {
+                    } else if ((strpos($objData, '/Creator') !== false) || (strpos($objData, '/Producer') !== false)) {
                         $type = 'info';
-                    } else if ((strpos($obj_data, '/Count') !== false) && (strpos($obj_data, '/Kids') !== false)) {
-                        $kids = substr($obj_data, strpos($obj_data, 'Kids'));
+                    } else if ((strpos($objData, '/Count') !== false) && (strpos($objData, '/Kids') !== false)) {
+                        $kids = substr($objData, strpos($objData, 'Kids'));
                         $kids = substr($kids, 0, strpos($kids, ']'));
                         $kids = str_replace('Kids', '', $kids);
                         $kids = str_replace('[', '', $kids);
                         $kids = str_replace(' 0 R', '|', $kids);
                         $kids = str_replace(' ', '', $kids);
                         $kids = substr($kids, 0, -1);
-                        $kids_objs = explode('|', $kids);
-                        $this->kids = $kids_objs;
+                        $kidsObjs = explode('|', $kids);
+                        $this->kids = $kidsObjs;
                         $type = 'parent';
-                    } else if ((strpos($obj_data, '/MediaBox') !== false) || (strpos($obj_data, '/Contents') !== false)) {
-                        if (strpos($obj_data, '/Thumb') !== false) {
+                    } else if ((strpos($objData, '/MediaBox') !== false) || (strpos($objData, '/Contents') !== false)) {
+                        if (strpos($objData, '/Thumb') !== false) {
                             // Strip away any thumbnail references.
-                            $thumbdata = substr($obj_data, strpos($obj_data, 'Thumb'));
+                            $thumbdata = substr($objData, strpos($objData, 'Thumb'));
                             $thumbdata = '/' . substr($thumbdata, 0, strpos($thumbdata, '/'));
 
                             $thumbindex = substr($thumbdata, strpos($thumbdata, ' '));
@@ -271,13 +290,13 @@ class Import
                             $thumbindex = str_replace(' ', '', $thumbindex);
                             $this->thumbs[] = $thumbindex;
 
-                            $obj_data = str_replace($thumbdata, '', $obj_data);
+                            $objData = str_replace($thumbdata, '', $objData);
                         }
                         $type = 'page';
                     } else {
                         $type = 'content';
                     }
-                    $this->objects[$index] = ['type' => $type, 'data' => $obj_data, 'refs' => $this->getRefs($obj_data)];
+                    $this->objects[$index] = ['type' => $type, 'data' => $objData, 'refs' => $this->getRefs($objData)];
                 }
             }
 
