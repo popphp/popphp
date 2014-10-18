@@ -39,7 +39,7 @@ abstract class AbstractAdjust implements AdjustInterface
      *
      * Instantiate an image object
      *
-     * @param  \Pop\Image\AbstractImage
+     * @param  \Pop\Image\AbstractImage $image
      * @return AbstractAdjust
      */
     public function __construct(\Pop\Image\AbstractImage $image = null)

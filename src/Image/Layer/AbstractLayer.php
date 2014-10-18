@@ -45,7 +45,7 @@ abstract class AbstractLayer implements LayerInterface
      *
      * Instantiate an image object
      *
-     * @param  \Pop\Image\AbstractImage
+     * @param  \Pop\Image\AbstractImage $image
      * @return AbstractLayer
      */
     public function __construct(\Pop\Image\AbstractImage $image = null)

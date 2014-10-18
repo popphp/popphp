@@ -63,7 +63,7 @@ abstract class AbstractDraw implements DrawInterface
      *
      * Instantiate an image object
      *
-     * @param  \Pop\Image\AbstractImage
+     * @param  \Pop\Image\AbstractImage $image
      * @return AbstractDraw
      */
     public function __construct(\Pop\Image\AbstractImage $image = null)

@@ -93,7 +93,7 @@ abstract class AbstractType implements TypeInterface
      *
      * Instantiate an image object
      *
-     * @param  \Pop\Image\AbstractImage
+     * @param  \Pop\Image\AbstractImage $image
      * @return AbstractType
      */
     public function __construct(\Pop\Image\AbstractImage $image = null)

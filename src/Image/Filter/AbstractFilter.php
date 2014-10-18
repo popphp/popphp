@@ -39,7 +39,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * Instantiate an image object
      *
-     * @param  \Pop\Image\AbstractImage
+     * @param  \Pop\Image\AbstractImage $image
      * @return AbstractFilter
      */
     public function __construct(\Pop\Image\AbstractImage $image = null)
