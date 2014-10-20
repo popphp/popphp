@@ -15,6 +15,7 @@
  */
 namespace Pop\Pdf\Parser;
 
+use Pop\Pdf\Type;
 use Pop\Pdf\Object\Object;
 
 /**
@@ -95,13 +96,13 @@ class Font
         $ext = strtolower(substr($fle, -4));
         switch ($ext) {
             case '.ttf':
-                $this->font = new \Pop\Pdf\Font\TrueType($fle);
+                $this->font = new Type\Font\TrueType($fle);
                 break;
             case '.otf':
-                $this->font = new \Pop\Pdf\Font\TrueType\OpenType($fle);
+                $this->font = new Type\Font\TrueType\OpenType($fle);
                 break;
             case '.pfb':
-                $this->font = new \Pop\Pdf\Font\Type1($fle);
+                $this->font = new Type\Font\Type1($fle);
                 if (null === $this->font->afmPath) {
                     throw new Exception('The AFM font file was not found.');
                 }
@@ -140,7 +141,7 @@ class Font
      */
     public function getFontName()
     {
-        $fontName = ($this->font instanceof \Pop\Pdf\Font\Type1) ? $this->font->info->postscriptName : $this->font->tables['name']->postscriptName;
+        $fontName = ($this->font instanceof Type\Font\Type1) ? $this->font->info->postscriptName : $this->font->tables['name']->postscriptName;
         return $fontName;
     }
 
@@ -161,7 +162,7 @@ class Font
      */
     protected function createFontObjects()
     {
-        if ($this->font instanceof \Pop\Pdf\Font\Type1) {
+        if ($this->font instanceof Type\Font\Type1) {
             $fontType     = 'Type1';
             $fontName     = $this->font->info->postscriptName;
             $fontFile     = 'FontFile';
@@ -196,10 +197,10 @@ class Font
     /**
      * Method to to get the glyph widths
      *
-     * @param  \Pop\Pdf\Font\TrueType\Table\Cmap $cmap
+     * @param  Type\Font\TrueType\Table\Cmap $cmap
      * @return array
      */
-    protected function getGlyphWidths(\Pop\Pdf\Font\TrueType\Table\Cmap $cmap)
+    protected function getGlyphWidths(Type\Font\TrueType\Table\Cmap $cmap)
     {
         $gw = ['encoding' => null, 'widths' => []];
         $uniTable = null;

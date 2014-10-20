@@ -104,7 +104,6 @@ class Type extends \Pop\Pdf\AbstractEffect
      */
     protected $y = 0;
 
-
     /**
      * Set the font size
      *
@@ -161,7 +160,7 @@ class Type extends \Pop\Pdf\AbstractEffect
      * @param  int $rotation
      * @return Type
      */
-    public function setRotation($rotation)
+    public function rotate($rotation)
     {
         $this->textParams['rot']  = $rotation;
         return $this;
@@ -181,16 +180,17 @@ class Type extends \Pop\Pdf\AbstractEffect
             throw new Exception('Error: That font is not contained within the standard PDF fonts.');
         }
         // Set the font index.
-        $fontIndex = (count($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts) == 0) ? 1 :
-            count($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts) + 1;
+        $fontIndex = (count($this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts) == 0) ? 1 :
+            count($this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts) + 1;
 
         // Set the font name and the next object index.
         $f = 'MF' . $fontIndex;
-        $i = $this->lastIndex($this->objects) + 1;
+        $i = $this->pdf->lastIndex($this->pdf->getObjects()) + 1;
 
         // Add the font to the current page's fonts and add the font to _objects array.
-        $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font] = "/{$f} {$i} 0 R";
-        $this->objects[$i] = new Object\Object("{$i} 0 obj\n<<\n    /Type /Font\n    /Subtype /Type1\n    /Name /{$f}\n    /BaseFont /{$font}\n    /Encoding /WinAnsiEncoding\n>>\nendobj\n\n");
+        $this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts[$font] = "/{$f} {$i} 0 R";
+        $obj = new \Pop\Pdf\Object\Object("{$i} 0 obj\n<<\n    /Type /Font\n    /Subtype /Type1\n    /Name /{$f}\n    /BaseFont /{$font}\n    /Encoding /WinAnsiEncoding\n>>\nendobj\n\n");
+        $this->pdf->setObject($obj, $i);
 
         $this->lastFontName = $font;
 
@@ -217,21 +217,22 @@ class Type extends \Pop\Pdf\AbstractEffect
             throw new Exception('Error: The font file does not exist.');
         }
 
-        $fontIndex = (count($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts) == 0) ? 1 :
-            count($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts) + 1;
-        $objectIndex = $this->lastIndex($this->objects) + 1;
+        $fontIndex = (count($this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts) == 0) ? 1 :
+            count($this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts) + 1;
 
-        $fontParser = new Parser\Font($font, $fontIndex, $objectIndex, $this->compress);
+        $objectIndex = $this->pdf->lastIndex($this->pdf->getObjects()) + 1;
+
+        $fontParser = new \Pop\Pdf\Parser\Font($font, $fontIndex, $objectIndex, $this->pdf->getCompression());
 
         if (!$fontParser->isEmbeddable() && !$embedOverride) {
             throw new Exception('Error: The font license does not allow for it to be embedded.');
         }
 
-        $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$fontParser->getFontName()] = $fontParser->getFontRef();
+        $this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts[$fontParser->getFontName()] = $fontParser->getFontRef();
         $fontObjects = $fontParser->getObjects();
 
         foreach ($fontObjects as $key => $value) {
-            $this->objects[$key] = $value;
+            $this->pdf->setObject($value, $key);
         }
 
         $this->lastFontName = $fontParser->getFontName();
@@ -266,29 +267,29 @@ class Type extends \Pop\Pdf\AbstractEffect
             }
         }
 
-        foreach ($this->pages as $value) {
-            if (array_key_exists($font, $this->objects[$value]->fonts)) {
-                $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font] = $this->objects[$value]->fonts[$font];
-                $fontObj = substr($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font], 1, (strpos(' ', $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font]) + 3));
+        foreach ($this->pdf->getPages() as $value) {
+            if (array_key_exists($font, $this->pdf->getObject($value)->fonts)) {
+                $this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts[$font] = $this->pdf->getObject($value)->fonts[$font];
+                $fontObj = substr($this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts[$font], 1, (strpos(' ', $this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts[$font]) + 3));
                 $fontExists = true;
             }
         }
 
         // If the font does not already exist, add it.
         if (!$fontExists) {
-            if (isset($this->pages[$this->currentPage]) &&
-                isset($this->objects[$this->pages[$this->currentPage]]) &&
-                isset($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]) &&
-                (array_key_exists($font, $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts))) {
-                $fontObj = substr($this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font], 1, (strpos(' ', $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->fonts[$font]) + 3));
+            if ((null !== $this->pdf->getCurrentPageIndex()) &&
+                (null !== $this->pdf->getPage($this->pdf->getCurrentPageIndex())) &&
+                (null !== $this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()->index))) &&
+                (array_key_exists($font, $this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts))) {
+                $fontObj = substr($this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts[$font], 1, (strpos(' ', $this->pdf->getObject($this->pdf->getObject($this->pdf->getPage($this->pdf->getCurrentPageIndex()))->index)->fonts[$font]) + 3));
             } else {
                 throw new Exception('Error: The font \'' . $font . '\' has not been added to the PDF.');
             }
         }
 
         // Add the text to the current page's content stream.
-        $coIndex = $this->getContentObject();
-        $this->objects[$coIndex]->setStream("\nBT\n    /{$fontObj} {$this->size} Tf\n    " . $this->calcTextMatrix() . " {$this->x} {$this->y} Tm\n    " . $this->textParams['c'] . " Tc " . $this->textParams['w'] . " Tw " . $this->textParams['rend'] . " Tr\n    ({$str})Tj\nET\n");
+        $coIndex = $this->pdf->getContentObjectIndex();
+        $this->pdf->getObject($coIndex)->setStream("\nBT\n    /{$fontObj} {$this->size} Tf\n    " . $this->calcTextMatrix() . " {$this->x} {$this->y} Tm\n    " . $this->textParams['c'] . " Tc " . $this->textParams['w'] . " Tw " . $this->textParams['rend'] . " Tr\n    ({$str})Tj\nET\n");
 
         return $this;
     }
@@ -372,6 +373,71 @@ class Type extends \Pop\Pdf\AbstractEffect
         $this->textParams['rend'] = $rend;
 
         return $this;
+    }
+
+    /**
+     * Method to calculate text matrix.
+     *
+     * @return string
+     */
+    protected function calcTextMatrix()
+    {
+        // Define some variables.
+        $a   = '';
+        $b   = '';
+        $c   = '';
+        $d   = '';
+        $neg = null;
+
+        // Determine is the rotate parameter is negative or not.
+        $neg = ($this->textParams['rot'] < 0) ? true : false;
+
+        // Calculate the text matrix parameters.
+        $rot = abs($this->textParams['rot']);
+
+        if (($rot >= 0) && ($rot <= 45)) {
+            $factor = round(($rot / 45), 2);
+            if ($neg) {
+                $a = 1;
+                $b = '-' . $factor;
+                $c = $factor;
+                $d = 1;
+            } else {
+                $a = 1;
+                $b = $factor;
+                $c = '-' . $factor;
+                $d = 1;
+            }
+        } else if (($rot > 45) && ($rot <= 90)) {
+            $factor = round(((90 - $rot) / 45), 2);
+            if ($neg) {
+                $a = $factor;
+                $b = -1;
+                $c = 1;
+                $d = $factor;
+            } else {
+                $a = $factor;
+                $b = 1;
+                $c = -1;
+                $d = $factor;
+            }
+        }
+
+        // Adjust the text matrix parameters according to the horizontal and vertical scale parameters.
+        if ($this->textParams['h'] != 100) {
+            $a = round(($a * ($this->textParams['h'] / 100)), 2);
+            $b = round(($b * ($this->textParams['h'] / 100)), 2);
+        }
+
+        if ($this->textParams['v'] != 100) {
+            $c = round(($c * ($this->textParams['v'] / 100)), 2);
+            $d = round(($d * ($this->textParams['v'] / 100)), 2);
+        }
+
+        // Set the text matrix and return it.
+        $tm = "{$a} {$b} {$c} {$d}";
+
+        return $tm;
     }
 
 }

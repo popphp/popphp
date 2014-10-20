@@ -85,6 +85,7 @@ class Import
 
         // If the page argument was passed, parse out the desired page(s), removing any unwanted pages and their content.
         if (null !== $pgs) {
+            $pAry = [];
             if (is_array($pgs)) {
                 foreach ($pgs as $value) {
                     $pAry[] = $this->pages[$value - 1];

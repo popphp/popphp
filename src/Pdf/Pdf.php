@@ -85,6 +85,18 @@ class Pdf
     protected $images = [];
 
     /**
+     * PDF draw object
+     * @var Draw\Draw
+     */
+    protected $draw = null;
+
+    /**
+     * PDF type object
+     * @var Type\Type
+     */
+    protected $type = null;
+
+    /**
      * Compression property
      * @var boolean
      */
@@ -386,6 +398,80 @@ class Pdf
     }
 
     /**
+     * Get the Pdf draw object
+     *
+     * @return Draw\Draw
+     */
+    public function draw()
+    {
+        if (null === $this->draw) {
+            $this->draw = new Draw\Draw($this);
+        }
+        if (null === $this->draw->getPdf()) {
+            $this->draw->setPdf($this);
+        }
+        return $this->draw;
+    }
+
+    /**
+     * Get the Pdf type object
+     *
+     * @return Type\Type
+     */
+    public function type()
+    {
+        if (null === $this->type) {
+            $this->type = new Type\Type($this);
+        }
+        if (null === $this->type->getPdf()) {
+            $this->type->setPdf($this);
+        }
+        return $this->type;
+    }
+
+    /**
+     * Method to get a page object
+     *
+     * @param int $i
+     * @return int
+     */
+    public function getPage($i)
+    {
+        return (isset($this->pages[$i]) ? $this->pages[$i] : null);
+    }
+
+    /**
+     * Method to get pages array
+     *
+     * @return array
+     */
+    public function getPages()
+    {
+        return $this->pages;
+    }
+
+    /**
+     * Method to get a content object
+     *
+     * @param int $i
+     * @return Object\ObjectInterface
+     */
+    public function getObject($i)
+    {
+        return (isset($this->objects[$i]) ? $this->objects[$i] : null);
+    }
+
+    /**
+     * Method to get content objects array
+     *
+     * @return array
+     */
+    public function getObjects()
+    {
+        return $this->objects;
+    }
+
+    /**
      * Method to return the current page number of the current page of the PDF.
      *
      * @return int
@@ -393,6 +479,16 @@ class Pdf
     public function getCurrentPage()
     {
         return ($this->currentPage + 1);
+    }
+
+    /**
+     * Method to return the current page number of the current page of the PDF.
+     *
+     * @return int
+     */
+    public function getCurrentPageIndex()
+    {
+        return $this->currentPage;
     }
 
     /**
@@ -424,6 +520,19 @@ class Pdf
     public function setCompression($comp)
     {
         $this->compress = (bool)$comp;
+        return $this;
+    }
+
+    /**
+     * Method to set a content object
+     *
+     * @param  mixed $object
+     * @param  int   $i
+     * @return Pdf
+     */
+    public function setObject($object, $i)
+    {
+        $this->objects[$i] = $object;
         return $this;
     }
 
@@ -541,7 +650,7 @@ class Pdf
      */
     public function openLayer()
     {
-        $coIndex = $this->getContentObject();
+        $coIndex = $this->getContentObjectIndex();
         $this->objects[$coIndex]->setStream("\nq\n");
 
         return $this;
@@ -555,184 +664,8 @@ class Pdf
      */
     public function closeLayer()
     {
-        $coIndex = $this->getContentObject();
+        $coIndex = $this->getContentObjectIndex();
         $this->objects[$coIndex]->setStream("\nQ\n");
-
-        return $this;
-    }
-
-    /**
-     * Method to add a clipping rectangle to the PDF.
-     *
-     * @param  int $x
-     * @param  int $y
-     * @param  int $w
-     * @param  int $h
-     * @return Pdf
-     */
-    public function drawClippingRectangle($x, $y, $w, $h = null)
-    {
-        $oldFillColor = $this->fillColor;
-        $oldStrokeColor = $this->strokeColor;
-        $oldStrokeWidth = $this->strokeWidth;
-        $oldStrokeDashLength = $this->strokeDashLength;
-        $oldStrokeDashGap = $this->strokeDashGap;
-
-        $this->setFillColor($this->backgroundColor);
-        $this->setStrokeWidth(false);
-
-        $h = (null === $h) ? $w : $h;
-        $coIndex = $this->getContentObject();
-        $this->objects[$coIndex]->setStream("\n{$x} {$y} {$w} {$h} re\nW\nF\n");
-
-        $this->setFillColor($oldFillColor);
-        if (null !== $oldStrokeColor) {
-            $this->setStrokeColor($oldStrokeColor);
-            $this->setStrokeWidth($oldStrokeWidth, $oldStrokeDashLength, $oldStrokeDashGap);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Method to add a clipping square to the PDF.
-     *
-     * @param  int     $x
-     * @param  int     $y
-     * @param  int     $w
-     * @return Pdf
-     */
-    public function drawClippingSquare($x, $y, $w)
-    {
-        $this->drawClippingRectangle($x, $y, $w, $w);
-        return $this;
-    }
-
-    /**
-     * Method to add a clipping ellipse to the PDF.
-     *
-     * @param  int     $x
-     * @param  int     $y
-     * @param  int     $w
-     * @param  int     $h
-     * @return Pdf
-     */
-    public function drawClippingEllipse($x, $y, $w, $h = null)
-    {
-        $oldFillColor = $this->fillColor;
-        $oldStrokeColor = $this->strokeColor;
-        $oldStrokeWidth = $this->strokeWidth;
-        $oldStrokeDashLength = $this->strokeDashLength;
-        $oldStrokeDashGap = $this->strokeDashGap;
-
-        $this->setFillColor($this->backgroundColor);
-        $this->setStrokeWidth(false);
-
-        if (null === $h) {
-            $h = $w;
-        }
-
-        $x1 = $x + $w;
-        $y1 = $y;
-
-        $x2 = $x;
-        $y2 = $y - $h;
-
-        $x3 = $x - $w;
-        $y3 = $y;
-
-        $x4 = $x;
-        $y4 = $y + $h;
-
-        // Calculate coordinate number one's 2 bezier points.
-        $coor1Bez1X = $x1;
-        $coor1Bez1Y = (round(0.55 * ($y2 - $y1))) + $y1;
-        $coor1Bez2X = $x1;
-        $coor1Bez2Y = (round(0.45 * ($y1 - $y4))) + $y4;
-
-        // Calculate coordinate number two's 2 bezier points.
-        $coor2Bez1X = (round(0.45 * ($x2 - $x1))) + $x1;
-        $coor2Bez1Y = $y2;
-        $coor2Bez2X = (round(0.55 * ($x3 - $x2))) + $x2;
-        $coor2Bez2Y = $y2;
-
-        // Calculate coordinate number three's 2 bezier points.
-        $coor3Bez1X = $x3;
-        $coor3Bez1Y = (round(0.55 * ($y2 - $y3))) + $y3;
-        $coor3Bez2X = $x3;
-        $coor3Bez2Y = (round(0.45 * ($y3 - $y4))) + $y4;
-
-        // Calculate coordinate number four's 2 bezier points.
-        $coor4Bez1X = (round(0.55 * ($x3 - $x4))) + $x4;
-        $coor4Bez1Y = $y4;
-        $coor4Bez2X = (round(0.45 * ($x4 - $x1))) + $x1;
-        $coor4Bez2Y = $y4;
-
-        $coIndex = $this->getContentObject();
-        $this->objects[$coIndex]->setStream("\n{$x1} {$y1} m\n{$coor1Bez1X} {$coor1Bez1Y} {$coor2Bez1X} {$coor2Bez1Y} {$x2} {$y2} c\n{$coor2Bez2X} {$coor2Bez2Y} {$coor3Bez1X} {$coor3Bez1Y} {$x3} {$y3} c\n{$coor3Bez2X} {$coor3Bez2Y} {$coor4Bez1X} {$coor4Bez1Y} {$x4} {$y4} c\n{$coor4Bez2X} {$coor4Bez2Y} {$coor1Bez2X} {$coor1Bez2Y} {$x1} {$y1} c\nW\nF\n");
-
-        $this->setFillColor($oldFillColor);
-        if (null !== $oldStrokeColor) {
-            $this->setStrokeColor($oldStrokeColor);
-            $this->setStrokeWidth($oldStrokeWidth, $oldStrokeDashLength, $oldStrokeDashGap);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Method to add a clipping circle to the PDF.
-     *
-     * @param  int     $x
-     * @param  int     $y
-     * @param  int     $w
-     * @return Pdf
-     */
-    public function drawClippingCircle($x, $y, $w)
-    {
-        $this->drawClippingEllipse($x, $y, $w, $w);
-        return $this;
-    }
-
-    /**
-     * Method to add a clipping polygon to the PDF.
-     *
-     * @param  array $points
-     * @return Pdf
-     */
-    public function drawClippingPolygon($points)
-    {
-        $oldFillColor = $this->fillColor;
-        $oldStrokeColor = $this->strokeColor;
-        $oldStrokeWidth = $this->strokeWidth;
-        $oldStrokeDashLength = $this->strokeDashLength;
-        $oldStrokeDashGap = $this->strokeDashGap;
-
-        $this->setFillColor($this->backgroundColor);
-        $this->setStrokeWidth(false);
-
-        $i = 1;
-        $polygon = null;
-
-        foreach ($points as $coord) {
-            if ($i == 1) {
-                $polygon .= $coord['x'] . " " . $coord['y'] . " m\n";
-            } else if ($i <= count($points)) {
-                $polygon .= $coord['x'] . " " . $coord['y'] . " l\n";
-            }
-            $i++;
-        }
-        $polygon .= "h\n";
-        $polygon .= "W\n";
-
-        $coIndex = $this->getContentObject();
-        $this->objects[$coIndex]->setStream("\n{$polygon}\nF\n");
-
-        $this->setFillColor($oldFillColor);
-        if (null !== $oldStrokeColor) {
-            $this->setStrokeColor($oldStrokeColor);
-            $this->setStrokeWidth($oldStrokeWidth, $oldStrokeDashLength, $oldStrokeDashGap);
-        }
 
         return $this;
     }
@@ -840,7 +773,7 @@ class Pdf
             // Add the image to the current page's xobject array and content stream.
             $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->xobjs[] = $imageParser->getXObject();
 
-            $coIndex = $this->getContentObject();
+            $coIndex = $this->getContentObjectIndex();
             $this->objects[$coIndex]->setStream($imageParser->getStream());
             if ($preserveRes) {
                 $this->images[$image] = [
@@ -859,9 +792,10 @@ class Pdf
      * Output the PDF directly to the browser.
      *
      * @param  boolean $download
-     * @return Pdf
+     * @param  boolean $sendHeaders
+     * @return void
      */
-    public function output($download = false)
+    public function output($download = false, $sendHeaders = true)
     {
         // Format and finalize the PDF.
         $this->finalize();
@@ -879,37 +813,28 @@ class Pdf
             $headers['Pragma']        = 'cache';
         }
 
-        header('HTTP/1.1 200 OK');
-        foreach ($headers as $name => $value) {
-            header($name . ": " . $value);
+        // Send the headers and output the PDF
+        if (!headers_sent() && ($sendHeaders)) {
+            header('HTTP/1.1 200 OK');
+            foreach ($headers as $name => $value) {
+                header($name . ": " . $value);
+            }
         }
 
         echo $this->output;
-        return $this;
     }
 
     /**
      * Save the PDF directly to the server.
      *
      * @param  string  $to
-     * @param  boolean $append
      * @throws Exception
-     * @return Pdf
+     * @return void
      */
-    public function save($to = null, $append = false)
+    public function save($to = null)
     {
-        // Format and finalize the PDF.
         $this->finalize();
-
-        $file = (null === $to) ? $this->fullpath : $to;
-
-        if ($append) {
-            file_put_contents($file, $this->output, FILE_APPEND);
-        } else {
-            file_put_contents($file, $this->output);
-        }
-
-        return $this;
+        file_put_contents(((null === $to) ? $this->fullpath : $to), $this->output);
     }
 
     /**
@@ -954,108 +879,54 @@ class Pdf
     }
 
     /**
-     * Method to return the current page's content object, or create one if necessary.
+     * Method to return the current page's content object index, or create one if necessary.
      *
      * @return int
      */
-    protected function getContentObject()
+    public function getContentObjectIndex()
     {
         // If the page's current content object index is not set, create one.
         if (null === $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->curContent) {
-            $coi = $this->lastIndex($this->objects) + 1;
-            $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->content[] = $coi;
-            $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->curContent = $coi;
-            $this->objects[$coi] = new Object\Object($coi);
+            $coIndex = $this->lastIndex($this->objects) + 1;
+            $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->content[] = $coIndex;
+            $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->curContent = $coIndex;
+            $this->objects[$coIndex] = new Object\Object($coIndex);
         // Else, set and return the page's current content object index.
         } else {
-            $coi = $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->curContent;
+            $coIndex = $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->curContent;
         }
 
-        return $coi;
+        return $coIndex;
     }
 
     /**
-     * Method to calculate text matrix.
+     * Method to return the last object index.
+     *
+     * @param  array $arr
+     * @return int
+     */
+    public function lastIndex(array $arr)
+    {
+        $last = null;
+        $objs = array_keys($arr);
+        sort($objs);
+
+        foreach ($objs as $obj) {
+            $last = $obj;
+        }
+
+        return $last;
+    }
+
+    /**
+     * Method to print the PDF.
      *
      * @return string
      */
-    protected function calcTextMatrix()
+    public function __toString()
     {
-        // Define some variables.
-        $a   = '';
-        $b   = '';
-        $c   = '';
-        $d   = '';
-        $neg = null;
-
-        // Determine is the rotate parameter is negative or not.
-        $neg = ($this->textParams['rot'] < 0) ? true : false;
-
-        // Calculate the text matrix parameters.
-        $rot = abs($this->textParams['rot']);
-
-        if (($rot >= 0) && ($rot <= 45)) {
-            $factor = round(($rot / 45), 2);
-            if ($neg) {
-                $a = 1;
-                $b = '-' . $factor;
-                $c = $factor;
-                $d = 1;
-            } else {
-                $a = 1;
-                $b = $factor;
-                $c = '-' . $factor;
-                $d = 1;
-            }
-        } else if (($rot > 45) && ($rot <= 90)) {
-            $factor = round(((90 - $rot) / 45), 2);
-            if ($neg) {
-                $a = $factor;
-                $b = -1;
-                $c = 1;
-                $d = $factor;
-            } else {
-                $a = $factor;
-                $b = 1;
-                $c = -1;
-                $d = $factor;
-            }
-        }
-
-        // Adjust the text matrix parameters according to the horizontal and vertical scale parameters.
-        if ($this->textParams['h'] != 100) {
-            $a = round(($a * ($this->textParams['h'] / 100)), 2);
-            $b = round(($b * ($this->textParams['h'] / 100)), 2);
-        }
-
-        if ($this->textParams['v'] != 100) {
-            $c = round(($c * ($this->textParams['v'] / 100)), 2);
-            $d = round(($d * ($this->textParams['v'] / 100)), 2);
-        }
-
-        // Set the text matrix and return it.
-        $tm = "{$a} {$b} {$c} {$d}";
-
-        return $tm;
-    }
-
-
-    /**
-     * Method to calculate which quadrant a point is in.
-     *
-     * @param  array $point
-     * @param  array $center
-     * @return int
-     */
-    protected function getQuadrant($point, $center)
-    {
-        if ($point['x'] >= $center['x']) {
-            $quad = ($point['y'] >= $center['y']) ? 4 : 1;
-        } else {
-            $quad = ($point['y'] >= $center['y']) ? 3 : 2;
-        }
-
-        return $quad;
+        $this->output();
+        return '';
     }
 
     /**
@@ -1079,58 +950,6 @@ class Pdf
     protected function formatByteLength($num)
     {
         return sprintf('%010d', $num);
-    }
-
-    /**
-     * Method to convert color.
-     *
-     * @param  int|string $color
-     * @return float
-     */
-    protected function convertColor($color)
-    {
-        $c = round(($color / 256), 2);
-        return $c;
-    }
-
-    /**
-     * Method to set the fill/stroke style.
-     *
-     * @param  boolean $fill
-     * @return string
-     */
-    protected function setStyle($fill)
-    {
-        $style = null;
-
-        if (($fill) && ($this->stroke)) {
-            $style = 'B';
-        } else if ($fill) {
-            $style = 'F';
-        } else {
-            $style = 'S';
-        }
-
-        return $style;
-    }
-
-    /**
-     * Method to return the last object index.
-     *
-     * @param  array $arr
-     * @return int
-     */
-    protected function lastIndex(array $arr)
-    {
-        $last = null;
-        $objs = array_keys($arr);
-        sort($objs);
-
-        foreach ($objs as $obj) {
-            $last = $obj;
-        }
-
-        return $last;
     }
 
 }

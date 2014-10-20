@@ -158,14 +158,14 @@ abstract class AbstractEffect
      * @param  int $r
      * @param  int $g
      * @param  int $b
-     * @return Pdf
+     * @return AbstractEffect
      */
     public function setFillColor($r = 0, $g = 0, $b = 0)
     {
         $this->fillColor = [(int)$r, (int)$g, (int)$b];
 
-        $coIndex = $this->getContentObject();
-        $this->objects[$coIndex]->setStream("\n" . $this->convertColor((int)$r) . " " .
+        $coIndex = $this->pdf->getContentObjectIndex();
+        $this->pdf->getObject($coIndex)->setStream("\n" . $this->convertColor((int)$r) . " " .
             $this->convertColor((int)$g) . " " . $this->convertColor((int)$b) . " rg\n");
 
         return $this;
@@ -177,14 +177,14 @@ abstract class AbstractEffect
      * @param  int $r
      * @param  int $g
      * @param  int $b
-     * @return Pdf
+     * @return AbstractEffect
      */
     public function setStrokeColor($r = 0, $g = 0, $b = 0)
     {
         $this->strokeColor = [(int)$r, (int)$g, (int)$b];
 
-        $coIndex = $this->getContentObject();
-        $this->objects[$coIndex]->setStream("\n" . $this->convertColor((int)$r) . " " .
+        $coIndex = $this->pdf->getContentObjectIndex();
+        $this->pdf->getObject($coIndex)->setStream("\n" . $this->convertColor((int)$r) . " " .
             $this->convertColor((int)$g) . " " . $this->convertColor((int)$b) . " RG\n");
 
         return $this;
@@ -196,7 +196,7 @@ abstract class AbstractEffect
      * @param  int $w
      * @param  int $dashLength
      * @param  int $dashGap
-     * @return Pdf
+     * @return AbstractEffect
      */
     public function setStrokeWidth($w = null, $dashLength = null, $dashGap = null)
     {
@@ -217,11 +217,62 @@ abstract class AbstractEffect
             // Set the dash properties of the stroke, or else default it to a solid line.
             $newString .= ((null !== $dashLength) && (null !== $dashGap)) ? "[{$dashLength} {$dashGap}] 0 d\n" : "[] 0 d\n";
 
-            $coIndex = $this->getContentObject();
-            $this->objects[$coIndex]->setStream($newString);
+            $coIndex = $this->pdf->getContentObjectIndex();
+            $this->pdf->getObject($coIndex)->setStream($newString);
         }
 
         return $this;
+    }
+
+    /**
+     * Method to calculate which quadrant a point is in.
+     *
+     * @param  array $point
+     * @param  array $center
+     * @return int
+     */
+    protected function getQuadrant($point, $center)
+    {
+        if ($point['x'] >= $center['x']) {
+            $quad = ($point['y'] >= $center['y']) ? 4 : 1;
+        } else {
+            $quad = ($point['y'] >= $center['y']) ? 3 : 2;
+        }
+
+        return $quad;
+    }
+
+    /**
+     * Method to convert color.
+     *
+     * @param  int|string $color
+     * @return float
+     */
+    protected function convertColor($color)
+    {
+        $c = round(($color / 256), 2);
+        return $c;
+    }
+
+    /**
+     * Method to set the fill/stroke style.
+     *
+     * @param  boolean $fill
+     * @return string
+     */
+    protected function setStyle($fill)
+    {
+        $style = null;
+
+        if (($fill) && ($this->strokeWidth > 0)) {
+            $style = 'B';
+        } else if ($fill) {
+            $style = 'F';
+        } else {
+            $style = 'S';
+        }
+
+        return $style;
     }
 
 }

@@ -281,7 +281,7 @@ class Svg extends AbstractDraw
      * @param  int $ry
      * @return Svg
      */
-    public function roundRectangle($x, $y, $w, $h = null, $rx = 10, $ry = null)
+    public function roundedRectangle($x, $y, $w, $h = null, $rx = 10, $ry = null)
     {
         if (null !== $this->clippingObject) {
             $rect = $this->clippingObject->addChild('rect');
@@ -315,9 +315,9 @@ class Svg extends AbstractDraw
      * @param  int $ry
      * @return Svg
      */
-    public function roundSquare($x, $y, $w, $rx = 10, $ry = null)
+    public function roundedSquare($x, $y, $w, $rx = 10, $ry = null)
     {
-        return $this->roundRectangle($x, $y, $w, $w, $rx, $ry);
+        return $this->roundedRectangle($x, $y, $w, $w, $rx, $ry);
     }
 
     /**

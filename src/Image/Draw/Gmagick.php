@@ -122,7 +122,7 @@ class Gmagick extends AbstractDraw
      * @param  int $ry
      * @return Gmagick
      */
-    public function roundRectangle($x, $y, $w, $h = null, $rx = 10, $ry = null)
+    public function roundedRectangle($x, $y, $w, $h = null, $rx = 10, $ry = null)
     {
         $x2 = $x + $w;
         $y2 = $y + ((null === $h) ? $w : $h);
@@ -141,7 +141,7 @@ class Gmagick extends AbstractDraw
             $draw->setStrokeWidth($this->strokeWidth);
         }
 
-        $draw->roundRectangle($x, $y, $x2, $y2, $rx, $ry);
+        $draw->roundedRectangle($x, $y, $x2, $y2, $rx, $ry);
         $this->image->resource()->drawImage($draw);
 
         return $this;
@@ -157,9 +157,9 @@ class Gmagick extends AbstractDraw
      * @param  int $ry
      * @return Gmagick
      */
-    public function roundSquare($x, $y, $w, $rx = 10, $ry = null)
+    public function roundedSquare($x, $y, $w, $rx = 10, $ry = null)
     {
-        return $this->roundRectangle($x, $y, $w, $w, $rx, $ry);
+        return $this->roundedRectangle($x, $y, $w, $w, $rx, $ry);
     }
 
     /**
