@@ -11,7 +11,6 @@ As of July 17, 2014
 * New
     - Application (replaces Project)
     - Acl (separated from Auth)
-    - Ldap component
     - Row Gateway and Table Gateway classes in the Db component
 * Revised
     - Acl
@@ -19,6 +18,7 @@ As of July 17, 2014
     - Auth
         + Separated the Acl component and moved to its own folder
         + Added support for Http auth
+        + Added support for Ldap auth
         + Stripped out and simplified the auth functionality
     - Db
         + Removed the top-level Pop\Db\Db class in favor of direct access to the Db\Adapter classes
@@ -43,6 +43,7 @@ As of July 17, 2014
     - Pdf
         + Font component moved under Pdf
 * Removed
+    - Color
     - Compress
     - Curl (moved under the Http component)
     - Db\Adapter\Mysql (renamed old Mysqli adapter class to Mysql)

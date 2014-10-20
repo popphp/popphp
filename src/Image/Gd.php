@@ -377,6 +377,11 @@ class Gd extends AbstractRasterImage
         $xOffset = 0;
         $yOffset = 0;
 
+        $scale        = ($this->width > $this->height) ? ($px / $this->height) : ($px / $this->width);
+        $w            = round($this->width * $scale);
+        $h            = round($this->height * $scale);
+        $this->output = imagecreatetruecolor($px, $px);
+
         if (null !== $offset) {
             if ($this->width > $this->height) {
                 $xOffset = $offset;
@@ -385,12 +390,15 @@ class Gd extends AbstractRasterImage
                 $xOffset = 0;
                 $yOffset = $offset;
             }
+        } else {
+            if ($this->width > $this->height) {
+                $xOffset = round(($this->width - $this->height) / 2);
+                $yOffset = 0;
+            } else if ($this->width < $this->height) {
+                $xOffset = 0;
+                $yOffset = round(($this->height - $this->width) / 2);
+            }
         }
-
-        $scale        = ($this->width > $this->height) ? ($px / $this->height) : ($px / $this->width);
-        $w            = round($this->width * $scale);
-        $h            = round($this->height * $scale);
-        $this->output = imagecreatetruecolor($px, $px);
 
         $this->copyImage($w, $h, $xOffset, $yOffset);
         return $this;
