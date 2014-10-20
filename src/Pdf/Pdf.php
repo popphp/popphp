@@ -86,15 +86,27 @@ class Pdf
 
     /**
      * PDF draw object
-     * @var Draw\Draw
+     * @var Draw\Pdf
      */
     protected $draw = null;
 
     /**
+     * PDF effect object
+     * @var Effect\Pdf
+     */
+    protected $effect = null;
+
+    /**
      * PDF type object
-     * @var Type\Type
+     * @var Type\Pdf
      */
     protected $type = null;
+
+    /**
+     * PDF background color
+     * @var array
+     */
+    protected $backgroundColor = [255, 255, 255];
 
     /**
      * Compression property
@@ -398,14 +410,29 @@ class Pdf
     }
 
     /**
+     * Set the PDF background color
+     *
+     * @param  int $r
+     * @param  int $g
+     * @param  int $b
+     * @return Pdf
+     */
+    public function setBackgroundColor($r, $g, $b)
+    {
+        $this->backgroundColor = [(int)$r, (int)$g, (int)$b];
+        $this->effect()->fill((int)$r, (int)$g, (int)$b);
+        return $this;
+    }
+
+    /**
      * Get the Pdf draw object
      *
-     * @return Draw\Draw
+     * @return Draw\Pdf
      */
     public function draw()
     {
         if (null === $this->draw) {
-            $this->draw = new Draw\Draw($this);
+            $this->draw = new Draw\Pdf($this);
         }
         if (null === $this->draw->getPdf()) {
             $this->draw->setPdf($this);
@@ -414,19 +441,45 @@ class Pdf
     }
 
     /**
+     * Get the Pdf effect object
+     *
+     * @return Effect\Pdf
+     */
+    public function effect()
+    {
+        if (null === $this->effect) {
+            $this->effect = new Effect\Pdf($this);
+        }
+        if (null === $this->effect->getPdf()) {
+            $this->effect->setPdf($this);
+        }
+        return $this->effect;
+    }
+
+    /**
      * Get the Pdf type object
      *
-     * @return Type\Type
+     * @return Type\Pdf
      */
     public function type()
     {
         if (null === $this->type) {
-            $this->type = new Type\Type($this);
+            $this->type = new Type\Pdf($this);
         }
         if (null === $this->type->getPdf()) {
             $this->type->setPdf($this);
         }
         return $this->type;
+    }
+
+    /**
+     * Method to get the background of the document.
+     *
+     * @return array
+     */
+    public function getBackgroundColor()
+    {
+        return $this->backgroundColor;
     }
 
     /**
@@ -479,6 +532,16 @@ class Pdf
     public function getCurrentPage()
     {
         return ($this->currentPage + 1);
+    }
+
+    /**
+     * Method to return the current page number of the current page of the PDF.
+     *
+     * @return Object\Page
+     */
+    public function getCurrentPageObject()
+    {
+        return (isset($this->objects[$this->pages[$this->currentPage]]) ? $this->objects[$this->pages[$this->currentPage]] : null);
     }
 
     /**
@@ -625,20 +688,6 @@ class Pdf
     public function setModDate($dt)
     {
         $this->objects[$this->info]->modDate = $dt;
-        return $this;
-    }
-
-    /**
-     * Method to set the background of the document.
-     *
-     * @param  int $r
-     * @param  int $g
-     * @param  int $b
-     * @return Pdf
-     */
-    public function setBackgroundColor($r = 0, $g = 0, $b = 0)
-    {
-        // Create a back fill object, $pdf->draw()->...
         return $this;
     }
 

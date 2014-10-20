@@ -25,7 +25,7 @@ namespace Pop\Pdf\Draw;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Draw extends \Pop\Pdf\AbstractEffect
+class Pdf extends \Pop\Pdf\AbstractPdfEffect
 {
 
     /**
@@ -38,7 +38,7 @@ class Draw extends \Pop\Pdf\AbstractEffect
      * Add a clipping path
      *
      * @param  boolean $clip
-     * @return Draw
+     * @return Pdf
      */
     public function clipping($clip = true)
     {
@@ -53,7 +53,7 @@ class Draw extends \Pop\Pdf\AbstractEffect
      * @param  int $y1
      * @param  int $x2
      * @param  int $y2
-     * @return Draw
+     * @return Pdf
      */
     public function line($x1, $y1, $x2, $y2)
     {
@@ -70,17 +70,24 @@ class Draw extends \Pop\Pdf\AbstractEffect
      * @param  int $y
      * @param  int $w
      * @param  int $h
-     * @param  boolean $fill
-     * @return Draw
+     * @return Pdf
      */
-    public function rectangle($x, $y, $w, $h = null, $fill = true)
+    public function rectangle($x, $y, $w, $h = null)
     {
         if (null === $h) {
             $h = $w;
         }
 
         $coIndex = $this->pdf->getContentObjectIndex();
-        $this->pdf->getObject($coIndex)->setStream("\n{$x} {$y} {$w} {$h} re\n" . $this->setStyle($fill) . "\n");
+
+        if ($this->clipping) {
+            $bgColor = $this->pdf->getBackgroundColor();
+            $this->setStrokeWidth(0);
+            $this->setFillColor($bgColor[0], $bgColor[1], $bgColor[2]);
+            $this->pdf->getObject($coIndex)->setStream("\n{$x} {$y} {$w} {$h} re\nW\nF\n");
+        } else {
+            $this->pdf->getObject($coIndex)->setStream("\n{$x} {$y} {$w} {$h} re\n" . $this->setStyle() . "\n");
+        }
 
         return $this;
     }
@@ -94,10 +101,9 @@ class Draw extends \Pop\Pdf\AbstractEffect
      * @param  int $h
      * @param  int $rx
      * @param  int $ry
-     * @param  boolean $fill
-     * @return Draw
+     * @return Pdf
      */
-    public function roundedRectangle($x, $y, $w, $h = null, $rx = 10, $ry = null, $fill = true)
+    public function roundedRectangle($x, $y, $w, $h = null, $rx = 10, $ry = null)
     {
         if (null === $h) {
             $h = $w;
@@ -142,7 +148,15 @@ class Draw extends \Pop\Pdf\AbstractEffect
         $rectangle .= "h\n";
 
         $coIndex = $this->pdf->getContentObjectIndex();
-        $this->pdf->getObject($coIndex)->setStream("\n{$rectangle}\n" . $this->setStyle($fill) . "\n");
+
+        if ($this->clipping) {
+            $bgColor = $this->pdf->getBackgroundColor();
+            $this->setStrokeWidth(0);
+            $this->setFillColor($bgColor[0], $bgColor[1], $bgColor[2]);
+            $this->pdf->getObject($coIndex)->setStream("\n{$rectangle}\nW\nF\n");
+        } else {
+            $this->pdf->getObject($coIndex)->setStream("\n{$rectangle}\n" . $this->setStyle() . "\n");
+        }
 
         return $this;
     }
@@ -153,12 +167,11 @@ class Draw extends \Pop\Pdf\AbstractEffect
      * @param  int     $x
      * @param  int     $y
      * @param  int     $w
-     * @param  boolean $fill
-     * @return Draw
+     * @return Pdf
      */
-    public function square($x, $y, $w, $fill = true)
+    public function square($x, $y, $w)
     {
-        $this->rectangle($x, $y, $w, $w, $fill);
+        $this->rectangle($x, $y, $w, $w);
         return $this;
     }
 
@@ -170,25 +183,23 @@ class Draw extends \Pop\Pdf\AbstractEffect
      * @param  int $w
      * @param  int $rx
      * @param  int $ry
-     * @param  boolean $fill
-     * @return Draw
+     * @return Pdf
      */
-    public function roundedSquare($x, $y, $w, $rx = 10, $ry = null, $fill = true)
+    public function roundedSquare($x, $y, $w, $rx = 10, $ry = null)
     {
-        return $this->roundedRectangle($x, $y, $w, $w, $rx, $ry, $fill);
+        return $this->roundedRectangle($x, $y, $w, $w, $rx, $ry);
     }
 
     /**
-     * Method to add an ellipse to the PDF.
+     * Method to draw an ellipse to the PDF.
      *
      * @param  int     $x
      * @param  int     $y
      * @param  int     $w
      * @param  int     $h
-     * @param  boolean $fill
-     * @return Draw
+     * @return Pdf
      */
-    public function ellipse($x, $y, $w, $h = null, $fill = true)
+    public function ellipse($x, $y, $w, $h = null)
     {
         if (null === $h) {
             $h = $w;
@@ -231,28 +242,35 @@ class Draw extends \Pop\Pdf\AbstractEffect
         $coor4Bez2Y = $y4;
 
         $coIndex = $this->pdf->getContentObjectIndex();
-        $this->pdf->getObject($coIndex)->setStream("\n{$x1} {$y1} m\n{$coor1Bez1X} {$coor1Bez1Y} {$coor2Bez1X} {$coor2Bez1Y} {$x2} {$y2} c\n{$coor2Bez2X} {$coor2Bez2Y} {$coor3Bez1X} {$coor3Bez1Y} {$x3} {$y3} c\n{$coor3Bez2X} {$coor3Bez2Y} {$coor4Bez1X} {$coor4Bez1Y} {$x4} {$y4} c\n{$coor4Bez2X} {$coor4Bez2Y} {$coor1Bez2X} {$coor1Bez2Y} {$x1} {$y1} c\n" . $this->setStyle($fill) . "\n");
+
+        if ($this->clipping) {
+            $bgColor = $this->pdf->getBackgroundColor();
+            $this->setStrokeWidth(0);
+            $this->setFillColor($bgColor[0], $bgColor[1], $bgColor[2]);
+            $this->pdf->getObject($coIndex)->setStream("\n{$x1} {$y1} m\n{$coor1Bez1X} {$coor1Bez1Y} {$coor2Bez1X} {$coor2Bez1Y} {$x2} {$y2} c\n{$coor2Bez2X} {$coor2Bez2Y} {$coor3Bez1X} {$coor3Bez1Y} {$x3} {$y3} c\n{$coor3Bez2X} {$coor3Bez2Y} {$coor4Bez1X} {$coor4Bez1Y} {$x4} {$y4} c\n{$coor4Bez2X} {$coor4Bez2Y} {$coor1Bez2X} {$coor1Bez2Y} {$x1} {$y1} c\nW\nF\n");
+        } else {
+            $this->pdf->getObject($coIndex)->setStream("\n{$x1} {$y1} m\n{$coor1Bez1X} {$coor1Bez1Y} {$coor2Bez1X} {$coor2Bez1Y} {$x2} {$y2} c\n{$coor2Bez2X} {$coor2Bez2Y} {$coor3Bez1X} {$coor3Bez1Y} {$x3} {$y3} c\n{$coor3Bez2X} {$coor3Bez2Y} {$coor4Bez1X} {$coor4Bez1Y} {$x4} {$y4} c\n{$coor4Bez2X} {$coor4Bez2Y} {$coor1Bez2X} {$coor1Bez2Y} {$x1} {$y1} c\n" . $this->setStyle() . "\n");
+        }
 
         return $this;
     }
 
     /**
-     * Method to add a circle to the PDF.
+     * Method to draw a circle to the PDF.
      *
      * @param  int     $x
      * @param  int     $y
      * @param  int     $w
-     * @param  boolean $fill
-     * @return Draw
+     * @return Pdf
      */
-    public function circle($x, $y, $w, $fill = true)
+    public function circle($x, $y, $w)
     {
-        $this->ellipse($x, $y, $w, $w, $fill);
+        $this->ellipse($x, $y, $w, $w);
         return $this;
     }
 
     /**
-     * Method to add an arc to the PDF.
+     * Method to draw an arc to the PDF.
      *
      * @param  int $x
      * @param  int $y
@@ -260,10 +278,9 @@ class Draw extends \Pop\Pdf\AbstractEffect
      * @param  int $end
      * @param  int $w
      * @param  int $h
-     * @param  boolean $fill
-     * @return Draw
+     * @return Pdf
      */
-    public function arc($x, $y, $start, $end, $w, $h = null, $fill = true)
+    public function arc($x, $y, $start, $end, $w, $h = null)
     {
         if (null === $h) {
             $h = $w;
@@ -369,20 +386,19 @@ class Draw extends \Pop\Pdf\AbstractEffect
 
         $polyPoints[] = $endPoint;
 
-        $this->ellipse($x, $y, $w, $h, $fill);
-        $this->clipping()->polygon($polyPoints, true);
+        $this->ellipse($x, $y, $w, $h);
+        $this->clipping(true)->polygon($polyPoints);
 
         return $this;
     }
 
     /**
-     * Method to add a polygon to the image.
+     * Method to draw a polygon to the image.
      *
      * @param  array $points
-     * @param  boolean $fill
-     * @return Draw
+     * @return Pdf
      */
-    public function polygon($points, $fill = true)
+    public function polygon($points)
     {
         $i = 1;
         $polygon = null;
@@ -398,7 +414,15 @@ class Draw extends \Pop\Pdf\AbstractEffect
         $polygon .= "h\n";
 
         $coIndex = $this->pdf->getContentObjectIndex();
-        $this->pdf->getObject($coIndex)->setStream("\n{$polygon}\n" . $this->setStyle($fill) . "\n");
+
+        if ($this->clipping) {
+            $bgColor = $this->pdf->getBackgroundColor();
+            $this->setStrokeWidth(0);
+            $this->setFillColor($bgColor[0], $bgColor[1], $bgColor[2]);
+            $this->pdf->getObject($coIndex)->setStream("\n{$polygon}\nW\nF\n");
+        } else {
+            $this->pdf->getObject($coIndex)->setStream("\n{$polygon}\n" . $this->setStyle() . "\n");
+        }
 
         return $this;
     }

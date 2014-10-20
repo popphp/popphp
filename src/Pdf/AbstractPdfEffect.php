@@ -25,7 +25,7 @@ namespace Pop\Pdf;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-abstract class AbstractEffect
+abstract class AbstractPdfEffect
 {
 
     /**
@@ -70,7 +70,7 @@ abstract class AbstractEffect
      * Instantiate a PDF effect object
      *
      * @param  Pdf $pdf
-     * @return AbstractEffect
+     * @return AbstractPdfEffect
      */
     public function __construct(Pdf $pdf = null)
     {
@@ -144,7 +144,7 @@ abstract class AbstractEffect
      * Set the PDF object
      *
      * @param  Pdf
-     * @return AbstractEffect
+     * @return AbstractPdfEffect
      */
     public function setPdf(Pdf $pdf)
     {
@@ -158,7 +158,7 @@ abstract class AbstractEffect
      * @param  int $r
      * @param  int $g
      * @param  int $b
-     * @return AbstractEffect
+     * @return AbstractPdfEffect
      */
     public function setFillColor($r = 0, $g = 0, $b = 0)
     {
@@ -177,7 +177,7 @@ abstract class AbstractEffect
      * @param  int $r
      * @param  int $g
      * @param  int $b
-     * @return AbstractEffect
+     * @return AbstractPdfEffect
      */
     public function setStrokeColor($r = 0, $g = 0, $b = 0)
     {
@@ -196,7 +196,7 @@ abstract class AbstractEffect
      * @param  int $w
      * @param  int $dashLength
      * @param  int $dashGap
-     * @return AbstractEffect
+     * @return AbstractPdfEffect
      */
     public function setStrokeWidth($w = null, $dashLength = null, $dashGap = null)
     {
@@ -257,16 +257,15 @@ abstract class AbstractEffect
     /**
      * Method to set the fill/stroke style.
      *
-     * @param  boolean $fill
      * @return string
      */
-    protected function setStyle($fill)
+    protected function setStyle()
     {
         $style = null;
 
-        if (($fill) && ($this->strokeWidth > 0)) {
+        if ((null !== $this->fillColor) && ($this->strokeWidth > 0)) {
             $style = 'B';
-        } else if ($fill) {
+        } else if (null !== $this->fillColor) {
             $style = 'F';
         } else {
             $style = 'S';

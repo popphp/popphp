@@ -25,7 +25,7 @@ namespace Pop\Pdf\Type;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Type extends \Pop\Pdf\AbstractEffect
+class Pdf extends \Pop\Pdf\AbstractPdfEffect
 {
 
     /**
@@ -75,7 +75,13 @@ class Type extends \Pop\Pdf\AbstractEffect
     ];
 
     /**
-     * Current fonts added to the PDF
+     * Current embedded fonts
+     * @var array
+     */
+    protected $embeddedFonts = [];
+
+    /**
+     * Array of all fonts added to or embedded in the PDF
      * @var array
      */
     protected $fonts = [];
@@ -108,7 +114,7 @@ class Type extends \Pop\Pdf\AbstractEffect
      * Set the font size
      *
      * @param  int $size
-     * @return Type
+     * @return Pdf
      */
     public function size($size)
     {
@@ -120,7 +126,7 @@ class Type extends \Pop\Pdf\AbstractEffect
      * Set the X-position
      *
      * @param  int $x
-     * @return Type
+     * @return Pdf
      */
     public function x($x)
     {
@@ -132,7 +138,7 @@ class Type extends \Pop\Pdf\AbstractEffect
      * Set the Y-position
      *
      * @param  int $y
-     * @return Type
+     * @return Pdf
      */
     public function y($y)
     {
@@ -145,7 +151,7 @@ class Type extends \Pop\Pdf\AbstractEffect
      *
      * @param  int $x
      * @param  int $y
-     * @return Type
+     * @return Pdf
      */
     public function xy($x, $y)
     {
@@ -158,7 +164,7 @@ class Type extends \Pop\Pdf\AbstractEffect
      * Method to set the rotation of the text
      *
      * @param  int $rotation
-     * @return Type
+     * @return Pdf
      */
     public function rotate($rotation)
     {
@@ -171,7 +177,7 @@ class Type extends \Pop\Pdf\AbstractEffect
      *
      * @param  string  $font
      * @throws Exception
-     * @return Type
+     * @return Pdf
      */
     public function addFont($font)
     {
@@ -208,7 +214,7 @@ class Type extends \Pop\Pdf\AbstractEffect
      * @param  string  $font
      * @param  boolean $embedOverride
      * @throws Exception
-     * @return Type
+     * @return Pdf
      */
     public function embedFont($font, $embedOverride = false)
     {
@@ -238,7 +244,8 @@ class Type extends \Pop\Pdf\AbstractEffect
         $this->lastFontName = $fontParser->getFontName();
 
         if (!in_array($this->lastFontName, $this->fonts)) {
-            $this->fonts[] = $this->lastFontName;
+            $this->fonts[]         = $this->lastFontName;
+            $this->embeddedFonts[] = $this->lastFontName;
         }
 
         return $this;
@@ -250,7 +257,7 @@ class Type extends \Pop\Pdf\AbstractEffect
      * @param  string $str
      * @param  string $font
      * @throws Exception
-     * @return Type
+     * @return Pdf
      */
     public function text($str, $font = null)
     {
@@ -321,13 +328,33 @@ class Type extends \Pop\Pdf\AbstractEffect
     }
 
     /**
-     * Method to return the name of the last font added.
+     * Method to return all of the fonts added or embedded in the PDF
      *
      * @return string
      */
     public function getFonts()
     {
         return $this->fonts;
+    }
+
+    /**
+     * Method to get available standard fonts.
+     *
+     * @return array
+     */
+    public function getStandardFonts()
+    {
+        return array_keys($this->standardFonts);
+    }
+
+    /**
+     * Method to get available standard fonts.
+     *
+     * @return array
+     */
+    public function getEmbeddedFonts()
+    {
+        return $this->embeddedFonts;
     }
 
     /**
@@ -350,7 +377,7 @@ class Type extends \Pop\Pdf\AbstractEffect
      * @param  int $rot  (rotation)
      * @param  int $rend (render flag, 0 - 7)
      * @throws Exception
-     * @return Type
+     * @return Pdf
      */
     public function setTextParams($c = 0, $w = 0, $h = 100, $v = 100, $rot = 0, $rend = 0)
     {
