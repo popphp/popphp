@@ -29,16 +29,13 @@ class Cmap extends AbstractTable
 {
 
     /**
-     * Cmap header
-     * @var \ArrayObject
+     * Allowed properties
+     * @var array
      */
-    public $header = null;
-
-    /**
-     * Cmap subtables
-     * @var \ArrayObject
-     */
-    public $subTables = [];
+    protected $allowed = [
+        'header'    => null,
+        'subTables' => []
+    ];
 
     /**
      * Constructor
@@ -50,6 +47,8 @@ class Cmap extends AbstractTable
      */
     public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
+        parent::__construct($this->allowed);
+
         $bytePos = $font->tableInfo['cmap']->offset;
 
         // Get the CMAP header data.

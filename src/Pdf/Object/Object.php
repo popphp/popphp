@@ -25,14 +25,16 @@ namespace Pop\Pdf\Object;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Object extends AbstractObject
+class Object extends \Pop\Pdf\AbstractObject implements ObjectInterface
 {
 
     /**
-     * PDF object index
-     * @var int
+     * Allowed properties
+     * @var array
      */
-    public $index = null;
+    protected $allowed = [
+        'index'      => null
+    ];
 
     /**
      * PDF object data
@@ -86,6 +88,8 @@ class Object extends AbstractObject
      */
     public function __construct($i)
     {
+        parent::__construct($this->allowed);
+
         // Use default settings for a new PDF object.
         if (is_int($i)) {
             $this->index = $i;

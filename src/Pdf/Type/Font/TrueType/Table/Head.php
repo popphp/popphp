@@ -29,10 +29,10 @@ class Head extends AbstractTable
 {
 
     /**
-     * Header info
+     * Allowed properties
      * @var array
      */
-    public $headerInfo = [];
+    protected $allowed = [];
 
     /**
      * Constructor
@@ -81,52 +81,8 @@ class Head extends AbstractTable
         $indexToLocFormat = unpack('nindexToLocFormat', $font->read($bytePos, 2));
         $headerArray['indexToLocFormat'] = $font->shiftToSigned($indexToLocFormat['indexToLocFormat']);
 
-        $this->headerInfo = array_merge($versionArray, $headerArray, $bBox);
-    }
-
-    /**
-     * Set method to set the property to the value of headerInfo[$name].
-     *
-     * @param  string $name
-     * @param  mixed $value
-     * @return void
-     */
-    public function __set($name, $value)
-    {
-        $this->headerInfo[$name] = $value;
-    }
-
-    /**
-     * Get method to return the value of headerInfo[$name].
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        return (array_key_exists($name, $this->headerInfo)) ? $this->headerInfo[$name] : null;
-    }
-
-    /**
-     * Return the isset value of headerInfo[$name].
-     *
-     * @param  string $name
-     * @return boolean
-     */
-    public function __isset($name)
-    {
-        return isset($this->headerInfo[$name]);
-    }
-
-    /**
-     * Unset headerInfo[$name].
-     *
-     * @param  string $name
-     * @return void
-     */
-    public function __unset($name)
-    {
-        $this->headerInfo[$name] = null;
+        $this->allowed = array_merge($versionArray, $headerArray, $bBox);
+        parent::__construct($this->allowed);
     }
 
 }

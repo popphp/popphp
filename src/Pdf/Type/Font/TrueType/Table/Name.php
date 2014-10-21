@@ -29,10 +29,10 @@ class Name extends AbstractTable
 {
 
     /**
-     * Font info
+     * Allowed properties
      * @var array
      */
-    protected $fontInfo = [];
+    protected $allowed = [];
 
     /**
      * TrueType font info names
@@ -99,57 +99,13 @@ class Name extends AbstractTable
                 $ttfValue = @iconv('UTF-16be', 'UTF-8//TRANSLIT', $ttfValue);
             }
             if (($ttfValue != '') && isset($ttfRecord['nameId']) && isset($this->names[$ttfRecord['nameId']])) {
-                $this->fontInfo[$this->names[$ttfRecord['nameId']]] = $ttfValue;
+                $this->allowed[$this->names[$ttfRecord['nameId']]] = $ttfValue;
             }
 
             $bytePos = $ttfRecordOffset;
         }
 
-    }
-
-    /**
-     * Set method to set the property to the value of fontInfo[$name].
-     *
-     * @param  string $name
-     * @param  mixed $value
-     * @return void
-     */
-    public function __set($name, $value)
-    {
-        $this->fontInfo[$name] = $value;
-    }
-
-    /**
-     * Get method to return the value of fontInfo[$name].
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        return (array_key_exists($name, $this->fontInfo)) ? $this->fontInfo[$name] : null;
-    }
-
-    /**
-     * Return the isset value of fontInfo[$name].
-     *
-     * @param  string $name
-     * @return boolean
-     */
-    public function __isset($name)
-    {
-        return isset($this->fontInfo[$name]);
-    }
-
-    /**
-     * Unset fontInfo[$name].
-     *
-     * @param  string $name
-     * @return void
-     */
-    public function __unset($name)
-    {
-        $this->fontInfo[$name] = null;
+        parent::__construct($this->allowed);
     }
 
 }

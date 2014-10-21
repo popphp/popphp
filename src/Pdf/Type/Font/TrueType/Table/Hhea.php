@@ -29,22 +29,14 @@ class Hhea extends AbstractTable
 {
 
     /**
-     * Ascent
-     * @var int
+     * Allowed properties
+     * @var array
      */
-    public $ascent = 0;
-
-    /**
-     * Descent
-     * @var int
-     */
-    public $descent = 0;
-
-    /**
-     * Number of horizontal metrics
-     * @var int
-     */
-    public $numberOfHMetrics = 0;
+    protected $allowed = [
+        'ascent'           => 0,
+        'descent'          => 0,
+        'numberOfHMetrics' => 0
+    ];
 
     /**
      * Constructor
@@ -56,6 +48,8 @@ class Hhea extends AbstractTable
      */
     public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
+        parent::__construct($this->allowed);
+
         $bytePos = $font->tableInfo['hhea']->offset + 4;
 
         $ary = unpack(

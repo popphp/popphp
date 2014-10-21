@@ -25,38 +25,20 @@ namespace Pop\Pdf\Object;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Root extends AbstractObject
+class Root extends \Pop\Pdf\AbstractObject implements ObjectInterface
 {
 
     /**
-     * PDF version
-     * @var string
+     * Allowed properties
+     * @var array
      */
-    public $version = '1.7';
-
-    /**
-     * PDF root object index
-     * @var int
-     */
-    public $index = 1;
-
-    /**
-     * PDF root parent object
-     * @var int
-     */
-    public $parent = 2;
-
-    /**
-     * PDF root metadata object
-     * @var int
-     */
-    public $metadata = null;
-
-    /**
-     * PDF header
-     * @var string
-     */
-    public $header = '%PDF-';
+    protected $allowed = [
+        'version'  => '1.7',
+        'index'    => 1,
+        'parent'   => 2,
+        'metadata' => null,
+        'header'   => '%PDF-'
+    ];
 
     /**
      * PDF root object data
@@ -74,6 +56,8 @@ class Root extends AbstractObject
      */
     public function __construct($str = null)
     {
+        parent::__construct($this->allowed);
+
         // Use default settings for a new PDF and its root object.
         if (null === $str) {
             $this->data = "1 0 obj\n<</Pages 2 0 R/Type/Catalog>>\nendobj\n";

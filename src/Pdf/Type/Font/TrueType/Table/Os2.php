@@ -29,22 +29,14 @@ class Os2 extends AbstractTable
 {
 
     /**
-     * Font cap height value
-     * @var int
+     * Allowed properties
+     * @var array
      */
-    public $capHeight = 0;
-
-    /**
-     * Font embeddable flag
-     * @var boolean
-     */
-    public $embeddable = true;
-
-    /**
-     * Font flags
-     * @var \ArrayObject
-     */
-    public $flags = null;
+    protected $allowed = [
+        'capHeight'  => 0,
+        'embeddable' => true,
+        'flags'      => null
+    ];
 
     /**
      * Constructor
@@ -56,6 +48,8 @@ class Os2 extends AbstractTable
      */
     public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
+        parent::__construct($this->allowed);
+
         $this->flags = new \ArrayObject([
             'isFixedPitch'  => false,
             'isSerif'       => false,

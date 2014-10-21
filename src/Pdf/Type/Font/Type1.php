@@ -29,58 +29,35 @@ class Type1 extends AbstractFont
 {
 
     /**
-     * Type1 dictionary
-     * @var string
+     * Allowed properties
+     * @var array
      */
-    public $dict = null;
-
-    /**
-     * Type1 data
-     * @var string
-     */
-    public $data = null;
-
-    /**
-     * Type1 data in hex format
-     * @var string
-     */
-    public $hex = null;
-
-    /**
-     * Type1 encoding
-     * @var string
-     */
-    public $encoding = null;
-
-    /**
-     * Type1 length1
-     * @var int
-     */
-    public $length1 = null;
-
-    /**
-     * Type1 length2
-     * @var int
-     */
-    public $length2 = null;
-
-    /**
-     * Type1 font data
-     * @var string
-     */
-    public $fontData = null;
-
-    /**
-     * Type1 PFB file path
-     * @var string
-     */
-    public $pfbPath = null;
-
-    /**
-     * Type1 AFM file path
-     * @var string
-     */
-    public $afmPath = null;
+    protected $allowed = [
+        'info'             => null,
+        'bBox'             => null,
+        'ascent'           => 0,
+        'descent'          => 0,
+        'numberOfGlyphs'   => 0,
+        'glyphWidths'      => [],
+        'missingWidth'     => 0,
+        'numberOfHMetrics' => 0,
+        'italicAngle'      => 0,
+        'capHeight'        => 0,
+        'stemH'            => 0,
+        'stemV'            => 0,
+        'unitsPerEm'       => 1000,
+        'flags'            => null,
+        'embeddable'       => true,
+        'dict'             => null,
+        'data'             => null,
+        'hex'              => null,
+        'encoding'         => null,
+        'length1'          => null,
+        'length2'          => null,
+        'fontData'         => null,
+        'pfbPath'          => null,
+        'afmPath'          => null,
+    ];
 
     /**
      * Constructor

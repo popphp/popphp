@@ -29,34 +29,31 @@ class TrueType extends AbstractFont
 {
 
     /**
-     * TrueType font header
-     * @var mixed
-     */
-    public $header = null;
-
-    /**
-     * TrueType font file header
-     * @var \ArrayObject
-     */
-    public $ttfHeader = null;
-
-    /**
-     * TrueType font file table
-     * @var \ArrayObject
-     */
-    public $ttfTable = null;
-
-    /**
-     * TrueType font tables
+     * Allowed properties
      * @var array
      */
-    public $tables = [];
-
-    /**
-     * TrueType font table info
-     * @var array
-     */
-    public $tableInfo = [];
+    protected $allowed = [
+        'info'             => null,
+        'bBox'             => null,
+        'ascent'           => 0,
+        'descent'          => 0,
+        'numberOfGlyphs'   => 0,
+        'glyphWidths'      => [],
+        'missingWidth'     => 0,
+        'numberOfHMetrics' => 0,
+        'italicAngle'      => 0,
+        'capHeight'        => 0,
+        'stemH'            => 0,
+        'stemV'            => 0,
+        'unitsPerEm'       => 1000,
+        'flags'            => null,
+        'embeddable'       => true,
+        'header'           => null,
+        'ttfHeader'        => null,
+        'ttfTable'         => null,
+        'tables'           => [],
+        'tableInfo'        => []
+    ];
 
     /**
      * Constructor

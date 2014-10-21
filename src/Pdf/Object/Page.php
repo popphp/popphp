@@ -25,68 +25,25 @@ namespace Pop\Pdf\Object;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Page extends AbstractObject
+class Page extends \Pop\Pdf\AbstractObject implements ObjectInterface
 {
 
     /**
-     * PDF page object index
-     * @var int
-     */
-    public $index = 4;
-
-    /**
-     * PDF page object parent index
-     * @var int
-     */
-    public $parent = 2;
-
-    /**
-     * PDF page object width
-     * @var int
-     */
-    public $width = 612;
-
-    /**
-     * PDF page object height
-     * @var int
-     */
-    public $height = 792;
-
-    /**
-     * PDF page object current content object index
-     * @var int
-     */
-    public $curContent = null;
-
-    /**
-     * PDF page annotations
+     * Allowed properties
      * @var array
      */
-    public $annots = [];
-
-    /**
-     * PDF page content objects
-     * @var array
-     */
-    public $content = [];
-
-    /**
-     * PDF page xobjects
-     * @var array
-     */
-    public $xobjs = [];
-
-    /**
-     * PDF page fonts
-     * @var array
-     */
-    public $fonts = [];
-
-    /**
-     * PDF page thumb object
-     * @var int
-     */
-    public $thumb = null;
+    protected $allowed = [
+        'index'      => 4,
+        'parent'     => 2,
+        'width'      => 612,
+        'height'     => 792,
+        'curContent' => null,
+        'annots'     => [],
+        'content'    => [],
+        'xobjs'      => [],
+        'fonts'      => [],
+        'thumb'      => null
+    ];
 
     /**
      * PDF page object data
@@ -146,6 +103,8 @@ class Page extends AbstractObject
      */
     public function __construct($str = null, $sz = null, $w = null, $h = null, $i = null)
     {
+        parent::__construct($this->allowed);
+
         // Use default settings for a new PDF page.
         if (null === $str) {
             // If no arguments are passed, default to the Letter size.

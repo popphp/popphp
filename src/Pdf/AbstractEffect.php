@@ -25,7 +25,7 @@ namespace Pop\Pdf;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-abstract class AbstractPdfEffect
+abstract class AbstractEffect
 {
 
     /**

@@ -25,44 +25,21 @@ namespace Pop\Pdf\Object;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Info extends AbstractObject
+class Info extends \Pop\Pdf\AbstractObject implements ObjectInterface
 {
 
     /**
-     * PDF info object index
-     * @var int
+     * Allowed properties
+     * @var array
      */
-    public $index = 3;
-
-    /**
-     * PDF info title
-     * @var string
-     */
-    public $title = 'Pop PDF';
-
-    /**
-     * PDF info author
-     * @var string
-     */
-    public $author = 'Pop PDF';
-
-    /**
-     * PDF info subject
-     * @var string
-     */
-    public $subject = 'Pop PDF';
-
-    /**
-     * PDF info creation date
-     * @var string
-     */
-    public $createDate = null;
-
-    /**
-     * PDF info mod date
-     * @var string
-     */
-    public $modDate = null;
+    protected $allowed = [
+        'index'      => 3,
+        'title'      => 'Pop PDF',
+        'author'     => 'Pop PDF',
+        'subject'    => 'Pop PDF',
+        'createDate' => null,
+        'modDate'    => null
+    ];
 
     /**
      * PDF info object data
@@ -80,6 +57,8 @@ class Info extends AbstractObject
      */
     public function __construct($str = null)
     {
+        parent::__construct($this->allowed);
+
         // Use default settings for a new PDF object and its info object.
         if (null === $str) {
             $this->createDate = date('D, M j, Y h:i A');

@@ -29,10 +29,12 @@ class Hmtx extends AbstractTable
 {
 
     /**
-     * Glyph widths
+     * Allowed properties
      * @var array
      */
-    public $glyphWidths = [];
+    protected $allowed = [
+        'glyphWidths' => []
+    ];
 
     /**
      * Constructor
@@ -44,6 +46,8 @@ class Hmtx extends AbstractTable
      */
     public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
+        parent::__construct($this->allowed);
+
         $bytePos = $font->tableInfo['hmtx']->offset;
 
         for ($i = 0; $i < $font->numberOfHMetrics; $i++) {

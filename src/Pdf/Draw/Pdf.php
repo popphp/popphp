@@ -25,7 +25,7 @@ namespace Pop\Pdf\Draw;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Pdf extends \Pop\Pdf\AbstractPdfEffect
+class Pdf extends \Pop\Pdf\AbstractEffect
 {
 
     /**

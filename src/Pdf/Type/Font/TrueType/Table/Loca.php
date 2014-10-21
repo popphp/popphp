@@ -29,10 +29,12 @@ class Loca extends AbstractTable
 {
 
     /**
-     * Location offsets
+     * Allowed properties
      * @var array
      */
-    public $offsets = [];
+    protected $allowed = [
+        'offsets' => []
+    ];
 
     /**
      * Constructor
@@ -44,6 +46,8 @@ class Loca extends AbstractTable
      */
     public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
+        parent::__construct($this->allowed);
+
         $bytePos    = $font->tableInfo['loca']->offset;
         $format     = ($font->header->indexToLocFormat == 1) ? 'N' : 'n';
         $byteLength = ($font->header->indexToLocFormat == 1) ? 4 : 2;

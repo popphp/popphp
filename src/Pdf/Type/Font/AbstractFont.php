@@ -25,104 +25,36 @@ namespace Pop\Pdf\Type\Font;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-abstract class AbstractFont
+abstract class AbstractFont extends \Pop\Pdf\AbstractObject
 {
 
     /**
-     * Font info
-     * @var mixed
-     */
-    public $info = null;
-
-    /**
-     * Font bounding box info
-     * @var \ArrayObject
-     */
-    public $bBox = null;
-
-    /**
-     * Font ascent value
-     * @var int
-     */
-    public $ascent = 0;
-
-    /**
-     * Font descent value
-     * @var int
-     */
-    public $descent = 0;
-
-    /**
-     * Font number of glyphs value
-     * @var int
-     */
-    public $numberOfGlyphs = 0;
-
-    /**
-     * Font glyph widths
+     * Allowed properties
      * @var array
      */
-    public $glyphWidths = [];
-
-    /**
-     * Missing glyph width
-     * @var int
-     */
-    public $missingWidth = 0;
-
-    /**
-     * Font number of horizontal metrics value
-     * @var int
-     */
-    public $numberOfHMetrics = 0;
-
-    /**
-     * Font italic angle value
-     * @var float
-     */
-    public $italicAngle = 0;
-
-    /**
-     * Font cap height value
-     * @var int
-     */
-    public $capHeight = 0;
-
-    /**
-     * Font StemH value
-     * @var int
-     */
-    public $stemH = 0;
-
-    /**
-     * Font StemV value
-     * @var int
-     */
-    public $stemV = 0;
-
-    /**
-     * Font units per EM value
-     * @var int
-     */
-    public $unitsPerEm = 1000;
-
-    /**
-     * Font flags
-     * @var \ArrayObject
-     */
-    public $flags = null;
-
-    /**
-     * Font embeddable flag
-     * @var boolean
-     */
-    public $embeddable = true;
+    protected $allowed = [
+        'info'             => null,
+        'bBox'             => null,
+        'ascent'           => 0,
+        'descent'          => 0,
+        'numberOfGlyphs'   => 0,
+        'glyphWidths'      => [],
+        'missingWidth'     => 0,
+        'numberOfHMetrics' => 0,
+        'italicAngle'      => 0,
+        'capHeight'        => 0,
+        'stemH'            => 0,
+        'stemV'            => 0,
+        'unitsPerEm'       => 1000,
+        'flags'            => null,
+        'embeddable'       => true,
+    ];
 
     /**
      * Array of allowed file types.
      * @var array
      */
-    protected $allowed = [
+    protected $allowedTypes = [
         'afm' => 'application/x-font-afm',
         'otf' => 'application/x-font-otf',
         'pfb' => 'application/x-font-pfb',
@@ -187,6 +119,8 @@ abstract class AbstractFont
             throw new Exception('The font file does not exist.');
         }
 
+        parent::__construct($this->allowed);
+
         $this->flags = new \ArrayObject([
             'isFixedPitch'  => false,
             'isSerif'       => false,
@@ -211,11 +145,11 @@ abstract class AbstractFont
             throw new Exception('Error: That font file does not have an extension.');
         }
 
-        if ((null !== $this->extension) && !isset($this->allowed[strtolower($this->extension)])) {
+        if ((null !== $this->extension) && !isset($this->allowedTypes[strtolower($this->extension)])) {
             throw new Exception('Error: That font file type is not allowed.');
         }
 
-        $this->mime = $this->allowed[strtolower($this->extension)];
+        $this->mime = $this->allowedTypes[strtolower($this->extension)];
     }
 
     /**

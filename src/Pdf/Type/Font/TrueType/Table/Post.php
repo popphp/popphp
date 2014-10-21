@@ -29,16 +29,13 @@ class Post extends AbstractTable
 {
 
     /**
-     * Italic angle
-     * @var float
+     * Allowed properties
+     * @var array
      */
-    public $italicAngle = 0;
-
-    /**
-     * Fixed
-     * @var int
-     */
-    public $fixed = 0;
+    protected $allowed = [
+        'italicAngle' => 0,
+        'fixed'       => 0
+    ];
 
     /**
      * Constructor
@@ -50,6 +47,8 @@ class Post extends AbstractTable
      */
     public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
+        parent::__construct($this->allowed);
+
         $bytePos = $font->tableInfo['post']->offset + 4;
 
         $italicBytes       = $font->read($bytePos, 4);

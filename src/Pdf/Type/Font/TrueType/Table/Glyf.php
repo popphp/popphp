@@ -29,16 +29,13 @@ class Glyf extends AbstractTable
 {
 
     /**
-     * Glyphs
+     * Allowed properties
      * @var array
      */
-    public $glyphs = [];
-
-    /**
-     * Glyph widths
-     * @var array
-     */
-    public $glyphWidths = [];
+    protected $allowed = [
+        'glyphs'      => [],
+        'glyphWidths' => []
+    ];
 
     /**
      * Constructor
@@ -50,6 +47,8 @@ class Glyf extends AbstractTable
      */
     public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
     {
+        parent::__construct($this->allowed);
+
         $locaLength = count($font->tables['loca']->offsets);
         $j = 0;
         foreach ($font->tables['loca']->offsets as $offset) {
