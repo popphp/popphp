@@ -25,7 +25,7 @@ namespace Pop\Pdf\Object;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Page implements ObjectInterface
+class Page extends AbstractObject
 {
 
     /**

@@ -25,7 +25,7 @@ namespace Pop\Pdf\Type\Font\TrueType\Table;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Glyf
+class Glyf extends AbstractTable
 {
 
     /**

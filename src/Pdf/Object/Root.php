@@ -25,7 +25,7 @@ namespace Pop\Pdf\Object;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Root implements ObjectInterface
+class Root extends AbstractObject
 {
 
     /**
@@ -56,7 +56,7 @@ class Root implements ObjectInterface
      * PDF header
      * @var string
      */
-    protected $header = '%PDF-';
+    public $header = '%PDF-';
 
     /**
      * PDF root object data

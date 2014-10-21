@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp2
  * @category   Pop
- * @package    Pop_Pdf
+ * @package    Pop_Image
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,40 +13,37 @@
 /**
  * @namespace
  */
-namespace Pop\Pdf\Type\Font\TrueType\Table;
+namespace Pop\Image\Factory;
 
 /**
- * MAXP table class
+ * Abstract factory class
  *
  * @category   Pop
- * @package    Pop_Pdf
+ * @package    Pop_Image
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Maxp extends AbstractTable
+abstract class AbstractImageFactory implements ImageFactoryInterface
 {
 
     /**
-     * Number of glyphs
-     * @var int
+     * Load an existing image as a resource and return the image object
+     *
+     * @param  string $image
+     * @return mixed
      */
-    public $numberOfGlyphs = 0;
+    abstract public function load($image);
 
     /**
-     * Constructor
+     * Create a new image resource and return the image object
      *
-     * Instantiate a TTF 'maxp' table object.
-     *
-     * @param  \Pop\Pdf\Type\Font\TrueType $font
-     * @return Maxp
+     * @param  int    $width
+     * @param  int    $height
+     * @param  string $image
+     * @return mixed
      */
-    public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
-    {
-        $bytePos = $font->tableInfo['maxp']->offset + 4;
-        $ary     = unpack('nnumberOfGlyphs/', $font->read($bytePos, 2));
-        $this->numberOfGlyphs = $ary['numberOfGlyphs'];
-    }
+    abstract public function create($width, $height, $image = null);
 
 }

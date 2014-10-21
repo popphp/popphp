@@ -25,7 +25,7 @@ namespace Pop\Image\Factory;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Gmagick extends AbstractFactory
+class Gmagick extends AbstractImageFactory
 {
 
     /**

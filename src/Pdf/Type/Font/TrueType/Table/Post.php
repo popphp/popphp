@@ -25,7 +25,7 @@ namespace Pop\Pdf\Type\Font\TrueType\Table;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Post
+class Post extends AbstractTable
 {
 
     /**
@@ -33,7 +33,6 @@ class Post
      * @var float
      */
     public $italicAngle = 0;
-
 
     /**
      * Fixed

@@ -16,7 +16,7 @@
 namespace Pop\Pdf\Type\Font\TrueType\Table;
 
 /**
- * MAXP table class
+ * Abstract table class
  *
  * @category   Pop
  * @package    Pop_Pdf
@@ -25,28 +25,7 @@ namespace Pop\Pdf\Type\Font\TrueType\Table;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Maxp extends AbstractTable
+abstract class AbstractTable implements TableInterface
 {
-
-    /**
-     * Number of glyphs
-     * @var int
-     */
-    public $numberOfGlyphs = 0;
-
-    /**
-     * Constructor
-     *
-     * Instantiate a TTF 'maxp' table object.
-     *
-     * @param  \Pop\Pdf\Type\Font\TrueType $font
-     * @return Maxp
-     */
-    public function __construct(\Pop\Pdf\Type\Font\TrueType $font)
-    {
-        $bytePos = $font->tableInfo['maxp']->offset + 4;
-        $ary     = unpack('nnumberOfGlyphs/', $font->read($bytePos, 2));
-        $this->numberOfGlyphs = $ary['numberOfGlyphs'];
-    }
 
 }
