@@ -700,7 +700,7 @@ class Pdf
     public function openLayer()
     {
         $coIndex = $this->getContentObjectIndex();
-        $this->objects[$coIndex]->setStream("\nq\n");
+        $this->objects[$coIndex]->appendStream("\nq\n");
 
         return $this;
     }
@@ -714,7 +714,7 @@ class Pdf
     public function closeLayer()
     {
         $coIndex = $this->getContentObjectIndex();
-        $this->objects[$coIndex]->setStream("\nQ\n");
+        $this->objects[$coIndex]->appendStream("\nQ\n");
 
         return $this;
     }
@@ -806,7 +806,7 @@ class Pdf
                 $imgWidth = $this->images[$image]['origW'];
                 $imgHeight = $this->images[$image]['origH'];
             }
-            $this->objects[$this->objects[$this->pages[$this->currentPage]]->curContent]->setStream("\nq\n" . $imgWidth . " 0 0 " . $imgHeight. " {$x} {$y} cm\n/I{$coIndex} Do\nQ\n");
+            $this->objects[$this->objects[$this->pages[$this->currentPage]]->curContent]->appendStream("\nq\n" . $imgWidth . " 0 0 " . $imgHeight. " {$x} {$y} cm\n/I{$coIndex} Do\nQ\n");
             $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->xobjs[] = $this->images[$image]['xobj'];
         } else {
             // Create image parser object
@@ -823,7 +823,7 @@ class Pdf
             $this->objects[$this->objects[$this->pages[$this->currentPage]]->index]->xobjs[] = $imageParser->getXObject();
 
             $coIndex = $this->getContentObjectIndex();
-            $this->objects[$coIndex]->setStream($imageParser->getStream());
+            $this->objects[$coIndex]->appendStream($imageParser->getStream());
             if ($preserveRes) {
                 $this->images[$image] = [
                     'index' => $i,

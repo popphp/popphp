@@ -102,7 +102,7 @@ class Object extends AbstractObject
                 $str = substr($s, (strpos($s, 'stream') + 6));
                 $str = substr($str, 0, strpos($str, 'endstream'));
                 $this->define($def);
-                $this->setStream($str);
+                $this->appendStream($str);
             } else {
                 $this->define($s);
             }
@@ -193,6 +193,17 @@ class Object extends AbstractObject
      * @return void
      */
     public function setStream($str)
+    {
+        $this->stream = $str;
+    }
+
+    /**
+     * Method to append to the stream the PDF object.
+     *
+     * @param  string $str
+     * @return void
+     */
+    public function appendStream($str)
     {
         $this->stream .= $str;
     }

@@ -49,7 +49,7 @@ class Pdf extends \Pop\Pdf\AbstractPdfEffect
         $w       = round($this->pdf->getCurrentPageObject()->width - ($this->strokeWidth), PHP_ROUND_HALF_DOWN);
         $h       = round($this->pdf->getCurrentPageObject()->height - ($this->strokeWidth), PHP_ROUND_HALF_DOWN);
         $coIndex = $this->pdf->getContentObjectIndex();
-        $this->pdf->getObject($coIndex)->setStream("\n{$x} {$y} {$w} {$h} re\n" . $this->setStyle() . "\n");
+        $this->pdf->getObject($coIndex)->appendStream("\n{$x} {$y} {$w} {$h} re\n" . $this->setStyle() . "\n");
 
         return $this;
     }
@@ -69,7 +69,7 @@ class Pdf extends \Pop\Pdf\AbstractPdfEffect
         $w       = $this->pdf->getCurrentPageObject()->width;
         $h       = $this->pdf->getCurrentPageObject()->height;
         $coIndex = $this->pdf->getContentObjectIndex();
-        $this->pdf->getObject($coIndex)->setStream("\n0 0 {$w} {$h} re\n" . $this->setStyle() . "\n");
+        $this->pdf->getObject($coIndex)->appendStream("\n0 0 {$w} {$h} re\n" . $this->setStyle() . "\n");
 
         return $this;
     }

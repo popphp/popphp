@@ -165,7 +165,7 @@ abstract class AbstractPdfEffect
         $this->fillColor = [(int)$r, (int)$g, (int)$b];
 
         $coIndex = $this->pdf->getContentObjectIndex();
-        $this->pdf->getObject($coIndex)->setStream("\n" . $this->convertColor((int)$r) . " " .
+        $this->pdf->getObject($coIndex)->appendStream("\n" . $this->convertColor((int)$r) . " " .
             $this->convertColor((int)$g) . " " . $this->convertColor((int)$b) . " rg\n");
 
         return $this;
@@ -184,7 +184,7 @@ abstract class AbstractPdfEffect
         $this->strokeColor = [(int)$r, (int)$g, (int)$b];
 
         $coIndex = $this->pdf->getContentObjectIndex();
-        $this->pdf->getObject($coIndex)->setStream("\n" . $this->convertColor((int)$r) . " " .
+        $this->pdf->getObject($coIndex)->appendStream("\n" . $this->convertColor((int)$r) . " " .
             $this->convertColor((int)$g) . " " . $this->convertColor((int)$b) . " RG\n");
 
         return $this;
@@ -218,7 +218,7 @@ abstract class AbstractPdfEffect
             $newString .= ((null !== $dashLength) && (null !== $dashGap)) ? "[{$dashLength} {$dashGap}] 0 d\n" : "[] 0 d\n";
 
             $coIndex = $this->pdf->getContentObjectIndex();
-            $this->pdf->getObject($coIndex)->setStream($newString);
+            $this->pdf->getObject($coIndex)->appendStream($newString);
         }
 
         return $this;

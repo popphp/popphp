@@ -296,7 +296,7 @@ class Pdf extends \Pop\Pdf\AbstractPdfEffect
 
         // Add the text to the current page's content stream.
         $coIndex = $this->pdf->getContentObjectIndex();
-        $this->pdf->getObject($coIndex)->setStream("\nBT\n    /{$fontObj} {$this->size} Tf\n    " . $this->calcTextMatrix() . " {$this->x} {$this->y} Tm\n    " . $this->textParams['c'] . " Tc " . $this->textParams['w'] . " Tw " . $this->textParams['rend'] . " Tr\n    ({$str})Tj\nET\n");
+        $this->pdf->getObject($coIndex)->appendStream("\nBT\n    /{$fontObj} {$this->size} Tf\n    " . $this->calcTextMatrix() . " {$this->x} {$this->y} Tm\n    " . $this->textParams['c'] . " Tc " . $this->textParams['w'] . " Tw " . $this->textParams['rend'] . " Tr\n    ({$str})Tj\nET\n");
 
         return $this;
     }

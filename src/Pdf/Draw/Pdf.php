@@ -58,7 +58,7 @@ class Pdf extends \Pop\Pdf\AbstractPdfEffect
     public function line($x1, $y1, $x2, $y2)
     {
         $coIndex = $this->pdf->getContentObjectIndex();
-        $this->pdf->getObject($coIndex)->setStream("\n{$x1} {$y1} m\n{$x2} {$y2} l\nS\n");
+        $this->pdf->getObject($coIndex)->appendStream("\n{$x1} {$y1} m\n{$x2} {$y2} l\nS\n");
 
         return $this;
     }
@@ -84,9 +84,9 @@ class Pdf extends \Pop\Pdf\AbstractPdfEffect
             $bgColor = $this->pdf->getBackgroundColor();
             $this->setStrokeWidth(0);
             $this->setFillColor($bgColor[0], $bgColor[1], $bgColor[2]);
-            $this->pdf->getObject($coIndex)->setStream("\n{$x} {$y} {$w} {$h} re\nW\nF\n");
+            $this->pdf->getObject($coIndex)->appendStream("\n{$x} {$y} {$w} {$h} re\nW\nF\n");
         } else {
-            $this->pdf->getObject($coIndex)->setStream("\n{$x} {$y} {$w} {$h} re\n" . $this->setStyle() . "\n");
+            $this->pdf->getObject($coIndex)->appendStream("\n{$x} {$y} {$w} {$h} re\n" . $this->setStyle() . "\n");
         }
 
         return $this;
@@ -153,9 +153,9 @@ class Pdf extends \Pop\Pdf\AbstractPdfEffect
             $bgColor = $this->pdf->getBackgroundColor();
             $this->setStrokeWidth(0);
             $this->setFillColor($bgColor[0], $bgColor[1], $bgColor[2]);
-            $this->pdf->getObject($coIndex)->setStream("\n{$rectangle}\nW\nF\n");
+            $this->pdf->getObject($coIndex)->appendStream("\n{$rectangle}\nW\nF\n");
         } else {
-            $this->pdf->getObject($coIndex)->setStream("\n{$rectangle}\n" . $this->setStyle() . "\n");
+            $this->pdf->getObject($coIndex)->appendStream("\n{$rectangle}\n" . $this->setStyle() . "\n");
         }
 
         return $this;
@@ -247,9 +247,9 @@ class Pdf extends \Pop\Pdf\AbstractPdfEffect
             $bgColor = $this->pdf->getBackgroundColor();
             $this->setStrokeWidth(0);
             $this->setFillColor($bgColor[0], $bgColor[1], $bgColor[2]);
-            $this->pdf->getObject($coIndex)->setStream("\n{$x1} {$y1} m\n{$coor1Bez1X} {$coor1Bez1Y} {$coor2Bez1X} {$coor2Bez1Y} {$x2} {$y2} c\n{$coor2Bez2X} {$coor2Bez2Y} {$coor3Bez1X} {$coor3Bez1Y} {$x3} {$y3} c\n{$coor3Bez2X} {$coor3Bez2Y} {$coor4Bez1X} {$coor4Bez1Y} {$x4} {$y4} c\n{$coor4Bez2X} {$coor4Bez2Y} {$coor1Bez2X} {$coor1Bez2Y} {$x1} {$y1} c\nW\nF\n");
+            $this->pdf->getObject($coIndex)->appendStream("\n{$x1} {$y1} m\n{$coor1Bez1X} {$coor1Bez1Y} {$coor2Bez1X} {$coor2Bez1Y} {$x2} {$y2} c\n{$coor2Bez2X} {$coor2Bez2Y} {$coor3Bez1X} {$coor3Bez1Y} {$x3} {$y3} c\n{$coor3Bez2X} {$coor3Bez2Y} {$coor4Bez1X} {$coor4Bez1Y} {$x4} {$y4} c\n{$coor4Bez2X} {$coor4Bez2Y} {$coor1Bez2X} {$coor1Bez2Y} {$x1} {$y1} c\nW\nF\n");
         } else {
-            $this->pdf->getObject($coIndex)->setStream("\n{$x1} {$y1} m\n{$coor1Bez1X} {$coor1Bez1Y} {$coor2Bez1X} {$coor2Bez1Y} {$x2} {$y2} c\n{$coor2Bez2X} {$coor2Bez2Y} {$coor3Bez1X} {$coor3Bez1Y} {$x3} {$y3} c\n{$coor3Bez2X} {$coor3Bez2Y} {$coor4Bez1X} {$coor4Bez1Y} {$x4} {$y4} c\n{$coor4Bez2X} {$coor4Bez2Y} {$coor1Bez2X} {$coor1Bez2Y} {$x1} {$y1} c\n" . $this->setStyle() . "\n");
+            $this->pdf->getObject($coIndex)->appendStream("\n{$x1} {$y1} m\n{$coor1Bez1X} {$coor1Bez1Y} {$coor2Bez1X} {$coor2Bez1Y} {$x2} {$y2} c\n{$coor2Bez2X} {$coor2Bez2Y} {$coor3Bez1X} {$coor3Bez1Y} {$x3} {$y3} c\n{$coor3Bez2X} {$coor3Bez2Y} {$coor4Bez1X} {$coor4Bez1Y} {$x4} {$y4} c\n{$coor4Bez2X} {$coor4Bez2Y} {$coor1Bez2X} {$coor1Bez2Y} {$x1} {$y1} c\n" . $this->setStyle() . "\n");
         }
 
         return $this;
@@ -419,9 +419,9 @@ class Pdf extends \Pop\Pdf\AbstractPdfEffect
             $bgColor = $this->pdf->getBackgroundColor();
             $this->setStrokeWidth(0);
             $this->setFillColor($bgColor[0], $bgColor[1], $bgColor[2]);
-            $this->pdf->getObject($coIndex)->setStream("\n{$polygon}\nW\nF\n");
+            $this->pdf->getObject($coIndex)->appendStream("\n{$polygon}\nW\nF\n");
         } else {
-            $this->pdf->getObject($coIndex)->setStream("\n{$polygon}\n" . $this->setStyle() . "\n");
+            $this->pdf->getObject($coIndex)->appendStream("\n{$polygon}\n" . $this->setStyle() . "\n");
         }
 
         return $this;
