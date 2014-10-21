@@ -31,6 +31,40 @@ class Pdf
 {
 
     /**
+     * Page size constants
+     */
+    const SIZE_10_ENVELOPE = 'SIZE_10_ENVELOPE';
+    const SIZE_C5_ENVELOPE = 'SIZE_C5_ENVELOPE';
+    const SIZE_DL_ENVELOPE = 'SIZE_DL_ENVELOPE';
+    const SIZE_FOLIO       = 'SIZE_FOLIO';
+    const SIZE_EXECUTIVE   = 'SIZE_EXECUTIVE';
+    const SIZE_LETTER      = 'SIZE_LETTER';
+    const SIZE_LEGAL       = 'SIZE_LEGAL';
+    const SIZE_LEDGER      = 'SIZE_LEDGER';
+    const SIZE_TABLOID     = 'SIZE_TABLOID';
+    const SIZE_A0          = 'SIZE_A0';
+    const SIZE_A1          = 'SIZE_A1';
+    const SIZE_A2          = 'SIZE_A2';
+    const SIZE_A3          = 'SIZE_A3';
+    const SIZE_A4          = 'SIZE_A4';
+    const SIZE_A5          = 'SIZE_A5';
+    const SIZE_A6          = 'SIZE_A6';
+    const SIZE_A7          = 'SIZE_A7';
+    const SIZE_A8          = 'SIZE_A8';
+    const SIZE_A9          = 'SIZE_A9';
+    const SIZE_B0          = 'SIZE_B0';
+    const SIZE_B1          = 'SIZE_B1';
+    const SIZE_B2          = 'SIZE_B2';
+    const SIZE_B3          = 'SIZE_B3';
+    const SIZE_B4          = 'SIZE_B4';
+    const SIZE_B5          = 'SIZE_B5';
+    const SIZE_B6          = 'SIZE_B6';
+    const SIZE_B7          = 'SIZE_B7';
+    const SIZE_B8          = 'SIZE_B8';
+    const SIZE_B9          = 'SIZE_B9';
+    const SIZE_B10         = 'SIZE_B10';
+
+    /**
      * PDF root index.
      * @var int
      */
@@ -835,6 +869,52 @@ class Pdf
         }
 
         return $this;
+    }
+
+    /**
+     * Search the PDF for text-based keywords. Returns false if nothing found,
+     * or returns an array with the pages the keywords are found on.
+     *
+     * @param  string  $keywords
+     * @param  boolean $caseSensitive
+     * @return mixed
+     */
+    public function search($keywords, $caseSensitive = false)
+    {
+        $pages   = [];
+        $objects = [];
+
+        // Search for the string in the content objects
+        foreach ($this->objects as $object) {
+            if ($object instanceof Object\Object) {
+                $stream = ($object->isCompressed() && (stripos($object->getDef(), 'FlateDecode') !== false)) ? gzuncompress(trim($object->getStream())) : trim($object->getStream());
+                $result = ($caseSensitive) ? (strpos($stream, $keywords) !== false) : (stripos($stream, $keywords) !== false);
+                if ($result) {
+                    $objects[] = $object->index;
+                }
+            }
+        }
+
+        // If content objects with the keywords are found, search for the pages that reference the content objects
+        foreach ($this->objects as $object) {
+            if ($object instanceof Object\Page) {
+                foreach ($objects as $objectIndex) {
+                    if (in_array($objectIndex, $object->content)) {
+                        $key = (int)(array_search($object->index, $this->pages)) + 1;
+                        if (!in_array($key, $pages)) {
+                            $pages[] = $key;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Return the results
+        if (count($pages) > 0) {
+            return $pages;
+        } else {
+            return false;
+        }
     }
 
     /**
