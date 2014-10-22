@@ -65,6 +65,36 @@ class Pdf
     const SIZE_B10         = 'SIZE_B10';
 
     /**
+     * Standard font constants
+     */
+    const FONT_ARIAL                      = 'Arial';
+    const FONT_ARIAL_ITALIC               = 'Arial,Italic';
+    const FONT_ARIAL_BOLD                 = 'Arial,Bold';
+    const FONT_ARIAL_BOLD_ITALIC          = 'Arial,BoldItalic';
+    const FONT_COURIER                    = 'Courier';
+    const FONT_COURIER_OBLIQUE            = 'Courier-Oblique';
+    const FONT_COURIER_BOLD               = 'Courier-Bold';
+    const FONT_COURIER_BOLD_OBLIQUE       = 'Courier-BoldOblique';
+    const FONT_COURIER_NEW                = 'CourierNew';
+    const FONT_COURIER_NEW_ITALIC         = 'CourierNew,Italic';
+    const FONT_COURIER_NEW_BOLD           = 'CourierNew,Bold';
+    const FONT_COURIER_NEW_BOLD_ITALIC    = 'CourierNew,BoldItalic';
+    const FONT_HELVETICA                  = 'Helvetica';
+    const FONT_HELVETICA_OBLIQUE          = 'Helvetica-Oblique';
+    const FONT_HELVETICA_BOLD             = 'Helvetica-Bold';
+    const FONT_HELVETICA_BOLD_OBLIQUE     = 'Helvetica-BoldOblique';
+    const FONT_SYMBOL                     = 'Symbol';
+    const FONT_TIMES_ROMAN                = 'Times-Roman';
+    const FONT_TIMES_BOLD                 = 'Times-Bold';
+    const FONT_TIMES_ITALIC               = 'Times-Italic';
+    const FONT_TIMES_BOLD_ITALIC          = 'Times-BoldItalic';
+    const FONT_TIMES_NEW_ROMAN            = 'TimesNewRoman';
+    const FONT_TIMES_NEW_ROMAN_ITALIC     = 'TimesNewRoman,Italic';
+    const FONT_TIMES_NEW_ROMAN_BOLD       = 'TimesNewRoman,Bold';
+    const FONT_TIMES_NEW_ROMAN_BOLDITALIC = 'TimesNewRoman,BoldItalic';
+    const FONT_ZAPF_DINGBATS              = 'ZapfDingbats';
+
+    /**
      * PDF root index.
      * @var int
      */
@@ -461,10 +491,14 @@ class Pdf
     /**
      * Get the Pdf draw object
      *
+     * @throws Exception
      * @return Draw\Pdf
      */
     public function draw()
     {
+        if (count($this->pages) == 0) {
+            throw new Exception('Error: No page has been added to the PDF yet.');
+        }
         if (null === $this->draw) {
             $this->draw = new Draw\Pdf($this);
         }
@@ -477,10 +511,14 @@ class Pdf
     /**
      * Get the Pdf effect object
      *
+     * @throws Exception
      * @return Effect\Pdf
      */
     public function effect()
     {
+        if (count($this->pages) == 0) {
+            throw new Exception('Error: No page has been added to the PDF yet.');
+        }
         if (null === $this->effect) {
             $this->effect = new Effect\Pdf($this);
         }
@@ -493,10 +531,14 @@ class Pdf
     /**
      * Get the Pdf type object
      *
+     * @throws Exception
      * @return Type\Pdf
      */
     public function type()
     {
+        if (count($this->pages) == 0) {
+            throw new Exception('Error: No page has been added to the PDF yet.');
+        }
         if (null === $this->type) {
             $this->type = new Type\Pdf($this);
         }
@@ -872,14 +914,14 @@ class Pdf
     }
 
     /**
-     * Search the PDF for text-based keywords. Returns false if nothing found,
+     * Search the entire PDF for text-based keywords. Returns false if nothing found,
      * or returns an array with the pages the keywords are found on.
      *
      * @param  string  $keywords
      * @param  boolean $caseSensitive
      * @return mixed
      */
-    public function search($keywords, $caseSensitive = false)
+    public function searchAll($keywords, $caseSensitive = false)
     {
         $pages   = [];
         $objects = [];
@@ -910,11 +952,55 @@ class Pdf
         }
 
         // Return the results
-        if (count($pages) > 0) {
-            return $pages;
-        } else {
-            return false;
+        return (count($pages) > 0) ? $pages : false;
+    }
+
+    /**
+     * Search the current page of the PDF for text-based keywords.
+     * Returns true or false if found or not.
+     *
+     * @param  string  $keywords
+     * @param  boolean $caseSensitive
+     * @return boolean
+     */
+    public function searchPage($keywords, $caseSensitive = false)
+    {
+        $pages = $this->searchAll($keywords, $caseSensitive);
+        return (is_array($pages) && in_array($this->getCurrentPage(), $pages));
+    }
+
+    /**
+     * Extract readable text from current page
+     *
+     * @return array
+     */
+    public function extractText()
+    {
+        $textAry = [];
+        $objects = [];
+
+        foreach ($this->objects as $object) {
+            if (($object instanceof Object\Page) && ($object->index == $this->pages[$this->currentPage]) && (count($object->content) > 0)) {
+                $objects = array_merge($objects, $object->content);
+            }
         }
+
+        foreach ($this->objects as $object) {
+            if (($object instanceof Object\Object) && (in_array($object->index, $objects))) {
+                $stream     = ($object->isCompressed() && (stripos($object->getDef(), 'FlateDecode') !== false)) ? gzuncompress(trim($object->getStream())) : trim($object->getStream());
+                $streamText = explode("Tj\nET", $stream);
+                foreach ($streamText as $text) {
+                    $text = trim($text);
+                    if (!empty($text)) {
+                        $text      = substr($text, strpos($text, '(') + 1);
+                        $text      = substr($text, 0, strrpos($text, ')'));
+                        $textAry[] = $text;
+                    }
+                }
+            }
+        }
+
+        return $textAry;
     }
 
     /**

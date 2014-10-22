@@ -87,10 +87,10 @@ class Pdf extends \Pop\Pdf\AbstractEffect
     protected $fonts = [];
 
     /**
-     * Last font name
+     * Current font name
      * @var string
      */
-    protected $lastFontName = null;
+    protected $currentFontName = null;
 
     /**
      * Type font size
@@ -198,10 +198,10 @@ class Pdf extends \Pop\Pdf\AbstractEffect
         $obj = new \Pop\Pdf\Object\Object("{$i} 0 obj\n<<\n    /Type /Font\n    /Subtype /Type1\n    /Name /{$f}\n    /BaseFont /{$font}\n    /Encoding /WinAnsiEncoding\n>>\nendobj\n\n");
         $this->pdf->setObject($obj, $i);
 
-        $this->lastFontName = $font;
+        $this->currentFontName = $font;
 
-        if (!in_array($this->lastFontName, $this->fonts)) {
-            $this->fonts[] = $this->lastFontName;
+        if (!in_array($this->currentFontName, $this->fonts)) {
+            $this->fonts[] = $this->currentFontName;
         }
 
         return $this;
@@ -241,18 +241,35 @@ class Pdf extends \Pop\Pdf\AbstractEffect
             $this->pdf->setObject($value, $key);
         }
 
-        $this->lastFontName = $fontParser->getFontName();
+        $this->currentFontName = $fontParser->getFontName();
 
-        if (!in_array($this->lastFontName, $this->fonts)) {
-            $this->fonts[]         = $this->lastFontName;
-            $this->embeddedFonts[] = $this->lastFontName;
+        if (!in_array($this->currentFontName, $this->fonts)) {
+            $this->fonts[]         = $this->currentFontName;
+            $this->embeddedFonts[] = $this->currentFontName;
         }
 
         return $this;
     }
 
     /**
-     * Method to add text to the PDF.
+     * Method to set a font (that's already been added or embedded) in the PDF.
+     *
+     * @param  string  $font
+     * @throws Exception
+     * @return Pdf
+     */
+    public function setFont($font)
+    {
+        if (!in_array($font, $this->fonts)) {
+            throw new Exception('Error: That font has not been added to or embedded in the PDF.');
+        }
+        $this->currentFontName = $font;
+
+        return $this;
+    }
+
+    /**
+     * Method to add a line of text to the PDF.
      *
      * @param  string $str
      * @param  string $font
@@ -265,7 +282,7 @@ class Pdf extends \Pop\Pdf\AbstractEffect
         $fontExists = false;
 
         if (null === $font) {
-            $font = $this->getLastFontName();
+            $font = $this->getCurrentFontName();
         }
 
         if (function_exists('mb_strlen')) {
@@ -299,6 +316,26 @@ class Pdf extends \Pop\Pdf\AbstractEffect
         $this->pdf->getObject($coIndex)->appendStream("\nBT\n    /{$fontObj} {$this->size} Tf\n    " . $this->calcTextMatrix() . " {$this->x} {$this->y} Tm\n    " . $this->textParams['c'] . " Tc " . $this->textParams['w'] . " Tw " . $this->textParams['rend'] . " Tr\n    ({$str})Tj\nET\n");
 
         return $this;
+    }
+
+    /**
+     * Method to add long text to the PDF as a paragraph.
+     *
+     * @param  string $str
+     * @param  int    $wrap
+     * @param  int    $lineHeight
+     * @param  string $font
+     * @throws Exception
+     * @return Pdf
+     */
+    public function paragraph($str, $wrap = 75, $lineHeight = 12, $font = null)
+    {
+        $lines = explode("\n", wordwrap($str, $wrap, "\n"));
+
+        foreach ($lines as $line) {
+            $this->text($line, $font);
+            $this->y -= $lineHeight;
+        }
     }
 
     /**
@@ -362,9 +399,9 @@ class Pdf extends \Pop\Pdf\AbstractEffect
      *
      * @return string
      */
-    public function getLastFontName()
+    public function getCurrentFontName()
     {
-        return $this->lastFontName;
+        return $this->currentFontName;
     }
 
     /**
