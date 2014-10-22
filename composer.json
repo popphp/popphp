@@ -1,15 +1,24 @@
 {
     "name": "popphp/popphp2",
-    "description": "Pop PHP 2",
+    "description": "Pop PHP Framework 2",
     "keywords": [
         "framework",
+        "php framework",
         "pop",
         "pop php",
         "pop php 2"
     ],
+    "homepage": "http://github.com/popphp/pop-image",
+    "license": "New BSD",
+    "authors": [
+        {
+            "name": "Nick Sagona",
+            "email": "dev@nolainteractive.com",
+            "homepage": "http://www.nolainteractive.com/"
+        }
+    ],
     "require": {
-        "php": ">=5.4.0",
-        "pear/archive_tar": ">=1.3.11"
+        "php": ">=5.4.0"
     },
     "autoload": {
         "psr-4": {
