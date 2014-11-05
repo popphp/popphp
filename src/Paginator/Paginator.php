@@ -29,36 +29,16 @@ class Paginator
 {
 
     /**
-     * Constant for using the single arrows bookends
-     * @var string
-     */
-    const SINGLE_ARROW = 'SINGLE_ARROW';
-
-    /**
-     * Constant for using the double arrows bookends
-     * @var string
-     */
-    const DOUBLE_ARROW = 'DOUBLE_ARROW';
-
-    /**
-     * Constant for using the ellipsis bookends
-     * @var string
-     */
-    const ELLIPSIS = 'ELLIPSIS';
-
-    /**
      * Total number of items
      * @var int
      */
     protected $total = 0;
-
 
     /**
      * Number of items per page
      * @var int
      */
     protected $perPage = 10;
-
 
     /**
      * Range of pages per page
@@ -67,20 +47,33 @@ class Paginator
     protected $range = 10;
 
     /**
+     * Query key
+     * @var string
+     */
+    protected $queryKey = 'page';
+
+    /**
      * Page bookends
      * @var array
      */
     protected $bookends = [
-        'SINGLE_ARROW' => ['&lt;', '&gt;'],
-        'DOUBLE_ARROW' => ['&lt;&lt;', '&gt;&gt;'],
-        'ELLIPSIS'     => ['...', '...']
+        'start'    => '&laquo;',
+        'previous' => '&lsaquo;',
+        'next'     => '&rsaquo;',
+        'end'      => '&raquo;'
     ];
 
     /**
-     * Page bookend key
+     * Flag to use an input form field
+     * @var boolean
+     */
+    protected $useInput = false;
+
+    /**
+     * Input separator
      * @var string
      */
-    protected $bookend = 'SINGLE_ARROW';
+    protected $inputSeparator = 'of';
 
     /**
      * Link separator
@@ -99,6 +92,12 @@ class Paginator
      * @var string
      */
     protected $classOff = null;
+
+    /**
+     * Current page property
+     * @var int
+     */
+    protected $currentPage = 1;
 
     /**
      * Number of pages property
@@ -178,6 +177,18 @@ class Paginator
     }
 
     /**
+     * Method to set the query key.
+     *
+     * @param  string $key
+     * @return Paginator
+     */
+    public function setQueryKey($key)
+    {
+        $this->queryKey = $key;
+        return $this;
+    }
+
+    /**
      * Method to set the bookend separator.
      *
      * @param  string $sep
@@ -214,24 +225,43 @@ class Paginator
     }
 
     /**
-     * Method to set the bookend key.
+     * Method to set the bookends.
      *
-     * @param  int $key
+     * @param  array $bookends
      * @return Paginator
      */
-    public function setBookend($key)
+    public function setBookends(array $bookends)
     {
-        switch ($key) {
-            case self::ELLIPSIS:
-                $this->bookend = self::ELLIPSIS;
-                break;
-            case self::DOUBLE_ARROW:
-                $this->bookend = self::DOUBLE_ARROW;
-                break;
-            default:
-                $this->bookend = self::SINGLE_ARROW;
+        if (array_key_exists('start', $bookends)) {
+            $this->bookends['start'] = $bookends['start'];
+        }
+        if (array_key_exists('previous', $bookends)) {
+            $this->bookends['previous'] = $bookends['previous'];
+        }
+        if (array_key_exists('next', $bookends)) {
+            $this->bookends['next'] = $bookends['next'];
+        }
+        if (array_key_exists('end', $bookends)) {
+            $this->bookends['end'] = $bookends['end'];
         }
 
+        return $this;
+    }
+
+    /**
+     * Method to set whether to use an input form field.
+     *
+     * @param  boolean $flag
+     * @param  string  $separator
+     * @return Paginator
+     */
+    public function useInput($flag, $separator = 'of')
+    {
+        $this->useInput       = (bool)$flag;
+        $this->inputSeparator = $separator;
+        if ($this->useInput) {
+            $this->range = 1;
+        }
         return $this;
     }
 
@@ -266,6 +296,16 @@ class Paginator
     }
 
     /**
+     * Method to get the query key.
+     *
+     * @return int
+     */
+    public function getQueryKey()
+    {
+        return $this->queryKey;
+    }
+
+    /**
      * Method to get the bookend separator.
      *
      * @return string
@@ -296,13 +336,34 @@ class Paginator
     }
 
     /**
-     * Method to get the bookend key
+     * Method to get a bookend
      *
+     * @param  string $key
      * @return string
      */
-    public function getBookend()
+    public function getBookend($key)
     {
-        return $this->bookend;
+        return (isset($this->bookends[$key])) ? $this->bookends[$key] : null;
+    }
+
+    /**
+     * Method to get the bookends
+     *
+     * @return array
+     */
+    public function getBookends()
+    {
+        return $this->bookends;
+    }
+
+    /**
+     * Method to get the current page.
+     *
+     * @return int
+     */
+    public function getCurrentPage()
+    {
+        return $this->currentPage;
     }
 
     /**
@@ -337,9 +398,12 @@ class Paginator
      */
     protected function calculateRange($page = 1)
     {
+        $this->currentPage = $page;
+
         // Calculate the number of pages based on the remainder.
         $remainder = $this->total % $this->perPage;
-        $this->numberOfPages = ($remainder != 0) ? (floor(($this->total / $this->perPage)) + 1) : floor(($this->total / $this->perPage));
+        $this->numberOfPages = ($remainder != 0) ? (floor(($this->total / $this->perPage)) + 1) :
+            floor(($this->total / $this->perPage));
 
         // Calculate the start index.
         $this->start = ($page * $this->perPage) - $this->perPage;
@@ -424,6 +488,8 @@ class Paginator
      */
     protected function createLinks($page = 1)
     {
+        $this->currentPage = $page;
+
         // Generate the page links.
         $this->links = [];
 
@@ -438,7 +504,7 @@ class Paginator
 
             if (count($_GET) > 0) {
                 foreach ($_GET as $key => $value) {
-                    if ($key != 'page') {
+                    if ($key != $this->queryKey) {
                         $query .= '&' . $key . '=' . $value;
                     }
                 }
@@ -455,16 +521,41 @@ class Paginator
             $classOff = (null !== $this->classOff) ? " class=\"{$this->classOff}\"" : null;
             $classOn  = (null !== $this->classOn) ? " class=\"{$this->classOn}\"" : null;
 
-            $newLink = ($i == $page) ? "<span{$classOff}>{$i}</span>" : "<a{$classOn} href=\"" . $uri . "?page={$i}{$query}\">{$i}</a>";
+            if ($this->useInput) {
+                $newLink = '<form action="' . $uri . ((null !== $query) ? '?' . substr($query, 1)  : null) .
+                    '" method="get"><div><input type="text" name="' . $this->queryKey . '" size="2" value="' .
+                    $this->currentPage . '" /> ' . $this->inputSeparator . ' ' . $this->numberOfPages . '</div></form>';
+            } else {
+                $newLink = ($i == $page) ? "<span{$classOff}>{$i}</span>" : "<a{$classOn} href=\"" . $uri . "?" .
+                    $this->queryKey . "={$i}{$query}\">{$i}</a>";
+            }
 
             if (($i == $pageRange['start']) && ($pageRange['prev'])) {
-                $prevLink = "<a{$classOn} href=\"" . $uri . "?page=" . ($i - 1) . "{$query}\">" . $this->bookends[$this->bookend][0] . "</a>";
-                $this->links[] = $prevLink;
+                if (null !== $this->bookends['start']) {
+                    $startLink = "<a{$classOn} href=\"" . $uri . "?" . $this->queryKey . "=1" . "{$query}\">" .
+                        $this->bookends['start'] . "</a>";
+                    $this->links[] = $startLink;
+                }
+                if (null !== $this->bookends['previous']) {
+                    $prevLink  = "<a{$classOn} href=\"" . $uri . "?" . $this->queryKey . "=" . ($i - 1) . "{$query}\">" .
+                        $this->bookends['previous'] . "</a>";
+                    $this->links[] = $prevLink;
+                }
             }
+
             $this->links[] = $newLink;
+
             if (($i == $pageRange['end']) && ($pageRange['next'])) {
-                $nextLink = "<a{$classOn} href=\"" . $uri . "?page=" . ($i + 1) . "{$query}\">" . $this->bookends[$this->bookend][1] . "</a>";
-                $this->links[] = $nextLink;
+                if (null !== $this->bookends['next']) {
+                    $nextLink = "<a{$classOn} href=\"" . $uri . "?" . $this->queryKey . "=" . ($i + 1) . "{$query}\">" .
+                        $this->bookends['next'] . "</a>";
+                    $this->links[] = $nextLink;
+                }
+                if (null !== $this->bookends['end']) {
+                    $endLink  = "<a{$classOn} href=\"" . $uri . "?" . $this->queryKey . "=" . $this->numberOfPages .
+                        "{$query}\">" . $this->bookends['end'] . "</a>";
+                    $this->links[] = $endLink;
+                }
             }
         }
     }
@@ -476,7 +567,7 @@ class Paginator
      */
     public function __toString()
     {
-        $page = (isset($_GET['page']) && ((int)$_GET['page'] > 0)) ? (int)$_GET['page'] : 1;
+        $page = (isset($_GET[$this->queryKey]) && ((int)$_GET[$this->queryKey] > 0)) ? (int)$_GET[$this->queryKey] : 1;
         return implode($this->separator, $this->getLinks($page));
     }
 
