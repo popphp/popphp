@@ -297,6 +297,53 @@ class Form extends Child
     }
 
     /**
+     * Insert a form element before another element
+     *
+     * @param  string                  $name
+     * @param  Element\AbstractElement $e
+     * @throws Exception
+     * @return Form
+     */
+    public function insertElementBefore($name, Element\AbstractElement $e)
+    {
+        $i = $this->getElementIndex($name);
+        if (null === $i) {
+            throw new Exception('Error: That element does not exist.');
+        }
+
+        // If the element is the top of element of a group, switch out for the new element being inserted before
+        foreach ($this->groups as $key => $group) {
+            if ($group == $name) {
+                $this->groups[$key] = $e->getName();
+            }
+        }
+
+        $this->childNodes = array_merge(array_slice($this->childNodes, 0, $i), [$e], array_slice($this->childNodes, $i));
+
+        return $this;
+    }
+
+    /**
+     * Insert a form element after another element
+     *
+     * @param  string                  $name
+     * @param  Element\AbstractElement $e
+     * @throws Exception
+     * @return Form
+     */
+    public function insertElementAfter($name, Element\AbstractElement $e)
+    {
+        $i = $this->getElementIndex($name);
+        if (null === $i) {
+            throw new Exception('Error: That element does not exist.');
+        }
+
+        $this->childNodes = array_merge(array_slice($this->childNodes, 0, $i + 1), [$e], array_slice($this->childNodes, $i + 1));
+
+        return $this;
+    }
+
+    /**
      * Add a form element or elements to the form object.
      *
      * @param  Element\AbstractElement $e
