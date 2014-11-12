@@ -414,7 +414,25 @@ class View
     protected function parseScalars()
     {
         foreach ($this->data as $key => $value) {
-            if (!is_array($value) && !($value instanceof \ArrayObject)) {
+            if (is_array($value) && (strpos($this->output, '[{' . $key . '[') !== false)) {
+                $matches = [];
+                preg_match_all('/\[{' . $key .'\[/mi', $this->output, $matches, PREG_OFFSET_CAPTURE);
+                if (isset($matches[0]) && isset($matches[0][0])) {
+                    $indices = [];
+                    foreach ($matches[0] as $match) {
+                        $i = substr($this->output, $match[1] + (strlen($key) + 3));
+                        $i = substr($i, 0, strpos($i, ']'));
+                        $indices[] = $i;
+                    }
+                    foreach ($indices as $i) {
+                        if (isset($value[$i])) {
+                            $this->output = str_replace('[{' . $key . '[' . $i . ']}]', $value[$i], $this->output);
+                        } else {
+                            $this->output = str_replace('[{' . $key . '[' . $i . ']}]', '', $this->output);
+                        }
+                    }
+                }
+            } else if (!is_array($value) && !($value instanceof \ArrayObject)) {
                 // Check is value is stringable
                 if ((is_object($value) && method_exists($value, '__toString')) || (!is_object($value) && !is_array($value))) {
                     $this->output = str_replace('[{' . $key . '}]', $value, $this->output);
