@@ -157,6 +157,94 @@ class Form extends Child
             }
         }
 
+        $this->childNodes = [];
+        $this->setFieldValues();
+
+        return $this;
+    }
+
+    /**
+     * Add multiple field configs
+     *
+     * @param  array  $fields
+     * @return Form
+     */
+    public function addFieldConfigs(array $fields)
+    {
+        foreach ($fields as $name => $field) {
+            $this->addFieldConfig($name, $field);
+        }
+        return $this;
+    }
+
+    /**
+     * Insert a field config before another field config
+     *
+     * @param  string $before
+     * @param  string $name
+     * @param  array  $field
+     * @throws Exception
+     * @return Form
+     */
+    public function insertFieldConfigBefore($before, $name, array $field)
+    {
+        if (!array_key_exists($before, $this->fieldConfig)) {
+            throw new Exception('Error: That field does not exist.');
+        }
+        $keys = array_keys($this->fieldConfig);
+        $i    = array_search($before, $keys);
+        $keys = array_merge(array_slice($keys, 0, $i), [$name], array_slice($keys, $i));
+
+        $fields = [];
+
+        foreach ($keys as $key) {
+            $fields[$key] = ($key == $name) ? $field : $this->fieldConfig[$key];
+        }
+
+        $this->childNodes = [];
+        $this->fieldConfig = $fields;
+        $this->setFieldConfig($fields);
+        $this->setFieldValues();
+
+        // If the element is the top of element of a group, switch out for the new element being inserted before
+        foreach ($this->groups as $key => $group) {
+            if ($group == $before) {
+                $this->groups[$key] = $name;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Insert a field config before another field config
+     *
+     * @param  string $after
+     * @param  string $name
+     * @param  array  $field
+     * @throws Exception
+     * @return Form
+     */
+    public function insertFieldConfigAfter($after, $name, array $field)
+    {
+        if (!array_key_exists($after, $this->fieldConfig)) {
+            throw new Exception('Error: That field does not exist.');
+        }
+        $keys = array_keys($this->fieldConfig);
+        $i    = array_search($after, $keys);
+        $keys = array_merge(array_slice($keys, 0, $i + 1), [$name], array_slice($keys, $i + 1));
+
+        $fields = [];
+
+        foreach ($keys as $key) {
+            $fields[$key] = ($key == $name) ? $field : $this->fieldConfig[$key];
+        }
+
+        $this->childNodes = [];
+        $this->fieldConfig = $fields;
+        $this->setFieldConfig($fields);
+        $this->setFieldValues();
+
         return $this;
     }
 
