@@ -55,25 +55,25 @@ class Acl
     /**
      * Constructor
      *
-     * Instantiate the auth object
+     * Instantiate the ACL object
      *
-     * @param  array $roles
-     * @param  array $resources
+     * @param  Role     $role
+     * @param  Resource $resource
      * @return Acl
      */
-    public function __construct(array $roles = null, array $resources = null)
+    public function __construct(Role $role = null, Resource $resource = null)
     {
-        if (null !== $roles) {
-            $this->addRoles($roles);
+        if (null !== $role) {
+            $this->addRole($role);
         }
 
-        if (null !== $resources) {
-            $this->addResources($resources);
+        if (null !== $resource) {
+            $this->addResource($resource);
         }
     }
 
     /**
-     * Method to get a role
+     * Get a role
      *
      * @param  string $role
      * @return Role
@@ -84,7 +84,7 @@ class Acl
     }
 
     /**
-     * Method to is if a role has been added
+     * See if a role has been added
      *
      * @param  string $role
      * @return boolean
@@ -95,19 +95,19 @@ class Acl
     }
 
     /**
-     * Method to add a role
+     * Add a role
      *
      * @param  Role $role
      * @return Acl
      */
     public function addRole(Role $role)
     {
-        $this->addRoles([$role]);
+        $this->roles[$role->getName()] = $role;
         return $this;
     }
 
     /**
-     * Method to add roles
+     * Add roles
      *
      * @param  array $roles
      * @throws Exception
@@ -116,17 +116,14 @@ class Acl
     public function addRoles(array $roles)
     {
         foreach ($roles as $role) {
-            if (!($role instanceof Role)) {
-                throw new Exception('Error: That role is not an instance of Pop\Acl\Role.');
-            }
-            $this->roles[$role->getName()] = $role;
+            $this->addRole($role);
         }
 
         return $this;
     }
 
     /**
-     * Method to get a resource
+     * Get a resource
      *
      * @param  string $resource
      * @return Resource
@@ -137,7 +134,7 @@ class Acl
     }
 
     /**
-     * Method to is if a resource has been added
+     * See if a resource has been added
      *
      * @param  string $resource
      * @return boolean
@@ -148,19 +145,19 @@ class Acl
     }
 
     /**
-     * Method to add a resource
+     * Add a resource
      *
-     * @param  \Pop\Acl\Resource $resource
+     * @param  Resource $resource
      * @return Acl
      */
     public function addResource(Resource $resource)
     {
-        $this->addResources([$resource]);
+        $this->resources[$resource->getName()] = $resource;
         return $this;
     }
 
     /**
-     * Method to add a resource
+     * Add resources
      *
      * @param  array $resources
      * @throws Exception
@@ -169,17 +166,14 @@ class Acl
     public function addResources(array $resources)
     {
         foreach ($resources as $resource) {
-            if (!($resource instanceof Resource)) {
-                throw new Exception('Error: That role is not an instance of Pop\Acl\Resource.');
-            }
-            $this->resources[$resource->getName()] = $resource;
+            $this->addResource($resource);
         }
 
         return $this;
     }
 
     /**
-     * Method to allow a user role permission to a resource or resources
+     * Allow a user role permission to a resource or resources
      *
      * @param  string|array  $roles
      * @param  string|array  $resources
@@ -232,7 +226,7 @@ class Acl
     }
 
     /**
-     * Method to remove an allow rule
+     * Remove an allow rule
      *
      * @param  mixed  $roles
      * @param  mixed  $resources
@@ -290,7 +284,7 @@ class Acl
     }
 
     /**
-     * Method to deny a user role permission to a resource or resources
+     * Deny a user role permission to a resource or resources
      *
      * @param  mixed $roles
      * @param  mixed $resources
@@ -343,7 +337,7 @@ class Acl
     }
 
     /**
-     * Method to remove a deny rule
+     * Remove a deny rule
      *
      * @param  mixed $roles
      * @param  mixed $resources
@@ -401,7 +395,7 @@ class Acl
     }
 
     /**
-     * Method to determine if the user is allowed
+     * Determine if the user is allowed
      *
      * @param  Role   $role
      * @param  string $resource
@@ -454,7 +448,7 @@ class Acl
     }
 
     /**
-     * Method to determine if the user is denied
+     * Determine if the user is denied
      *
      * @param  Role   $role
      * @param  string $resource

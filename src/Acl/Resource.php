@@ -44,11 +44,23 @@ class Resource
      */
     public function __construct($name)
     {
-        $this->name = $name;
+        $this->setName($name);
     }
 
     /**
-     * Method to get the role name
+     * Set the resource name
+     *
+     * @param  string $name
+     * @return Resource
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * Get the role name
      *
      * @return string
      */
@@ -58,7 +70,7 @@ class Resource
     }
 
     /**
-     * Method to return the string value of the name of the role
+     * Return the string value of the name of the role
      *
      * @return string
      */

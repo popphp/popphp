@@ -62,11 +62,23 @@ class Role
      */
     public function __construct($name)
     {
-        $this->name = $name;
+        $this->setName($name);
     }
 
     /**
-     * Method to get the role name
+     * Set the role name
+     *
+     * @param  string $name
+     * @return Role
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * Get the role name
      *
      * @return string
      */
@@ -76,7 +88,7 @@ class Role
     }
 
     /**
-     * Method to add a permission to the role
+     * Add a permission to the role
      *
      * @param  string $name
      * @return Role
@@ -88,7 +100,7 @@ class Role
     }
 
     /**
-     * Method to remove a permission from the role
+     * Remove a permission from the role
      *
      * @param  string $name
      * @return Role
@@ -102,7 +114,7 @@ class Role
     }
 
     /**
-     * Method to check if a role has a permission
+     * Check if a role has a permission
      *
      * @param  string $name
      * @return boolean
@@ -124,7 +136,7 @@ class Role
     }
 
     /**
-     * Method to add a child role
+     * Add a child role
      *
      * @param  Role $role
      * @return Role
@@ -139,7 +151,7 @@ class Role
     }
 
     /**
-     * Method to set the inherited role
+     * Set the inherited role
      *
      * @param  Role $parent
      * @return Role
@@ -152,7 +164,7 @@ class Role
     }
 
     /**
-     * Method to set the parent role
+     * Set the parent role
      *
      * @param  Role $parent
      * @return Role
@@ -164,7 +176,7 @@ class Role
     }
 
     /**
-     * Method to get the role parent
+     * Get the role parent
      *
      * @return Role
      */
@@ -174,7 +186,7 @@ class Role
     }
 
     /**
-     * Method to see if the role has a parent
+     * See if the role has a parent
      *
      * @return Role
      */
@@ -184,7 +196,7 @@ class Role
     }
 
     /**
-     * Method to return the string value of the name of the role
+     * Return the string value of the name of the role
      *
      * @return string
      */
