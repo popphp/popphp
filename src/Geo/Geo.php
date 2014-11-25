@@ -87,7 +87,7 @@ class Geo
     /**
      * Constructor
      *
-     * Instantiate the Geo object.
+     * Instantiate the Geo object
      *
      * @param  array $options
      * @return Geo
@@ -209,7 +209,7 @@ class Geo
     }
 
     /**
-     * Method to calculate the distance between 2 sets of coordinate
+     * Calculate the distance between 2 sets of coordinate
      *
      * @param  array   $origin
      * @param  array   $destination

@@ -39,7 +39,7 @@ class Url extends AbstractInput
      * Constructor
      *
      * Instantiate the url input form element.
-     *
+
      * @param  string $name
      * @param  string $value
      * @param  string $indent
@@ -52,7 +52,7 @@ class Url extends AbstractInput
     }
 
     /**
-     * Set whether the form element is required.
+     * Set whether the form element is required
      *
      * @param  boolean $required
      * @return Url

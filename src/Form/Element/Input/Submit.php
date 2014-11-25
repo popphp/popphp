@@ -38,7 +38,7 @@ class Submit extends AbstractInput
     /**
      * Constructor
      *
-     * Instantiate the submit input form element.
+     * Instantiate the submit input form element
      *
      * @param  string $name
      * @param  string $value

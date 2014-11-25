@@ -117,7 +117,7 @@ class PayLeap extends AbstractAdapter
     /**
      * Constructor
      *
-     * Method to instantiate an Payleap payment adapter object
+     * Instantiate an Payleap payment adapter object
      *
      * @param  string  $apiLoginId
      * @param  string  $transKey

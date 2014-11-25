@@ -139,7 +139,7 @@ class Mobile
     /**
      * Constructor
      *
-     * Instantiate the mobile session object.
+     * Instantiate the mobile object
      *
      * @param  array $options
      * @return Mobile
@@ -166,7 +166,7 @@ class Mobile
     }
 
     /**
-     * Static method to only detect a desktop device or not.
+     * Static method to only detect a desktop device or not
      *
      * @return boolean
      */
@@ -176,7 +176,7 @@ class Mobile
     }
 
     /**
-     * Static method to only detect a tablet device or not.
+     * Static method to only detect a tablet device or not
      *
      * @return boolean
      */
@@ -186,7 +186,7 @@ class Mobile
     }
 
     /**
-     * Static method to only detect a mobile device or not.
+     * Static method to only detect a mobile device or not
      *
      * @return boolean
      */
@@ -196,7 +196,7 @@ class Mobile
     }
 
     /**
-     * Static method to only get the mobile device.
+     * Static method to only get the mobile device
      *
      * @return string
      */
@@ -206,7 +206,7 @@ class Mobile
     }
 
     /**
-     * Method to get user-agent
+     * Get user-agent
      *
      * @return string
      */
@@ -216,7 +216,7 @@ class Mobile
     }
 
     /**
-     * Method to get device name
+     * Get device name
      *
      * @return string
      */
@@ -226,7 +226,7 @@ class Mobile
     }
 
     /**
-     * Method to get desktop URL
+     * Get desktop URL
      *
      * @return string
      */
@@ -236,7 +236,7 @@ class Mobile
     }
 
     /**
-     * Method to get tablet URL
+     * Get tablet URL
      *
      * @return string
      */
@@ -246,7 +246,7 @@ class Mobile
     }
 
     /**
-     * Method to get mobile URL
+     * Get mobile URL
      *
      * @return string
      */
@@ -256,7 +256,7 @@ class Mobile
     }
 
     /**
-     * Method to get route flag
+     * Get route flag
      *
      * @return string
      */
@@ -266,7 +266,7 @@ class Mobile
     }
 
     /**
-     * Method to set desktop URL
+     * Set desktop URL
      *
      * @param string $url
      * @return Mobile
@@ -278,7 +278,7 @@ class Mobile
     }
 
     /**
-     * Method to set tablet URL
+     * Set tablet URL
      *
      * @param string $url
      * @return Mobile
@@ -290,7 +290,7 @@ class Mobile
     }
 
     /**
-     * Method to set mobile URL
+     * Set mobile URL
      *
      * @param string $url
      * @return Mobile
@@ -302,7 +302,7 @@ class Mobile
     }
 
     /**
-     * Method to set route flag
+     * Set route flag
      *
      * @param string $route
      * @return Mobile
@@ -314,7 +314,7 @@ class Mobile
     }
 
     /**
-     * Method to get is desktop flag
+     * Set is desktop flag
      *
      * @return boolean
      */
@@ -324,7 +324,7 @@ class Mobile
     }
 
     /**
-     * Method to get is tablet flag
+     * Get is tablet flag
      *
      * @return boolean
      */
@@ -334,7 +334,7 @@ class Mobile
     }
 
     /**
-     * Method to get is mobile flag
+     * Get is mobile flag
      *
      * @return boolean
      */
@@ -344,7 +344,7 @@ class Mobile
     }
 
     /**
-     * Method to get Android flag
+     * Get Android flag
      *
      * @return boolean
      */
@@ -354,7 +354,7 @@ class Mobile
     }
 
     /**
-     * Method to get Apple flag
+     * Get Apple flag
      *
      * @return boolean
      */
@@ -364,7 +364,7 @@ class Mobile
     }
 
     /**
-     * Method to get Windows flag
+     * Get Windows flag
      *
      * @return boolean
      */
@@ -374,7 +374,7 @@ class Mobile
     }
 
     /**
-     * Method to get Blackberry flag
+     * Get Blackberry flag
      *
      * @return boolean
      */
@@ -384,7 +384,7 @@ class Mobile
     }
 
     /**
-     * Method to get Pre flag
+     * Get Pre flag
      *
      * @return boolean
      */
@@ -394,7 +394,7 @@ class Mobile
     }
 
     /**
-     * Method to get Opera flag
+     * Get Opera flag
      *
      * @return boolean
      */
@@ -404,7 +404,7 @@ class Mobile
     }
 
     /**
-     * Method to go to the desktop site.
+     * Go to the desktop site
      *
      * @throws Exception
      * @return void
@@ -419,7 +419,7 @@ class Mobile
     }
 
     /**
-     * Method to go to the tablet site.
+     * Go to the tablet site
      *
      * @throws Exception
      * @return void
@@ -434,7 +434,7 @@ class Mobile
     }
 
     /**
-     * Method to go to the mobile site.
+     * Go to the mobile site
      *
      * @throws Exception
      * @return void
@@ -449,7 +449,7 @@ class Mobile
     }
 
     /**
-     * Method to go to a specific URL.
+     * Go to a specific URL
      *
      * @param  string $url
      * @return void
@@ -461,7 +461,7 @@ class Mobile
     }
 
     /**
-     * Method to route to the appropriate URL
+     * Route to the appropriate URL
      *
      * @return void
      */
@@ -492,7 +492,7 @@ class Mobile
     }
 
     /**
-     * Method to detect whether or not the device is a mobile device or not.
+     * Detect whether or not the device is a mobile device or not
      *
      * @return void
      */

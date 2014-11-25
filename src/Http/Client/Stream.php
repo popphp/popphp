@@ -43,7 +43,7 @@ class Stream extends AbstractClient
     /**
      * Constructor
      *
-     * Instantiate the stream object.
+     * Instantiate the stream object
      *
      * @param  string $url
      * @param  array  $context

@@ -41,7 +41,7 @@ class Checkbox extends AbstractElement
     /**
      * Constructor
      *
-     * Instantiate the checkbox input form elements.
+     * Instantiate the checkbox input form elements
      *
      * @param  string       $name
      * @param  array        $values

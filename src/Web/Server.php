@@ -91,7 +91,7 @@ class Server
     /**
      * Constructor
      *
-     * Instantiate the server session object.
+     * Instantiate the server session object
      *
      * @return Server
      */
@@ -104,7 +104,7 @@ class Server
     }
 
     /**
-     * Method to get OS
+     * Get OS
      *
      * @return string
      */
@@ -114,7 +114,7 @@ class Server
     }
 
     /**
-     * Method to get distro
+     * Get distro
      *
      * @return string
      */
@@ -124,7 +124,7 @@ class Server
     }
 
     /**
-     * Method to get software
+     * Get software
      *
      * @return string
      */
@@ -134,7 +134,7 @@ class Server
     }
 
     /**
-     * Method to get server
+     * Get server
      *
      * @return string
      */
@@ -144,7 +144,7 @@ class Server
     }
 
     /**
-     * Method to get PHP version
+     * Get PHP version
      *
      * @return string
      */
@@ -154,7 +154,7 @@ class Server
     }
 
     /**
-     * Method to get server version
+     * Get server version
      *
      * @return string
      */
@@ -164,7 +164,7 @@ class Server
     }
 
     /**
-     * Method to get Linux flag
+     * Get Linux flag
      *
      * @return boolean
      */
@@ -174,7 +174,7 @@ class Server
     }
 
     /**
-     * Method to get Unix flag
+     * Get Unix flag
      *
      * @return boolean
      */
@@ -184,7 +184,7 @@ class Server
     }
 
     /**
-     * Method to get Windows flag
+     * Get Windows flag
      *
      * @return boolean
      */
@@ -194,7 +194,7 @@ class Server
     }
 
     /**
-     * Method to get Mac flag
+     * Get Mac flag
      *
      * @return boolean
      */
@@ -204,7 +204,27 @@ class Server
     }
 
     /**
-     * Method to detect properties.
+     * Get Apache flag
+     *
+     * @return boolean
+     */
+    public function isApache()
+    {
+        return ($this->server == 'Apache');
+    }
+
+    /**
+     * Get IIS flag
+     *
+     * @return boolean
+     */
+    public function isIIS()
+    {
+        return ($this->server == 'IIS');
+    }
+
+    /**
+     * Detect properties
      *
      * @return void
      */

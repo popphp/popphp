@@ -38,7 +38,7 @@ class File extends AbstractInput
     /**
      * Constructor
      *
-     * Instantiate the file input form element.
+     * Instantiate the file input form element
      *
      * @param  string $name
      * @param  string $value
@@ -52,7 +52,7 @@ class File extends AbstractInput
     }
 
     /**
-     * Set whether the form element is required.
+     * Set whether the form element is required
      *
      * @param  boolean $required
      * @return File

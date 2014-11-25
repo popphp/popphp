@@ -58,7 +58,7 @@ class I18n
     /**
      * Constructor
      *
-     * Instantiate the I18n object.
+     * Instantiate the I18n object
      *
      * @param  string $lang
      * @param  string $dir
@@ -86,7 +86,7 @@ class I18n
     }
 
     /**
-     * Get current language setting.
+     * Get current language setting
      *
      * @return string
      */
@@ -96,7 +96,7 @@ class I18n
     }
 
     /**
-     * Get current locale setting.
+     * Get current locale setting
      *
      * @return string
      */
@@ -106,7 +106,7 @@ class I18n
     }
 
     /**
-     * Load language content from an XML file.
+     * Load language content from an XML file
      *
      * @param  string $langFile
      * @throws Exception
@@ -179,7 +179,7 @@ class I18n
     }
 
     /**
-     * Echo the translated string.
+     * Echo the translated string
      *
      * @param  string $str
      * @param  string|array $params
@@ -191,7 +191,7 @@ class I18n
     }
 
     /**
-     * Get languages from the XML files.
+     * Get languages from the XML files
      *
      * @param  string $dir
      * @return array
@@ -240,7 +240,7 @@ class I18n
     }
 
     /**
-     * Translate and return the string.
+     * Translate and return the string
      *
      * @param  string $str
      * @param  string|array $params
@@ -265,7 +265,7 @@ class I18n
     }
 
     /**
-     * Get language content from the XML file.
+     * Get language content from the XML file
      *
      * @return void
      */

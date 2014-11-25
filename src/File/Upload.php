@@ -32,7 +32,7 @@ class Upload
      * Array of allowed file types.
      * @var array
      */
-    protected static $allowedTypes = array(
+    protected static $allowedTypes = [
         'afm'    => 'application/x-font-afm',
         'ai'     => 'application/postscript',
         'aif'    => 'audio/x-aiff',
@@ -106,10 +106,10 @@ class Upload
         'yaml'   => 'text/plain',
         'yml'    => 'text/plain',
         'zip'    => 'application/x-zip'
-    );
+    ];
 
     /**
-     * Static method to upload a file and return a file object.
+     * Static method to upload a file and return it
      *
      * @param  string $upload
      * @param  string $file

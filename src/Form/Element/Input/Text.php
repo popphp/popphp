@@ -38,7 +38,7 @@ class Text extends AbstractInput
     /**
      * Constructor
      *
-     * Instantiate the text input form element.
+     * Instantiate the text input form element
      *
      * @param  string $name
      * @param  string $value
@@ -52,7 +52,7 @@ class Text extends AbstractInput
     }
 
     /**
-     * Set whether the form element is required.
+     * Set whether the form element is required
      *
      * @param  boolean $required
      * @return Text

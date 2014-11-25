@@ -29,28 +29,28 @@ interface ValidatorInterface
 {
 
     /**
-     * Method to get the validator value
+     * Get the validator value
      *
      * @return mixed
      */
     public function getValue();
 
     /**
-     * Method to get the validator default message
+     * Get the validator default message
      *
      * @return boolean
      */
     public function getMessage();
 
     /**
-     * Method to get the validator input
+     * Get the validator input
      *
      * @return mixed
      */
     public function getInput();
 
     /**
-     * Method to set the validator value
+     * Set the validator value
      *
      * @param  mixed $value
      * @return AbstractValidator
@@ -58,7 +58,7 @@ interface ValidatorInterface
     public function setValue($value);
 
     /**
-     * Method to set the validator default message
+     * Set the validator default message
      *
      * @param  string $msg
      * @return AbstractValidator
@@ -66,7 +66,7 @@ interface ValidatorInterface
     public function setMessage($msg = null);
 
     /**
-     * Method to set the validator input
+     * Set the validator input
      *
      * @param  mixed $input
      * @return AbstractValidator
@@ -74,7 +74,7 @@ interface ValidatorInterface
     public function setInput($input = null);
 
     /**
-     * Method to evaluate
+     * Evaluate
      *
      * @param  mixed $input
      * @return boolean

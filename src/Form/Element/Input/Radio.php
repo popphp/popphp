@@ -41,7 +41,7 @@ class Radio extends AbstractElement
     /**
      * Constructor
      *
-     * Instantiate the radio input form elements.
+     * Instantiate the radio input form elements
      *
      * @param  string $name
      * @param  array  $values

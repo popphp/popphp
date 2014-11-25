@@ -159,7 +159,7 @@ class PayPal extends AbstractAdapter
     /**
      * Constructor
      *
-     * Method to instantiate an PayPal payment adapter object
+     * Instantiate an PayPal payment adapter object
      *
      * @param  string  $apiUser
      * @param  string  $apiPass

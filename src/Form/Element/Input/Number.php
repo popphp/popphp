@@ -38,7 +38,7 @@ class Number extends AbstractInput
     /**
      * Constructor
      *
-     * Instantiate the number input form element.
+     * Instantiate the number input form element
      *
      * @param  string $name
      * @param  string $value
@@ -52,7 +52,7 @@ class Number extends AbstractInput
     }
 
     /**
-     * Set whether the form element is required.
+     * Set whether the form element is required
      *
      * @param  boolean $required
      * @return Number

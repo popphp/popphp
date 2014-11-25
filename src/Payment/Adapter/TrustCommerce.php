@@ -128,7 +128,7 @@ class TrustCommerce extends AbstractAdapter
     /**
      * Constructor
      *
-     * Method to instantiate an TrustCommerce payment adapter object
+     * Instantiate an TrustCommerce payment adapter object
      *
      * @param  string  $custId
      * @param  string  $password

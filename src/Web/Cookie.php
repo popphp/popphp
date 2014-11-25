@@ -73,7 +73,7 @@ class Cookie
     /**
      * Constructor
      *
-     * Private method to instantiate the cookie object.
+     * Private method to instantiate the cookie object
      *
      * @param  array $options
      * @return Cookie
@@ -129,7 +129,7 @@ class Cookie
     }
 
     /**
-     * Set a cookie.
+     * Set a cookie
      *
      * @param  string  $name
      * @param  mixed   $value
@@ -171,7 +171,7 @@ class Cookie
     }
 
     /**
-     * Return the current cookie domain.
+     * Return the current cookie domain
      *
      * @return string
      */
@@ -228,7 +228,7 @@ class Cookie
     }
 
     /**
-     * Clear (delete) all cookies via unset($cookie)
+     * Clear (delete) all cookies
      *
      * @param  array $options
      * @return void
@@ -246,7 +246,7 @@ class Cookie
     }
 
     /**
-     * Get method to return the value of the $_COOKIE global variable.
+     * Get method to return the value of the $_COOKIE global variable
      *
      * @param  string $name
      * @return mixed
@@ -261,7 +261,7 @@ class Cookie
     }
 
     /**
-     * Return the isset value of the $_COOKIE global variable.
+     * Return the isset value of the $_COOKIE global variable
      *
      * @param  string $name
      * @return boolean
@@ -272,7 +272,7 @@ class Cookie
     }
 
     /**
-     * Unset the value in the $_COOKIE global variable.
+     * Unset the value in the $_COOKIE global variable
      *
      * @param  string $name
      * @return void

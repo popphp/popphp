@@ -88,7 +88,7 @@ class Select extends AbstractElement
     /**
      * Constructor
      *
-     * Instantiate the select form element object.
+     * Instantiate the select form element object
      *
      * @param  string       $name
      * @param  string|array $values
@@ -153,7 +153,7 @@ class Select extends AbstractElement
     }
 
     /**
-     * Set whether the form element is required.
+     * Set whether the form element is required
      *
      * @param  boolean $required
      * @return Select
@@ -165,7 +165,7 @@ class Select extends AbstractElement
     }
 
     /**
-     * Set an attribute for the child element object.
+     * Set an attribute for the child element object
      *
      * @param  string $a
      * @param  string $v
@@ -180,7 +180,7 @@ class Select extends AbstractElement
     }
 
     /**
-     * Set attributes for the child element object.
+     * Set attributes for the child element object
      *
      * @param  array $a
      * @return Select

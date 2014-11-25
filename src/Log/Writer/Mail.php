@@ -43,7 +43,7 @@ class Mail implements WriterInterface
     /**
      * Constructor
      *
-     * Instantiate the Mail writer object.
+     * Instantiate the Mail writer object
      *
      * @param  mixed $emails
      * @param  array $options
@@ -73,7 +73,7 @@ class Mail implements WriterInterface
     }
 
     /**
-     * Method to write to the log
+     * Write to the log
      *
      * @param  array $logEntry
      * @return Mail

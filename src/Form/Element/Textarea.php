@@ -38,7 +38,7 @@ class Textarea extends AbstractElement
     /**
      * Constructor
      *
-     * Instantiate the textarea form element.
+     * Instantiate the textarea form element
      *
      * @param  string $name
      * @param  string $value
@@ -55,7 +55,7 @@ class Textarea extends AbstractElement
     }
 
     /**
-     * Set whether the form element is required.
+     * Set whether the form element is required
      *
      * @param  boolean $required
      * @return Textarea

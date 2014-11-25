@@ -29,7 +29,7 @@ class String
 {
 
     /**
-     * Method to generate a random string of a predefined length.
+     * Generate a random string of a predefined length.
      *
      * @param  int   $length
      * @param  array $options
@@ -88,7 +88,7 @@ class String
     }
 
     /**
-     * Method to return a substring of the string between two delimiters.
+     * Return a substring of the string between two delimiters.
      *
      * @param  string $string
      * @param  int    $start
@@ -108,7 +108,7 @@ class String
     }
 
     /**
-     * Method to convert newlines from DOS to UNIX
+     * Convert newlines from DOS to UNIX
      *
      * @param  string $string
      * @return string
@@ -119,7 +119,7 @@ class String
     }
 
     /**
-     * Method to convert newlines from UNIX to DOS
+     * Convert newlines from UNIX to DOS
      *
      * @param  string $string
      * @return string
@@ -130,7 +130,7 @@ class String
     }
 
     /**
-     * Method to convert the string into an SEO-friendly slug.
+     * Convert the string into an SEO-friendly slug.
      *
      * @param  string $string
      * @param  string $sep
@@ -172,7 +172,7 @@ class String
     }
 
     /**
-     * Method to convert any links in the string to clickable HTML links.
+     * Convert any links in the string to clickable HTML links.
      *
      * @param  string $string
      * @param  boolean $target
@@ -205,7 +205,7 @@ class String
     }
 
     /**
-     * Method to convert the string from camelCase to dash format
+     * Convert the string from camelCase to dash format
      *
      * @param  string $string
      * @return string
@@ -216,7 +216,7 @@ class String
     }
 
     /**
-     * Method to convert the string from camelCase to separator format
+     * Convert the string from camelCase to separator format
      *
      * @param  string $string
      * @param  string $sep
@@ -228,7 +228,7 @@ class String
     }
 
     /**
-     * Method to convert the string from camelCase to under_score format
+     * Convert the string from camelCase to under_score format
      *
      * @param  string $string
      * @return string
@@ -239,7 +239,7 @@ class String
     }
 
     /**
-     * Method to convert the string from dash to camelCase format
+     * Convert the string from dash to camelCase format
      *
      * @param  string $string
      * @return string
@@ -263,7 +263,7 @@ class String
     }
 
     /**
-     * Method to convert the string from dash to separator format
+     * Convert the string from dash to separator format
      *
      * @param  string $string
      * @param  string $sep
@@ -275,7 +275,7 @@ class String
     }
 
     /**
-     * Method to convert the string from dash to under_score format
+     * Convert the string from dash to under_score format
      *
      * @param  string $string
      * @return string
@@ -286,7 +286,7 @@ class String
     }
 
     /**
-     * Method to convert the string from under_score to camelCase format
+     * Convert the string from under_score to camelCase format
      *
      * @param  string $string
      * @return string
@@ -310,7 +310,7 @@ class String
     }
 
     /**
-     * Method to convert the string from under_score to dash format
+     * Convert the string from under_score to dash format
      *
      * @param  string $string
      * @return string
@@ -321,7 +321,7 @@ class String
     }
 
     /**
-     * Method to convert the string from under_score to separator format
+     * Convert the string from under_score to separator format
      *
      * @param  string $string
      * @param  string $sep
@@ -333,7 +333,7 @@ class String
     }
 
     /**
-     * Method to convert a camelCase string using the $sep value passed
+     * Convert a camelCase string using the $sep value passed
      *
      * @param string $string
      * @param string $sep

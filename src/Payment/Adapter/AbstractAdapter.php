@@ -215,7 +215,7 @@ abstract class AbstractAdapter implements AdapterInterface
     public function set($data, $value = null)
     {
         if (!is_array($data)) {
-            $data = array($data => $value);
+            $data = [$data => $value];
         }
 
         foreach ($data as $key => $value) {

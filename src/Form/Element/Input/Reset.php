@@ -38,7 +38,7 @@ class Reset extends AbstractInput
     /**
      * Constructor
      *
-     * Instantiate the reset input form element.
+     * Instantiate the reset input form element
      *
      * @param  string $name
      * @param  string $value

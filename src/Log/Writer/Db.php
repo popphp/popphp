@@ -37,7 +37,7 @@ class Db implements WriterInterface
     /**
      * Constructor
      *
-     * Instantiate the DB writer object.
+     * Instantiate the DB writer object
      *
      * The DB table requires the following fields at a minimum:
      *     timestamp  DATETIME
@@ -62,7 +62,7 @@ class Db implements WriterInterface
     }
 
     /**
-     * Method to write to the log
+     * Write to the log
      *
      * @param  array $logEntry
      * @return Db

@@ -31,7 +31,7 @@ class Queue extends \SplQueue
     /**
      * Constructor
      *
-     * Instantiate the mail queue object.
+     * Instantiate the mail queue object
      *
      * @param  mixed  $email
      * @param  string $name

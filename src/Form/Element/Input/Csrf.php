@@ -38,7 +38,7 @@ class Csrf extends Hidden
     /**
      * Constructor
      *
-     * Instantiate the hidden input form element.
+     * Instantiate the CSRF input form element
      *
      * @param  string $name
      * @param  string $value
@@ -61,7 +61,7 @@ class Csrf extends Hidden
                 'start'  => time()
             ];
             $_SESSION['pop_csrf'] = serialize($this->token);
-            // Else, retrieve existing token
+        // Else, retrieve existing token
         } else {
             $this->token = unserialize($_SESSION['pop_csrf']);
 
@@ -84,7 +84,7 @@ class Csrf extends Hidden
     }
 
     /**
-     * Method to set the validator
+     * Set the validator
      *
      * @throws Exception
      * @return void

@@ -126,7 +126,7 @@ class Paginator
     /**
      * Constructor
      *
-     * Instantiate the paginator object.
+     * Instantiate the paginator object
      *
      * @param  int $total
      * @param  int $perPage
@@ -141,7 +141,7 @@ class Paginator
     }
 
     /**
-     * Method to set the content items total
+     * Set the content items total
      *
      * @param  int $total
      * @return Paginator
@@ -153,7 +153,7 @@ class Paginator
     }
 
     /**
-     * Method to set the page range.
+     * Set the per page
      *
      * @param  int $perPage
      * @return Paginator
@@ -165,7 +165,7 @@ class Paginator
     }
 
     /**
-     * Method to set the page range.
+     * Set the page range
      *
      * @param  int $range
      * @return Paginator
@@ -177,7 +177,7 @@ class Paginator
     }
 
     /**
-     * Method to set the query key.
+     * Set the query key
      *
      * @param  string $key
      * @return Paginator
@@ -189,7 +189,7 @@ class Paginator
     }
 
     /**
-     * Method to set the bookend separator.
+     * Set the bookend separator
      *
      * @param  string $sep
      * @return Paginator
@@ -201,7 +201,7 @@ class Paginator
     }
 
     /**
-     * Method to set the class 'on' name.
+     * Set the class 'on' name
      *
      * @param  string $class
      * @return Paginator
@@ -213,7 +213,7 @@ class Paginator
     }
 
     /**
-     * Method to set the class 'off' name.
+     * Set the class 'off' name.
      *
      * @param  string $class
      * @return Paginator
@@ -225,7 +225,7 @@ class Paginator
     }
 
     /**
-     * Method to set the bookends.
+     * Set the bookends
      *
      * @param  array $bookends
      * @return Paginator
@@ -249,7 +249,7 @@ class Paginator
     }
 
     /**
-     * Method to set whether to use an input form field.
+     * Set whether to use an input form field
      *
      * @param  boolean $flag
      * @param  string  $separator
@@ -266,7 +266,7 @@ class Paginator
     }
 
     /**
-     * Method to get the content items total
+     * Get the content items total
      *
      * @return int
      */
@@ -276,7 +276,7 @@ class Paginator
     }
 
     /**
-     * Method to get the page range.
+     * Get the per page
      *
      * @return int
      */
@@ -286,7 +286,7 @@ class Paginator
     }
 
     /**
-     * Method to get the page range.
+     * Get the page range
      *
      * @return int
      */
@@ -296,7 +296,7 @@ class Paginator
     }
 
     /**
-     * Method to get the query key.
+     * Get the query key
      *
      * @return int
      */
@@ -306,7 +306,7 @@ class Paginator
     }
 
     /**
-     * Method to get the bookend separator.
+     * Get the bookend separator
      *
      * @return string
      */
@@ -316,7 +316,7 @@ class Paginator
     }
 
     /**
-     * Method to get the class 'on' name.
+     * Get the class 'on' name
      *
      * @return string
      */
@@ -326,7 +326,7 @@ class Paginator
     }
 
     /**
-     * Method to get the class 'off' name.
+     * Get the class 'off' name.
      *
      * @return string
      */
@@ -336,7 +336,7 @@ class Paginator
     }
 
     /**
-     * Method to get a bookend
+     * Get a bookend
      *
      * @param  string $key
      * @return string
@@ -347,7 +347,7 @@ class Paginator
     }
 
     /**
-     * Method to get the bookends
+     * Get the bookends
      *
      * @return array
      */
@@ -357,7 +357,7 @@ class Paginator
     }
 
     /**
-     * Method to get the current page.
+     * Get the current page
      *
      * @return int
      */
@@ -367,7 +367,7 @@ class Paginator
     }
 
     /**
-     * Method to get the number of pages.
+     * Get the number of pages
      *
      * @return int
      */
@@ -377,7 +377,7 @@ class Paginator
     }
 
     /**
-     * Method to get the page links.
+     * Get the page links
      *
      * @param  int $page
      * @return array
@@ -391,7 +391,7 @@ class Paginator
     }
 
     /**
-     * Method to calculate the page range
+     * Calculate the page range
      *
      * @param  int $page
      * @return array
@@ -481,7 +481,7 @@ class Paginator
     }
 
     /**
-     * Method to create links.
+     * Create links
      *
      * @param  int  $page
      * @return void

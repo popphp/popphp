@@ -118,7 +118,7 @@ class Response
     /**
      * Constructor
      *
-     * Instantiate the response object.
+     * Instantiate the response object
      *
      * @param  array $config
      * @throws Exception
@@ -252,7 +252,7 @@ class Response
     }
 
     /**
-     * Encode the body data.
+     * Encode the body data
      *
      * @param  string $body
      * @param  string $encode
@@ -288,7 +288,7 @@ class Response
     }
 
     /**
-     * Decode the body data.
+     * Decode the body data
      *
      * @param  string $body
      * @param  string $decode

@@ -38,7 +38,7 @@ class Button extends AbstractElement
     /**
      * Constructor
      *
-     * Instantiate the buttom form element.
+     * Instantiate the button form element.
      *
      * @param  string $name
      * @param  string $value

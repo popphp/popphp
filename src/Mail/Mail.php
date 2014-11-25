@@ -85,7 +85,7 @@ class Mail
     /**
      * Constructor
      *
-     * Instantiate the mail object.
+     * Instantiate the mail object
      *
      * @param  string $subj
      * @param  mixed  $rcpts
@@ -184,7 +184,7 @@ class Mail
     }
 
     /**
-     * Get text part of the message.
+     * Get text part of the message
      *
      * @return string
      */
@@ -194,7 +194,7 @@ class Mail
     }
 
     /**
-     * Get HTML part of the message.
+     * Get HTML part of the message
      *
      * @return string
      */
@@ -519,7 +519,7 @@ class Mail
     }
 
     /**
-     * Save mail message or messages in a folder to be sent at a later date.
+     * Save mail message or messages in a folder to be sent at a later date
      *
      * @param string $to
      * @param string $format

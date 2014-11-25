@@ -43,8 +43,7 @@ class Session
     /**
      * Constructor
      *
-     * Private method to instantiate the session object. As part of the
-     * singleton pattern, it can only be called internally by the object itself.
+     * Private method to instantiate the session object
      *
      * @return Session
      */
@@ -73,7 +72,7 @@ class Session
     }
 
     /**
-     * Return the current the session id.
+     * Return the current the session id
      *
      * @return string
      */
@@ -83,7 +82,7 @@ class Session
     }
 
     /**
-     * Regenerate the session id.
+     * Regenerate the session id
      *
      * @return void
      */
@@ -94,7 +93,7 @@ class Session
     }
 
     /**
-     * Destroy the session.
+     * Destroy the session
      *
      * @return void
      */
@@ -107,7 +106,7 @@ class Session
     }
 
     /**
-     * Set a property in the session object that is linked to the $_SESSION global variable.
+     * Set a property in the session object that is linked to the $_SESSION global variable
      *
      * @param  string $name
      * @param  mixed $value
@@ -119,7 +118,7 @@ class Session
     }
 
     /**
-     * Get method to return the value of the $_SESSION global variable.
+     * Get method to return the value of the $_SESSION global variable
      *
      * @param  string $name
      * @return mixed
@@ -130,7 +129,7 @@ class Session
     }
 
     /**
-     * Return the isset value of the $_SESSION global variable.
+     * Return the isset value of the $_SESSION global variable
      *
      * @param  string $name
      * @return boolean
@@ -141,7 +140,7 @@ class Session
     }
 
     /**
-     * Unset the $_SESSION global variable.
+     * Unset the $_SESSION global variable
      *
      * @param  string $name
      * @return void

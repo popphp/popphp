@@ -55,7 +55,7 @@ class View
     /**
      * Constructor
      *
-     * Instantiate the view object.
+     * Instantiate the view object
      *
      * @param  string $template
      * @param  array  $data

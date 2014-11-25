@@ -64,7 +64,7 @@ abstract class AbstractValidator implements ValidatorInterface
     }
 
     /**
-     * Method to get the validator value
+     * Get the validator value
      *
      * @return mixed
      */
@@ -74,7 +74,7 @@ abstract class AbstractValidator implements ValidatorInterface
     }
 
     /**
-     * Method to get the validator default message
+     * Get the validator default message
      *
      * @return boolean
      */
@@ -84,7 +84,7 @@ abstract class AbstractValidator implements ValidatorInterface
     }
 
     /**
-     * Method to get the validator input
+     * GEt the validator input
      *
      * @return mixed
      */
@@ -94,7 +94,7 @@ abstract class AbstractValidator implements ValidatorInterface
     }
 
     /**
-     * Method to set the validator value
+     * Set the validator value
      *
      * @param  mixed $value
      * @return AbstractValidator
@@ -106,7 +106,7 @@ abstract class AbstractValidator implements ValidatorInterface
     }
 
     /**
-     * Method to set the validator condition
+     * Set the validator condition
      *
      * @param  string $msg
      * @return AbstractValidator
@@ -118,7 +118,7 @@ abstract class AbstractValidator implements ValidatorInterface
     }
 
     /**
-     * Method to set the validator input
+     * Set the validator input
      *
      * @param  mixed $input
      * @return AbstractValidator
@@ -130,7 +130,7 @@ abstract class AbstractValidator implements ValidatorInterface
     }
 
     /**
-     * Method to get the validator value
+     * Evaluate
 
      * @param  mixed $input
      * @return boolean

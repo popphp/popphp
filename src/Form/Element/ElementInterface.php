@@ -29,7 +29,7 @@ interface ElementInterface
 {
 
     /**
-     * Set the name of the form element.
+     * Set the name of the form element
      *
      * @param  string $name
      * @return AbstractElement
@@ -37,7 +37,7 @@ interface ElementInterface
     public function setName($name);
 
     /**
-     * Set the value of the form element.
+     * Set the value of the form element
      *
      * @param  mixed $value
      * @return AbstractElement
@@ -45,7 +45,7 @@ interface ElementInterface
     public function setValue($value);
 
     /**
-     * Set the marked value(s) of the form element.
+     * Set the marked value(s) of the form element
      *
      * @param  mixed $marked
      * @return AbstractElement
@@ -53,7 +53,7 @@ interface ElementInterface
     public function setMarked($marked);
 
     /**
-     * Set the label of the form element.
+     * Set the label of the form element
      *
      * @param  mixed $label
      * @return AbstractElement
@@ -61,7 +61,7 @@ interface ElementInterface
     public function setLabel($label);
 
     /**
-     * Set the attributes of the label of the form element.
+     * Set the attributes of the label of the form element
      *
      * @param  array $attribs
      * @return AbstractElement
@@ -69,7 +69,7 @@ interface ElementInterface
     public function setLabelAttributes(array $attribs);
 
     /**
-     * Set whether the form element is required.
+     * Set whether the form element is required
      *
      * @param  boolean $required
      * @return AbstractElement
@@ -111,49 +111,49 @@ interface ElementInterface
     public function setValidators(array $validators = []);
 
     /**
-     * Clear errors.
+     * Clear errors
      *
      * @return AbstractElement
      */
     public function clearErrors();
 
     /**
-     * Get form element name.
+     * Get form element name
      *
      * @return string
      */
     public function getName();
 
     /**
-     * Get form element type.
+     * Get form element type
      *
      * @return string
      */
     public function getType();
 
     /**
-     * Get form element value.
+     * Get form element value
      *
      * @return mixed
      */
     public function getValue();
 
     /**
-     * Get form element marked value(s).
+     * Get form element marked value(s)
      *
      * @return mixed
      */
     public function getMarked();
 
     /**
-     * Get form element label.
+     * Get form element label
      *
      * @return string
      */
     public function getLabel();
 
     /**
-     * Get the attributes of the form element label.
+     * Get the attributes of the form element label
      *
      * @return array
      */
@@ -167,28 +167,28 @@ interface ElementInterface
     public function getValidators();
 
     /**
-     * Get whether the form element is required.
+     * Get whether the form element is required
      *
      * @return boolean
      */
     public function isRequired();
 
     /**
-     * Get form element errors.
+     * Get form element errors
      *
      * @return array
      */
     public function getErrors();
 
     /**
-     * Get if form element has errors.
+     * Get if form element has errors
      *
      * @return array
      */
     public function hasErrors();
 
     /**
-     * Add a validator the form element.
+     * Add a validator the form element
      *
      * @param  mixed $validator
      * @return AbstractElement
@@ -196,7 +196,7 @@ interface ElementInterface
     public function addValidator($validator);
 
     /**
-     * Validate the form element.
+     * Validate the form element
      *
      * @throws Exception
      * @return boolean

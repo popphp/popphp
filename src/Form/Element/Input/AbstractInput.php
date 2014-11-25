@@ -40,7 +40,7 @@ abstract class AbstractInput extends AbstractElement
     /**
      * Constructor
      *
-     * Instantiate the button input form element.
+     * Instantiate the form element
      *
      * @param  string $name
      * @param  string $value

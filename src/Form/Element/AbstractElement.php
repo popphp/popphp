@@ -98,7 +98,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     protected $errors = [];
 
     /**
-     * Set the name of the form element object.
+     * Set the name of the form element object
      *
      * @param  string $name
      * @return AbstractElement
@@ -110,7 +110,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Set the value of the form element object.
+     * Set the value of the form element object
      *
      * @param  mixed $value
      * @return AbstractElement
@@ -122,7 +122,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Set the marked value of the form element object.
+     * Set the marked value of the form element object
      *
      * @param  mixed $marked
      * @return AbstractElement
@@ -134,7 +134,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Set the label of the form element object.
+     * Set the label of the form element object
      *
      * @param  mixed $label
      * @return AbstractElement
@@ -154,7 +154,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Set the attributes of the label of the form element object.
+     * Set the attributes of the label of the form element object
      *
      * @param  array $attribs
      * @return AbstractElement
@@ -168,7 +168,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Set whether the form element is required.
+     * Set whether the form element is required
      *
      * @param  boolean $required
      * @return AbstractElement
@@ -234,7 +234,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Clear errors.
+     * Clear errors
      *
      * @return AbstractElement
      */
@@ -245,7 +245,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Get form element object name.
+     * Get form element object name
      *
      * @return string
      */
@@ -255,7 +255,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Get form element object type.
+     * Get form element object type
      *
      * @return string
      */
@@ -265,7 +265,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Get form element object value.
+     * Get form element object value
      *
      * @return mixed
      */
@@ -275,7 +275,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Get form element object marked values.
+     * Get form element object marked values
      *
      * @return mixed
      */
@@ -285,7 +285,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Get form element object label.
+     * Get form element object label
      *
      * @return string
      */
@@ -295,7 +295,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Get the attributes of the form element object label.
+     * Get the attributes of the form element object label
      *
      * @return array
      */
@@ -315,7 +315,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Get whether the form element object is required.
+     * Get whether the form element object is required
      *
      * @return boolean
      */
@@ -325,7 +325,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Get form element object errors.
+     * Get form element object errors
      *
      * @return array
      */
@@ -335,7 +335,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Get if form element object has errors.
+     * Get if form element object has errors
      *
      * @return array
      */
@@ -345,7 +345,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Add a validator the form element.
+     * Add a validator the form element
      *
      * @param  mixed $validator
      * @throws Exception
@@ -361,7 +361,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Add multiple validators the form element.
+     * Add multiple validators the form element
      *
      * @param  array $validators
      * @return AbstractElement
@@ -375,7 +375,7 @@ abstract class AbstractElement extends Child implements ElementInterface
     }
 
     /**
-     * Validate the form element object.
+     * Validate the form element object
      *
      * @throws Exception
      * @return boolean
@@ -449,7 +449,7 @@ abstract class AbstractElement extends Child implements ElementInterface
 
 
     /**
-     * Method to render the child and its child nodes.
+     * Render the child and its child nodes
      *
      * @param  boolean $ret
      * @param  int     $depth

@@ -71,7 +71,7 @@ class Logger
     /**
      * Constructor
      *
-     * Instantiate the logger object.
+     * Instantiate the logger object
      *
      * @param  Writer\WriterInterface $writer
      * @return Logger
@@ -84,7 +84,7 @@ class Logger
     }
 
     /**
-     * Method to add a log writer
+     * Add a log writer
      *
      * @param  Writer\WriterInterface $writer
      * @return Logger
@@ -96,7 +96,7 @@ class Logger
     }
 
     /**
-     * Method to get all log writers
+     * Get all log writers
      *
      * @return array
      */
@@ -106,7 +106,7 @@ class Logger
     }
 
     /**
-     * Method to set timestamp format
+     * Set timestamp format
      *
      * @param  string $format
      * @return Logger
@@ -118,7 +118,7 @@ class Logger
     }
 
     /**
-     * Method to get timestamp format
+     * Get timestamp format
      *
      * @return string
      */
@@ -128,7 +128,7 @@ class Logger
     }
 
     /**
-     * Method to add a log entry
+     * Add a log entry
      *
      * @param  int   $priority
      * @param  mixed $message
@@ -152,7 +152,7 @@ class Logger
     }
 
     /**
-     * Method to add an EMERG log entry
+     * Add an EMERG log entry
      *
      * @param  mixed $message
      * @param  array $options
@@ -164,7 +164,7 @@ class Logger
     }
 
     /**
-     * Method to add an ALERT log entry
+     * Add an ALERT log entry
      *
      * @param  mixed $message
      * @param  array $options
@@ -176,7 +176,7 @@ class Logger
     }
 
     /**
-     * Method to add a CRIT log entry
+     * Add a CRIT log entry
      *
      * @param  mixed $message
      * @param  array $options
@@ -188,7 +188,7 @@ class Logger
     }
 
     /**
-     * Method to add an ERR log entry
+     * Add an ERR log entry
      *
      * @param  mixed $message
      * @param  array $options
@@ -200,7 +200,7 @@ class Logger
     }
 
     /**
-     * Method to add a WARN log entry
+     * Add a WARN log entry
      *
      * @param  mixed $message
      * @param  array $options
@@ -212,7 +212,7 @@ class Logger
     }
 
     /**
-     * Method to add a NOTICE log entry
+     * Add a NOTICE log entry
      *
      * @param  mixed $message
      * @param  array $options
@@ -224,7 +224,7 @@ class Logger
     }
 
     /**
-     * Method to add an INFO log entry
+     * Add an INFO log entry
      *
      * @param  mixed $message
      * @param  array $options
@@ -236,7 +236,7 @@ class Logger
     }
 
     /**
-     * Method to add a DEBUG log entry
+     * Add a DEBUG log entry
      *
      * @param  mixed $message
      * @param  array $options

@@ -145,7 +145,7 @@ class Request
     /**
      * Constructor
      *
-     * Instantiate the request object.
+     * Instantiate the request object
      *
      * @param  string $uri
      * @param  string $basePath

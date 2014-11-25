@@ -165,7 +165,7 @@ class Authorize extends AbstractAdapter
     /**
      * Constructor
      *
-     * Method to instantiate an Authorize.net payment adapter object
+     * Instantiate an Authorize.net payment adapter object
      *
      * @param  string  $apiLoginId
      * @param  string  $transKey

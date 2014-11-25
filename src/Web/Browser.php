@@ -103,7 +103,7 @@ class Browser
     /**
      * Constructor
      *
-     * Instantiate the browser session object.
+     * Instantiate the browser object
      *
      * @return Browser
      */
@@ -122,7 +122,7 @@ class Browser
     }
 
     /**
-     * Method to get IP
+     * Get IP
      *
      * @return string
      */
@@ -132,7 +132,7 @@ class Browser
     }
 
     /**
-     * Method to get subnet
+     * Get subnet
      *
      * @return string
      */
@@ -142,7 +142,7 @@ class Browser
     }
 
     /**
-     * Method to get user-agent
+     * Get user-agent
      *
      * @return string
      */
@@ -152,7 +152,7 @@ class Browser
     }
 
     /**
-     * Method to get platform
+     * Get platform
      *
      * @return string
      */
@@ -162,7 +162,7 @@ class Browser
     }
 
     /**
-     * Method to get OS
+     * Get OS
      *
      * @return string
      */
@@ -172,7 +172,7 @@ class Browser
     }
 
     /**
-     * Method to get browser name
+     * Get browser name
      *
      * @return string
      */
@@ -182,7 +182,7 @@ class Browser
     }
 
     /**
-     * Method to get version
+     * Get version
      *
      * @return string
      */
@@ -192,7 +192,7 @@ class Browser
     }
 
     /**
-     * Method to get Mozilla flag
+     * Get Mozilla flag
      *
      * @return boolean
      */
@@ -202,7 +202,7 @@ class Browser
     }
 
     /**
-     * Method to get Chrome flag
+     * Get Chrome flag
      *
      * @return boolean
      */
@@ -212,7 +212,7 @@ class Browser
     }
 
     /**
-     * Method to get WebKit flag
+     * Get WebKit flag
      *
      * @return boolean
      */
@@ -222,7 +222,7 @@ class Browser
     }
 
     /**
-     * Method to get MSIE flag
+     * Get MSIE flag
      *
      * @return boolean
      */
@@ -232,7 +232,7 @@ class Browser
     }
 
     /**
-     * Method to get Opera flag
+     * Get Opera flag
      *
      * @return boolean
      */
@@ -242,7 +242,7 @@ class Browser
     }
 
     /**
-     * Method to detect properties.
+     * Detect properties.
      *
      * @return void
      */

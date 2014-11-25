@@ -31,7 +31,7 @@ class Captcha extends Text
     /**
      * Constructor
      *
-     * Instantiate the hidden input form element.
+     * Instantiate the captcha input form element
      *
      * @param  string $name
      * @param  string $value
@@ -92,7 +92,7 @@ class Captcha extends Text
     }
 
     /**
-     * Set the label of the captcha form element.
+     * Set the label of the captcha form element
      *
      * @param  string $label
      * @return Captcha
@@ -113,7 +113,7 @@ class Captcha extends Text
     }
 
     /**
-     * Method to set the validator
+     * Set the validator
      *
      * @throws Exception
      * @return void
@@ -162,7 +162,7 @@ class Captcha extends Text
     }
 
     /**
-     * Method to randomly generate a simple, basic equation
+     * Randomly generate a simple, basic equation
      *
      * @return string
      */

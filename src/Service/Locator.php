@@ -118,7 +118,7 @@ class Locator
     }
 
     /**
-     * Get a service object.
+     * Get a service object
      *
      * @param  string $name
      * @return mixed
@@ -136,7 +136,7 @@ class Locator
     }
 
     /**
-     * Determine of a service object is available (but not loaded).
+     * Determine of a service object is available (but not loaded)
      *
      * @param  string $name
      * @return boolean
@@ -147,7 +147,7 @@ class Locator
     }
 
     /**
-     * Determine of a service object is loaded.
+     * Determine of a service object is loaded
      *
      * @param  string $name
      * @return boolean

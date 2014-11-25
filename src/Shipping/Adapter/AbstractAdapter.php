@@ -26,7 +26,6 @@ namespace Pop\Shipping\Adapter;
  * @version    2.0.0a
  */
 
-
 abstract class AbstractAdapter implements AdapterInterface
 {
 

@@ -37,7 +37,7 @@ class Curl extends AbstractClient
     /**
      * Constructor
      *
-     * Instantiate the cURL object.
+     * Instantiate the cURL object
      *
      * @param  string $url
      * @param  array  $opts
@@ -63,7 +63,7 @@ class Curl extends AbstractClient
     }
 
     /**
-     * Set cURL session option.
+     * Set cURL session option
      *
      * @param  int    $opt
      * @param  string $val
@@ -79,7 +79,7 @@ class Curl extends AbstractClient
     }
 
     /**
-     * Set cURL session options.
+     * Set cURL session options
      *
      * @param  array $opts
      * @return Curl
@@ -163,7 +163,7 @@ class Curl extends AbstractClient
     }
 
     /**
-     * Get a cURL session option.
+     * Get a cURL session option
      *
      * @param  int $opt
      * @return string
@@ -174,7 +174,7 @@ class Curl extends AbstractClient
     }
 
     /**
-     * Return the cURL session last info.
+     * Return the cURL session last info
      *
      * @param  int $opt
      * @return array|string
@@ -224,7 +224,7 @@ class Curl extends AbstractClient
     }
 
     /**
-     * Return the cURL version.
+     * Return the cURL version
      *
      * @return array
      */
@@ -234,7 +234,7 @@ class Curl extends AbstractClient
     }
 
     /**
-     * Close the cURL connection.
+     * Close the cURL connection
      *
      * @return void
      */

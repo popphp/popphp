@@ -309,7 +309,7 @@ class Fields
     }
 
     /**
-     * Set method to set the property to the value of fields[$name].
+     * Set method to set the property to the value of fields[$name]
      *
      * @param  string $name
      * @param  mixed $value
@@ -322,7 +322,7 @@ class Fields
     }
 
     /**
-     * Get method to return the value of fields[$name].
+     * Get method to return the value of fields[$name]
      *
      * @param  string $name
      * @throws Exception
@@ -334,7 +334,7 @@ class Fields
     }
 
     /**
-     * Return the isset value of fields[$name].
+     * Return the isset value of fields[$name]
      *
      * @param  string $name
      * @return boolean

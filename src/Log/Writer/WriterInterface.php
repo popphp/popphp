@@ -29,7 +29,7 @@ interface WriterInterface
 {
 
     /**
-     * Method to write to the log
+     * Write to the log
      *
      * @param  array $logEntry
      * @return void

@@ -37,7 +37,7 @@ class Ftp
     /**
      * Constructor
      *
-     * Instantiate the FTP object.
+     * Instantiate the FTP object
      *
      * @param  string  $ftp
      * @param  string  $user
@@ -66,7 +66,7 @@ class Ftp
     }
 
     /**
-     * Return current working directory.
+     * Return current working directory
      *
      * @return string
      */
@@ -76,7 +76,7 @@ class Ftp
     }
 
     /**
-     * Change directories.
+     * Change directories
      *
      * @param  string $dir
      * @throws Exception
@@ -91,7 +91,7 @@ class Ftp
     }
 
     /**
-     * Make directory.
+     * Make directory
      *
      * @param  string $dir
      * @throws Exception
@@ -106,7 +106,7 @@ class Ftp
     }
 
     /**
-     * Remove directory.
+     * Remove directory
      *
      * @param  string $dir
      * @throws Exception
@@ -121,7 +121,7 @@ class Ftp
     }
 
     /**
-     * Get file.
+     * Get file
      *
      * @param  string $local
      * @param  string $remote
@@ -138,7 +138,7 @@ class Ftp
     }
 
     /**
-     * Put file.
+     * Put file
      *
      * @param  string $remote
      * @param  string $local
@@ -154,7 +154,7 @@ class Ftp
     }
 
     /**
-     * Rename file.
+     * Rename file
      *
      * @param  string $old
      * @param  string $new
@@ -170,7 +170,7 @@ class Ftp
     }
 
     /**
-     * Change permissions.
+     * Change permissions
      *
      * @param  string $file
      * @param  string $mode
@@ -186,7 +186,7 @@ class Ftp
     }
 
     /**
-     * Delete file.
+     * Delete file
      *
      * @param  string $file
      * @throws Exception
@@ -201,7 +201,7 @@ class Ftp
     }
 
     /**
-     * Switch the passive mode.
+     * Switch the passive mode
      *
      * @param  boolean $flag
      * @return Ftp

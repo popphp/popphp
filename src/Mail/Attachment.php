@@ -43,7 +43,7 @@ class Attachment
     /**
      * Constructor
      *
-     * Instantiate the mail attachment object.
+     * Instantiate the mail attachment object
      *
      * @param  string $file
      * @throws Exception
@@ -57,11 +57,8 @@ class Attachment
         }
 
         // Encode the file contents and set the file into the attachments array property.
-        $fileParts      = pathinfo($file);
-        $fileContents   = file_get_contents($file);
-        $encoded        = chunk_split(base64_encode($fileContents));
-        $this->basename = $fileParts['basename'];
-        $this->encoded  = $encoded;
+        $this->basename = basename($file);
+        $this->encoded  = chunk_split(base64_encode(file_get_contents($file)));
     }
 
     /**

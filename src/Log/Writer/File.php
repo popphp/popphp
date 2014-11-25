@@ -29,7 +29,7 @@ class File implements WriterInterface
 {
 
     /**
-     * Array of allowed log file types.
+     * Array of allowed log file types
      * @var array
      */
     protected $allowed = [
@@ -79,7 +79,7 @@ class File implements WriterInterface
     /**
      * Constructor
      *
-     * Instantiate the file writer object.
+     * Instantiate the file writer object
      *
      * @param  string $file
      * @param  array $types
@@ -113,7 +113,7 @@ class File implements WriterInterface
     }
 
     /**
-     * Method to write to the log
+     * Write to the log
      *
      * @param  array $logEntry
      * @return File

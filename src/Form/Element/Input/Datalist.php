@@ -40,7 +40,7 @@ class Datalist extends Text
     /**
      * Constructor
      *
-     * Instantiate the datalist text input form element.
+     * Instantiate the datalist text input form element
      *
      * @param  string $name
      * @param  string $value
@@ -63,7 +63,7 @@ class Datalist extends Text
     }
 
     /**
-     * Set whether the form element is required.
+     * Set whether the form element is required
      *
      * @param  boolean $required
      * @return Datalist
@@ -75,7 +75,7 @@ class Datalist extends Text
     }
 
     /**
-     * Method to render the child and its child nodes.
+     * Render the child and its child nodes
      *
      * @param  boolean $ret
      * @param  int     $depth
