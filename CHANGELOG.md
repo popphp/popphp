@@ -3,7 +3,7 @@ Pop PHP Framework Changelog
 
 2.0.0a
 ------
-As of July 17, 2014
+As of November 25, 2014
 
 * PHP 5.4+ Only
 * Composer Support
@@ -15,6 +15,8 @@ As of July 17, 2014
 * Revised
     - Acl
         + Add inheritsFrom() method for Acl\Role
+    - Application
+        + Moved the main Application class to the top level
     - Auth
         + Separated the Acl component and moved to its own folder
         + Added support for Http auth
@@ -26,6 +28,7 @@ As of July 17, 2014
         + Revised the join() method to be more clear in the Sql\Select class
         + Upgraded and Improved the Db\Sql component
         + Refactored the Record class to utilize the new Table Gateway and Row Gateway
+        + Added a Db class for checking and installing databases
     - Feed
         + Specific services and formats have been removed (Facebook, Twitter, etc.)
     - File
@@ -43,6 +46,7 @@ As of July 17, 2014
     - Pdf
         + Font component moved under Pdf
 * Removed
+    - Application\Build
     - Color
     - Compress
     - Curl (moved under the Http component)
