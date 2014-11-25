@@ -65,7 +65,7 @@ class Memcached implements AdapterInterface
     }
 
     /**
-     * Method to get the current version of memcache.
+     * Get the current version of memcache.
      *
      * @return string
      */
@@ -75,7 +75,7 @@ class Memcached implements AdapterInterface
     }
 
     /**
-     * Method to save a value to cache.
+     * Save a value to cache.
      *
      * @param  string $id
      * @param  mixed  $value
@@ -88,7 +88,7 @@ class Memcached implements AdapterInterface
     }
 
     /**
-     * Method to load a value from cache.
+     * Load a value from cache.
      *
      * @param  string $id
      * @param  string $time
@@ -100,7 +100,7 @@ class Memcached implements AdapterInterface
     }
 
     /**
-     * Method to delete a value in cache.
+     * Remove a value in cache.
      *
      * @param  string $id
      * @return void
@@ -111,7 +111,7 @@ class Memcached implements AdapterInterface
     }
 
     /**
-     * Method to clear all stored values from cache.
+     * Clear all stored values from cache.
      *
      * @return void
      */

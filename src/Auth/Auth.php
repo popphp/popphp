@@ -66,7 +66,7 @@ class Auth
     }
 
     /**
-     * Method to get the auth adapter
+     * Get the auth adapter
      *
      * @return Adapter\AbstractAdapter
      */
@@ -76,7 +76,7 @@ class Auth
     }
 
     /**
-     * Method to get the authentication result
+     * Get the authentication result
      *
      * @return int
      */
@@ -86,7 +86,7 @@ class Auth
     }
 
     /**
-     * Method to determine if the authentication attempt was valid
+     * Determine if the authentication attempt was valid
      *
      * @return boolean
      */
@@ -96,7 +96,7 @@ class Auth
     }
 
     /**
-     * Method to get the username
+     * Get the username
      *
      * @return string
      */
@@ -106,7 +106,7 @@ class Auth
     }
 
     /**
-     * Method to get the password
+     * Get the password
      *
      * @return string
      */
@@ -116,7 +116,7 @@ class Auth
     }
 
     /**
-     * Method to set the username
+     * Set the username
      *
      * @param  string $username
      * @return Auth
@@ -128,7 +128,7 @@ class Auth
     }
 
     /**
-     * Method to set the password
+     * Set the password
      *
      * @param  string $password
      * @return Auth

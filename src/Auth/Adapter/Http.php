@@ -117,7 +117,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to get the auth type
+     * Get the auth type
      *
      * @return string
      */
@@ -127,7 +127,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to get the auth scheme
+     * Get the auth scheme
      *
      * @return array
      */
@@ -137,7 +137,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to get the HTTP version
+     * Get the HTTP version
      *
      * @return string
      */
@@ -147,7 +147,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to get the HTTP code
+     * Get the HTTP code
      *
      * @return string
      */
@@ -157,7 +157,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to get the HTTP message
+     * Get the HTTP message
      *
      * @return string
      */
@@ -167,7 +167,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to get the HTTP response headers
+     * Get the HTTP response headers
      *
      * @return array
      */
@@ -177,7 +177,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to get an HTTP response header
+     * Get an HTTP response header
      *
      * @param  string $name
      * @return mixed
@@ -188,7 +188,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to get the HTTP response body
+     * Get the HTTP response body
      *
      * @return string
      */
@@ -198,7 +198,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to authenticate the user
+     * Method to authenticate
      *
      * @return int
      */
@@ -234,7 +234,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to generate the request
+     * Generate the request
      *
      * @return void
      */
@@ -255,7 +255,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to parse the scheme
+     * Parse the scheme
      *
      * @param  string $wwwAuth
      * @return void
@@ -278,7 +278,7 @@ class Http extends AbstractAdapter
     }
 
     /**
-     * Method to send the request
+     * Send the request
      *
      * @param  array $context
      * @return void

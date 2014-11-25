@@ -41,7 +41,7 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $password = null;
 
     /**
-     * Method to get the username
+     * Get the username
      *
      * @return string
      */
@@ -51,7 +51,7 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
-     * Method to get the password
+     * Get the password
      *
      * @return string
      */
@@ -61,7 +61,7 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
-     * Method to get the username
+     * Set the username
      *
      * @param  string $username
      * @return AbstractAdapter
@@ -73,7 +73,7 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
-     * Method to get the password
+     * Set the password
      *
      * @param  string $password
      * @return AbstractAdapter
@@ -83,5 +83,12 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->password = $password;
         return $this;
     }
+
+    /**
+     * Method to authenticate
+     *
+     * @return int
+     */
+    abstract public function authenticate();
 
 }

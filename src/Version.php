@@ -34,7 +34,7 @@ class Version
     const VERSION = '2.0.0a';
 
     /**
-     * Returns the latest version available.
+     * Compares the local version to the latest version available
      *
      * @param  string $version
      * @return mixed
@@ -59,7 +59,7 @@ class Version
             fclose($handle);
         }
 
-        return $latest;
+        return trim($latest);
     }
 
     /**

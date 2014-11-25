@@ -172,7 +172,7 @@ class Archive
     }
 
     /**
-     * Method to return the fullpath
+     * Return the fullpath
      *
      * @return string
      */
@@ -182,7 +182,7 @@ class Archive
     }
 
     /**
-     * Method to return the basename
+     * Return the basename
      *
      * @return string
      */
@@ -192,7 +192,7 @@ class Archive
     }
 
     /**
-     * Method to return the filename
+     * Return the filename
      *
      * @return string
      */
@@ -202,7 +202,7 @@ class Archive
     }
 
     /**
-     * Method to return the extension
+     * Return the extension
      *
      * @return string
      */
@@ -212,7 +212,7 @@ class Archive
     }
 
     /**
-     * Method to return the size
+     * Return the size
      *
      * @return int
      */
@@ -222,7 +222,7 @@ class Archive
     }
 
     /**
-     * Method to return the mime
+     * Return the mime
      *
      * @return string
      */
@@ -232,7 +232,7 @@ class Archive
     }
 
     /**
-     * Method to return the adapter object
+     * Return the adapter object
      *
      * @return mixed
      */
@@ -242,7 +242,7 @@ class Archive
     }
 
     /**
-     * Method to return the archive object within the adapter object
+     * Return the archive object within the adapter object
      *
      * @return mixed
      */
@@ -252,7 +252,7 @@ class Archive
     }
 
     /**
-     * Method to extract an archived and/or compressed file
+     * Extract an archived and/or compressed file
      *
      * @param  string $to
      * @throws Exception
@@ -273,7 +273,7 @@ class Archive
     }
 
     /**
-     * Method to create an archive file
+     * Create an archive file
      *
      * @param  string|array $files
      * @return Archive
@@ -286,7 +286,7 @@ class Archive
     }
 
     /**
-     * Method to return a listing of the contents of an archived file
+     * Return a listing of the contents of an archived file
      *
      * @param  boolean $full
      * @return array
@@ -297,7 +297,7 @@ class Archive
     }
 
     /**
-     * Method to compress an archive file with Gzip or Bzip2
+     * Compress an archive file with Gzip or Bzip2
      *
      * @param  string $ext
      * @return Archive
@@ -350,7 +350,7 @@ class Archive
     }
 
     /**
-     * Static method to compress a file with gzip
+     * Compress a file with gzip
      *
      * @param  string $file
      * @param  int    $level
@@ -371,7 +371,7 @@ class Archive
     }
 
     /**
-     * Static method to decompress a file with gzip
+     * Decompress a file with gzip
      *
      * @param  string $file
      * @return mixed
@@ -398,7 +398,7 @@ class Archive
     }
 
     /**
-     * Static method to compress a file with bzip2
+     * Compress a file with bzip2
      *
      * @param  string $file
      * @return mixed
@@ -417,7 +417,7 @@ class Archive
     }
 
     /**
-     * Static method to decompress a file with bzip2
+     * Decompress a file with bzip2
      *
      * @param  string $file
      * @return mixed
@@ -449,7 +449,7 @@ class Archive
     }
 
     /**
-     * Method to set the adapter based on the file name
+     * Set the adapter based on the file name
      *
      * @param  string $password
      * @param  string $prefix

@@ -75,8 +75,8 @@ class File extends AbstractAdapter
      *
      * Instantiate the File auth adapter object
      *
-     * @param string $filename
-     * @param array  $options
+     * @param  string $filename
+     * @param  array  $options
      * @return File
      */
     public function __construct($filename, array $options = null)
@@ -97,7 +97,7 @@ class File extends AbstractAdapter
     }
 
     /**
-     * Method to get the auth filename
+     * Get the auth filename
      *
      * @return string
      */
@@ -107,7 +107,7 @@ class File extends AbstractAdapter
     }
 
     /**
-     * Method to get the auth encryption
+     * Get the auth encryption
      *
      * @return string
      */
@@ -117,7 +117,7 @@ class File extends AbstractAdapter
     }
 
     /**
-     * Method to get the auth realm
+     * Get the auth realm
      *
      * @return string
      */
@@ -127,7 +127,7 @@ class File extends AbstractAdapter
     }
 
     /**
-     * Method to get the auth file delimiter
+     * Get the auth file delimiter
      *
      * @return string
      */
@@ -137,7 +137,7 @@ class File extends AbstractAdapter
     }
 
     /**
-     * Method to set the auth filename
+     * Set the auth filename
      *
      * @param string $filename
      * @throws Exception
@@ -154,7 +154,7 @@ class File extends AbstractAdapter
     }
 
     /**
-     * Method to set the auth encryption
+     * Set the auth encryption
      *
      * @param string $encryption
      * @return File
@@ -166,7 +166,7 @@ class File extends AbstractAdapter
     }
 
     /**
-     * Method to set the auth realm
+     * Set the auth realm
      *
      * @param string $realm
      * @return File
@@ -178,7 +178,7 @@ class File extends AbstractAdapter
     }
 
     /**
-     * Method to set the auth file delimiter
+     * Set the auth file delimiter
      *
      * @param string $delimiter
      * @return File
@@ -190,7 +190,7 @@ class File extends AbstractAdapter
     }
 
     /**
-     * Method to authenticate the user
+     * Method to authenticate
      *
      * @return int
      */

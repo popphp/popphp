@@ -79,7 +79,7 @@ class Ldap extends AbstractAdapter
     }
 
     /**
-     * Method to set the host
+     * Set the host
      *
      * @param  string $host
      * @return Ldap
@@ -91,7 +91,7 @@ class Ldap extends AbstractAdapter
     }
 
     /**
-     * Method to set the port
+     * Set the port
      *
      * @param  string $port
      * @return Ldap
@@ -120,7 +120,7 @@ class Ldap extends AbstractAdapter
     }
 
     /**
-     * Set an option
+     * Set options
      *
      * @param  array $options
      * @return Ldap
@@ -135,7 +135,7 @@ class Ldap extends AbstractAdapter
     }
 
     /**
-     * Method to get the host
+     * Get the host
      *
      * @return string
      */
@@ -145,7 +145,7 @@ class Ldap extends AbstractAdapter
     }
 
     /**
-     * Method to get the port
+     * Get the port
      *
      * @return string
      */
@@ -186,7 +186,7 @@ class Ldap extends AbstractAdapter
     }
 
     /**
-     * Method to authenticate the user
+     * Method to authenticate
      *
      * @return int
      */

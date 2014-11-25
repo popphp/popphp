@@ -29,6 +29,36 @@ interface AdapterInterface
 {
 
     /**
+     * Get the username
+     *
+     * @return string
+     */
+    public function getUsername();
+
+    /**
+     * Get the password
+     *
+     * @return string
+     */
+    public function getPassword();
+
+    /**
+     * Set the username
+     *
+     * @param  string $username
+     * @return AdapterInterface
+     */
+    public function setUsername($username);
+
+    /**
+     * Set the password
+     *
+     * @param  string $password
+     * @return AdapterInterface
+     */
+    public function setPassword($password);
+
+    /**
      * Method to authenticate
      *
      * @return int

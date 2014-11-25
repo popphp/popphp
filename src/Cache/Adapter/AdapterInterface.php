@@ -29,7 +29,7 @@ interface AdapterInterface
 {
 
     /**
-     * Method to save a value to cache.
+     * Save a value to cache.
      *
      * @param  string $id
      * @param  mixed  $value
@@ -39,7 +39,7 @@ interface AdapterInterface
     public function save($id, $value, $time);
 
     /**
-     * Method to load a value from cache.
+     * Load a value from cache.
      *
      * @param  string $id
      * @param  string $time
@@ -48,7 +48,7 @@ interface AdapterInterface
     public function load($id, $time);
 
     /**
-     * Method to delete a value in cache.
+     * Remove a value in cache.
      *
      * @param  string $id
      * @return void
@@ -56,7 +56,7 @@ interface AdapterInterface
     public function remove($id);
 
     /**
-     * Method to clear all stored values from cache.
+     * Clear all stored values from cache.
      *
      * @return void
      */

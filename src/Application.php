@@ -13,9 +13,8 @@
 /**
  * @namespace
  */
-namespace Pop\Application;
+namespace Pop;
 
-use Pop\Config;
 use Pop\Event\Manager;
 use Pop\Mvc\Router;
 use Pop\Service\Locator;

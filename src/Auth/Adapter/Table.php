@@ -64,7 +64,7 @@ class Table extends AbstractAdapter
     }
 
     /**
-     * Method to get the table name
+     * Get the table name
      *
      * @return string
      */
@@ -74,7 +74,7 @@ class Table extends AbstractAdapter
     }
 
     /**
-     * Method to get the username field
+     * Get the username field
      *
      * @return string
      */
@@ -84,7 +84,7 @@ class Table extends AbstractAdapter
     }
 
     /**
-     * Method to get the password field
+     * Get the password field
      *
      * @return string
      */
@@ -94,7 +94,7 @@ class Table extends AbstractAdapter
     }
 
     /**
-     * Method to set the table name
+     * Set the table name
      *
      * @param string $table
      * @return Table
@@ -106,7 +106,7 @@ class Table extends AbstractAdapter
     }
 
     /**
-     * Method to set the username field
+     * Set the username field
      *
      * @param string $usernameField
      * @return Table
@@ -118,7 +118,7 @@ class Table extends AbstractAdapter
     }
 
     /**
-     * Method to set the password field
+     * Set the password field
      *
      * @param string $passwordField
      * @return Table
@@ -130,7 +130,7 @@ class Table extends AbstractAdapter
     }
 
     /**
-     * Method to authenticate the user
+     * Method to authenticate
      *
      * @return int
      */

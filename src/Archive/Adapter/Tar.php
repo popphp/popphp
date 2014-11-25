@@ -47,7 +47,7 @@ class Tar implements ArchiveInterface
     protected $compression = null;
 
     /**
-     * Method to instantiate an archive adapter object
+     * Instantiate an archive adapter object
      *
      * @param  \Pop\Archive\Archive $archive
      * @return Tar
@@ -64,7 +64,7 @@ class Tar implements ArchiveInterface
     }
 
     /**
-     * Method to return the archive object
+     * Return the archive object
      *
      * @return mixed
      */
@@ -74,7 +74,7 @@ class Tar implements ArchiveInterface
     }
 
     /**
-     * Method to extract an archived and/or compressed file
+     * Extract an archived and/or compressed file
      *
      * @param  string $to
      * @return void
@@ -92,7 +92,7 @@ class Tar implements ArchiveInterface
     }
 
     /**
-     * Method to create an archive file
+     * Create an archive file
      *
      * @param  string|array $files
      * @return void
@@ -122,7 +122,7 @@ class Tar implements ArchiveInterface
     }
 
     /**
-     * Method to return a listing of the contents of an archived file
+     * Return a listing of the contents of an archived file
      *
      * @param  boolean $full
      * @return array
@@ -144,7 +144,7 @@ class Tar implements ArchiveInterface
     }
 
     /**
-     * Method to get files from the directory
+     * Get files from the directory
      *
      * @param  string $dir
      * @return array

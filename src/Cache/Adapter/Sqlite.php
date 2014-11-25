@@ -38,7 +38,7 @@ class Sqlite implements AdapterInterface
      * Cache db table
      * @var string
      */
-    protected $table = null;
+    protected $table = 'pop_cache';
 
     /**
      * Sqlite DB object (either a PDO or Sqlite3 object)
@@ -122,7 +122,7 @@ class Sqlite implements AdapterInterface
     }
 
     /**
-     * Method to get the current cache db file.
+     * Get the current cache db file.
      *
      * @return string
      */
@@ -132,7 +132,7 @@ class Sqlite implements AdapterInterface
     }
 
     /**
-     * Method to get the current cache db table.
+     * Get the current cache db table.
      *
      * @return string
      */
@@ -142,18 +142,18 @@ class Sqlite implements AdapterInterface
     }
 
     /**
-     * Method to Set the cache db table.
+     * Set the cache db table.
      *
      * @param  string $table
      * @return Sqlite
      */
-    public function setTable($table = 'pop_cache')
+    public function setTable($table)
     {
         return $this->table = addslashes($table);
     }
 
     /**
-     * Method to save a value to cache.
+     * Save a value to cache.
      *
      * @param  string $id
      * @param  mixed  $value
@@ -191,7 +191,7 @@ class Sqlite implements AdapterInterface
     }
 
     /**
-     * Method to load a value from cache.
+     * Load a value from cache.
      *
      * @param  string $id
      * @param  string $time
@@ -231,7 +231,7 @@ class Sqlite implements AdapterInterface
     }
 
     /**
-     * Method to delete a value in cache.
+     * Remove a value in cache.
      *
      * @param  string $id
      * @return void
@@ -244,7 +244,7 @@ class Sqlite implements AdapterInterface
     }
 
     /**
-     * Method to clear all stored values from cache.
+     * Clear all stored values from cache.
      *
      * @return void
      */
@@ -333,14 +333,15 @@ class Sqlite implements AdapterInterface
     }
 
     /**
-     * Method to check if cache table exists
+     * Check if cache table exists
      *
      * @return void
      */
     protected function checkTable()
     {
         $tables = [];
-        $sql    = "SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%' UNION ALL SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view') ORDER BY 1";
+        $sql    = "SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%' " .
+            "UNION ALL SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view') ORDER BY 1";
 
         if ($this->isPdo) {
             $sth = $this->sqlite->prepare($sql);

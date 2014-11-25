@@ -29,7 +29,7 @@ interface ArchiveInterface
 {
 
     /**
-     * Method to instantiate an archive adapter object
+     * Instantiate an archive adapter object
      *
      * @param  \Pop\Archive\Archive $archive
      * @return ArchiveInterface
@@ -37,14 +37,14 @@ interface ArchiveInterface
     public function __construct(\Pop\Archive\Archive $archive);
 
     /**
-     * Method to return the archive object
+     * Return the archive object
      *
      * @return mixed
      */
     public function archive();
 
     /**
-     * Method to extract an archived and/or compressed file
+     * Extract an archived and/or compressed file
      *
      * @param  string $to
      * @return void
@@ -52,7 +52,7 @@ interface ArchiveInterface
     public function extract($to = null);
 
     /**
-     * Method to create an archive file
+     * Create an archive file
      *
      * @param  string|array $files
      * @return void
@@ -60,7 +60,7 @@ interface ArchiveInterface
     public function addFiles($files);
 
     /**
-     * Method to return a listing of the contents of an archived file
+     * Return a listing of the contents of an archived file
      *
      * @param  boolean $full
      * @return array

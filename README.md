@@ -16,7 +16,6 @@ PSR-4 and will be integrated with Composer.
 COMPONENTS
 ----------
  - Acl
- - Application
  - Archive
  - Auth [ _Db_ ]
  - Cache
@@ -46,6 +45,7 @@ COMPONENTS
  - Shipping
  - Validator
  - Web
+ - Application
  - Cli
  - Config
  - Version

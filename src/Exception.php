@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop\Application\Build;
+namespace Pop;
 
 /**
- * Application install exception class
+ * Pop exception class
  *
  * @category   Pop
  * @package    Pop_Application

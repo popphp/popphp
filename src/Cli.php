@@ -41,8 +41,6 @@ class Cli
     protected $commands = [
         'check',
         'help',
-        'build',
-        'show',
         'version'
     ];
 
@@ -75,40 +73,11 @@ class Cli
                 case 'help':
                     $this->help();
                     break;
-                case 'build':
-                    $this->build();
-                    break;
-                case 'show':
-                    self::instructions();
-                    exit();
-                    break;
                 case 'version':
                     $this->version();
                     break;
             }
         }
-    }
-
-    /**
-     * Show build instructions
-     *
-     * @return void
-     */
-    public static function instructions()
-    {
-        $msg1 = "You can construct the scaffolding of your application or module using the build command. " .
-            "This process will create and build the base foundation under the folder specified in the build file. " .
-            "Minimally, the build file should return a Pop\\Config object containing your build settings, such as " .
-            "name, folders, forms, controllers, views and any database credentials.";
-
-        $msg2 = "Besides creating the base folders and files for you, one of the main benefits is ability to test and " .
-            "install the database and the corresponding configuration and class files. You can take advantage of this " .
-            "by having the database SQL files in the same folder as your build file, like so:";
-
-        echo '    ' . wordwrap($msg1, 70, PHP_EOL . '    ') . PHP_EOL . PHP_EOL;
-        echo '    ' . wordwrap($msg2, 70, PHP_EOL . '    ') . PHP_EOL . PHP_EOL;
-        echo '    app' . DIRECTORY_SEPARATOR . 'build.php' . PHP_EOL;
-        echo '    app' . DIRECTORY_SEPARATOR . 'db.sql' . PHP_EOL . PHP_EOL;
     }
 
     /**
@@ -182,29 +151,8 @@ class Cli
     {
         echo '   ./pop check             ' . 'Check the current environment for dependencies' . PHP_EOL;
         echo '   ./pop help              ' . 'Display this help' . PHP_EOL;
-        echo '   ./pop build file.php    ' . 'Build an application based on the build file specified' . PHP_EOL;
-        echo '   ./pop show              ' . 'Show project build instructions' . PHP_EOL;
         echo '   ./pop version           ' . 'Display version of Pop PHP Framework and latest available' . PHP_EOL . PHP_EOL;
         exit();
-    }
-
-    /**
-     * Build application
-     *
-     * @return void
-     */
-    protected function build()
-    {
-        if (!isset($this->args[2])) {
-            echo '  You must pass an build file to build the project.'. PHP_EOL . PHP_EOL;
-            exit();
-        } else if (!file_exists($this->args[2])) {
-            echo '  The build file does not exist.' . PHP_EOL . PHP_EOL;
-            exit();
-        } else {
-            \Pop\Application\Build::build($this->args[2]);
-            exit();
-        }
     }
 
     /**

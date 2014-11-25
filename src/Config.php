@@ -61,7 +61,7 @@ class Config
     }
 
     /**
-     * Method to merge the values of another config object into this one
+     * Merge the values of another config object into this one
      *
      * @param  mixed $config
      * @throws \Exception
@@ -83,7 +83,7 @@ class Config
     }
 
     /**
-     * Method to get the config values as an array or ArrayObject
+     * Get the config values as an array or ArrayObject
      *
      * @param  boolean $arrayObject
      * @return array
@@ -96,7 +96,7 @@ class Config
     }
 
     /**
-     * Method to return if changes to the config are allowed.
+     * Return if changes to the config are allowed.
      *
      * @return boolean
      */
@@ -117,7 +117,7 @@ class Config
     }
 
     /**
-     * Set method to set the property to the value of config[$name].
+     * Magic set method to set the property to the value of config[$name].
      *
      * @param  string $name
      * @param  mixed $value
@@ -161,7 +161,7 @@ class Config
     }
 
     /**
-     * Method to set the config values
+     * Set the config values
      *
      * @param  array $config
      * @return void
@@ -174,7 +174,7 @@ class Config
     }
 
     /**
-     * Method to get the config values as array
+     * Get the config values as array
      *
      * @param  boolean $arrayObject
      * @return void

@@ -56,7 +56,7 @@ class Cache
     }
 
     /**
-     * Static method to determine available adapters
+     * Determine available adapters
      *
      * @return array
      */
@@ -76,7 +76,7 @@ class Cache
     }
 
     /**
-     * Static method to determine if an adapter is available
+     * Determine if an adapter is available
      *
      * @param  string $adapter
      * @return boolean
@@ -89,7 +89,7 @@ class Cache
     }
 
     /**
-     * Method to get the adapter
+     * Get the adapter
      *
      * @return mixed
      */
@@ -99,7 +99,7 @@ class Cache
     }
 
     /**
-     * Method to set the cache lifetime.
+     * Set the cache lifetime.
      *
      * @param  int $time
      * @return Cache
@@ -111,7 +111,7 @@ class Cache
     }
 
     /**
-     * Method to get the cache lifetime.
+     * Get the cache lifetime.
      *
      * @return int
      */
@@ -121,7 +121,7 @@ class Cache
     }
 
     /**
-     * Method to save a value to cache.
+     * Save a value to cache.
      *
      * @param  string $id
      * @param  mixed  $value
@@ -133,7 +133,7 @@ class Cache
     }
 
     /**
-     * Method to load a value from cache.
+     * Load a value from cache.
      *
      * @param  string $id
      * @return mixed
@@ -144,7 +144,7 @@ class Cache
     }
 
     /**
-     * Method to delete a value in cache.
+     * Remove a value in cache.
      *
      * @param  string $id
      * @return void
@@ -155,7 +155,7 @@ class Cache
     }
 
     /**
-     * Method to clear all stored values from cache.
+     * Clear all stored values from cache.
      *
      * @return void
      */

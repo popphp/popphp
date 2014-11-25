@@ -55,7 +55,7 @@ class File implements AdapterInterface
     }
 
     /**
-     * Method to get the current cache dir.
+     * Get the current cache dir.
      *
      * @return string
      */
@@ -65,7 +65,7 @@ class File implements AdapterInterface
     }
 
     /**
-     * Method to save a value to cache.
+     * Save a value to cache.
      *
      * @param  string $id
      * @param  mixed  $value
@@ -80,7 +80,7 @@ class File implements AdapterInterface
     }
 
     /**
-     * Method to load a value from cache.
+     * Load a value from cache.
      *
      * @param  string $id
      * @param  string $time
@@ -102,7 +102,7 @@ class File implements AdapterInterface
     }
 
     /**
-     * Method to delete a value in cache.
+     * Remove a value in cache.
      *
      * @param  string $id
      * @return void
@@ -116,7 +116,7 @@ class File implements AdapterInterface
     }
 
     /**
-     * Method to clear all stored values from cache.
+     * Clear all stored values from cache.
      *
      * @param  boolean $del
      * @param  string  $path

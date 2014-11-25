@@ -47,7 +47,7 @@ class Zip implements ArchiveInterface
     protected $workingDir = null;
 
     /**
-     * Method to instantiate an archive adapter object
+     * Instantiate an archive adapter object
      *
      * @param  \Pop\Archive\Archive $archive
      * @return Zip
@@ -71,7 +71,7 @@ class Zip implements ArchiveInterface
     }
 
     /**
-     * Method to return the archive object
+     * Return the archive object
      *
      * @return mixed
      */
@@ -81,7 +81,7 @@ class Zip implements ArchiveInterface
     }
 
     /**
-     * Method to extract an archived and/or compressed file
+     * Extract an archived and/or compressed file
      *
      * @param  string $to
      * @return void
@@ -96,7 +96,7 @@ class Zip implements ArchiveInterface
     }
 
     /**
-     * Method to create an archive file
+     * Create an archive file
      *
      * @param  string|array $files
      * @return void
@@ -128,7 +128,7 @@ class Zip implements ArchiveInterface
     }
 
     /**
-     * Method to create sub directories within the zip archive
+     * Create sub directories within the zip archive
      *
      * @param  array $branch
      * @param  string $level
@@ -160,7 +160,7 @@ class Zip implements ArchiveInterface
     }
 
     /**
-     * Method to return a listing of the contents of an archived file
+     * Return a listing of the contents of an archived file
      *
      * @param  boolean $full
      * @return array
@@ -190,7 +190,7 @@ class Zip implements ArchiveInterface
     }
 
     /**
-     * Method to return an array of all the directories in the archive
+     * Return an array of all the directories in the archive
      *
      * @return array
      */

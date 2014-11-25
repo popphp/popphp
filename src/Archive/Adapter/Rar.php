@@ -47,7 +47,7 @@ class Rar implements ArchiveInterface
     protected $password = null;
 
     /**
-     * Method to instantiate an archive adapter object
+     * Instantiate an archive adapter object
      *
      * @param  \Pop\Archive\Archive $archive
      * @param  string               $password
@@ -67,7 +67,7 @@ class Rar implements ArchiveInterface
     }
 
     /**
-     * Method to return the archive object
+     * Return the archive object
      *
      * @return mixed
      */
@@ -77,7 +77,7 @@ class Rar implements ArchiveInterface
     }
 
     /**
-     * Method to extract an archived and/or compressed file
+     * Extract an archived and/or compressed file
      *
      * @param  string $to
      * @return void
@@ -93,7 +93,7 @@ class Rar implements ArchiveInterface
     }
 
     /**
-     * Method to create an archive file
+     * Create an archive file
      *
      * @param  string|array $files
      * @throws Exception
@@ -105,7 +105,7 @@ class Rar implements ArchiveInterface
     }
 
     /**
-     * Method to return a listing of the contents of an archived file
+     * Return a listing of the contents of an archived file
      *
      * @param  boolean $full
      * @return array
