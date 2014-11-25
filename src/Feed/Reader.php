@@ -49,7 +49,7 @@ class Reader
     }
 
     /**
-     * Method to get the adapter object
+     * Get the adapter object
      *
      * @return Format\AbstractFormat
      */
@@ -59,7 +59,7 @@ class Reader
     }
 
     /**
-     * Method to get the adapter object feed
+     * Get the adapter object feed
      *
      * @return array
      */
@@ -69,7 +69,7 @@ class Reader
     }
 
     /**
-     * Method to determine if the feed type is RSS
+     * Determine if the feed type is RSS
      *
      * @return boolean
      */
@@ -79,7 +79,7 @@ class Reader
     }
 
     /**
-     * Method to determine if the feed type is Atom
+     * Determine if the feed type is Atom
      *
      * @return boolean
      */
@@ -96,8 +96,8 @@ class Reader
      */
     public function __get($name)
     {
-        $value = null;
-        $alias = null;
+        $value   = null;
+        $alias   = null;
         $aliases = [
             'entry', 'entries', 'images', 'posts',
             'statuses', 'tweets', 'updates', 'videos'

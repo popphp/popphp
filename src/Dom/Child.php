@@ -107,7 +107,7 @@ class Child extends AbstractNode
     }
 
     /**
-     * Method to return the child node name.
+     * Return the child node name.
      *
      * @return string
      */
@@ -117,7 +117,7 @@ class Child extends AbstractNode
     }
 
     /**
-     * Method to return the child node value.
+     * Return the child node value.
      *
      * @return string
      */
@@ -127,7 +127,7 @@ class Child extends AbstractNode
     }
 
     /**
-     * Method to set the child node name.
+     * Set the child node name.
      *
      * @param  string $name
      * @return Child
@@ -139,7 +139,7 @@ class Child extends AbstractNode
     }
 
     /**
-     * Method to set the child node value.
+     * Set the child node value.
      *
      * @param  string $value
      * @return Child
@@ -199,11 +199,11 @@ class Child extends AbstractNode
     }
 
     /**
-     * Method to render the child and its child nodes.
+     * Render the child and its child nodes.
      *
      * @param  boolean $ret
-     * @param  int $depth
-     * @param  string $indent
+     * @param  int     $depth
+     * @param  string  $indent
      * @return mixed
      */
     public function render($ret = false, $depth = 0, $indent = null)

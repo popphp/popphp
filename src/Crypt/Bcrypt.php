@@ -60,7 +60,7 @@ class Bcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to set the cost
+     * Set the cost
      *
      * @param  string $cost
      * @return self
@@ -79,7 +79,7 @@ class Bcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to get the cost
+     * Get the cost
      *
      * @return string
      */
@@ -89,7 +89,7 @@ class Bcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to set the cost
+     * Set the prefix
      *
      * @param  string $prefix
      * @return self
@@ -108,7 +108,7 @@ class Bcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to get the prefix
+     * Get the prefix
      *
      * @return string
      */
@@ -118,7 +118,7 @@ class Bcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to create the hashed value
+     * Create the hashed value
      *
      * @param  string $string
      * @throws Exception
@@ -142,7 +142,7 @@ class Bcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to verify the hashed value
+     * Verify the hashed value
      *
      * @param  string $string
      * @param  string $hash

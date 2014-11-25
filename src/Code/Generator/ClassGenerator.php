@@ -392,7 +392,7 @@ class ClassGenerator implements GeneratorInterface
     }
 
     /**
-     * Method to format the properties
+     * Format the properties
      *
      * @return string
      */
@@ -408,7 +408,7 @@ class ClassGenerator implements GeneratorInterface
     }
 
     /**
-     * Method to format the methods
+     * Format the methods
      *
      * @return string
      */

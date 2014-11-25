@@ -262,7 +262,7 @@ class InterfaceGenerator implements GeneratorInterface
     }
 
     /**
-     * Method to format the methods
+     * Format the methods
      *
      * @return string
      */

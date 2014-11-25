@@ -29,14 +29,14 @@ class Manager
 {
 
     /**
-     * Constant to stop the event Manager
+     * Constant to stop the event manager
      * @var string
      */
     const STOP = 'Pop\Event\Manager::STOP';
 
 
     /**
-     * Constant to kill the project application and do something else (re-route, etc.)
+     * Constant to send a kill signal to the application
      * @var string
      */
     const KILL = 'Pop\Event\Manager::KILL';
@@ -77,7 +77,7 @@ class Manager
     }
 
     /**
-     * Method to attach an event listener
+     * Attach an event listener
      *
      * @param  string $name
      * @param  mixed  $action
@@ -95,7 +95,7 @@ class Manager
     }
 
     /**
-     * Method to detach an event listener
+     * Detach an event listener
      *
      * @param  string $name
      * @param  mixed  $action
@@ -124,7 +124,7 @@ class Manager
     }
 
     /**
-     * Method to return an event
+     * Return an event
      *
      * @param  string $name
      * @return mixed
@@ -140,7 +140,7 @@ class Manager
     }
 
     /**
-     * Method to return the event results
+     * Return the event results
      *
      * @param  string $name
      * @return mixed
@@ -151,7 +151,7 @@ class Manager
     }
 
     /**
-     * Method to if the project application is still alive or has been killed
+     * Determine if the project application is still alive or has been killed
      *
      * @return boolean
      */
@@ -161,7 +161,7 @@ class Manager
     }
 
     /**
-     * Method to trigger an event listener priority
+     * Trigger an event listener priority
      *
      * @param  string $name
      * @param  array  $args

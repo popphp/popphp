@@ -505,7 +505,7 @@ class Sql
     }
 
     /**
-     * Method to return the SQL as a string
+     * Return the SQL as a string
      *
      * @return string
      */

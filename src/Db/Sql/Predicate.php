@@ -545,7 +545,7 @@ class Predicate
     }
 
     /**
-     * Method to parse a predicate string
+     * Parse a predicate string
      *
      * @param  string $predicate
      * @return array

@@ -29,7 +29,7 @@ class Atom extends AbstractFormat
 {
 
     /**
-     * Method to create an Atom feed object
+     * Constructor method to create an Atom feed object
      *
      * @param  mixed  $options
      * @param  int    $limit
@@ -62,7 +62,7 @@ class Atom extends AbstractFormat
     }
 
     /**
-     * Method to parse an Atom feed object
+     * Parse an Atom feed object
      *
      * @return void
      */

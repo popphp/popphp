@@ -35,7 +35,7 @@ abstract class AbstractCrypt implements CryptInterface
     protected $salt = null;
 
     /**
-     * Method to set the salt
+     * Set the salt
      *
      * @param  string $salt
      * @return self
@@ -47,7 +47,7 @@ abstract class AbstractCrypt implements CryptInterface
     }
 
     /**
-     * Method to get the salt
+     * Get the salt
      *
      * @return string
      */
@@ -57,7 +57,7 @@ abstract class AbstractCrypt implements CryptInterface
     }
 
     /**
-     * Method to generate a random alphanumeric string of a predefined length.
+     * Generate a random alphanumeric string of a predefined length.
      *
      * @param  int  $length
      * @return string

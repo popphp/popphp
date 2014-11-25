@@ -29,7 +29,7 @@ interface CryptInterface
 {
 
     /**
-     * Method to set the salt
+     * Set the salt
      *
      * @param  string $salt
      * @return self
@@ -37,14 +37,14 @@ interface CryptInterface
     public function setSalt($salt = null);
 
     /**
-     * Method to get the salt
+     * Get the salt
      *
      * @return string
      */
     public function getSalt();
 
     /**
-     * Method to create the hashed value
+     * Create the hashed value
      *
      * @param  string $string
      * @return string
@@ -52,7 +52,7 @@ interface CryptInterface
     public function create($string);
 
     /**
-     * Method to create the hashed value
+     * Create the hashed value
      *
      * @param  string $string
      * @param  string $hash

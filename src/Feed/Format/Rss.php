@@ -29,7 +29,7 @@ class Rss extends AbstractFormat
 {
 
     /**
-     * Method to create an RSS feed object
+     * Constructor method to create an RSS feed object
      *
      * @param  mixed  $options
      * @param  int    $limit
@@ -71,7 +71,7 @@ class Rss extends AbstractFormat
     }
 
     /**
-     * Method to parse an RSS feed object
+     * Parse an RSS feed object
      *
      * @return void
      */

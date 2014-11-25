@@ -44,7 +44,7 @@ class Md5 extends AbstractCrypt
     }
 
     /**
-     * Method to create the hashed value
+     * Create the hashed value
      *
      * @param  string $string
      * @return string
@@ -63,7 +63,7 @@ class Md5 extends AbstractCrypt
     }
 
     /**
-     * Method to verify the hashed value
+     * Verify the hashed value
      *
      * @param  string $string
      * @param  string $hash

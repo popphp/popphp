@@ -88,10 +88,10 @@ abstract class AbstractFormat
     protected $options = null;
 
     /**
-     * Method to parse a feed object
+     * Constructor method
      *
-     * @param  mixed  $options
-     * @param  int    $limit
+     * @param  mixed $options
+     * @param  int   $limit
      * @throws Exception
      * @return AbstractFormat
      */
@@ -137,7 +137,7 @@ abstract class AbstractFormat
     }
 
     /**
-     * Method to calculate the elapsed time between the date passed and now.
+     * Calculate the elapsed time between the date passed and now.
      *
      * @param  string $time
      * @return string
@@ -173,14 +173,14 @@ abstract class AbstractFormat
     }
 
     /**
-     * Method to parse a feed object
+     * Parse a feed object
      *
      * @return void
      */
     abstract public function parse();
 
     /**
-     * Method to get the URL
+     * Get the URL
      *
      * @return string
      */
@@ -190,7 +190,7 @@ abstract class AbstractFormat
     }
 
     /**
-     * Method to get the parsed object
+     * Get the parsed object
      *
      * @return mixed
      */
@@ -200,7 +200,7 @@ abstract class AbstractFormat
     }
 
     /**
-     * Method to set the feed
+     * Set the feed
      *
      * @param  array $feed
      * @return AbstractFormat
@@ -212,7 +212,7 @@ abstract class AbstractFormat
     }
 
     /**
-     * Method to get the feed
+     * Get the feed
      *
      * @return array
      */
@@ -222,7 +222,7 @@ abstract class AbstractFormat
     }
 
     /**
-     * Method to get the feed options
+     * Get the feed options
      *
      * @return mixed
      */
@@ -232,7 +232,7 @@ abstract class AbstractFormat
     }
 
     /**
-     * Method to get the limit
+     * Get the limit
      *
      * @return int
      */

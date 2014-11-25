@@ -514,7 +514,7 @@ class MethodGenerator implements GeneratorInterface
     }
 
     /**
-     * Method to format the arguments
+     * Format the arguments
      *
      * @return string
      */

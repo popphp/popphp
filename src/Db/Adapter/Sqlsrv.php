@@ -78,7 +78,7 @@ class Sqlsrv extends AbstractAdapter
     }
 
     /**
-     * Check if Sqlarv is installed.
+     * Check if Sqlsrv is installed.
      *
      * @return boolean
      */

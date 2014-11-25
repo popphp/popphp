@@ -30,21 +30,21 @@ class Generator
 
     /**
      * Constant to not use a class or interface
-     * @var int
+     * @var string
      */
-    const CREATE_NONE = 0;
+    const CREATE_EMPTY = 'CREATE_EMPTY';
 
     /**
-     * Constant to use a class
-     * @var int
+     * Constant to create a class
+     * @var string
      */
-    const CREATE_CLASS = 1;
+    const CREATE_CLASS = 'CREATE_CLASS';
 
     /**
-     * Constant to use an interface
+     * Constant to create an interface
      * @var int
      */
-    const CREATE_INTERFACE = 2;
+    const CREATE_INTERFACE = 'CREATE_INTERFACE';
 
     /**
      * Full path and name of the file, i.e. '/some/dir/file.ext'
@@ -128,10 +128,10 @@ class Generator
      * Instantiate the code generator object
      *
      * @param  string $file
-     * @param  int    $type
+     * @param  string $type
      * @return Generator
      */
-    public function __construct($file, $type = Generator::CREATE_NONE)
+    public function __construct($file, $type = Generator::CREATE_EMPTY)
     {
         $fileInfo = pathinfo($file);
 
@@ -144,7 +144,7 @@ class Generator
             $this->createClass();
         } else if ($type == self::CREATE_INTERFACE) {
             $this->createInterface();
-        } else if (($type == self::CREATE_NONE) && file_exists($file)) {
+        } else if (($type == self::CREATE_EMPTY) && file_exists($file)) {
             $this->body = str_replace('<?php', '', file_get_contents($file));
             $this->body = trim(str_replace('?>', '', $this->body)) . PHP_EOL . PHP_EOL;
         }

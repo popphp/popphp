@@ -136,24 +136,24 @@ class Document extends AbstractNode
      * Instantiate the document object
      *
      * @param  string $doctype
-     * @param  string $charset
      * @param  mixed  $childNode
      * @param  string $indent
      * @return Document
      */
-    public function __construct($doctype = null, $charset = 'utf-8', $childNode = null, $indent = null)
+    public function __construct($doctype = null, $childNode = null, $indent = null)
     {
         $this->setDoctype($doctype);
-        $this->setCharset($charset);
-        $this->setIndent($indent);
 
         if (null !== $childNode) {
             $this->addChild($childNode);
         }
+        if (null !== $indent) {
+            $this->setIndent($indent);
+        }
     }
 
     /**
-     * Method to return the document type.
+     * Return the document type.
      *
      * @return string
      */
@@ -163,7 +163,7 @@ class Document extends AbstractNode
     }
 
     /**
-     * Method to return the document charset.
+     * Return the document charset.
      *
      * @return string
      */
@@ -173,7 +173,7 @@ class Document extends AbstractNode
     }
 
     /**
-     * Method to return the document charset.
+     * Return the document charset.
      *
      * @return string
      */
@@ -183,7 +183,7 @@ class Document extends AbstractNode
     }
 
     /**
-     * Method to set the document type.
+     * Set the document type.
      *
      * @param  string $doctype
      * @return Document
@@ -217,7 +217,7 @@ class Document extends AbstractNode
     }
 
     /**
-     * Method to set the document charset.
+     * Set the document charset.
      *
      * @param  string $char
      * @return Document
@@ -229,7 +229,7 @@ class Document extends AbstractNode
     }
 
     /**
-     * Method to set the document charset.
+     * Set the document charset.
      *
      * @param  string $content
      * @return Document
@@ -241,7 +241,7 @@ class Document extends AbstractNode
     }
 
     /**
-     * Method to render the document and its child elements.
+     * Render the document and its child elements.
      *
      * @param  boolean $ret
      * @return mixed

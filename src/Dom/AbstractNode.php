@@ -47,7 +47,7 @@ abstract class AbstractNode
     protected $output = null;
 
     /**
-     * Method to return the indent.
+     * Return the indent.
      *
      * @return string
      */
@@ -57,7 +57,7 @@ abstract class AbstractNode
     }
 
     /**
-     * Method to set the indent.
+     * Set the indent.
      *
      * @param  string $indent
      * @return mixed

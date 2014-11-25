@@ -34,7 +34,6 @@ class Data
      */
     protected $type = null;
 
-
     /**
      * Data file output stream
      * @var string

@@ -82,7 +82,7 @@ class Sha extends AbstractCrypt
     }
 
     /**
-     * Method to get the bits
+     * Get the bits
      *
      * @return int
      */
@@ -92,7 +92,7 @@ class Sha extends AbstractCrypt
     }
 
     /**
-     * Method to set the rounds
+     * Set the rounds
      *
      * @param  int $rounds
      * @return self
@@ -112,7 +112,7 @@ class Sha extends AbstractCrypt
     }
 
     /**
-     * Method to get the rounds
+     * Get the rounds
      *
      * @return int
      */
@@ -122,7 +122,7 @@ class Sha extends AbstractCrypt
     }
 
     /**
-     * Method to create the hashed value
+     * Create the hashed value
      *
      * @param  string $string
      * @throws Exception
@@ -144,7 +144,7 @@ class Sha extends AbstractCrypt
     }
 
     /**
-     * Method to verify the hashed value
+     * Verify the hashed value
      *
      * @param  string $string
      * @param  string $hash

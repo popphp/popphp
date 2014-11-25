@@ -80,7 +80,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to set the cipher
+     * Set the cipher
      *
      * @param  int $cipher
      * @return self
@@ -92,7 +92,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to get the cipher
+     * Get the cipher
      *
      * @return int
      */
@@ -102,7 +102,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to set the mode
+     * Set the mode
      *
      * @param  int $mode
      * @return self
@@ -114,7 +114,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to get the mode
+     * Get the mode
      *
      * @return int
      */
@@ -124,7 +124,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to set the source
+     * Set the source
      *
      * @param  int $source
      * @return self
@@ -136,7 +136,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to get the source
+     * Get the source
      *
      * @return int
      */
@@ -146,7 +146,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to get the iv
+     * Get the iv
      *
      * @return string
      */
@@ -156,7 +156,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to get the iv size
+     * Get the iv size
      *
      * @return int
      */
@@ -166,7 +166,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to create the hashed value
+     * Create the hashed value
      *
      * @param  string $string
      * @return string
@@ -190,7 +190,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to decrypt the hashed value
+     * Decrypt the hashed value
      *
      * @param  string $hash
      * @return string
@@ -213,7 +213,7 @@ class Mcrypt extends AbstractCrypt
     }
 
     /**
-     * Method to verify the hashed value
+     * Verify the hashed value
      *
      * @param  string $string
      * @param  string $hash
