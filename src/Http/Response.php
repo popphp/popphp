@@ -369,11 +369,11 @@ class Response
     }
 
     /**
-     * Determine if the response is successful
+     * Determine if the response is a success
      *
      * @return boolean
      */
-    public function isSuccessful()
+    public function isSuccess()
     {
         $type = floor($this->code / 100);
         return (($type == 3) || ($type == 2) || ($type == 1));
