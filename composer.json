@@ -31,6 +31,7 @@
         "popphp/pop-auth": "For authorization and authentication",
         "popphp/pop-cache": "For cache management via PHP cache tools such as memcache and APC",
         "popphp/pop-code": "For PHP code generation",
+        "popphp/pop-console": "For console programming and usage",
         "popphp/pop-crypt": "For creating encrypted hash strings and comparing and verifying them",
         "popphp/pop-data": "For converting data between different types, SQL, CSV, XML, etc",
         "popphp/pop-db": "For DB management and transactions",
@@ -51,6 +52,7 @@
         "popphp/pop-pdf": "For PDF processing and manipulation",
         "popphp/pop-shipping": "For calculating shipping rates with major shipping carriers",
         "popphp/pop-validator": "For input validation",
+        "popphp/pop-version": "For version information",
         "popphp/pop-web": "For web extra, like sessions, cookies and mobile redirects"
     }
 }
