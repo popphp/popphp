@@ -183,13 +183,18 @@ class Controller
      * Dispatch the controller based on the action
      *
      * @param  string $action
+     * @param  array  $params
      * @throws Exception
      * @return Controller
      */
-    public function dispatch($action = 'index')
+    public function dispatch($action = 'index', array $params = null)
     {
         if (method_exists($this, $action)) {
-            $this->$action();
+            if (null !== $params) {
+                call_user_func_array([$this, $action], $params);
+            } else {
+                $this->$action();
+            }
         } else {
             throw new Exception('That action is not defined in the controller.');
         }

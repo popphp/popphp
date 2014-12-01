@@ -37,7 +37,7 @@ class Router
     protected $request = null;
 
     /**
-     * Current controller class name string
+     * Current controller class name
      * @var string
      */
     protected $controllerClass = null;

@@ -63,12 +63,6 @@ class Application
     protected $services = null;
 
     /**
-     * Application start timestamp
-     * @var int
-     */
-    protected $start = null;
-
-    /**
      * Constructor
      *
      * Instantiate a project object
@@ -94,11 +88,6 @@ class Application
 
         $this->events   = new Manager();
         $this->services = new Locator();
-
-        if (isset($this->config->defaultDb)) {
-            $default = $this->config->defaultDb;
-            \Pop\Db\Record::setDb($this->config->databases->$default);
-        }
     }
 
     /**
@@ -109,23 +98,6 @@ class Application
     public function config()
     {
         return $this->config;
-    }
-
-    /**
-     * Access a project database
-     *
-     * @param  string $dbname
-     * @return \Pop\Db\Adapter\AbstractAdapter
-     */
-    public function db($dbname)
-    {
-        if (isset($this->config->databases) &&
-            isset($this->config->databases->{$dbname}) &&
-            ($this->config->databases->{$dbname} instanceof \Pop\Db\Adapter\AbstractAdapter)) {
-            return $this->config->databases->{$dbname};
-        } else {
-            return null;
-        }
     }
 
     /**
@@ -323,16 +295,6 @@ class Application
     }
 
     /**
-     * Get the application start time
-     *
-     * @return int
-     */
-    public function getStart()
-    {
-        return $this->start;
-    }
-
-    /**
      * Run the project.
      *
      * @return void
@@ -341,8 +303,6 @@ class Application
     {
         // If router exists, then route the project to the appropriate controller
         if (null !== $this->router) {
-            $this->start = time();
-
             // Trigger any pre-route events, route, then trigger any post-route events
             $this->events->trigger('route.pre', ['application' => $this]);
 
@@ -380,8 +340,8 @@ class Application
                             }
                         }
                     }
+                // Trigger any route error events
                 } else {
-                    // Trigger any route error events
                     $this->events->trigger('route.error', ['application' => $this]);
                 }
             }
