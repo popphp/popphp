@@ -112,7 +112,7 @@ class Http extends AbstractMatch
             if (($index !== false) && isset($this->segments[$index + 1]) && !empty($this->segments[$index + 1])) {
                 $this->action = $this->segments[$index + 1];
             }
-        } else if (($this->segments[0]) && ($this->action == 'index')) {
+        } else if (isset($this->segments[0]) && ($this->action == 'index')) {
             $this->action = $this->segments[0];
         }
 

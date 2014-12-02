@@ -81,6 +81,16 @@ class Cli extends AbstractMatch
                     }
                 }
             }
+        } else if (isset($this->segments[0]) && ($this->action == 'index')) {
+            $this->action = $this->segments[0];
+            if (count($this->segments) > 1) {
+                $index = 1;
+                $argv = [];
+                // Clean up the arguments
+                for ($i = $index; $i < count($this->segments); $i++) {
+                    $argv[] = $this->segments[$i];
+                }
+            }
         }
 
         return $match;
