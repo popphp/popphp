@@ -1,12 +1,11 @@
 {
-    "name": "popphp/popphp2",
-    "description": "Pop PHP Framework 2",
+    "name": "popphp/popphp",
+    "description": "Pop PHP Framework",
     "keywords": [
         "framework",
         "php framework",
         "pop",
-        "pop php",
-        "pop php 2"
+        "pop php"
     ],
     "homepage": "http://www.popphp.org/",
     "license": "New BSD",
