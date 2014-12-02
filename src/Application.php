@@ -29,16 +29,16 @@ class Application
 {
 
     /**
-     * Application config
-     * @var mixed
-     */
-    protected $config = null;
-
-    /**
      * Application module configs
      * @var array
      */
     protected $modules = [];
+
+    /**
+     * Application config
+     * @var mixed
+     */
+    protected $config = null;
 
     /**
      * Application router
@@ -72,12 +72,12 @@ class Application
     {
         $args = func_get_args();
         foreach ($args as $arg) {
-            if ($arg instanceof Service\Locator) {
+            if ($arg instanceof Router\Router) {
+                $this->loadRouter($arg);
+            } else if ($arg instanceof Service\Locator) {
                 $this->loadServices($arg);
             } else if ($arg instanceof Event\Manager) {
                 $this->loadEvents($arg);
-            } else if ($arg instanceof Router\Router) {
-                $this->loadRouter($arg);
             } else {
                 $this->loadConfig($arg);
             }
@@ -120,16 +120,6 @@ class Application
     }
 
     /**
-     * Access application config
-     *
-     * @return mixed
-     */
-    public function config()
-    {
-        return $this->config;
-    }
-
-    /**
      * Access all application module configs
      *
      * @return array
@@ -137,6 +127,16 @@ class Application
     public function modules()
     {
         return $this->modules;
+    }
+
+    /**
+     * Access application config
+     *
+     * @return mixed
+     */
+    public function config()
+    {
+        return $this->config;
     }
 
     /**
