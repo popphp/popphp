@@ -63,7 +63,8 @@ class Application
      *
      * Instantiate a application object
      *
-     * Optional parameters are a service locator instance, a router instance, an event manager instance or a configuration object or array
+     * Optional parameters are a service locator instance, a router instance,
+     * an event manager instance or a configuration object or array
      *
      * @return Application
      */
