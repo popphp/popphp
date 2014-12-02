@@ -146,6 +146,17 @@ class Manager
     }
 
     /**
+     * Determine whether the event manage has an event registered with it
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function has($name)
+    {
+        return (isset($this->listeners[$name]));
+    }
+
+    /**
      * Return the event results
      *
      * @param  string $name

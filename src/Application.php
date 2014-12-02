@@ -71,6 +71,7 @@ class Application
     public function __construct()
     {
         $args = func_get_args();
+
         foreach ($args as $arg) {
             if ($arg instanceof Router\Router) {
                 $this->loadRouter($arg);
@@ -82,6 +83,37 @@ class Application
                 $this->loadConfig($arg);
             }
         }
+
+        $this->bootstrap();
+    }
+
+    /**
+     * Bootstrap the application
+     *
+     * @return Application
+     */
+    public function bootstrap()
+    {
+        if (null === $this->$router) {
+            $this->router = new Router\Router();
+        }
+        if (null === $this->$services) {
+            $this->services = new Service\Locator();
+        }
+        if (null === $this->events) {
+            $this->events = new Event\Manager();
+        }
+    }
+
+    /**
+     * Initialize the application
+     *
+     * @return Application
+     */
+    public function init()
+    {
+        $this->trigger('app.init');
+        return $this;
     }
 
     /**
@@ -257,18 +289,19 @@ class Application
     /**
      * Attach an event. Default hook-points are:
      *
-     *   route.pre
-     *   route
-     *   dispatch
-     *   route.error
-     *   route.post
+     *   app.init
+     *   app.route.pre
+     *   app.route.post
+     *   app.dispatch.pre
+     *   app.dispatch.post
+     *   app.error
      *
      * @param  string $name
      * @param  mixed  $action
      * @param  int    $priority
      * @return Application
      */
-    public function attachEvent($name, $action, $priority = 0)
+    public function attach($name, $action, $priority = 0)
     {
         $this->events->on($name, $action, $priority);
         return $this;
@@ -281,8 +314,13 @@ class Application
      * @param  array  $args
      * @return Application
      */
-    public function triggerEvent($name, array $args = [])
+    public function trigger($name, array $args = [])
     {
+        if (count($args) == 0) {
+            $args = ['application' => $this];
+        } else if (!in_array($this, $args, true)) {
+            $args['application'] = $this;
+        }
         $this->events->trigger($name, $args);
         return $this;
     }
@@ -290,38 +328,88 @@ class Application
     /**
      * Detach an event. Default hook-points are:
      *
-     *   route.pre
-     *   route
-     *   dispatch
-     *   route.error
-     *   route.post
+     *   app.init
+     *   app.route.pre
+     *   app.route.post
+     *   app.dispatch.pre
+     *   app.dispatch.post
+     *   app.error
      *
      * @param  string $name
      * @param  mixed  $action
      * @return Application
      */
-    public function detachEvent($name, $action)
+    public function detach($name, $action)
     {
         $this->events->off($name, $action);
         return $this;
     }
 
     /**
-     * Run the project.
+     * Run the application.
      *
      * @return void
      */
     public function run()
     {
-        // Trigger any route.pre events
-        $this->events->trigger('route.pre', ['application' => $this]);
+        try {
+            $this->init();
 
-        if ((null !== $this->router)) {
-            $this->router->route($this);
+            // Trigger any app.route.pre events
+            $this->trigger('app.route.pre');
+
+            if ((null !== $this->router)) {
+                $this->router->route();
+
+                // Trigger any app.route.post events
+                $this->trigger('app.route.post');
+
+                $controllerClass = $this->router->getControllerClass();
+                $action          = $this->router->getRouteMatch()->getAction();
+                $errorAction     = $this->router->getController()->getErrorAction();
+
+                // Trigger any app.dispatch.pre events
+                $this->trigger('app.dispatch.pre');
+
+                // If action exists in the controller, dispatch it
+                if ((null !== $action) && method_exists($this->router->getController(), $action)) {
+                    // If the controller->action has dispatch parameters
+                    if (null !== $this->router()->getDispatchParams([$controllerClass . '->' . $action])) {
+                        $params = $this->router()->getDispatchParams([$controllerClass . '->' . $action]);
+                        if (!is_array($params)) {
+                            $params = [$action, $params];
+                        } else {
+                            array_unshift($params, $action);
+                        }
+                        call_user_func_array([$this->router->getController(), 'dispatch'], $params);
+                    // Else, just dispatch it
+                    } else {
+                        $this->router->getController()->dispatch($action);
+                    }
+                // Else, if an error action exists in the controller, dispatch it
+                } else if ((null !== $errorAction) && method_exists($this->router->getController(), $errorAction)) {
+                    // If the controller->errorAction has dispatch parameters
+                    if ((null !== $action) && method_exists($this->router->getController(), $errorAction)) {
+                        $params = $this->router()->getDispatchParams([$controllerClass . '->' . $errorAction]);
+                        if (!is_array($params)) {
+                            $params = [$errorAction, $params];
+                        } else {
+                            array_unshift($params, $errorAction);
+                        }
+                        call_user_func_array([$this->router->getController(), 'dispatch'], $params);
+                    // Else, just dispatch it
+                    } else {
+                        $this->router->getController()->dispatch($errorAction);
+                    }
+                }
+
+                // Trigger any app.dispatch.post events
+                $this->trigger('app.dispatch.post');
+            }
+        } catch (\Exception $e) {
+            // Trigger any app.error events
+            $this->trigger('app.error', ['exception' => $e]);
         }
-
-        // Trigger any route.post events
-        $this->events->trigger('route.post', ['application' => $this]);
     }
 
 }

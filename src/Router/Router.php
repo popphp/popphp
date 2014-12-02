@@ -53,6 +53,12 @@ class Router implements RouterInterface
     protected $routeMatch = null;
 
     /**
+     * Controller class name
+     * @var string
+     */
+    protected $controllerClass = null;
+
+    /**
      * Controller object
      * @var \Pop\Controller\ControllerInterface
      */
@@ -142,6 +148,28 @@ class Router implements RouterInterface
     }
 
     /**
+     * Get the params assigned to the route
+     *
+     * @param  string $route
+     * @return mixed
+     */
+    public function getRouterParams($route)
+    {
+        return (isset($this->routeParams[$route])) ? $this->routeParams[$route] : null;
+    }
+
+    /**
+     * Get the params assigned to the dispatch
+     *
+     * @param  string $dispatch
+     * @return mixed
+     */
+    public function getDispatchParams($dispatch)
+    {
+        return (isset($this->dispatchParams[$dispatch])) ? $this->dispatchParams[$dispatch] : null;
+    }
+
+    /**
      * Get route
      *
      * @return mixed
@@ -192,14 +220,24 @@ class Router implements RouterInterface
     }
 
     /**
+     * Get the current controller class name
+     *
+     * @return string
+     */
+    public function getControllerClass()
+    {
+        return $this->controllerClass;
+    }
+
+    /**
      * Route to the correct controller
      *
-     * @param \Pop\Application $application
      * @return void
      */
-    public function route(\Pop\Application $application)
+    public function route()
     {
-        $controllerClass = $this->getRoute();
+        $controllerClass       = $this->getRoute();
+        $this->controllerClass = $controllerClass;
 
         if ((null !== $controllerClass) && class_exists($controllerClass)) {
             // If the controller has route parameters
@@ -213,51 +251,6 @@ class Router implements RouterInterface
             // Else, just instantiate the controller
             } else {
                 $this->controller = new $controllerClass();
-            }
-
-            // Trigger any route events
-            $application->triggerEvent('route', ['application' => $application]);
-
-            $action      = $this->routeMatch->getAction();
-            $errorAction = $this->controller->getErrorAction();
-
-            // If action exists in the controller, dispatch it
-            if ((null !== $action) && method_exists($this->controller, $action)) {
-                // If the controller->action has dispatch parameters
-                if (isset($this->dispatchParams[$controllerClass . '->' . $action])) {
-                    $params = $this->dispatchParams[$controllerClass . '->' . $action];
-                    if (!is_array($params)) {
-                        $params = [$action, $params];
-                    } else {
-                        array_unshift($params, $action);
-                    }
-                    call_user_func_array([$this->controller, 'dispatch'], $params);
-                // Else, just dispatch it
-                } else {
-                    $this->controller->dispatch($action);
-                }
-                // Trigger any dispatch events
-                $application->triggerEvent('dispatch', ['application' => $application]);
-            // Else, if an error action exists in the controller, dispatch it
-            } else if ((null !== $errorAction) && method_exists($this->controller, $errorAction)) {
-                // If the controller->errorAction has dispatch parameters
-                if (isset($this->dispatchParams[$controllerClass . '->' . $errorAction])) {
-                    $params = $this->dispatchParams[$controllerClass . '->' . $errorAction];
-                    if (!is_array($params)) {
-                        $params = [$errorAction, $params];
-                    } else {
-                        array_unshift($params, $errorAction);
-                    }
-                    call_user_func_array([$this->controller, 'dispatch'], $params);
-                // Else, just dispatch it
-                } else {
-                    $this->controller->dispatch($errorAction);
-                }
-                // Trigger any dispatch events
-                $application->triggerEvent('dispatch', ['application' => $application]);
-            // Trigger any route.error events
-            } else {
-                $application->triggerEvent('route.error', ['application' => $application]);
             }
         }
     }
