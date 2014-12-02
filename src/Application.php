@@ -53,11 +53,17 @@ class Application
     protected $services = null;
 
     /**
+     * Event manager
+     * @var Event\Manager
+     */
+    protected $events = null;
+
+    /**
      * Constructor
      *
      * Instantiate a application object
      *
-     * Optional parameters are a service locator instance, a router instance or a configuration object or array
+     * Optional parameters are a service locator instance, a router instance, an event manager instance or a configuration object or array
      *
      * @return Application
      */
@@ -67,6 +73,8 @@ class Application
         foreach ($args as $arg) {
             if ($arg instanceof Service\Locator) {
                 $this->loadServices($arg);
+            } else if ($arg instanceof Event\Manager) {
+                $this->loadEvents($arg);
             } else if ($arg instanceof Router\Router) {
                 $this->loadRouter($arg);
             } else {
@@ -138,6 +146,16 @@ class Application
     }
 
     /**
+     * Get the event manager
+     *
+     * @return Event\Manager
+     */
+    public function events()
+    {
+        return $this->events;
+    }
+
+    /**
      * Load an application config
      *
      * @param  mixed $config
@@ -202,6 +220,18 @@ class Application
     }
 
     /**
+     * Load an event manager
+     *
+     * @param  Event\Manager $events
+     * @return Application
+     */
+    public function loadEvents(Event\Manager $events)
+    {
+        $this->events = $events;
+        return $this;
+    }
+
+    /**
      * Set a service
      *
      * @param  string $name
@@ -239,15 +269,73 @@ class Application
     }
 
     /**
+     * Attach an event. Default project event name hook-points are:
+     *
+     *   route.pre
+     *   route
+     *   dispatch
+     *   route.error
+     *   route.post
+     *
+     * @param  string $name
+     * @param  mixed  $action
+     * @param  int    $priority
+     * @return Application
+     */
+    public function attachEvent($name, $action, $priority = 0)
+    {
+        $this->events->on($name, $action, $priority);
+        return $this;
+    }
+
+    /**
+     * Trigger an event
+     *
+     * @param  string $name
+     * @param  array  $args
+     * @return Application
+     */
+    public function triggerEvent($name, array $args = [])
+    {
+        $this->events->trigger($name, $args);
+        return $this;
+    }
+
+    /**
+     * Detach an event. Default project event name hook-points are:
+     *
+     *   route.pre
+     *   route
+     *   dispatch
+     *   route.error
+     *   route.post
+     *
+     * @param  string $name
+     * @param  mixed  $action
+     * @return Application
+     */
+    public function detachEvent($name, $action)
+    {
+        $this->events->off($name, $action);
+        return $this;
+    }
+
+    /**
      * Run the project.
      *
      * @return void
      */
     public function run()
     {
+        // Trigger any route.pre events
+        $this->events->trigger('route.pre', ['application' => $this]);
+
         if ((null !== $this->router)) {
-            $this->router->route();
+            $this->router->route($this);
         }
+
+        // Trigger any route.post events
+        $this->events->trigger('route.post', ['application' => $this]);
     }
 
 }

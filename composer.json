@@ -37,7 +37,6 @@
         "popphp/pop-data": "For converting data between different types, SQL, CSV, XML, etc",
         "popphp/pop-db": "For DB management and transactions",
         "popphp/pop-dom": "For DOM generation",
-        "popphp/pop-event": "For event management",
         "popphp/pop-feed": "For reading and writing RSS and Atom feeds",
         "popphp/pop-file": "For file uploads and directory traversing",
         "popphp/pop-filter": "For string filtering",

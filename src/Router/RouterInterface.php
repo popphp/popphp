@@ -93,8 +93,9 @@ interface RouterInterface
     /**
      * Route to the correct controller
      *
+     * @param \Pop\Application $application
      * @return void
      */
-    public function route();
+    public function route(\Pop\Application $application);
 
 }

@@ -194,9 +194,10 @@ class Router implements RouterInterface
     /**
      * Route to the correct controller
      *
+     * @param \Pop\Application $application
      * @return void
      */
-    public function route()
+    public function route(\Pop\Application $application)
     {
         $controllerClass = $this->getRoute();
 
@@ -213,6 +214,9 @@ class Router implements RouterInterface
             } else {
                 $this->controller = new $controllerClass();
             }
+
+            // Trigger any route events
+            $application->triggerEvent('route', ['application' => $application]);
 
             $action      = $this->routeMatch->getAction();
             $errorAction = $this->controller->getErrorAction();
@@ -232,6 +236,8 @@ class Router implements RouterInterface
                 } else {
                     $this->controller->dispatch($action);
                 }
+                // Trigger any dispatch events
+                $application->triggerEvent('dispatch', ['application' => $application]);
             // Else, if an error action exists in the controller, dispatch it
             } else if ((null !== $errorAction) && method_exists($this->controller, $errorAction)) {
                 // If the controller->errorAction has dispatch parameters
@@ -247,6 +253,11 @@ class Router implements RouterInterface
                 } else {
                     $this->controller->dispatch($errorAction);
                 }
+                // Trigger any dispatch events
+                $application->triggerEvent('dispatch', ['application' => $application]);
+            // Trigger any route.error events
+            } else {
+                $application->triggerEvent('route.error', ['application' => $application]);
             }
         }
     }
