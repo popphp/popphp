@@ -176,7 +176,7 @@ class Application
      */
     public function run()
     {
-        if (null !== $this->router) {
+        if ((null !== $this->router)) {
             $this->router->route();
         }
     }

@@ -75,6 +75,7 @@ class Cli extends AbstractMatch
                 } else {
                     $index++;
                     $argv = [];
+                    // Clean up the arguments
                     for ($i = $index; $i < count($this->segments); $i++) {
                         $argv[] = $this->segments[$i];
                     }

@@ -29,16 +29,10 @@ class Router implements RouterInterface
 {
 
     /**
-     * Current controller object
-     * @var \Pop\Controller\ControllerInterface
-     */
-    protected $controller = null;
-
-    /**
-     * Array of available controllers class names
+     * Array of available routes
      * @var array
      */
-    protected $controllers = [];
+    protected $routes = [];
 
     /**
      * Route match object
@@ -47,18 +41,24 @@ class Router implements RouterInterface
     protected $routeMatch = null;
 
     /**
+     * Controller object
+     * @var \Pop\Controller\ControllerInterface
+     */
+    protected $controller = null;
+
+    /**
      * Constructor
      *
      * Instantiate the router object
      *
-     * @param  array $controllers
+     * @param  array $routes
      * @return Router
      */
-    public function __construct(array $controllers = null)
+    public function __construct(array $routes = null)
     {
         $this->routeMatch = (stripos(php_sapi_name(), 'cli') !== false) ? new Match\Cli() : new Match\Http();
-        if (null !== $controllers) {
-            $this->addControllers($controllers);
+        if (null !== $routes) {
+            $this->addRoutes($routes);
         }
     }
 
@@ -69,15 +69,15 @@ class Router implements RouterInterface
      * @param  string $controller
      * @return Router
      */
-    public function addController($route, $controller)
+    public function addRoute($route, $controller)
     {
-        if (!isset($this->controllers[$route])) {
-            $this->controllers[$route] = $controller;
+        if (!isset($this->routes[$route])) {
+            $this->routes[$route] = $controller;
         } else {
-            if (is_array($this->controllers[$route]) && is_array($controller)) {
-                $this->controllers[$route] = array_merge_recursive($this->controllers[$route], $controller);
+            if (is_array($this->routes[$route]) && is_array($controller)) {
+                $this->routes[$route] = array_merge_recursive($this->routes[$route], $controller);
             } else {
-                $this->controllers[$route] = $controller;
+                $this->routes[$route] = $controller;
             }
         }
 
@@ -87,36 +87,46 @@ class Router implements RouterInterface
     /**
      * Add multiple controller routes
      *
-     * @param  array $controllers
+     * @param  array $routes
      * @return Router
      */
-    public function addControllers(array $controllers)
+    public function addRoutes(array $routes)
     {
-        foreach ($controllers as $route => $controller) {
-            $this->addController($route, $controller);
+        foreach ($routes as $route => $controller) {
+            $this->addRoute($route, $controller);
         }
 
         return $this;
     }
 
     /**
-     * Get the current controller object
+     * Get route
      *
-     * @return \Pop\Controller\ControllerInterface
+     * @return mixed
      */
-    public function getController()
+    public function getRoute()
     {
-        return $this->controller;
+        return $this->routeMatch->match($this->routes);
     }
 
     /**
-     * Get array of controller class names
+     * Determine if a route is set for the current request
+     *
+     * @return boolean
+     */
+    public function hasRoute()
+    {
+        return (null !== $this->getRoute());
+    }
+
+    /**
+     * Get routes
      *
      * @return array
      */
-    public function getControllers()
+    public function getRoutes()
     {
-        return $this->controllers;
+        return $this->routes;
     }
 
     /**
@@ -130,13 +140,23 @@ class Router implements RouterInterface
     }
 
     /**
+     * Get the current controller object
+     *
+     * @return \Pop\Controller\ControllerInterface
+     */
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    /**
      * Route to the correct controller
      *
      * @return void
      */
     public function route()
     {
-        $controllerClass = $this->routeMatch->match($this->controllers);
+        $controllerClass = $this->getRoute();
 
         if ((null !== $controllerClass) && class_exists($controllerClass)) {
             $this->controller = new $controllerClass();

@@ -35,15 +35,15 @@ interface RouterInterface
      * @param  string $controller
      * @return Router
      */
-    public function addController($route, $controller);
+    public function addRoute($route, $controller);
 
     /**
      * Add multiple controller routes
      *
-     * @param  array $controllers
+     * @param  array $routes
      * @return Router
      */
-    public function addControllers(array $controllers);
+    public function addRoutes(array $routes);
 
     /**
      * Get the current controller object
@@ -53,11 +53,25 @@ interface RouterInterface
     public function getController();
 
     /**
-     * Get array of controller class names
+     * Get route
+     *
+     * @return mixed
+     */
+    public function getRoute();
+
+    /**
+     * Determine if a route is set for the current request
+     *
+     * @return boolean
+     */
+    public function hasRoute();
+
+    /**
+     * Get routes
      *
      * @return array
      */
-    public function getControllers();
+    public function getRoutes();
 
     /**
      * Route to the correct controller
