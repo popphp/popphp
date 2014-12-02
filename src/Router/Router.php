@@ -35,6 +35,18 @@ class Router implements RouterInterface
     protected $routes = [];
 
     /**
+     * Array of route parameters
+     * @var array
+     */
+    protected $routeParams = [];
+
+    /**
+     * Array of dispatch parameters
+     * @var array
+     */
+    protected $dispatchParams = [];
+
+    /**
      * Route match object
      * @var Match\MatchInterface
      */
@@ -63,7 +75,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Add a controller route
+     * Add a route
      *
      * @param  string $route
      * @param  string $controller
@@ -96,6 +108,36 @@ class Router implements RouterInterface
             $this->addRoute($route, $controller);
         }
 
+        return $this;
+    }
+
+    /**
+     * Add route params to be passed into a new controller instance
+     *
+     *     $router->addRouteParams('MyApp\Controller\IndexController', ['foo', 'bar']);
+     *
+     * @param  string $route
+     * @param  mixed  $params
+     * @return Router
+     */
+    public function addRouteParams($route, $params)
+    {
+        $this->routeParams[$route] = $params;
+        return $this;
+    }
+
+    /**
+     * Add dispatch params to be passed into the dispatched method of the controller instance
+     *
+     *     $router->addDispatchParams('MyApp\Controller\IndexController->foo', ['bar', 'baz']);
+     *
+     * @param  string $dispatch
+     * @param  mixed  $params
+     * @return Router
+     */
+    public function addDispatchParams($dispatch, $params)
+    {
+        $this->dispatchParams[$dispatch] = $params;
         return $this;
     }
 
@@ -159,16 +201,52 @@ class Router implements RouterInterface
         $controllerClass = $this->getRoute();
 
         if ((null !== $controllerClass) && class_exists($controllerClass)) {
-            $this->controller = new $controllerClass();
-            $action           = $this->routeMatch->getAction();
-            $errorAction      = $this->controller->getErrorAction();
+            // If the controller has route parameters
+            if (isset($this->routeParams[$controllerClass])) {
+                $params = $this->routeParams[$controllerClass];
+                if (!is_array($params)) {
+                    $params = [$params];
+                }
+                $reflect          = new \ReflectionClass($controllerClass);
+                $this->controller = $reflect->newInstanceArgs($params);
+            // Else, just instantiate the controller
+            } else {
+                $this->controller = new $controllerClass();
+            }
+
+            $action      = $this->routeMatch->getAction();
+            $errorAction = $this->controller->getErrorAction();
 
             // If action exists in the controller, dispatch it
             if ((null !== $action) && method_exists($this->controller, $action)) {
-                $this->controller->dispatch($action);
+                // If the controller->action has dispatch parameters
+                if (isset($this->dispatchParams[$controllerClass . '->' . $action])) {
+                    $params = $this->dispatchParams[$controllerClass . '->' . $action];
+                    if (!is_array($params)) {
+                        $params = [$action, $params];
+                    } else {
+                        array_unshift($params, $action);
+                    }
+                    call_user_func_array([$this->controller, 'dispatch'], $params);
+                // Else, just dispatch it
+                } else {
+                    $this->controller->dispatch($action);
+                }
             // Else, if an error action exists in the controller, dispatch it
             } else if ((null !== $errorAction) && method_exists($this->controller, $errorAction)) {
-                $this->controller->dispatch($errorAction);
+                // If the controller->errorAction has dispatch parameters
+                if (isset($this->dispatchParams[$controllerClass . '->' . $errorAction])) {
+                    $params = $this->dispatchParams[$controllerClass . '->' . $errorAction];
+                    if (!is_array($params)) {
+                        $params = [$errorAction, $params];
+                    } else {
+                        array_unshift($params, $errorAction);
+                    }
+                    call_user_func_array([$this->controller, 'dispatch'], $params);
+                // Else, just dispatch it
+                } else {
+                    $this->controller->dispatch($errorAction);
+                }
             }
         }
     }

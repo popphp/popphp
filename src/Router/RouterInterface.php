@@ -29,21 +29,38 @@ interface RouterInterface
 {
 
     /**
-     * Add a controller route
+     * Add a route
      *
      * @param  string $route
      * @param  string $controller
-     * @return Router
+     * @return RouterInterface
      */
     public function addRoute($route, $controller);
 
     /**
-     * Add multiple controller routes
+     * Add multiple routes
      *
      * @param  array $routes
-     * @return Router
+     * @return RouterInterface
      */
     public function addRoutes(array $routes);
+
+    /**
+     * Add route params
+     *
+     * @param  string $route
+     * @param  mixed  $params
+     * @return RouterInterface
+     */
+    public function addRouteParams($route, $params);
+    /**
+     * Add route params
+     *
+     * @param  string $action
+     * @param  mixed  $params
+     * @return RouterInterface
+     */
+    public function addDispatchParams($action, $params);
 
     /**
      * Get the current controller object

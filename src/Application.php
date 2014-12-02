@@ -47,21 +47,31 @@ class Application
     protected $router = null;
 
     /**
+     * Service locator
+     * @var Service\Locator
+     */
+    protected $services = null;
+
+    /**
      * Constructor
      *
      * Instantiate a application object
      *
-     * @param  mixed         $config
-     * @param  Router\Router $router
+     * @param  mixed           $config
+     * @param  Router\Router   $router
+     * @param  Service\Locator $services
      * @return Application
      */
-    public function __construct($config = null, Router\Router $router = null)
+    public function __construct($config = null, Router\Router $router = null, Service\Locator $services = null)
     {
         if (null !== $config) {
             $this->loadConfig($config);
         }
         if (null !== $router) {
             $this->loadRouter($router);
+        }
+        if (null !== $services) {
+            $this->loadServices($services);
         }
     }
 
@@ -118,6 +128,16 @@ class Application
     }
 
     /**
+     * Get the service locator
+     *
+     * @return Service\Locator
+     */
+    public function services()
+    {
+        return $this->services;
+    }
+
+    /**
      * Load an application config
      *
      * @param  mixed $config
@@ -143,6 +163,21 @@ class Application
     }
 
     /**
+     * Load a module config
+     *
+     * @param  array $modules
+     * @return Application
+     */
+    public function loadModules(array $modules)
+    {
+        foreach ($modules as $name => $module) {
+            $this->loadModule($name, $module);
+        }
+
+        return $this;
+    }
+
+    /**
      * Load a router
      *
      * @param  Router\Router $router
@@ -155,17 +190,51 @@ class Application
     }
 
     /**
-     * Load a module config
+     * Load a service locator
      *
-     * @param  array $modules
+     * @param  Service\Locator $services
      * @return Application
      */
-    public function loadModules(array $modules)
+    public function loadServices(Service\Locator $services)
     {
-        foreach ($modules as $name => $module) {
-            $this->loadModule($name, $module);
-        }
+        $this->services = $services;
+        return $this;
+    }
 
+    /**
+     * Set a service
+     *
+     * @param  string $name
+     * @param  mixed  $call
+     * @param  mixed  $params
+     * @return Application
+     */
+    public function setService($name, $call, $params = null)
+    {
+        $this->services->set($name, $call, $params);
+        return $this;
+    }
+
+    /**
+     * Get a service
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function getService($name)
+    {
+        return $this->services->get($name);
+    }
+
+    /**
+     * Remove a service
+     *
+     * @param  string $name
+     * @return Application
+     */
+    public function removeService($name)
+    {
+        $this->services->remove($name);
         return $this;
     }
 

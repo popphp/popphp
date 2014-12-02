@@ -53,7 +53,6 @@
         "popphp/pop-paginator": "For paginator of large sets of data",
         "popphp/pop-payment": "For interfacing with the payment gateway processors for major payment gateways",
         "popphp/pop-pdf": "For PDF processing and manipulation",
-        "popphp/pop-service": "For service location",
         "popphp/pop-shipping": "For calculating shipping rates with major shipping carriers",
         "popphp/pop-validator": "For input validation",
         "popphp/pop-version": "For version information",
