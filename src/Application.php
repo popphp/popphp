@@ -94,10 +94,10 @@ class Application
      */
     public function bootstrap()
     {
-        if (null === $this->$router) {
+        if (null === $this->router) {
             $this->router = new Router\Router();
         }
-        if (null === $this->$services) {
+        if (null === $this->services) {
             $this->services = new Service\Locator();
         }
         if (null === $this->events) {
@@ -374,8 +374,8 @@ class Application
                 // If action exists in the controller, dispatch it
                 if ((null !== $action) && method_exists($this->router->getController(), $action)) {
                     // If the controller->action has dispatch parameters
-                    if (null !== $this->router()->getDispatchParams([$controllerClass . '->' . $action])) {
-                        $params = $this->router()->getDispatchParams([$controllerClass . '->' . $action]);
+                    if (null !== $this->router()->getDispatchParams($controllerClass . '->' . $action)) {
+                        $params = $this->router()->getDispatchParams($controllerClass . '->' . $action);
                         if (!is_array($params)) {
                             $params = [$action, $params];
                         } else {
@@ -390,7 +390,7 @@ class Application
                 } else if ((null !== $errorAction) && method_exists($this->router->getController(), $errorAction)) {
                     // If the controller->errorAction has dispatch parameters
                     if ((null !== $action) && method_exists($this->router->getController(), $errorAction)) {
-                        $params = $this->router()->getDispatchParams([$controllerClass . '->' . $errorAction]);
+                        $params = $this->router()->getDispatchParams($controllerClass . '->' . $errorAction);
                         if (!is_array($params)) {
                             $params = [$errorAction, $params];
                         } else {
