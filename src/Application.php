@@ -85,6 +85,30 @@ class Application
     }
 
     /**
+     * Register a module config with the application object
+     *
+     * @param  string $name
+     * @param  mixed  $module
+     * @return Application
+     */
+    public function register($name, $module)
+    {
+        $this->modules[$name] = $module;
+        return $this;
+    }
+
+    /**
+     * Determine whether a module is registered with the application object
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function isRegistered($name)
+    {
+        return (array_key_exists($name, $this->modules));
+    }
+
+    /**
      * Access an application module config
      *
      * @param  string $name
@@ -93,17 +117,6 @@ class Application
     public function module($name)
     {
         return (array_key_exists($name, $this->modules)) ? $this->modules[$name] : null;
-    }
-
-    /**
-     * Determine whether a module is loaded
-     *
-     * @param  string $name
-     * @return boolean
-     */
-    public function isLoaded($name)
-    {
-        return (array_key_exists($name, $this->modules));
     }
 
     /**
@@ -165,34 +178,6 @@ class Application
     public function loadConfig($config)
     {
         $this->config = $config;
-        return $this;
-    }
-
-    /**
-     * Load a module config
-     *
-     * @param  string $name
-     * @param  mixed  $module
-     * @return Application
-     */
-    public function loadModule($name, $module)
-    {
-        $this->modules[$name] = $module;
-        return $this;
-    }
-
-    /**
-     * Load a module config
-     *
-     * @param  array $modules
-     * @return Application
-     */
-    public function loadModules(array $modules)
-    {
-        foreach ($modules as $name => $module) {
-            $this->loadModule($name, $module);
-        }
-
         return $this;
     }
 
@@ -270,7 +255,7 @@ class Application
     }
 
     /**
-     * Attach an event. Default project event name hook-points are:
+     * Attach an event. Default hook-points are:
      *
      *   route.pre
      *   route
@@ -303,7 +288,7 @@ class Application
     }
 
     /**
-     * Detach an event. Default project event name hook-points are:
+     * Detach an event. Default hook-points are:
      *
      *   route.pre
      *   route
