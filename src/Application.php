@@ -57,21 +57,21 @@ class Application
      *
      * Instantiate a application object
      *
-     * @param  mixed           $config
-     * @param  Router\Router   $router
-     * @param  Service\Locator $services
+     * Optional parameters are a service locator instance, a router instance or a configuration object or array
+     *
      * @return Application
      */
-    public function __construct($config = null, Router\Router $router = null, Service\Locator $services = null)
+    public function __construct()
     {
-        if (null !== $config) {
-            $this->loadConfig($config);
-        }
-        if (null !== $router) {
-            $this->loadRouter($router);
-        }
-        if (null !== $services) {
-            $this->loadServices($services);
+        $args = func_get_args();
+        foreach ($args as $arg) {
+            if ($arg instanceof Service\Locator) {
+                $this->loadServices($arg);
+            } else if ($arg instanceof Router\Router) {
+                $this->loadRouter($arg);
+            } else {
+                $this->loadConfig($arg);
+            }
         }
     }
 

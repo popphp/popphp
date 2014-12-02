@@ -35,18 +35,6 @@ class Controller implements ControllerInterface
     protected $errorAction = 'error';
 
     /**
-     * Constructor
-     *
-     * Instantiate the controller object
-     *
-     * @return Controller
-     */
-    public function __construct()
-    {
-
-    }
-
-    /**
      * Set the error action
      *
      * @param  string $error
