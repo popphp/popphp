@@ -24,11 +24,6 @@
             "Pop\\": "src/"
         }
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.0.x-dev"
-        }
-    },
     "suggest": {
         "popphp/pop-acl": "For creating and managing an access control list",
         "popphp/pop-archive": "For creating and extracting archive files such as ZIP, TAR and RAR",
