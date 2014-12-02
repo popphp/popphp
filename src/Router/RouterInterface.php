@@ -63,11 +63,34 @@ interface RouterInterface
     public function addDispatchParams($action, $params);
 
     /**
+     * Get the params assigned to the route
+     *
+     * @param  string $route
+     * @return mixed
+     */
+    public function getRouterParams($route);
+
+    /**
+     * Get the params assigned to the dispatch
+     *
+     * @param  string $dispatch
+     * @return mixed
+     */
+    public function getDispatchParams($dispatch);
+
+    /**
      * Get the current controller object
      *
      * @return \Pop\Controller\ControllerInterface
      */
     public function getController();
+
+    /**
+     * Get the current controller class name
+     *
+     * @return string
+     */
+    public function getControllerClass();
 
     /**
      * Get route
