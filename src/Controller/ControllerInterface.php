@@ -13,10 +13,10 @@
 /**
  * @namespace
  */
-namespace Pop;
+namespace Pop\Controller;
 
 /**
- * Pop exception class
+ * Pop controller interface
  *
  * @category   Pop
  * @package    Pop
@@ -25,4 +25,32 @@ namespace Pop;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Exception extends \Exception {}
+interface ControllerInterface
+{
+
+    /**
+     * Set the error action
+     *
+     * @param  string $error
+     * @return \Pop\Controller\Controller
+     */
+    public function setErrorAction($error);
+
+    /**
+     * Get the error action
+     *
+     * @return string
+     */
+    public function getErrorAction();
+
+    /**
+     * Dispatch the controller based on the action
+     *
+     * @param  string $action
+     * @param  array  $params
+     * @throws Exception
+     * @return Controller
+     */
+    public function dispatch($action, array $params = null);
+
+}

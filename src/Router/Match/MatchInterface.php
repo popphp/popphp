@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp2
  * @category   Pop
- * @package    Pop_Mvc
+ * @package    Pop
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,16 +13,41 @@
 /**
  * @namespace
  */
-namespace Pop\Mvc;
+namespace Pop\Router\Match;
 
 /**
- * Mvc exception class
+ * Pop router match interface
  *
  * @category   Pop
- * @package    Pop_Mvc
+ * @package    Pop
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Exception extends \Exception {}
+interface MatchInterface
+{
+
+    /**
+     * Match the route to the controller class
+     *
+     * @param  array $controllers
+     * @return string
+     */
+    public function match($controllers);
+
+    /**
+     * Get the route segments
+     *
+     * @return array
+     */
+    public function getSegments();
+
+    /**
+     * Get the action
+     *
+     * @return string
+     */
+    public function getAction();
+
+}

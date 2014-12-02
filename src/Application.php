@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp2
  * @category   Pop
- * @package    Pop_Application
+ * @package    Pop
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -15,15 +15,11 @@
  */
 namespace Pop;
 
-use Pop\Event\Manager;
-use Pop\Mvc\Router;
-use Pop\Service\Locator;
-
 /**
  * Application class
  *
  * @category   Pop
- * @package    Pop_Application
+ * @package    Pop
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2014 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -34,7 +30,7 @@ class Application
 
     /**
      * Application config
-     * @var Config
+     * @var mixed
      */
     protected $config = null;
 
@@ -46,73 +42,38 @@ class Application
 
     /**
      * Application router
-     * @var Router
+     * @var Router\Router
      */
     protected $router = null;
 
     /**
-     * Application events
-     * @var Manager
-     */
-    protected $events = null;
-
-    /**
-     * Application services
-     * @var Locator
-     */
-    protected $services = null;
-
-    /**
      * Constructor
      *
-     * Instantiate a project object
+     * Instantiate a application object
      *
-     * @param  mixed  $config
-     * @param  Router $router
-     * @param  mixed  $module
+     * @param  mixed         $config
+     * @param  Router\Router $router
      * @return Application
      */
-    public function __construct($config = null, Router $router = null, $module = null)
+    public function __construct($config = null, Router\Router $router = null)
     {
         if (null !== $config) {
             $this->loadConfig($config);
         }
-
         if (null !== $router) {
             $this->loadRouter($router);
         }
-
-        if (null !== $module) {
-            $this->loadModule($module);
-        }
-
-        $this->events   = new Manager();
-        $this->services = new Locator();
     }
 
     /**
-     * Access the project config
-     *
-     * @return Config
-     */
-    public function config()
-    {
-        return $this->config;
-    }
-
-    /**
-     * Access a project module config
+     * Access an application module config
      *
      * @param  string $name
-     * @return Config
+     * @return mixed
      */
     public function module($name)
     {
-        $module = null;
-        if (array_key_exists($name, $this->modules)) {
-            $module =  $this->modules[$name];
-        }
-        return $module;
+        return (array_key_exists($name, $this->modules)) ? $this->modules[$name] : null;
     }
 
     /**
@@ -127,7 +88,17 @@ class Application
     }
 
     /**
-     * Access all project module configs
+     * Access application config
+     *
+     * @return mixed
+     */
+    public function config()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Access all application module configs
      *
      * @return array
      */
@@ -137,9 +108,9 @@ class Application
     }
 
     /**
-     * Access the project router
+     * Access the application router
      *
-     * @return Router
+     * @return Router\Router
      */
     public function router()
     {
@@ -147,151 +118,55 @@ class Application
     }
 
     /**
-     * Load a project config
+     * Load an application config
      *
      * @param  mixed $config
-     * @throws Exception
      * @return Application
      */
     public function loadConfig($config)
     {
-        // Test to see if the config is already set and changes are allowed.
-        if ((null !== $this->config) && (!$this->config->changesAllowed())) {
-            throw new Exception('Real-time configuration changes are not allowed.');
-        }
-
-        // Else, set the new config
-        if (is_array($config)) {
-            $this->config = new Config($config);
-        } else if ($config instanceof Config) {
-            $this->config = $config;
-        } else {
-            throw new Exception('The project config must be either an array or an instance of Pop\Config.');
-        }
-
+        $this->config = $config;
         return $this;
     }
 
     /**
      * Load a module config
      *
-     * @param  mixed $module
-     * @throws Exception
+     * @param  string $name
+     * @param  mixed  $module
      * @return Application
      */
-    public function loadModule($module)
+    public function loadModule($name, $module)
     {
-        foreach ($module as $key => $value) {
-            if (is_array($value)) {
-                $this->modules[$key] = new Config($value);
-            } else if ($value instanceof Config) {
-                $this->modules[$key] = $value;
-            } else {
-                throw new Exception('The module config must be either an array or an instance of Pop\Config.');
-            }
-        }
-
+        $this->modules[$name] = $module;
         return $this;
     }
 
     /**
      * Load a router
      *
-     * @param  Router $router
+     * @param  Router\Router $router
      * @return Application
      */
-    public function loadRouter(Router $router)
+    public function loadRouter(Router\Router $router)
     {
         $this->router = $router;
         return $this;
     }
 
     /**
-     * Attach an event. Default event name hook-points are:
+     * Load a module config
      *
-     *   route.pre
-     *   route.post
-     *   route.error
-     *
-     *   dispatch.pre
-     *   dispatch.post
-     *   dispatch.error
-     *
-     * @param  string $name
-     * @param  mixed  $action
-     * @param  int    $priority
+     * @param  array $modules
      * @return Application
      */
-    public function on($name, $action, $priority = 0)
+    public function loadModules(array $modules)
     {
-        $this->events->on($name, $action, $priority);
+        foreach ($modules as $name => $module) {
+            $this->loadModule($name, $module);
+        }
+
         return $this;
-    }
-
-    /**
-     * Detach an event. Default event name hook-points are:
-     *
-     *   route.pre
-     *   route.post
-     *   route.error
-     *
-     *   dispatch.pre
-     *   dispatch.post
-     *   dispatch.error
-     *
-     * @param  string $name
-     * @param  mixed  $action
-     * @return Application
-     */
-    public function off($name, $action)
-    {
-        $this->events->off($name, $action);
-        return $this;
-    }
-
-    /**
-     * Get the event Manager
-     *
-     * @return Manager
-     */
-    public function getEventManager()
-    {
-        return $this->events;
-    }
-
-    /**
-     * Set a service
-     *
-     * @param  string $name
-     * @param  mixed  $call
-     * @param  mixed  $params
-     * @return Application
-     */
-    public function setService($name, $call, $params = null)
-    {
-        $this->services->set($name, $call, $params);
-        return $this;
-    }
-
-    /**
-     * Get a service
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public function getService($name)
-    {
-        return $this->services->get($name);
-    }
-
-    /**
-     * Get the service Locator
-     *
-     * @return Locator
-     */
-    public function getServiceLocator()
-    {
-        return $this->services;
     }
 
     /**
@@ -301,50 +176,8 @@ class Application
      */
     public function run()
     {
-        // If router exists, then route the project to the appropriate controller
         if (null !== $this->router) {
-            // Trigger any pre-route events, route, then trigger any post-route events
-            $this->events->trigger('route.pre', ['application' => $this]);
-
-            // If still alive after 'route.pre'
-            if ($this->events->alive()) {
-                $this->router->route($this);
-
-                // If still alive after 'route'
-                if ($this->events->alive()) {
-                    $this->events->trigger('route.post', ['application' => $this]);
-
-                    // If still alive after 'route.post' and if a controller was properly
-                    // routed and created, then dispatch it
-                    if (($this->events->alive()) && (null !== $this->router->controller())) {
-                        // Trigger any pre-dispatch events
-                        $this->events->trigger('dispatch.pre', ['application' => $this]);
-
-                        // If still alive after 'dispatch.pre'
-                        if ($this->events->alive()) {
-                            // Get the action and dispatch it
-                            $action = $this->router->getAction();
-
-                            // Dispatch the found action, the error action or trigger the dispatch error events
-                            if ((null !== $action) && method_exists($this->router->controller(), $action)) {
-                                $this->router->controller()->dispatch($action);
-                            } else if (method_exists($this->router->controller(), $this->router->controller()->getErrorAction())) {
-                                $this->router->controller()->dispatch($this->router->controller()->getErrorAction());
-                            } else {
-                                $this->events->trigger('dispatch.error', ['application' => $this]);
-                            }
-                            // If still alive after 'dispatch'
-                            if ($this->events->alive()) {
-                                // Trigger any post-dispatch events
-                                $this->events->trigger('dispatch.post', ['application' => $this]);
-                            }
-                        }
-                    }
-                // Trigger any route error events
-                } else {
-                    $this->events->trigger('route.error', ['application' => $this]);
-                }
-            }
+            $this->router->route();
         }
     }
 
