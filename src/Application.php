@@ -61,7 +61,7 @@ class Application
     /**
      * Constructor
      *
-     * Instantiate a application object
+     * Instantiate an application object
      *
      * Optional parameters are a service locator instance, a router instance,
      * an event manager instance or a configuration object or array
