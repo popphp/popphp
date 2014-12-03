@@ -29,6 +29,18 @@ class Cli extends AbstractMatch
 {
 
     /**
+     * Array of arguments
+     * @var array
+     */
+    protected $arguments = [];
+
+    /**
+     * Argument string
+     * @var string
+     */
+    protected $argumentString = null;
+
+    /**
      * Constructor
      *
      * Instantiate the CLI match object
@@ -37,63 +49,65 @@ class Cli extends AbstractMatch
      */
     public function __construct()
     {
-        $this->setSegments();
+        $this->setArguments();
     }
 
     /**
-     * Set the route segments
+     * Set the route arguments
      *
      * @return Cli
      */
-    public function setSegments()
+    public function setArguments()
     {
         global $argv;
+
+        // Trim the script name out of the arguments array
         array_shift($argv);
-        $this->segments = $argv;
+
+        $this->arguments      = $argv;
+        $this->argumentString = implode(' ', $argv);
+
         return $this;
+    }
+
+    /**
+     * Get the route arguments
+     *
+     * @return array
+     */
+    public function getArguments()
+    {
+        return $this->arguments;
+    }
+
+    /**
+     * Get the route argument string
+     *
+     * @return string
+     */
+    public function getArgumentString()
+    {
+        return $this->argumentString;
     }
 
     /**
      * Match the route to the controller class
      *
-     * @param  array $controllers
-     * @return string
+     * @param  array $routes
+     * @return boolean
      */
-    public function match($controllers)
+    public function match($routes)
     {
-        global $argv;
-        $match = $this->traverseControllers($controllers);
-
-        $this->action = 'index';
-
-        // Get the action if present
-        if (null !== $this->segmentMatch) {
-            $index = array_search($this->segmentMatch, $this->segments);
-            if (($index !== false) && isset($this->segments[$index + 1]) && !empty($this->segments[$index + 1])) {
-                if (method_exists($match, $this->segments[$index + 1])) {
-                    $this->action = $this->segments[$index + 1];
-                } else {
-                    $index++;
-                    $argv = [];
-                    // Clean up the arguments
-                    for ($i = $index; $i < count($this->segments); $i++) {
-                        $argv[] = $this->segments[$i];
-                    }
-                }
-            }
-        } else if (isset($this->segments[0]) && ($this->action == 'index')) {
-            $this->action = $this->segments[0];
-            if (count($this->segments) > 1) {
-                $index = 1;
-                $argv = [];
-                // Clean up the arguments
-                for ($i = $index; $i < count($this->segments); $i++) {
-                    $argv[] = $this->segments[$i];
+        foreach ($routes as $route => $controller) {
+            if (substr($this->argumentString, 0, strlen($route)) == $route) {
+                if (isset($controller['controller']) && isset($controller['action'])) {
+                    $this->controller = $controller['controller'];
+                    $this->action     = $controller['action'];
                 }
             }
         }
 
-        return $match;
+        return ((null !== $this->controller) && (null !== $this->action));
     }
 
 }

@@ -29,76 +29,35 @@ abstract class AbstractMatch
 {
 
     /**
-     * Array of route segments
-     * @var array
+     * Controller string
+     * @var string
      */
-    protected $segments = [];
+    protected $controller = null;
 
     /**
-     * Action
+     * Action string
      * @var string
      */
     protected $action = null;
 
     /**
-     * Segment match
-     * @var string
-     */
-    protected $segmentMatch = null;
-
-    /**
-     * Get the route segments
+     * Get the matched controller string
      *
-     * @return array
+     * @return string
      */
-    public function getSegments()
+    public function getController()
     {
-        return $this->segments;
+        return $this->controller;
     }
 
     /**
-     * Get the action
+     * Get the matched action string
      *
      * @return string
      */
     public function getAction()
     {
         return $this->action;
-    }
-
-    /**
-     * Traverse the controllers
-     *
-     * @param  array $controllers
-     * @param  int $depth
-     * @return string
-     */
-    protected function traverseControllers($controllers, $depth = 0)
-    {
-        $next = $depth + 1;
-        // If the path stem exists in the controllers, the traverse it
-        if (isset($this->segments[$depth]) &&
-            (array_key_exists($this->segments[$depth], $controllers))) {
-            // If the next level is an array, traverse it
-            if (is_array($controllers[$this->segments[$depth]])) {
-                $this->segmentMatch = $this->segments[$depth];
-                return $this->traverseControllers($controllers[$this->segments[$depth]], $next);
-            // Else, return the controller class name
-            } else {
-                $this->segmentMatch = $this->segments[$depth];
-                return (isset($controllers[$this->segments[$depth]])) ?
-                    $controllers[$this->segments[$depth]] : null;
-            }
-        // Else check for the root 'index' path
-        } else if (array_key_exists('index', $controllers)) {
-            // If the next level is an array, traverse it
-            if (is_array($controllers['index'])) {
-                return $this->traverseControllers($controllers['index'], $next);
-            // Else, return the controller class name
-            } else {
-                return (isset($controllers['index'])) ? $controllers['index'] : null;
-            }
-        }
     }
 
     /**
@@ -111,18 +70,11 @@ abstract class AbstractMatch
     abstract public function __construct();
 
     /**
-     * Set the route segments
-     *
-     * @return AbstractMatch
-     */
-    abstract public function setSegments();
-
-    /**
      * Match the route to the controller class
      *
-     * @param  array $controllers
-     * @return string
+     * @param  array $routes
+     * @return boolean
      */
-    abstract public function match($controllers);
+    abstract public function match($routes);
 
 }

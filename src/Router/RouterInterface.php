@@ -79,6 +79,20 @@ interface RouterInterface
     public function getDispatchParams($dispatch);
 
     /**
+     * Determine if a route is set for the current request
+     *
+     * @return boolean
+     */
+    public function hasRoute();
+
+    /**
+     * Get routes
+     *
+     * @return array
+     */
+    public function getRoutes();
+
+    /**
      * Get the current controller object
      *
      * @return \Pop\Controller\ControllerInterface
@@ -93,25 +107,18 @@ interface RouterInterface
     public function getControllerClass();
 
     /**
-     * Get route
-     *
-     * @return mixed
-     */
-    public function getRoute();
-
-    /**
-     * Determine if a route is set for the current request
+     * Determine if the route is CLI
      *
      * @return boolean
      */
-    public function hasRoute();
+    public function isCli();
 
     /**
-     * Get routes
+     * Determine if the route is HTTP
      *
-     * @return array
+     * @return boolean
      */
-    public function getRoutes();
+    public function isHttp();
 
     /**
      * Route to the correct controller

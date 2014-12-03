@@ -29,25 +29,25 @@ interface MatchInterface
 {
 
     /**
-     * Match the route to the controller class
+     * Get the matched controller string
      *
-     * @param  array $controllers
      * @return string
      */
-    public function match($controllers);
+    public function getController();
 
     /**
-     * Get the route segments
-     *
-     * @return array
-     */
-    public function getSegments();
-
-    /**
-     * Get the action
+     * Get the matched action string
      *
      * @return string
      */
     public function getAction();
+
+    /**
+     * Match the route to the controller class
+     *
+     * @param  array $routes
+     * @return boolean
+     */
+    public function match($routes);
 
 }

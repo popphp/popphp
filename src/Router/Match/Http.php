@@ -35,6 +35,18 @@ class Http extends AbstractMatch
     protected $basePath = null;
 
     /**
+     * Array of segments
+     * @var array
+     */
+    protected $segments = [];
+
+    /**
+     * Segment string
+     * @var array
+     */
+    protected $segmentString = null;
+
+    /**
      * Constructor
      *
      * Instantiate the HTTP match object
@@ -80,7 +92,14 @@ class Http extends AbstractMatch
             $path = substr($path, 0, -1);
         }
 
-        $this->segments = ($path == '') ? $this->segments = ['index'] : explode('/', substr($path, 1));
+        if ($path == '') {
+            $this->segments      = ['index'];
+            $this->segmentString = '/';
+        } else {
+            $this->segments      = explode('/', substr($path, 1));
+            $this->segmentString = '/' . implode('/', $this->segments);
+        }
+
         return $this;
     }
 
@@ -95,28 +114,50 @@ class Http extends AbstractMatch
     }
 
     /**
-     * Match the route to the controller class
+     * Get the route segments
      *
-     * @param  array $controllers
+     * @return array
+     */
+    public function getSegments()
+    {
+        return $this->segments;
+    }
+
+    /**
+     * Get the route segment string
+     *
      * @return string
      */
-    public function match($controllers)
+    public function getSegmentString()
     {
-        $match = $this->traverseControllers($controllers);
+        return $this->segmentString;
+    }
 
-        $this->action = 'index';
-
-        // Get the action if present
-        if (null !== $this->segmentMatch) {
-            $index = array_search($this->segmentMatch, $this->segments);
-            if (($index !== false) && isset($this->segments[$index + 1]) && !empty($this->segments[$index + 1])) {
-                $this->action = $this->segments[$index + 1];
+    /**
+     * Match the route to the controller class
+     *
+     * @param  array $routes
+     * @return boolean
+     */
+    public function match($routes)
+    {
+        if (($this->segmentString == '/') && isset($routes['/'])) {
+            if (isset($routes['/']['controller']) && isset($routes['/']['action'])) {
+                $this->controller = $routes['/']['controller'];
+                $this->action     = $routes['/']['action'];
             }
-        } else if (isset($this->segments[0]) && ($this->action == 'index')) {
-            $this->action = $this->segments[0];
+        } else {
+            foreach ($routes as $route => $controller) {
+                if (($route != '/') && (substr($this->segmentString, 0, strlen($route)) == $route)) {
+                    if (isset($controller['controller']) && isset($controller['action'])) {
+                        $this->controller = $controller['controller'];
+                        $this->action     = $controller['action'];
+                    }
+                }
+            }
         }
 
-        return $match;
+        return ((null !== $this->controller) && (null !== $this->action));
     }
 
 }

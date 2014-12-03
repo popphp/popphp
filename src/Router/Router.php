@@ -171,23 +171,13 @@ class Router implements RouterInterface
     }
 
     /**
-     * Get route
-     *
-     * @return mixed
-     */
-    public function getRoute()
-    {
-        return $this->routeMatch->match($this->routes);
-    }
-
-    /**
      * Determine if a route is set for the current request
      *
      * @return boolean
      */
     public function hasRoute()
     {
-        return (null !== $this->getRoute());
+        return $this->routeMatch->match($this->routes);
     }
 
     /**
@@ -231,13 +221,33 @@ class Router implements RouterInterface
     }
 
     /**
+     * Determine if the route is CLI
+     *
+     * @return boolean
+     */
+    public function isCli()
+    {
+        return ($this->routeMatch instanceof Match\Cli);
+    }
+
+    /**
+     * Determine if the route is HTTP
+     *
+     * @return boolean
+     */
+    public function isHttp()
+    {
+        return ($this->routeMatch instanceof Match\Http);
+    }
+
+    /**
      * Route to the correct controller
      *
      * @return void
      */
     public function route()
     {
-        $controllerClass       = $this->getRoute();
+        $controllerClass       = $this->routeMatch->getController();
         $this->controllerClass = $controllerClass;
 
         if ((null !== $controllerClass) && class_exists($controllerClass)) {
