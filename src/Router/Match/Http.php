@@ -152,7 +152,8 @@ class Http extends AbstractMatch
         } else {
             foreach ($routes as $route => $controller) {
                 if (($route != '/') && (substr($this->segmentString, 0, strlen($route)) == $route)) {
-                    if (isset($controller['controller']) && isset($controller['action'])) {
+                    $suffix = substr($this->segmentString, strlen($route));
+                    if ((($suffix == '') || (substr($suffix, 0, 1) == '/')) && (isset($controller['controller']) && isset($controller['action']))) {
                         $this->controller = $controller['controller'];
                         $this->action     = $controller['action'];
                     }
