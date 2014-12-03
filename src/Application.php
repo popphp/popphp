@@ -378,6 +378,9 @@ class Application
                     $action          = $this->router->getController()->getErrorAction();
                 }
 
+                // Trigger any app.dispatch.post events
+                $this->trigger('app.dispatch.pre');
+
                 // If action exists in the controller, dispatch it
                 if ((null !== $action) && method_exists($this->router->getController(), $action)) {
                     // If the controller->errorAction has dispatch parameters
