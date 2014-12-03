@@ -65,20 +65,40 @@ class Router implements RouterInterface
     protected $controller = null;
 
     /**
+     * Strict flag
+     * @var boolean
+     */
+    protected $strict = false;
+
+    /**
      * Constructor
      *
      * Instantiate the router object
      *
-     * @param  array $routes
+     * @param  array   $routes
+     * @param  boolean $strict
      * @return Router
      */
-    public function __construct(array $routes = null)
+    public function __construct(array $routes = null, $strict = false)
     {
         $this->routeMatch = ((stripos(php_sapi_name(), 'cli') !== false) && (stripos(php_sapi_name(), 'server') === false)) ?
             new Match\Cli() : new Match\Http();
         if (null !== $routes) {
             $this->addRoutes($routes);
         }
+
+        $this->setStrict($strict);
+    }
+
+    /**
+     * Set strict flag
+     *
+     * @param  boolean $strict
+     * @return RouterInterface
+     */
+    public function setStrict($strict)
+    {
+        $this->strict = (bool)$strict;
     }
 
     /**
@@ -94,8 +114,8 @@ class Router implements RouterInterface
         if (!isset($controller['controller']) && !isset($controller['action'])) {
             throw new Exception("Error: The 'controller' and 'action' keys of the controller array must be set.");
         }
-
         $this->routes[$route] = $controller;
+
         return $this;
     }
 
@@ -142,6 +162,16 @@ class Router implements RouterInterface
     {
         $this->dispatchParams[$dispatch] = $params;
         return $this;
+    }
+
+    /**
+     * Get strict flag
+     *
+     * @return boolean
+     */
+    public function isStrict()
+    {
+        return $this->strict;
     }
 
     /**
@@ -243,7 +273,7 @@ class Router implements RouterInterface
      */
     public function route()
     {
-        $this->routeMatch->match($this->routes);
+        $this->routeMatch->match($this->routes, $this->strict);
 
         $controllerClass = $this->routeMatch->getController();
         if (null === $controllerClass) {

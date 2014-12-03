@@ -90,6 +90,9 @@ class Http extends AbstractMatch
         // Trim trailing slash, if present
         if (substr($path, -1) == '/') {
             $path = substr($path, 0, -1);
+            $trailingSlash = '/';
+        } else {
+            $trailingSlash = null;
         }
 
         if ($path == '') {
@@ -97,7 +100,7 @@ class Http extends AbstractMatch
             $this->segmentString = '/';
         } else {
             $this->segments      = explode('/', substr($path, 1));
-            $this->segmentString = '/' . implode('/', $this->segments);
+            $this->segmentString = '/' . implode('/', $this->segments) . $trailingSlash;
         }
 
         return $this;
@@ -136,26 +139,36 @@ class Http extends AbstractMatch
     /**
      * Match the route to the controller class
      *
-     * @param  array $routes
+     * @param  array   $routes
+     * @param  boolean $strict
      * @return boolean
      */
-    public function match($routes)
+    public function match($routes, $strict = false)
     {
-        if (($this->segmentString == '/') && isset($routes['/'])) {
-            if (isset($routes['/']['controller']) && isset($routes['/']['action'])) {
-                $this->controller = $routes['/']['controller'];
-                $this->action     = $routes['/']['action'];
+        $this->prepareRoutes($routes);
+
+        if (($this->segmentString == '/') && isset($this->routes['/'])) {
+            if (isset($this->routes['/']['controller']) && isset($this->routes['/']['action'])) {
+                $this->controller = $this->routes['/']['controller'];
+                $this->action     = $this->routes['/']['action'];
             }
-            if (isset($routes['/']['default']) && ($routes['/']['default']) && isset($routes['/']['controller'])) {
-                $this->defaultController = $routes['/']['controller'];
+            if (isset($this->routes['/']['default']) && ($this->routes['/']['default']) && isset($this->routes['/']['controller'])) {
+                $this->defaultController = $this->routes['/']['controller'];
             }
         } else {
-            foreach ($routes as $route => $controller) {
+            foreach ($this->routes as $route => $controller) {
                 if (($route != '/') && (substr($this->segmentString, 0, strlen($route)) == $route)) {
-                    $suffix = substr($this->segmentString, strlen($route));
-                    if ((($suffix == '') || (substr($suffix, 0, 1) == '/')) && (isset($controller['controller']) && isset($controller['action']))) {
+                    if (($strict) && ($this->segmentString == $route)) {
                         $this->controller = $controller['controller'];
                         $this->action     = $controller['action'];
+                    } else if (!$strict) {
+                        $suffix = (substr($route, -1) == '/') ?
+                            substr($this->segmentString, (strlen($route) - 1)) : substr($this->segmentString, strlen($route));
+                        if ((($suffix == '') || (substr($suffix, 0, 1) == '/')) &&
+                            (isset($controller['controller']) && isset($controller['action']))) {
+                            $this->controller = $controller['controller'];
+                            $this->action     = $controller['action'];
+                        }
                     }
                 }
                 if (isset($controller['default']) && ($controller['default']) && isset($controller['controller'])) {
@@ -165,6 +178,54 @@ class Http extends AbstractMatch
         }
 
         return ((null !== $this->controller) && (null !== $this->action));
+    }
+
+    protected function prepareRoutes($routes)
+    {
+        foreach ($routes as $route => $controller) {
+            // Handle optional trailing slash
+            if (substr($route, -3) == '[/]') {
+                $this->routes[substr($route, 0, -3)]       = $controller;
+                $this->routes[substr($route, 0, -3) . '/'] = $controller;
+            } else if (strpos($route, '[/:') !== false) {
+                $controller['optional'] = $this->getOptionalParams($route);
+                $route = substr($route, 0, strpos($route, '[/:'));
+                $this->routes[$route] = $controller;
+            // Handle required arguments
+            } else if (strpos($route, '/:') !== false) {
+                $controller['required'] = $this->getRequiredParams($route);
+                $route = substr($route, 0, strpos($route, '/:'));
+                $this->routes[$route] = $controller;
+            // Handle optional arguments
+            } else {
+                $this->routes[$route] = $controller;
+            }
+        }
+    }
+
+    /**
+     * Get required parameters from the route
+     *
+     * @param  string $route
+     * @return array
+     */
+    protected function getRequiredParams($route)
+    {
+        $route = substr($route, (strpos($route, '/:') + 2));
+        return explode('/:', $route);
+    }
+
+    /**
+     * Get optional parameters from the route
+     *
+     * @param  string $route
+     * @return array
+     */
+    protected function getOptionalParams($route)
+    {
+        $route = substr($route, (strpos($route, '[/:') + 3));
+        $route = substr($route, 0, -1);
+        return explode('][/:', $route);
     }
 
 }

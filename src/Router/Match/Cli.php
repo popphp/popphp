@@ -93,17 +93,24 @@ class Cli extends AbstractMatch
     /**
      * Match the route to the controller class
      *
-     * @param  array $routes
+     * @param  array   $routes
+     * @param  boolean $strict
      * @return boolean
      */
-    public function match($routes)
+    public function match($routes, $strict = false)
     {
         foreach ($routes as $route => $controller) {
             if (substr($this->argumentString, 0, strlen($route)) == $route) {
-                $suffix = substr($this->argumentString, strlen($route));
-                if ((($suffix == '') || (substr($suffix, 0, 1) == ' ')) && (isset($controller['controller']) && isset($controller['action']))) {
+                if (($strict) && ($this->argumentString == $route)) {
                     $this->controller = $controller['controller'];
                     $this->action     = $controller['action'];
+                } else if (!$strict) {
+                    $suffix = substr($this->argumentString, strlen($route));
+                    if ((($suffix == '') || (substr($suffix, 0, 1) == ' ')) &&
+                        (isset($controller['controller']) && isset($controller['action']))) {
+                        $this->controller = $controller['controller'];
+                        $this->action     = $controller['action'];
+                    }
                 }
             }
             if (isset($controller['default']) && ($controller['default']) && isset($controller['controller'])) {
