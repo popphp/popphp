@@ -29,19 +29,25 @@ abstract class AbstractMatch
 {
 
     /**
-     * Controller string
+     * Controller class name
      * @var string
      */
     protected $controller = null;
 
     /**
-     * Action string
+     * Action name
      * @var string
      */
     protected $action = null;
 
     /**
-     * Get the matched controller string
+     * Default controller class name
+     * @var array
+     */
+    protected $defaultController = null;
+
+    /**
+     * Get the matched controller class name
      *
      * @return string
      */
@@ -51,13 +57,23 @@ abstract class AbstractMatch
     }
 
     /**
-     * Get the matched action string
+     * Get the matched action name
      *
      * @return string
      */
     public function getAction()
     {
         return $this->action;
+    }
+
+    /**
+     * Get the default controller class name
+     *
+     * @return string
+     */
+    public function getDefaultController()
+    {
+        return $this->defaultController;
     }
 
     /**

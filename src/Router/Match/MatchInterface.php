@@ -29,18 +29,25 @@ interface MatchInterface
 {
 
     /**
-     * Get the matched controller string
+     * Get the matched controller class name
      *
      * @return string
      */
     public function getController();
 
     /**
-     * Get the matched action string
+     * Get the matched action name
      *
      * @return string
      */
     public function getAction();
+
+    /**
+     * Get the default controller class name
+     *
+     * @return string
+     */
+    public function getDefaultController();
 
     /**
      * Match the route to the controller class

@@ -105,6 +105,9 @@ class Cli extends AbstractMatch
                     $this->action     = $controller['action'];
                 }
             }
+            if (isset($controller['default']) && ($controller['default']) && isset($controller['controller'])) {
+                $this->defaultController = $controller['controller'];
+            }
         }
 
         return ((null !== $this->controller) && (null !== $this->action));

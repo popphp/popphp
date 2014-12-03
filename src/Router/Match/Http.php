@@ -146,6 +146,9 @@ class Http extends AbstractMatch
                 $this->controller = $routes['/']['controller'];
                 $this->action     = $routes['/']['action'];
             }
+            if (isset($routes['/']['default']) && ($routes['/']['default']) && isset($routes['/']['controller'])) {
+                $this->defaultController = $routes['/']['controller'];
+            }
         } else {
             foreach ($routes as $route => $controller) {
                 if (($route != '/') && (substr($this->segmentString, 0, strlen($route)) == $route)) {
@@ -153,6 +156,9 @@ class Http extends AbstractMatch
                         $this->controller = $controller['controller'];
                         $this->action     = $controller['action'];
                     }
+                }
+                if (isset($controller['default']) && ($controller['default']) && isset($controller['controller'])) {
+                    $this->defaultController = $controller['controller'];
                 }
             }
         }

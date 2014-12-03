@@ -239,11 +239,14 @@ class Router implements RouterInterface
     /**
      * Route to the correct controller
      *
+     * @param  boolean $default
      * @return void
      */
-    public function route()
+    public function route($default = false)
     {
-        $controllerClass       = $this->routeMatch->getController();
+        $this->routeMatch->match($this->routes);
+
+        $controllerClass       = ($default) ? $this->routeMatch->getDefaultController() : $this->routeMatch->getController();
         $this->controllerClass = $controllerClass;
 
         if ((null !== $controllerClass) && class_exists($controllerClass)) {
