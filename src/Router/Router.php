@@ -65,40 +65,20 @@ class Router implements RouterInterface
     protected $controller = null;
 
     /**
-     * Strict flag
-     * @var boolean
-     */
-    protected $strict = false;
-
-    /**
      * Constructor
      *
      * Instantiate the router object
      *
      * @param  array   $routes
-     * @param  boolean $strict
      * @return Router
      */
-    public function __construct(array $routes = null, $strict = false)
+    public function __construct(array $routes = null)
     {
         $this->routeMatch = ((stripos(php_sapi_name(), 'cli') !== false) && (stripos(php_sapi_name(), 'server') === false)) ?
             new Match\Cli() : new Match\Http();
         if (null !== $routes) {
             $this->addRoutes($routes);
         }
-
-        $this->setStrict($strict);
-    }
-
-    /**
-     * Set strict flag
-     *
-     * @param  boolean $strict
-     * @return RouterInterface
-     */
-    public function setStrict($strict)
-    {
-        $this->strict = (bool)$strict;
     }
 
     /**
@@ -162,16 +142,6 @@ class Router implements RouterInterface
     {
         $this->dispatchParams[$dispatch] = $params;
         return $this;
-    }
-
-    /**
-     * Get strict flag
-     *
-     * @return boolean
-     */
-    public function isStrict()
-    {
-        return $this->strict;
     }
 
     /**
@@ -273,7 +243,7 @@ class Router implements RouterInterface
      */
     public function route()
     {
-        $this->routeMatch->match($this->routes, $this->strict);
+        $this->routeMatch->match($this->routes);
 
         $controllerClass = $this->routeMatch->getController();
         if (null === $controllerClass) {

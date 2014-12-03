@@ -29,12 +29,6 @@ abstract class AbstractMatch
 {
 
     /**
-     * Routes
-     * @var array
-     */
-    protected $routes = [];
-
-    /**
      * Controller class name
      * @var string
      */
@@ -51,6 +45,12 @@ abstract class AbstractMatch
      * @var array
      */
     protected $defaultController = null;
+
+    /**
+     * Prepared routes
+     * @var array
+     */
+    protected $routes = [];
 
     /**
      * Get the matched controller class name
@@ -95,9 +95,8 @@ abstract class AbstractMatch
      * Match the route to the controller class
      *
      * @param  array   $routes
-     * @param  boolean $strict
      * @return boolean
      */
-    abstract public function match($routes, $strict = false);
+    abstract public function match($routes);
 
 }

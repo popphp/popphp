@@ -94,24 +94,17 @@ class Cli extends AbstractMatch
      * Match the route to the controller class
      *
      * @param  array   $routes
-     * @param  boolean $strict
      * @return boolean
      */
-    public function match($routes, $strict = false)
+    public function match($routes)
     {
-        foreach ($routes as $route => $controller) {
-            if (substr($this->argumentString, 0, strlen($route)) == $route) {
-                if (($strict) && ($this->argumentString == $route)) {
-                    $this->controller = $controller['controller'];
-                    $this->action     = $controller['action'];
-                } else if (!$strict) {
-                    $suffix = substr($this->argumentString, strlen($route));
-                    if ((($suffix == '') || (substr($suffix, 0, 1) == ' ')) &&
-                        (isset($controller['controller']) && isset($controller['action']))) {
-                        $this->controller = $controller['controller'];
-                        $this->action     = $controller['action'];
-                    }
-                }
+        $this->prepareRoutes($routes);
+
+        foreach ($this->routes as $route => $controller) {
+            if ((substr($this->argumentString, 0, strlen($route)) == $route) &&
+                isset($controller['controller']) && isset($controller['action'])) {
+                $this->controller = $controller['controller'];
+                $this->action     = $controller['action'];
             }
             if (isset($controller['default']) && ($controller['default']) && isset($controller['controller'])) {
                 $this->defaultController = $controller['controller'];
@@ -119,6 +112,17 @@ class Cli extends AbstractMatch
         }
 
         return ((null !== $this->controller) && (null !== $this->action));
+    }
+
+    /**
+     * Prepare the routes
+     *
+     * @param  array   $routes
+     * @return void
+     */
+    protected function prepareRoutes($routes)
+    {
+        $this->routes = $routes;
     }
 
 }

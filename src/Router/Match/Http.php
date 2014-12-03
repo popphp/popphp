@@ -140,46 +140,35 @@ class Http extends AbstractMatch
      * Match the route to the controller class
      *
      * @param  array   $routes
-     * @param  boolean $strict
      * @return boolean
      */
-    public function match($routes, $strict = false)
+    public function match($routes)
     {
         $this->prepareRoutes($routes);
 
-        if (($this->segmentString == '/') && isset($this->routes['/'])) {
-            if (isset($this->routes['/']['controller']) && isset($this->routes['/']['action'])) {
-                $this->controller = $this->routes['/']['controller'];
-                $this->action     = $this->routes['/']['action'];
-            }
-            if (isset($this->routes['/']['default']) && ($this->routes['/']['default']) && isset($this->routes['/']['controller'])) {
-                $this->defaultController = $this->routes['/']['controller'];
-            }
-        } else {
-            foreach ($this->routes as $route => $controller) {
-                if (($route != '/') && (substr($this->segmentString, 0, strlen($route)) == $route)) {
-                    if (($strict) && ($this->segmentString == $route)) {
-                        $this->controller = $controller['controller'];
-                        $this->action     = $controller['action'];
-                    } else if (!$strict) {
-                        $suffix = (substr($route, -1) == '/') ?
-                            substr($this->segmentString, (strlen($route) - 1)) : substr($this->segmentString, strlen($route));
-                        if ((($suffix == '') || (substr($suffix, 0, 1) == '/')) &&
-                            (isset($controller['controller']) && isset($controller['action']))) {
-                            $this->controller = $controller['controller'];
-                            $this->action     = $controller['action'];
-                        }
-                    }
+        foreach ($this->routes as $route => $controller) {
+            if ((substr($this->segmentString, 0, strlen($route)) == $route) &&
+                isset($controller['controller']) && isset($controller['action'])) {
+                $this->controller = $controller['controller'];
+                $this->action     = $controller['action'];
+                if (isset($controller['optional']) || isset($controller['required'])) {
+
                 }
-                if (isset($controller['default']) && ($controller['default']) && isset($controller['controller'])) {
-                    $this->defaultController = $controller['controller'];
-                }
+            }
+            if (isset($controller['default']) && ($controller['default']) && isset($controller['controller'])) {
+                $this->defaultController = $controller['controller'];
             }
         }
 
         return ((null !== $this->controller) && (null !== $this->action));
     }
 
+    /**
+     * Prepare the routes
+     *
+     * @param  array   $routes
+     * @return void
+     */
     protected function prepareRoutes($routes)
     {
         foreach ($routes as $route => $controller) {
@@ -187,6 +176,7 @@ class Http extends AbstractMatch
             if (substr($route, -3) == '[/]') {
                 $this->routes[substr($route, 0, -3)]       = $controller;
                 $this->routes[substr($route, 0, -3) . '/'] = $controller;
+            // Handle optional arguments
             } else if (strpos($route, '[/:') !== false) {
                 $controller['optional'] = $this->getOptionalParams($route);
                 $route = substr($route, 0, strpos($route, '[/:'));
@@ -196,7 +186,6 @@ class Http extends AbstractMatch
                 $controller['required'] = $this->getRequiredParams($route);
                 $route = substr($route, 0, strpos($route, '/:'));
                 $this->routes[$route] = $controller;
-            // Handle optional arguments
             } else {
                 $this->routes[$route] = $controller;
             }

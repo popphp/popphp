@@ -53,9 +53,8 @@ interface MatchInterface
      * Match the route to the controller class
      *
      * @param  array   $routes
-     * @param  boolean $strict
      * @return boolean
      */
-    public function match($routes, $strict = false);
+    public function match($routes);
 
 }

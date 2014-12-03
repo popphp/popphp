@@ -29,14 +29,6 @@ interface RouterInterface
 {
 
     /**
-     * Set strict flag
-     *
-     * @param  boolean $strict
-     * @return RouterInterface
-     */
-    public function setStrict($strict);
-
-    /**
      * Add a route
      *
      * @param  string $route
@@ -69,13 +61,6 @@ interface RouterInterface
      * @return RouterInterface
      */
     public function addDispatchParams($action, $params);
-
-    /**
-     * Get strict flag
-     *
-     * @return boolean
-     */
-    public function isStrict();
 
     /**
      * Get the params assigned to the route
