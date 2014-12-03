@@ -384,9 +384,9 @@ class Application
                     if ((null !== $action) && method_exists($this->router->getController(), $action)) {
                         $params = $this->router()->getDispatchParams($controllerClass . '->' . $action);
                         if (!is_array($params)) {
-                            $params = [$action, $params];
+                            $params = [$action, [$params]];
                         } else {
-                            array_unshift($params, $action);
+                            $params = array_merge([$action], [$params]);
                         }
                         call_user_func_array([$this->router->getController(), 'dispatch'], $params);
                     // Else, just dispatch it
