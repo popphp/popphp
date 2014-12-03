@@ -32,10 +32,10 @@ interface RouterInterface
      * Add a route
      *
      * @param  string $route
-     * @param  string $controller
+     * @param  array  $controller
      * @return RouterInterface
      */
-    public function addRoute($route, $controller);
+    public function addRoute($route, array $controller);
 
     /**
      * Add multiple routes

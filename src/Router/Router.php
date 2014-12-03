@@ -85,21 +85,17 @@ class Router implements RouterInterface
      * Add a route
      *
      * @param  string $route
-     * @param  string $controller
+     * @param  array  $controller
+     * @throws Exception
      * @return Router
      */
-    public function addRoute($route, $controller)
+    public function addRoute($route, array $controller)
     {
-        if (!isset($this->routes[$route])) {
-            $this->routes[$route] = $controller;
-        } else {
-            if (is_array($this->routes[$route]) && is_array($controller)) {
-                $this->routes[$route] = array_merge_recursive($this->routes[$route], $controller);
-            } else {
-                $this->routes[$route] = $controller;
-            }
+        if (!isset($controller['controller']) && !isset($controller['action'])) {
+            throw new Exception("Error: The 'controller' and 'action' keys of the controller array must be set.");
         }
 
+        $this->routes[$route] = $controller;
         return $this;
     }
 
