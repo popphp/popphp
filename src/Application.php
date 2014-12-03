@@ -371,21 +371,16 @@ class Application
                 if (null !== $this->router->getController()) {
                     $controllerClass = $this->router->getControllerClass();
                     $action          = $this->router->getRouteMatch()->getAction();
-                // Else, try and fall back on the default controller, if it exists
-                } else if (null !== $this->router->getRouteMatch()->getDefaultController()) {
-                    $this->router->route(true);
-                    $controllerClass = $this->router->getControllerClass();
-                    $action          = $this->router->getController()->getErrorAction();
                 }
 
                 // Trigger any app.dispatch.post events
                 $this->trigger('app.dispatch.pre');
 
                 // If action exists in the controller, dispatch it
-                if ((null !== $action) && method_exists($this->router->getController(), $action)) {
+                if (null !== $controllerClass) {
                     // If the controller->errorAction has dispatch parameters
-                    if ((null !== $action) && method_exists($this->router->getController(), $action)) {
-                        $params = $this->router()->getDispatchParams($controllerClass . '->' . $action);
+                    $params = $this->router()->getDispatchParams($controllerClass . '->' . $action);
+                    if (null !== $params) {
                         if (!is_array($params)) {
                             $params = [$action, [$params]];
                         } else {

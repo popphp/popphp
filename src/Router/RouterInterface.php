@@ -123,9 +123,8 @@ interface RouterInterface
     /**
      * Route to the correct controller
      *
-     * @param  boolean $default
      * @return void
      */
-    public function route($default = false);
+    public function route();
 
 }

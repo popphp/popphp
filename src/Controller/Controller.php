@@ -29,31 +29,31 @@ class Controller implements ControllerInterface
 {
 
     /**
-     * Error action
+     * Default action
      * @var string
      */
-    protected $errorAction = 'error';
+    protected $defaultAction = 'error';
 
     /**
-     * Set the error action
+     * Set the default action
      *
-     * @param  string $error
+     * @param  string $default
      * @return \Pop\Controller\Controller
      */
-    public function setErrorAction($error)
+    public function setDefaultAction($default)
     {
-        $this->errorAction = $error;
+        $this->defaultAction = $default;
         return $this;
     }
 
     /**
-     * Get the error action
+     * Get the default action
      *
      * @return string
      */
-    public function getErrorAction()
+    public function getDefaultAction()
     {
-        return $this->errorAction;
+        return $this->defaultAction;
     }
 
     /**
@@ -62,11 +62,18 @@ class Controller implements ControllerInterface
      * @param  string $action
      * @param  array  $params
      * @throws Exception
-     * @return Controller
+     * @return void
      */
-    public function dispatch($action, array $params = null)
+    public function dispatch($action = null, array $params = null)
     {
-        if (method_exists($this, $action)) {
+        if ((null !== $action) && method_exists($this, $action)) {
+            if (null !== $params) {
+                call_user_func_array([$this, $action], $params);
+            } else {
+                $this->$action();
+            }
+        } else if (method_exists($this, $this->defaultAction)) {
+            $action = $this->defaultAction;
             if (null !== $params) {
                 call_user_func_array([$this, $action], $params);
             } else {

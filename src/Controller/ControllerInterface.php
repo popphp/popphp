@@ -29,19 +29,19 @@ interface ControllerInterface
 {
 
     /**
-     * Set the error action
+     * Set the default action
      *
-     * @param  string $error
+     * @param  string $default
      * @return \Pop\Controller\Controller
      */
-    public function setErrorAction($error);
+    public function setDefaultAction($default);
 
     /**
-     * Get the error action
+     * Get the default action
      *
      * @return string
      */
-    public function getErrorAction();
+    public function getDefaultAction();
 
     /**
      * Dispatch the controller based on the action
