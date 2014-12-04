@@ -139,14 +139,14 @@ class Http extends AbstractMatch
     /**
      * Match the route to the controller class. Possible matches are:
      *
-     *     /list/:album/:id                         -- All 3 params are required
-     *     /list[/:album][/:id]                     -- First param required, last two are optional
-     *     /list/:album[/:id]                       -- First two params required, last one is optional
-     *     /list/:action/:artist[/:album][/:id]     -- Two required, two optional
-     *     /list/:album/:id*                        -- One required param, one required param that is a collection (array)
-     *     /list/:album[/:id*]                      -- One required param, one optional param that is a collection (array)
+     *     /list/:album/:id                      - All 3 params are required
+     *     /list[/:album][/:id]                  - First param required, last two are optional
+     *     /list/:album[/:id]                    - First two params required, last one is optional
+     *     /list/:action/:artist[/:album][/:id]  - Two required, two optional
+     *     /list/:album/:id*                     - One required param, one required param that is a collection (array)
+     *     /list/:album[/:id*]                   - One required param, one optional param that is a collection (array)
      *
-     * @param  array   $routes
+     * @param  array $routes
      * @return boolean
      */
     public function match($routes)
@@ -345,6 +345,7 @@ class Http extends AbstractMatch
                     $matchedParams[$param['name']] = ($param['collection']) ? [$params[$i]] : $params[$i];
                 }
             }
+        // Else, check for a collection of parameters
         } else if (count($params) > count($routeParams)) {
             foreach ($routeParams as $i => $param) {
                 if ($param['collection']) {

@@ -91,9 +91,17 @@ class Cli extends AbstractMatch
     }
 
     /**
-     * Match the route to the controller class
+     * Match the route to the controller class. Possible matches are:
      *
-     * @param  array   $routes
+     *     foo bar
+     *     foo [bar|baz]
+     *     foo bar -o1 [-o2]
+     *     foo bar --option1 [--option2]
+     *     foo bar --option1|-o1 [--option2|-o2]
+     *     foo bar <name> [<email>]
+     *     foo bar --name= [--email=]
+     *
+     * @param  array $routes
      * @return boolean
      */
     public function match($routes)
@@ -117,12 +125,57 @@ class Cli extends AbstractMatch
     /**
      * Prepare the routes
      *
-     * @param  array   $routes
+     * @param  array $routes
      * @return void
      */
     protected function prepareRoutes($routes)
     {
-        $this->routes = $routes;
+
+    }
+
+    /**
+     * Get required parameters from the route
+     *
+     * @param  string $route
+     * @return array
+     */
+    protected function getRequiredParams($route)
+    {
+
+    }
+
+    /**
+     * Get optional parameters from the route
+     *
+     * @param  string $route
+     * @return array
+     */
+    protected function getOptionalParams($route)
+    {
+
+    }
+
+    /**
+     * Get parameters from the route string
+     *
+     * @param  string $route
+     * @return array
+     */
+    protected function getParamsFromRoute($route)
+    {
+
+    }
+
+    /**
+     * Process parameters from the route string
+     *
+     * @param  array $params
+     * @param  array $routeParams
+     * @return mixed
+     */
+    protected function processParamsFromRoute($params, $routeParams)
+    {
+
     }
 
 }
