@@ -66,14 +66,10 @@ class Controller implements ControllerInterface
      */
     public function dispatch($action = null, array $params = null)
     {
-        if ((null !== $action) && method_exists($this, $action)) {
-            if (null !== $params) {
-                call_user_func_array([$this, $action], $params);
-            } else {
-                $this->$action();
-            }
-        } else if (method_exists($this, $this->defaultAction)) {
+        if (null === $action) {
             $action = $this->defaultAction;
+        }
+        if (method_exists($this, $action)) {
             if (null !== $params) {
                 call_user_func_array([$this, $action], $params);
             } else {

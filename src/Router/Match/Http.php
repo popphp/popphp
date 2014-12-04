@@ -139,12 +139,16 @@ class Http extends AbstractMatch
     /**
      * Match the route to the controller class. Possible matches are:
      *
-     *     /list/:album/:id                      - All 3 params are required
-     *     /list[/:album][/:id]                  - First param required, last two are optional
-     *     /list/:album[/:id]                    - First two params required, last one is optional
-     *     /list/:action/:artist[/:album][/:id]  - Two required, two optional
-     *     /list/:album/:id*                     - One required param, one required param that is a collection (array)
-     *     /list/:album[/:id*]                   - One required param, one optional param that is a collection (array)
+     *     /foo/:bar/:baz                     - All 3 params are required
+     *     /foo[/:bar][/:baz]                 - First param required, last two are optional
+     *     /foo/:bar[/:baz]                   - First two params required, last one is optional
+     *     /foo/:bar/:baz[/:some][/:other]    - Two required, two optional
+     *     /foo/:bar/:baz*                    - One required param, one required param that is a collection (array)
+     *     /foo/:bar[/:baz*]                  - One required param, one optional param that is a collection (array)
+     *
+     *     - OR -
+     *
+     *     /foo/*   - Turns off strict matching and allows any route that starts with /foo/ to pass
      *
      * @param  array $routes
      * @return boolean
@@ -166,7 +170,7 @@ class Http extends AbstractMatch
                     }
                 } else {
                     $suffix = substr($this->segmentString, strlen($route));
-                    if ($suffix == '') {
+                    if (($suffix == '') || ($controller['wildcard'])) {
                         $this->controller = $controller['controller'];
                         $this->action     = $controller['action'];
                     }
@@ -215,6 +219,13 @@ class Http extends AbstractMatch
             if (substr($route, -3) == '[/]') {
                 $route = substr($route, 0, -3);
                 $hasOptionalTrailingSlash = true;
+            }
+            // Handle wildcard route
+            if (substr($route, -1) == '*') {
+                $route = substr($route, 0, -1);
+                $controller['wildcard'] = true;
+            } else {
+                $controller['wildcard'] = false;
             }
 
             // Handle params

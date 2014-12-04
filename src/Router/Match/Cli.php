@@ -101,6 +101,10 @@ class Cli extends AbstractMatch
      *     foo bar <name> [<email>]
      *     foo bar --name= [--email=]
      *
+     *     - OR -
+     *
+     *     foo *   - Turns off strict matching and allows any route that starts with 'foo ' to pass
+     *
      * @param  array $routes
      * @return boolean
      */
