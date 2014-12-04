@@ -264,6 +264,11 @@ class Router implements RouterInterface
             } else {
                 $this->controller = new $controllerClass();
             }
+
+            // If parameters are found, add them for dispatch
+            if ($this->routeMatch->hasParams() && (null !== $this->routeMatch->getAction())) {
+                $this->addDispatchParams($controllerClass . '->' .$this->routeMatch->getAction(), $this->routeMatch->getParams());
+            }
         }
     }
 

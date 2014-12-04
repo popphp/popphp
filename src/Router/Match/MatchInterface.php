@@ -43,6 +43,20 @@ interface MatchInterface
     public function getAction();
 
     /**
+     * Get the matched route params
+     *
+     * @return array
+     */
+    public function getParams();
+
+    /**
+     * Determine if there are matched route params
+     *
+     * @return boolean
+     */
+    public function hasParams();
+
+    /**
      * Get the default controller class name
      *
      * @return string

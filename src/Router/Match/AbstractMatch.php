@@ -41,6 +41,12 @@ abstract class AbstractMatch
     protected $action = null;
 
     /**
+     * Matched route parameters
+     * @var array
+     */
+    protected $params = [];
+
+    /**
      * Default controller class name
      * @var array
      */
@@ -70,6 +76,26 @@ abstract class AbstractMatch
     public function getAction()
     {
         return $this->action;
+    }
+
+    /**
+     * Get the matched route params
+     *
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
+     * Determine if there are matched route params
+     *
+     * @return boolean
+     */
+    public function hasParams()
+    {
+        return (count($this->params) > 0);
     }
 
     /**
