@@ -365,6 +365,7 @@ class Http extends AbstractMatch
                 $result = false;
             }
         }
+
         return ($result) ? $matchedParams : false;
     }
 

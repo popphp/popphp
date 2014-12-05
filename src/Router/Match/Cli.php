@@ -96,7 +96,6 @@ class Cli extends AbstractMatch
      *     foo bar
      *     foo [bar|baz]
      *     foo bar -o1 [-o2]
-     *     foo bar --option1 [--option2]
      *     foo bar --option1|-o1 [--option2|-o2]
      *     foo bar <name> [<email>]
      *     foo bar --name= [--email=]
@@ -128,16 +127,37 @@ class Cli extends AbstractMatch
                         }
                     }
                 } else {
-                    $this->controller = $controller['controller'];
-                    $this->action     = $controller['action'];
-                    if (isset($controller['routeParams'])) {
-                        $this->routeParams = (!is_array($controller['routeParams'])) ?
-                            [$controller['routeParams']] : $controller['routeParams'];
+                    $suffix = substr($this->argumentString, strlen($route));
+                    if (($suffix == '') || ($controller['wildcard'])) {
+                        $this->controller = $controller['controller'];
+                        $this->action     = $controller['action'];
+                        if (isset($controller['routeParams'])) {
+                            $this->routeParams = (!is_array($controller['routeParams'])) ?
+                                [$controller['routeParams']] : $controller['routeParams'];
+                        }
                     }
                 }
             }
             if (isset($controller['default']) && ($controller['default']) && isset($controller['controller'])) {
                 $this->defaultController = $controller['controller'];
+            }
+        }
+
+        // If no route or controller found, check for a wildcard/default route
+        if ((null === $this->controller) && array_key_exists('*', $this->routes) &&
+            isset($this->routes['*']['controller']) && isset($this->routes['*']['action'])) {
+            $this->controller = $this->routes['*']['controller'];
+            $this->action     = $this->routes['*']['action'];
+            if (isset($controller['dispatchParams'])) {
+                $params        = $this->getDispatchParamsFromRoute('*');
+                $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
+                if ($matchedParams != false) {
+                    $this->dispatchParams  = $matchedParams;
+                }
+            }
+            if (isset($this->routes['*']['routeParams'])) {
+                $this->routeParams = (!is_array($this->routes['*']['routeParams'])) ?
+                    [$this->routes['*']['routeParams']] : $this->routes['*']['routeParams'];
             }
         }
 
@@ -161,6 +181,19 @@ class Cli extends AbstractMatch
                 $controller['wildcard'] = false;
             }
 
+            $altRoutes = [];
+            // Handle optional literals
+            if ((strpos($route, '[') !== false) && (substr($route, strpos($route, '['), 2) != '[-') &&
+                (substr($route, strpos($route, '['), 2) != '[<')) {
+                $optLiterals = substr($route, strpos($route, '['));
+                $optLiterals = substr($optLiterals, 0, strpos($optLiterals, ']') + 1);
+                $route = str_replace(' ' . $optLiterals, '', $route);
+
+                $alt = substr($optLiterals, 1);
+                $alt = substr($alt, 0, -1);
+                $altRoutes = explode('|', $alt);
+            }
+
             // Handle params
             $dash    = strpos($route, '-');
             $bracket = strpos($route, '[');
@@ -177,28 +210,35 @@ class Cli extends AbstractMatch
                 $match[] = $angle;
             }
 
-            $params = substr($route, min($match));
-            $route  = substr($route, 0, min($match) - 1);
-            $params = (strpos($params, ' ') !== false) ? explode(' ', $params) : [$params];
+            if (count($match) > 0) {
+                $params = substr($route, min($match));
+                $route  = substr($route, 0, min($match) - 1);
+                $params = (strpos($params, ' ') !== false) ? explode(' ', $params) : [$params];
 
-            $controller['dispatchParams'] = [];
-            foreach ($params as $param) {
-                if (strpos($param, '[') !== false) {
-                    $param = substr($param, 1);
-                    $param = substr($param, 0, -1);
-                    $controller['dispatchParams'][] = [
-                        'name'       => $param,
-                        'required'   => false
-                    ];
-                } else {
-                    $controller['dispatchParams'][] = [
-                        'name'       => $param,
-                        'required'   => true
-                    ];
+                $controller['dispatchParams'] = [];
+                foreach ($params as $param) {
+                    if (strpos($param, '[') !== false) {
+                        $param = substr($param, 1);
+                        $param = substr($param, 0, -1);
+                        $controller['dispatchParams'][] = [
+                            'name'       => $param,
+                            'required'   => false
+                        ];
+                    } else {
+                        $controller['dispatchParams'][] = [
+                            'name'       => $param,
+                            'required'   => true
+                        ];
+                    }
                 }
             }
 
             $this->routes[$route] = $controller;
+            if (count($altRoutes) > 0) {
+                foreach ($altRoutes as $alt) {
+                    $this->routes[$route . ' ' . $alt] = $controller;
+                }
+            }
         }
     }
 
@@ -210,13 +250,16 @@ class Cli extends AbstractMatch
      */
     protected function getDispatchParamsFromRoute($route)
     {
-        $params = substr($this->argumentString, strlen($route) + 1);
-        $params = explode(' ', $params);
-        if ((count($params) == 1) && ($params[0] == '')) {
-            $params = [];
-        }
-        return $params;
+        $params = [];
+        $route = explode(' ', $route);
 
+        foreach ($this->arguments as $arg) {
+            if (!in_array($arg, $route)) {
+                $params[] = $arg;
+            }
+        }
+
+        return $params;
     }
 
     /**
@@ -228,10 +271,64 @@ class Cli extends AbstractMatch
      */
     protected function processDispatchParamsFromRoute($params, $routeParams)
     {
-        print_r($params);
-        print_r($routeParams);
+        $result        = true;
+        $matchedParams = [];
+        $offset        = 0;
 
+        foreach ($routeParams as $i => $param) {
+            if (($param['required']) && !isset($params[$i])) {
+                $result = false;
+            } else if (isset($params[$i])) {
+                // If value
+                if (substr($param['name'], 0, 1) == '<') {
+                    $p = substr($param['name'], 1);
+                    $p = substr($p, 0, -1);
+                    $matchedParams[$p] = $params[$i];
+                // Option with value
+                } else if (substr($param['name'], -1) == '=') {
+                    foreach ($params as $value) {
+                        if (substr($value, 0, strlen($param['name'])) == $param['name']) {
+                            $p = explode('=', $value);
+                            $matchedParams[str_replace('-', '', $p[0])] = $p[1];
+                        }
+                    }
+                // Option
+                } else if (substr($param['name'], 0, 1) == '-') {
+                    $p = explode('|', $param['name']);
+                    $whichOpt = null;
+                    foreach ($p as $opt) {
+                        if (in_array($opt, $params)) {
+                            $whichOpt = $opt;
+                        }
+                    }
 
+                    if (null !== $whichOpt) {
+                        $key = array_search($whichOpt, $params);
+                        // Look ahead for a value
+                        if (isset($params[$key + 1]) && (substr($params[$key + 1], 0, 1) != '-')) {
+                            if (isset($routeParams[($key + 1 - $offset)])) {
+                                // Value is meant for the next arg place
+                                if (substr($routeParams[($key + 1 - $offset)]['name'], 0, 1) == '<') {
+                                    $matchedParams[str_replace('-', '', $whichOpt)] = true;
+                                // Value is meant for the option
+                                } else {
+                                    $matchedParams[str_replace('-', '', $whichOpt)] = $params[$key + 1];
+                                    $offset++;
+                                }
+                            } else {
+                                $matchedParams[str_replace('-', '', $whichOpt)] = $params[$key + 1];
+                                $offset++;
+                            }
+                        // Else, just set to true
+                        } else {
+                            $matchedParams[str_replace('-', '', $whichOpt)] = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return ($result) ? $matchedParams : false;
     }
 
 }
