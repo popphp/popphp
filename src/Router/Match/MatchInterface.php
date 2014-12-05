@@ -29,6 +29,13 @@ interface MatchInterface
 {
 
     /**
+     * Get the matched route
+     *
+     * @return string
+     */
+    public function getRoute();
+
+    /**
      * Get the matched controller class name
      *
      * @return string

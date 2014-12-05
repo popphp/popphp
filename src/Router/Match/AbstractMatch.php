@@ -29,13 +29,19 @@ abstract class AbstractMatch
 {
 
     /**
-     * Controller class name
+     * Matched route
+     * @var array
+     */
+    protected $route = null;
+
+    /**
+     * Controller class string name or closure function
      * @var string
      */
     protected $controller = null;
 
     /**
-     * Action name
+     * Action name for the controller class
      * @var string
      */
     protected $action = null;
@@ -53,7 +59,7 @@ abstract class AbstractMatch
     protected $dispatchParams = [];
 
     /**
-     * Default controller class name
+     * Default controller class string name or closure function
      * @var array
      */
     protected $defaultController = null;
@@ -65,7 +71,17 @@ abstract class AbstractMatch
     protected $routes = [];
 
     /**
-     * Get the matched controller class name
+     * Get the matched route
+     *
+     * @return string
+     */
+    public function getRoute()
+    {
+        return $this->route;
+    }
+
+    /**
+     * Get the matched controller class name or closure function
      *
      * @return string
      */
@@ -125,7 +141,7 @@ abstract class AbstractMatch
     }
 
     /**
-     * Get the default controller class name
+     * Get the default controller class name or closure function
      *
      * @return string
      */

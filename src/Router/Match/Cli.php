@@ -112,13 +112,15 @@ class Cli extends AbstractMatch
         $this->prepareRoutes($routes);
 
         foreach ($this->routes as $route => $controller) {
-            if (preg_match($route, $this->argumentString) && isset($controller['controller']) && isset($controller['action'])) {
+            if (preg_match($route, $this->argumentString) && isset($controller['controller'])) {
                 if (isset($controller['dispatchParams'])) {
                     $params        = $this->getDispatchParamsFromRoute($route);
                     $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
                     if ($matchedParams !== false) {
-                        $this->controller     = $controller['controller'];
-                        $this->action         = $controller['action'];
+                        $this->controller = $controller['controller'];
+                        if (isset($controller['action'])) {
+                            $this->action = $controller['action'];
+                        }
                         $this->dispatchParams = $matchedParams;
                         if (isset($controller['routeParams'])) {
                             $this->routeParams = (!is_array($controller['routeParams'])) ?
@@ -129,7 +131,9 @@ class Cli extends AbstractMatch
                     $suffix = substr($this->argumentString, strlen($route));
                     if (($suffix == '') || ($controller['wildcard'])) {
                         $this->controller = $controller['controller'];
-                        $this->action     = $controller['action'];
+                        if (isset($controller['action'])) {
+                            $this->action = $controller['action'];
+                        }
                         if (isset($controller['routeParams'])) {
                             $this->routeParams = (!is_array($controller['routeParams'])) ?
                                 [$controller['routeParams']] : $controller['routeParams'];
@@ -143,10 +147,11 @@ class Cli extends AbstractMatch
         }
 
         // If no route or controller found, check for a wildcard/default route
-        if ((null === $this->controller) && array_key_exists('*', $this->routes) &&
-            isset($this->routes['*']['controller']) && isset($this->routes['*']['action'])) {
+        if ((null === $this->controller) && array_key_exists('*', $this->routes) && isset($this->routes['*']['controller'])) {
             $this->controller = $this->routes['*']['controller'];
-            $this->action     = $this->routes['*']['action'];
+            if (isset($controller['action'])) {
+                $this->action = $this->routes['*']['action'];
+            }
             if (isset($controller['dispatchParams'])) {
                 $params        = $this->getDispatchParamsFromRoute('*');
                 $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
@@ -160,7 +165,7 @@ class Cli extends AbstractMatch
             }
         }
 
-        return ((null !== $this->controller) && (null !== $this->action));
+        return (null !== $this->controller);
     }
 
     /**

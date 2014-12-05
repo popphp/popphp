@@ -158,14 +158,16 @@ class Http extends AbstractMatch
         $this->prepareRoutes($routes);
 
         foreach ($this->routes as $route => $controller) {
-            if ((substr($this->segmentString, 0, strlen($route)) == $route) &&
-                isset($controller['controller']) && isset($controller['action'])) {
+            if ((substr($this->segmentString, 0, strlen($route)) == $route) && isset($controller['controller'])) {
                 if (isset($controller['dispatchParams'])) {
                     $params        = $this->getDispatchParamsFromRoute($route);
                     $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
                     if ($matchedParams !== false) {
-                        $this->controller     = $controller['controller'];
-                        $this->action         = $controller['action'];
+                        $this->route      = $route;
+                        $this->controller = $controller['controller'];
+                        if (isset($controller['action'])) {
+                            $this->action = $controller['action'];
+                        }
                         $this->dispatchParams = $matchedParams;
                         if (isset($controller['routeParams'])) {
                             $this->routeParams = (!is_array($controller['routeParams'])) ?
@@ -175,8 +177,11 @@ class Http extends AbstractMatch
                 } else {
                     $suffix = substr($this->segmentString, strlen($route));
                     if (($suffix == '') || ($controller['wildcard'])) {
+                        $this->route      = $route;
                         $this->controller = $controller['controller'];
-                        $this->action     = $controller['action'];
+                        if (isset($controller['action'])) {
+                            $this->action = $controller['action'];
+                        }
                         if (isset($controller['routeParams'])) {
                             $this->routeParams = (!is_array($controller['routeParams'])) ?
                                 [$controller['routeParams']] : $controller['routeParams'];
@@ -190,10 +195,12 @@ class Http extends AbstractMatch
         }
 
         // If no route or controller found, check for a wildcard/default route
-        if ((null === $this->controller) && array_key_exists('*', $this->routes) &&
-            isset($this->routes['*']['controller']) && isset($this->routes['*']['action'])) {
+        if ((null === $this->controller) && array_key_exists('*', $this->routes) && isset($this->routes['*']['controller'])) {
+            $this->route      = '*';
             $this->controller = $this->routes['*']['controller'];
-            $this->action     = $this->routes['*']['action'];
+            if (isset($controller['action'])) {
+                $this->action = $this->routes['*']['action'];
+            }
             if (isset($controller['dispatchParams'])) {
                 $params        = $this->getDispatchParamsFromRoute('*');
                 $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);

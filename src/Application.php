@@ -364,32 +364,46 @@ class Application
                 // Trigger any app.route.post events
                 $this->trigger('app.route.post');
 
-                $controllerClass = null;
+                $controller = null;
                 $action          = null;
 
                 // Get the routed controller
                 if (null !== $this->router->getController()) {
-                    $controllerClass = $this->router->getControllerClass();
-                    $action          = $this->router->getRouteMatch()->getAction();
+                    $controller = $this->router->getControllerClass();
+                    $action     = $this->router->getRouteMatch()->getAction();
                 }
 
                 // Trigger any app.dispatch.post events
                 $this->trigger('app.dispatch.pre');
 
-                // If action exists in the controller, dispatch it
-                if (null !== $controllerClass) {
-                    // If the controller->errorAction has dispatch parameters
-                    $params = $this->router()->getDispatchParams($controllerClass . '->' . $action);
-                    if (null !== $params) {
-                        if (!is_array($params)) {
-                            $params = [$action, [$params]];
+                // If controller exists, dispatch it
+                if (null !== $controller) {
+                    if ($controller instanceof \Closure) {
+                        // If the controller->action has dispatch parameters
+                        $params = $this->router()->getDispatchParams($this->router()->getRouteMatch()->getRoute());
+                        if (null !== $params) {
+                            if (!is_array($params)) {
+                                $params = [$params];
+                            }
+                            call_user_func_array($controller, $params);
+                        // Else, just dispatch it
                         } else {
-                            $params = array_merge([$action], [$params]);
+                            $controller();
                         }
-                        call_user_func_array([$this->router->getController(), 'dispatch'], $params);
-                    // Else, just dispatch it
                     } else {
-                        $this->router->getController()->dispatch($action);
+                        // If the controller->action has dispatch parameters
+                        $params = $this->router()->getDispatchParams($this->router()->getRouteMatch()->getRoute());
+                        if (null !== $params) {
+                            if (!is_array($params)) {
+                                $params = [$action, [$params]];
+                            } else {
+                                $params = array_merge([$action], [$params]);
+                            }
+                            call_user_func_array([$this->router->getController(), 'dispatch'], $params);
+                        // Else, just dispatch it
+                        } else {
+                            $this->router->getController()->dispatch($action);
+                        }
                     }
                 }
 

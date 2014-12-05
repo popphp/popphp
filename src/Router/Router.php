@@ -263,32 +263,45 @@ class Router implements RouterInterface
     {
         $this->routeMatch->match($this->routes);
 
-        $controllerClass = $this->routeMatch->getController();
-        if (null === $controllerClass) {
-            $controllerClass = $this->routeMatch->getDefaultController();
+        $controller = $this->routeMatch->getController();
+        if (null === $controller) {
+            $controller = $this->routeMatch->getDefaultController();
         }
 
-        if ((null !== $controllerClass) && class_exists($controllerClass)) {
-            $this->controllerClass = $controllerClass;
+        if (null !== $controller) {
 
-            // If parameters are found, add them for dispatch
-            if ($this->routeMatch->hasRouteParams()) {
-                $this->addRouteParams($controllerClass, $this->routeMatch->getRouteParams());
-            }
+            // If controller is a closure
+            if ($controller instanceof \Closure) {
+                $this->controller      = $controller;
+                $this->controllerClass = $controller;
+                if ($this->routeMatch->hasDispatchParams()) {
+                    $this->addDispatchParams(
+                        $this->routeMatch->getRoute(), $this->routeMatch->getDispatchParams()
+                    );
+                }
+            // Else if controller is a class
+            } else if (class_exists($controller)) {
+                $this->controllerClass = $controller;
 
-            // If the controller has route parameters
-            if (isset($this->routeParams[$controllerClass])) {
-                $reflect          = new \ReflectionClass($controllerClass);
-                $this->controller = $reflect->newInstanceArgs($this->routeParams[$controllerClass]);
-            // Else, just instantiate the controller
-            } else {
-                $this->controller = new $controllerClass();
-            }
+                // If parameters are found, add them for dispatch
+                if ($this->routeMatch->hasRouteParams()) {
+                    $this->addRouteParams($controller, $this->routeMatch->getRouteParams());
+                }
 
-            if ($this->routeMatch->hasDispatchParams() && (null !== $this->routeMatch->getAction())) {
-                $this->addDispatchParams(
-                    $controllerClass . '->' .$this->routeMatch->getAction(), $this->routeMatch->getDispatchParams()
-                );
+                // If the controller has route parameters
+                if (isset($this->routeParams[$controller])) {
+                    $reflect          = new \ReflectionClass($controller);
+                    $this->controller = $reflect->newInstanceArgs($this->routeParams[$controller]);
+                // Else, just instantiate the controller
+                } else {
+                    $this->controller = new $controller();
+                }
+
+                if ($this->routeMatch->hasDispatchParams() && (null !== $this->routeMatch->getAction())) {
+                    $this->addDispatchParams(
+                        $this->routeMatch->getRoute(), $this->routeMatch->getDispatchParams()
+                    );
+                }
             }
         }
     }
