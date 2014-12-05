@@ -365,7 +365,7 @@ class Application
                 $this->trigger('app.route.post');
 
                 $controller = null;
-                $action          = null;
+                $action     = null;
 
                 // Get the routed controller
                 if (null !== $this->router->getController()) {
@@ -378,6 +378,7 @@ class Application
 
                 // If controller exists, dispatch it
                 if (null !== $controller) {
+                    // If the controller is a closure
                     if ($controller instanceof \Closure) {
                         // If the controller->action has dispatch parameters
                         $params = $this->router()->getDispatchParams($this->router()->getRouteMatch()->getRoute());
@@ -390,6 +391,7 @@ class Application
                         } else {
                             $controller();
                         }
+                    // Else, if it's a class
                     } else {
                         // If the controller->action has dispatch parameters
                         $params = $this->router()->getDispatchParams($this->router()->getRouteMatch()->getRoute());
