@@ -159,21 +159,6 @@ abstract class AbstractMatch
      */
     abstract protected function prepareRoutes($routes);
 
-    /**
-     * Get required parameters from the route
-     *
-     * @param  string $route
-     * @return array
-     */
-    abstract protected function getRequiredParams($route);
-
-    /**
-     * Get optional parameters from the route
-     *
-     * @param  string $route
-     * @return array
-     */
-    abstract protected function getOptionalParams($route);
 
     /**
      * Get parameters from the route string

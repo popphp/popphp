@@ -103,7 +103,7 @@ class Cli extends AbstractMatch
      *
      *     - OR -
      *
-     *     foo *   - Turns off strict matching and allows any route that starts with 'foo ' to pass
+     *     foo*   - Turns off strict matching and allows any route that starts with 'foo ' to pass
      *
      * @param  array $routes
      * @return boolean
@@ -115,8 +115,26 @@ class Cli extends AbstractMatch
         foreach ($this->routes as $route => $controller) {
             if ((substr($this->argumentString, 0, strlen($route)) == $route) &&
                 isset($controller['controller']) && isset($controller['action'])) {
-                $this->controller = $controller['controller'];
-                $this->action     = $controller['action'];
+                if (isset($controller['dispatchParams'])) {
+                    $params        = $this->getDispatchParamsFromRoute($route);
+                    $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
+                    if ($matchedParams != false) {
+                        $this->controller     = $controller['controller'];
+                        $this->action         = $controller['action'];
+                        $this->dispatchParams = $matchedParams;
+                        if (isset($controller['routeParams'])) {
+                            $this->routeParams = (!is_array($controller['routeParams'])) ?
+                                [$controller['routeParams']] : $controller['routeParams'];
+                        }
+                    }
+                } else {
+                    $this->controller = $controller['controller'];
+                    $this->action     = $controller['action'];
+                    if (isset($controller['routeParams'])) {
+                        $this->routeParams = (!is_array($controller['routeParams'])) ?
+                            [$controller['routeParams']] : $controller['routeParams'];
+                    }
+                }
             }
             if (isset($controller['default']) && ($controller['default']) && isset($controller['controller'])) {
                 $this->defaultController = $controller['controller'];
@@ -134,29 +152,54 @@ class Cli extends AbstractMatch
      */
     protected function prepareRoutes($routes)
     {
+        foreach ($routes as $route => $controller) {
+            // Handle wildcard route
+            if (substr($route, -1) == '*') {
+                $route = substr($route, 0, -1);
+                $controller['wildcard'] = true;
+            } else {
+                $controller['wildcard'] = false;
+            }
 
-    }
+            // Handle params
+            $dash    = strpos($route, '-');
+            $bracket = strpos($route, '[');
+            $angle   = strpos($route, '<');
 
-    /**
-     * Get required parameters from the route
-     *
-     * @param  string $route
-     * @return array
-     */
-    protected function getRequiredParams($route)
-    {
+            $match = [];
+            if ($dash !== false) {
+                $match[] = $dash;
+            }
+            if ($bracket !== false) {
+                $match[] = $bracket;
+            }
+            if ($angle !== false) {
+                $match[] = $angle;
+            }
 
-    }
+            $params = substr($route, min($match));
+            $route  = substr($route, 0, min($match) - 1);
+            $params = (strpos($params, ' ') !== false) ? explode(' ', $params) : [$params];
 
-    /**
-     * Get optional parameters from the route
-     *
-     * @param  string $route
-     * @return array
-     */
-    protected function getOptionalParams($route)
-    {
+            $controller['dispatchParams'] = [];
+            foreach ($params as $param) {
+                if (strpos($param, '[') !== false) {
+                    $param = substr($param, 1);
+                    $param = substr($param, 0, -1);
+                    $controller['dispatchParams'][] = [
+                        'name'       => $param,
+                        'required'   => false
+                    ];
+                } else {
+                    $controller['dispatchParams'][] = [
+                        'name'       => $param,
+                        'required'   => true
+                    ];
+                }
+            }
 
+            $this->routes[$route] = $controller;
+        }
     }
 
     /**
@@ -167,18 +210,27 @@ class Cli extends AbstractMatch
      */
     protected function getDispatchParamsFromRoute($route)
     {
+        $params = substr($this->argumentString, strlen($route) + 1);
+        $params = explode(' ', $params);
+        if ((count($params) == 1) && ($params[0] == '')) {
+            $params = [];
+        }
+        return $params;
 
     }
 
     /**
      * Process parameters from the route string
      *
-     * @param  array $params
-     * @param  array $routeParams
+     * @param  array  $params
+     * @param  array  $routeParams
      * @return mixed
      */
     protected function processDispatchParamsFromRoute($params, $routeParams)
     {
+        print_r($params);
+        print_r($routeParams);
+
 
     }
 

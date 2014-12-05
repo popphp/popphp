@@ -244,16 +244,13 @@ class Http extends AbstractMatch
             if (strpos($route, '/:') !== false) {
                 $controller['dispatchParams'] = [];
                 $params = substr($route, (strpos($route,'/:') + 2));
-                $route = substr($route, 0, strpos($route,'/:'));
+                $route  = substr($route, 0, strpos($route,'/:'));
                 if (strpos($route, '[') !== false) {
                     $route = substr($route, 0, strpos($route, '['));
                 }
 
-                if (strpos($params, '/:') !== false) {
-                    $params = explode('/:', $params);
-                } else {
-                    $params = [$params];
-                }
+                $params = (strpos($params, '/:') !== false) ? explode('/:', $params) : [$params];
+
                 foreach ($params as $param) {
                     if (strpos($param, '*') !== false) {
                         $collection = true;
@@ -269,14 +266,14 @@ class Http extends AbstractMatch
                         ];
                     } else if (strpos($param, '[') !== false) {
                         $controller['dispatchParams'][] = [
-                            'name'     => substr($param, 0, strpos($param, '[')),
-                            'required' => true,
+                            'name'       => substr($param, 0, strpos($param, '[')),
+                            'required'   => true,
                             'collection' => $collection
                         ];
                     } else {
                         $controller['dispatchParams'][] = [
-                            'name'     => $param,
-                            'required' => true,
+                            'name'       => $param,
+                            'required'   => true,
                             'collection' => $collection
                         ];
                     }
@@ -292,31 +289,6 @@ class Http extends AbstractMatch
                 $this->routes[$route] = $controller;
             }
          }
-    }
-
-    /**
-     * Get required parameters from the route
-     *
-     * @param  string $route
-     * @return array
-     */
-    protected function getRequiredParams($route)
-    {
-        $route = substr($route, (strpos($route, '/:') + 2));
-        return explode('/:', $route);
-    }
-
-    /**
-     * Get optional parameters from the route
-     *
-     * @param  string $route
-     * @return array
-     */
-    protected function getOptionalParams($route)
-    {
-        $route = substr($route, (strpos($route, '[/:') + 3));
-        $route = substr($route, 0, -1);
-        return explode('][/:', $route);
     }
 
     /**
@@ -370,7 +342,7 @@ class Http extends AbstractMatch
             }
         // Else, check for a collection of parameters
         } else if (count($params) > count($routeParams)) {
-            foreach ($routeParams as $i => $param) {
+            foreach ($routeParams as $param) {
                 if ($param['collection']) {
                     $hasCollection = true;
                 }
