@@ -214,7 +214,7 @@ class Http extends AbstractMatch
             }
         }
 
-        return ((null !== $this->controller) && (null !== $this->action));
+        return (null !== $this->controller);
     }
 
     /**

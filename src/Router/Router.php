@@ -269,7 +269,6 @@ class Router implements RouterInterface
         }
 
         if (null !== $controller) {
-
             // If controller is a closure
             if ($controller instanceof \Closure) {
                 $this->controller      = $controller;
