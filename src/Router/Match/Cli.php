@@ -116,7 +116,7 @@ class Cli extends AbstractMatch
                 if (isset($controller['dispatchParams'])) {
                     $params        = $this->getDispatchParamsFromRoute($route);
                     $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
-                    if ($matchedParams != false) {
+                    if ($matchedParams !== false) {
                         $this->controller     = $controller['controller'];
                         $this->action         = $controller['action'];
                         $this->dispatchParams = $matchedParams;
@@ -150,7 +150,7 @@ class Cli extends AbstractMatch
             if (isset($controller['dispatchParams'])) {
                 $params        = $this->getDispatchParamsFromRoute('*');
                 $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
-                if ($matchedParams != false) {
+                if ($matchedParams !== false) {
                     $this->dispatchParams  = $matchedParams;
                 }
             }
