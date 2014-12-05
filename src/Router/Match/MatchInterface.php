@@ -47,14 +47,28 @@ interface MatchInterface
      *
      * @return array
      */
-    public function getParams();
+    public function getRouteParams();
 
     /**
      * Determine if there are matched route params
      *
      * @return boolean
      */
-    public function hasParams();
+    public function hasRouteParams();
+
+    /**
+     * Get the matched dispatch params
+     *
+     * @return array
+     */
+    public function getDispatchParams();
+
+    /**
+     * Determine if there are matched dispatch params
+     *
+     * @return boolean
+     */
+    public function hasDispatchParams();
 
     /**
      * Get the default controller class name

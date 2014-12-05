@@ -165,7 +165,7 @@ class Cli extends AbstractMatch
      * @param  string $route
      * @return array
      */
-    protected function getParamsFromRoute($route)
+    protected function getDispatchParamsFromRoute($route)
     {
 
     }
@@ -177,7 +177,7 @@ class Cli extends AbstractMatch
      * @param  array $routeParams
      * @return mixed
      */
-    protected function processParamsFromRoute($params, $routeParams)
+    protected function processDispatchParamsFromRoute($params, $routeParams)
     {
 
     }

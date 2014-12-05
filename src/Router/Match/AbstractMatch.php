@@ -44,7 +44,13 @@ abstract class AbstractMatch
      * Matched route parameters
      * @var array
      */
-    protected $params = [];
+    protected $routeParams = [];
+
+    /**
+     * Matched dispatch parameters
+     * @var array
+     */
+    protected $dispatchParams = [];
 
     /**
      * Default controller class name
@@ -83,9 +89,9 @@ abstract class AbstractMatch
      *
      * @return array
      */
-    public function getParams()
+    public function getRouteParams()
     {
-        return $this->params;
+        return $this->routeParams;
     }
 
     /**
@@ -93,9 +99,29 @@ abstract class AbstractMatch
      *
      * @return boolean
      */
-    public function hasParams()
+    public function hasRouteParams()
     {
-        return (count($this->params) > 0);
+        return (count($this->routeParams) > 0);
+    }
+
+    /**
+     * Get the matched dispatch params
+     *
+     * @return array
+     */
+    public function getDispatchParams()
+    {
+        return $this->dispatchParams;
+    }
+
+    /**
+     * Determine if there are matched dispatch params
+     *
+     * @return boolean
+     */
+    public function hasDispatchParams()
+    {
+        return (count($this->dispatchParams) > 0);
     }
 
     /**
@@ -155,7 +181,7 @@ abstract class AbstractMatch
      * @param  string $route
      * @return array
      */
-    abstract protected function getParamsFromRoute($route);
+    abstract protected function getDispatchParamsFromRoute($route);
 
     /**
      * Process parameters from the route string
@@ -164,6 +190,6 @@ abstract class AbstractMatch
      * @param  array $routeParams
      * @return mixed
      */
-    abstract protected function processParamsFromRoute($params, $routeParams);
+    abstract protected function processDispatchParamsFromRoute($params, $routeParams);
 
 }

@@ -301,7 +301,7 @@ class Application
      * @param  int    $priority
      * @return Application
      */
-    public function attach($name, $action, $priority = 0)
+    public function on($name, $action, $priority = 0)
     {
         $this->events->on($name, $action, $priority);
         return $this;
@@ -339,7 +339,7 @@ class Application
      * @param  mixed  $action
      * @return Application
      */
-    public function detach($name, $action)
+    public function off($name, $action)
     {
         $this->events->off($name, $action);
         return $this;
@@ -396,9 +396,9 @@ class Application
                 // Trigger any app.dispatch.post events
                 $this->trigger('app.dispatch.post');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $exception) {
             // Trigger any app.error events
-            $this->trigger('app.error', ['exception' => $e]);
+            $this->trigger('app.error', ['exception' => $exception]);
         }
     }
 
