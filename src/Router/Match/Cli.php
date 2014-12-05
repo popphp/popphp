@@ -102,7 +102,7 @@ class Cli extends AbstractMatch
      *
      *     - OR -
      *
-     *     foo*   - Turns off strict matching and allows any route that starts with 'foo ' to pass
+     *     foo*   - Turns off strict matching and allows any route that starts with 'foo' to pass
      *
      * @param  array $routes
      * @return boolean
@@ -112,8 +112,7 @@ class Cli extends AbstractMatch
         $this->prepareRoutes($routes);
 
         foreach ($this->routes as $route => $controller) {
-            if ((substr($this->argumentString, 0, strlen($route)) == $route) &&
-                isset($controller['controller']) && isset($controller['action'])) {
+            if (preg_match($route, $this->argumentString) && isset($controller['controller']) && isset($controller['action'])) {
                 if (isset($controller['dispatchParams'])) {
                     $params        = $this->getDispatchParamsFromRoute($route);
                     $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
@@ -181,33 +180,24 @@ class Cli extends AbstractMatch
                 $controller['wildcard'] = false;
             }
 
-            $altRoutes = [];
-            // Handle optional literals
-            if ((strpos($route, '[') !== false) && (substr($route, strpos($route, '['), 2) != '[-') &&
-                (substr($route, strpos($route, '['), 2) != '[<')) {
-                $optLiterals = substr($route, strpos($route, '['));
-                $optLiterals = substr($optLiterals, 0, strpos($optLiterals, ']') + 1);
-                $route = str_replace(' ' . $optLiterals, '', $route);
-
-                $alt = substr($optLiterals, 1);
-                $alt = substr($alt, 0, -1);
-                $altRoutes = explode('|', $alt);
-            }
-
             // Handle params
-            $dash    = strpos($route, '-');
-            $bracket = strpos($route, '[');
-            $angle   = strpos($route, '<');
+            $dash     = strpos($route, '-');
+            $optDash  = strpos($route, '[-');
+            $angle    = strpos($route, '<');
+            $optAngle = strpos($route, '[<');
 
             $match = [];
             if ($dash !== false) {
                 $match[] = $dash;
             }
-            if ($bracket !== false) {
-                $match[] = $bracket;
+            if ($optDash !== false) {
+                $match[] = $optDash;
             }
             if ($angle !== false) {
                 $match[] = $angle;
+            }
+            if ($optAngle !== false) {
+                $match[] = $optAngle;
             }
 
             if (count($match) > 0) {
@@ -233,12 +223,14 @@ class Cli extends AbstractMatch
                 }
             }
 
-            $this->routes[$route] = $controller;
-            if (count($altRoutes) > 0) {
-                foreach ($altRoutes as $alt) {
-                    $this->routes[$route . ' ' . $alt] = $controller;
-                }
+            // Handle optional literals, create regex for route matching
+            if (strpos($route, '[') !== false) {
+                $route = '/' . str_replace(['[', ']', '|', ') '], ['(', ')','\s|', '\s)?'], $route) . '(.*)/';
+            } else {
+                $route = '/' . $route . '(.*)/';
             }
+
+            $this->routes[$route] = $controller;
         }
     }
 
@@ -251,10 +243,9 @@ class Cli extends AbstractMatch
     protected function getDispatchParamsFromRoute($route)
     {
         $params = [];
-        $route = explode(' ', $route);
 
         foreach ($this->arguments as $arg) {
-            if (!in_array($arg, $route)) {
+            if (strpos($route, $arg) === false) {
                 $params[] = $arg;
             }
         }
@@ -296,9 +287,23 @@ class Cli extends AbstractMatch
                 } else if (substr($param['name'], 0, 1) == '-') {
                     $p = explode('|', $param['name']);
                     $whichOpt = null;
+                    $optValue = null;
                     foreach ($p as $opt) {
                         if (in_array($opt, $params)) {
                             $whichOpt = $opt;
+                        } else {
+                            // Check if a value is passed with the parameter option
+
+                            foreach ($params as $searchParam) {
+                                if (substr($searchParam, 0, strlen($opt)) == $opt) {
+                                    $whichOpt = $opt;
+                                    if (strlen($searchParam) > strlen($opt)) {
+                                        $optValue = (strpos($searchParam, '=') !== false) ?
+                                            substr($searchParam, (strpos($searchParam, '=') + 1)) :
+                                            substr($searchParam, (strpos($searchParam, $whichOpt) + strlen($whichOpt)));
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -309,7 +314,7 @@ class Cli extends AbstractMatch
                             if (isset($routeParams[($key + 1 - $offset)])) {
                                 // Value is meant for the next arg place
                                 if (substr($routeParams[($key + 1 - $offset)]['name'], 0, 1) == '<') {
-                                    $matchedParams[str_replace('-', '', $whichOpt)] = true;
+                                    $matchedParams[str_replace('-', '', $whichOpt)] = (null !== $optValue) ? $optValue : true;
                                 // Value is meant for the option
                                 } else {
                                     $matchedParams[str_replace('-', '', $whichOpt)] = $params[$key + 1];
@@ -321,7 +326,7 @@ class Cli extends AbstractMatch
                             }
                         // Else, just set to true
                         } else {
-                            $matchedParams[str_replace('-', '', $whichOpt)] = true;
+                            $matchedParams[str_replace('-', '', $whichOpt)] = (null !== $optValue) ? $optValue : true;
                         }
                     }
                 }
