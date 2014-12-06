@@ -178,7 +178,7 @@ class Cli extends AbstractMatch
     {
         foreach ($routes as $route => $controller) {
             // Handle wildcard route
-            if (substr($route, -1) == '*') {
+            if (($route != '*') && (substr($route, -1) == '*')) {
                 $route = substr($route, 0, -1);
                 $controller['wildcard'] = true;
             } else {
