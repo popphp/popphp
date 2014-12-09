@@ -28,26 +28,5 @@
         "branch-alias": {
             "dev-master": "2.0.x-dev"
         }
-    },
-    "suggest": {
-        "popphp/pop-acl": "For creating and managing an access control list",
-        "popphp/pop-auth": "For authorization and authentication",
-        "popphp/pop-cache": "For cache management via PHP cache tools such as memcache and APC",
-        "popphp/pop-crypt": "For creating encrypted hash strings and comparing and verifying them",
-        "popphp/pop-data": "For converting data between different types, SQL, CSV, XML, etc",
-        "popphp/pop-db": "For DB management and transactions",
-        "popphp/pop-dom": "For DOM generation",
-        "popphp/pop-file": "For file uploads and directory traversing",
-        "popphp/pop-form": "For HTML form generation and validation",
-        "popphp/pop-http": "For HTTP support",
-        "popphp/pop-image": "For image processing and manipulation",
-        "popphp/pop-log": "For logging various messages at different triggered times",
-        "popphp/pop-mail": "For managing and sending mail via PHP",
-        "popphp/pop-nav": "For generating HTML navigation objects with ACL support",
-        "popphp/pop-paginator": "For paginator of large sets of data",
-        "popphp/pop-pdf": "For PDF processing and manipulation",
-        "popphp/pop-validator": "For input validation",
-        "popphp/pop-view": "For view templates",
-        "popphp/pop-web": "For web extra, like sessions, cookies and mobile redirects"
     }
 }

@@ -59,6 +59,12 @@ class Application
     protected $events = null;
 
     /**
+     * Event manager
+     * @var \Composer\Autoload\ClassLoader
+     */
+    protected $autoloader = null;
+
+    /**
      * Constructor
      *
      * Instantiate an application object
@@ -73,7 +79,9 @@ class Application
         $args = func_get_args();
 
         foreach ($args as $arg) {
-            if ($arg instanceof Router\Router) {
+            if ($arg instanceof \Composer\Autoload\ClassLoader) {
+                $this->registerAutoloader($arg);
+            } else if ($arg instanceof Router\Router) {
                 $this->loadRouter($arg);
             } else if ($arg instanceof Service\Locator) {
                 $this->loadServices($arg);
@@ -120,12 +128,31 @@ class Application
      * Register a module config with the application object
      *
      * @param  string $name
-     * @param  mixed  $module
+     * @param  mixed  $moduleConfig
+     * @throws Exception
      * @return Application
      */
-    public function register($name, $module)
+    public function register($name, $moduleConfig)
     {
-        $this->modules[$name] = $module;
+        if (!is_array($moduleConfig) && !($moduleConfig instanceof \ArrayAccess) && !($moduleConfig instanceof \ArrayObject)) {
+            throw new Exception('Error: The module config must be either an array itself or implement ArrayAccess or extend ArrayObject.');
+        }
+
+        $this->modules[$name] = $moduleConfig;
+
+        // If the autoloader is set and the the module config has a
+        // defined prefix and src, register the module with the autoloader
+        if ((null !== $this->autoloader) && isset($moduleConfig['prefix']) &&
+            isset($moduleConfig['src']) && file_exists($moduleConfig['src'])) {
+            // Register as PSR-0
+            if (isset($moduleConfig['psr-0']) && ($moduleConfig['psr-0'])) {
+                $this->autoloader->add($moduleConfig['prefix'], $moduleConfig['src']);
+            // Else, default to PSR-4
+            } else {
+                $this->autoloader->addPsr4($moduleConfig['prefix'], $moduleConfig['src']);
+            }
+        }
+
         return $this;
     }
 
@@ -159,6 +186,16 @@ class Application
     public function modules()
     {
         return $this->modules;
+    }
+
+    /**
+     * Get the autoloader object
+     *
+     * @return \Composer\Autoload\ClassLoader
+     */
+    public function autoloader()
+    {
+        return $this->autoloader;
     }
 
     /**
@@ -246,6 +283,18 @@ class Application
     public function loadEvents(Event\Manager $events)
     {
         $this->events = $events;
+        return $this;
+    }
+
+    /**
+     * Register the autoloader object
+     *
+     * @param  \Composer\Autoload\ClassLoader $autoloader
+     * @return Application
+     */
+    public function registerAutoloader(\Composer\Autoload\ClassLoader $autoloader)
+    {
+        $this->autoloader = $autoloader;
         return $this;
     }
 
