@@ -76,11 +76,12 @@ class Application
      */
     public function __construct()
     {
-        $args = func_get_args();
+        $args       = func_get_args();
+        $autoloader = null;
 
         foreach ($args as $arg) {
             if ($arg instanceof \Composer\Autoload\ClassLoader) {
-                $this->registerAutoloader($arg);
+                $autoloader = $arg;
             } else if ($arg instanceof Router\Router) {
                 $this->loadRouter($arg);
             } else if ($arg instanceof Service\Locator) {
@@ -92,16 +93,20 @@ class Application
             }
         }
 
-        $this->bootstrap();
+        $this->bootstrap($autoloader);
     }
 
     /**
      * Bootstrap the application
      *
+     * @param  \Composer\Autoload\ClassLoader $autoloader
      * @return Application
      */
-    public function bootstrap()
+    public function bootstrap(\Composer\Autoload\ClassLoader $autoloader = null)
     {
+        if (null !== $autoloader) {
+            $this->registerAutoloader($autoloader);
+        }
         if (null === $this->router) {
             $this->router = new Router\Router();
         }
