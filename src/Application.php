@@ -139,8 +139,11 @@ class Application
      */
     public function register($name, $moduleConfig)
     {
-        if (!is_array($moduleConfig) && !($moduleConfig instanceof \ArrayAccess) && !($moduleConfig instanceof \ArrayObject)) {
-            throw new Exception('Error: The module config must be either an array itself or implement ArrayAccess or extend ArrayObject.');
+        if (!is_array($moduleConfig) && !($moduleConfig instanceof \ArrayAccess) &&
+            !($moduleConfig instanceof \ArrayObject)) {
+            throw new Exception(
+                'Error: The module config must be either an array itself or implement ArrayAccess or extend ArrayObject.'
+            );
         }
 
         $this->modules[$name] = $moduleConfig;
