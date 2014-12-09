@@ -161,6 +161,31 @@ class Application
             }
         }
 
+        // If routes are set for the module, register them with the application
+        if (isset($moduleConfig['routes'])) {
+            $this->router->addRoutes($moduleConfig['routes']);
+        }
+
+        // If services are set for the module, register them with the application
+        if (isset($moduleConfig['services'])) {
+            foreach ($moduleConfig['services'] as $name => $service) {
+                if (isset($service['call']) && isset($service['params'])) {
+                    $this->setService($name, $service['call'], $service['params']);
+                } else if (isset($service['call'])) {
+                    $this->setService($name, $service['call']);
+                }
+            }
+        }
+
+        // If events are set for the module, register them with the application
+        if (isset($moduleConfig['events'])) {
+            foreach ($moduleConfig['events'] as $event) {
+                if (isset($event['name']) && isset($event['name'])) {
+                    $this->on($event['name'], $event['name'], ((isset($event['priority'])) ? $event['priority'] : 0));
+                }
+            }
+        }
+
         return $this;
     }
 
