@@ -88,7 +88,7 @@ class Application
                 $this->loadServices($arg);
             } else if ($arg instanceof Event\Manager) {
                 $this->loadEvents($arg);
-            } else {
+            } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)){
                 $this->loadConfig($arg);
             }
         }
@@ -275,10 +275,16 @@ class Application
      * Load an application config
      *
      * @param  mixed $config
+     * @throws Exception
      * @return Application
      */
     public function loadConfig($config)
     {
+        if (!is_array($config) && !($config instanceof \ArrayAccess) && !($config instanceof \ArrayObject)) {
+            throw new Exception(
+                'Error: The config must be either an array itself or implement ArrayAccess or extend ArrayObject.'
+            );
+        }
         $this->config = $config;
         return $this;
     }
