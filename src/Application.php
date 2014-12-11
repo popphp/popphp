@@ -161,13 +161,13 @@ class Application
             }
         }
 
-        // If routes are set for the module, register them with the application
-        if (isset($moduleConfig['routes'])) {
+        // If routes are set in the module config, register them with the application
+        if (isset($moduleConfig['routes']) && (null !== $this->router)) {
             $this->router->addRoutes($moduleConfig['routes']);
         }
 
-        // If services are set for the module, register them with the application
-        if (isset($moduleConfig['services'])) {
+        // If services are set in the module config, register them with the application
+        if (isset($moduleConfig['services']) && (null !== $this->services)) {
             foreach ($moduleConfig['services'] as $name => $service) {
                 if (isset($service['call']) && isset($service['params'])) {
                     $this->setService($name, $service['call'], $service['params']);
@@ -177,8 +177,8 @@ class Application
             }
         }
 
-        // If events are set for the module, register them with the application
-        if (isset($moduleConfig['events'])) {
+        // If events are set in the module config, register them with the application
+        if (isset($moduleConfig['events']) && (null !== $this->events)) {
             foreach ($moduleConfig['events'] as $event) {
                 if (isset($event['name']) && isset($event['name'])) {
                     $this->on($event['name'], $event['name'], ((isset($event['priority'])) ? $event['priority'] : 0));
@@ -285,7 +285,34 @@ class Application
                 'Error: The config must be either an array itself or implement ArrayAccess or extend ArrayObject.'
             );
         }
+
         $this->config = $config;
+
+        // If routes are set in the app config, register them with the application
+        if (isset($this->config['routes']) && (null !== $this->router)) {
+            $this->router->addRoutes($this->config['routes']);
+        }
+
+        // If services are set in the app config, register them with the application
+        if (isset($this->config['services']) && (null !== $this->services)) {
+            foreach ($this->config['services'] as $name => $service) {
+                if (isset($service['call']) && isset($service['params'])) {
+                    $this->setService($name, $service['call'], $service['params']);
+                } else if (isset($service['call'])) {
+                    $this->setService($name, $service['call']);
+                }
+            }
+        }
+
+        // If events are set in the app config, register them with the application
+        if (isset($this->config['events']) && (null !== $this->events)) {
+            foreach ($this->config['events'] as $event) {
+                if (isset($event['name']) && isset($event['name'])) {
+                    $this->on($event['name'], $event['name'], ((isset($event['priority'])) ? $event['priority'] : 0));
+                }
+            }
+        }
+
         return $this;
     }
 
