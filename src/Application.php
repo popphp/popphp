@@ -78,6 +78,7 @@ class Application
     {
         $args       = func_get_args();
         $autoloader = null;
+        $config     = null;
 
         foreach ($args as $arg) {
             if ($arg instanceof \Composer\Autoload\ClassLoader) {
@@ -89,11 +90,15 @@ class Application
             } else if ($arg instanceof Event\Manager) {
                 $this->loadEvents($arg);
             } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)){
-                $this->loadConfig($arg);
+                $config = $arg;
             }
         }
 
         $this->bootstrap($autoloader);
+
+        if (null !== $config) {
+            $this->loadConfig($config);
+        }
     }
 
     /**
