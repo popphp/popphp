@@ -185,8 +185,8 @@ class Application
         // If events are set in the module config, register them with the application
         if (isset($moduleConfig['events']) && (null !== $this->events)) {
             foreach ($moduleConfig['events'] as $event) {
-                if (isset($event['name']) && isset($event['name'])) {
-                    $this->on($event['name'], $event['name'], ((isset($event['priority'])) ? $event['priority'] : 0));
+                if (isset($event['name']) && isset($event['action'])) {
+                    $this->on($event['name'], $event['action'], ((isset($event['priority'])) ? $event['priority'] : 0));
                 }
             }
         }
@@ -312,8 +312,8 @@ class Application
         // If events are set in the app config, register them with the application
         if (isset($this->config['events']) && (null !== $this->events)) {
             foreach ($this->config['events'] as $event) {
-                if (isset($event['name']) && isset($event['name'])) {
-                    $this->on($event['name'], $event['name'], ((isset($event['priority'])) ? $event['priority'] : 0));
+                if (isset($event['name']) && isset($event['action'])) {
+                    $this->on($event['name'], $event['action'], ((isset($event['priority'])) ? $event['priority'] : 0));
                 }
             }
         }
