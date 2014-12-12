@@ -288,9 +288,16 @@ class Router implements RouterInterface
                 }
 
                 // If the controller has route parameters
-                if (isset($this->routeParams[$controller])) {
+                if (isset($this->routeParams['*']) || isset($this->routeParams[$controller])) {
+                    if (isset($this->routeParams['*']) && isset($this->routeParams[$controller])) {
+                        $routeParams = array_merge($this->routeParams['*'], $this->routeParams[$controller]);
+                    } else if (isset($this->routeParams['*'])) {
+                        $routeParams = $this->routeParams['*'];
+                    } else {
+                        $routeParams = $this->routeParams[$controller];
+                    }
                     $reflect          = new \ReflectionClass($controller);
-                    $this->controller = $reflect->newInstanceArgs($this->routeParams[$controller]);
+                    $this->controller = $reflect->newInstanceArgs($routeParams);
                 // Else, just instantiate the controller
                 } else {
                     $this->controller = new $controller();
