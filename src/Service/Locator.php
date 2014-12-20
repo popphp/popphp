@@ -171,6 +171,58 @@ class Locator implements \ArrayAccess
     }
 
     /**
+     * Get a service's callable
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function getCall($name)
+    {
+        return (isset($this->services[$name]) && isset($this->services[$name]['call'])) ? $this->services[$name]['call'] : null;
+    }
+
+    /**
+     * Get a service's params
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function getParams($name)
+    {
+        return (isset($this->services[$name]) && isset($this->services[$name]['params'])) ? $this->services[$name]['params'] : null;
+    }
+
+    /**
+     * Get a service's callable
+     *
+     * @param  string $name
+     * @param  mixed  $call
+     * @return Locator
+     */
+    public function setCall($name, $call)
+    {
+        if (isset($this->services[$name])) {
+            $this->services[$name]['call'] = $call;
+        }
+        return $this;
+    }
+
+    /**
+     * Get a service's callable
+     *
+     * @param  string $name
+     * @param  mixed  $params
+     * @return Locator
+     */
+    public function setParams($name, $params)
+    {
+        if (isset($this->services[$name])) {
+            $this->services[$name]['params'] = $params;
+        }
+        return $this;
+    }
+
+    /**
      * Determine of a service object is available (but not loaded)
      *
      * @param  string $name
