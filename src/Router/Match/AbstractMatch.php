@@ -81,6 +81,16 @@ abstract class AbstractMatch
     }
 
     /**
+     * Get the prepared routes
+     *
+     * @return array
+     */
+    public function getRoutes()
+    {
+        return $this->routes;
+    }
+
+    /**
      * Get the matched controller class name or closure function
      *
      * @return string
