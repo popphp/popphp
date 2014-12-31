@@ -86,16 +86,23 @@ class Router implements RouterInterface
      *
      * @param  string $route
      * @param  array  $controller
-     * @throws Exception
      * @return Router
      */
     public function addRoute($route, array $controller)
     {
-        if (!isset($controller['controller']) && !isset($controller['action'])) {
-            throw new Exception("Error: The 'controller' and 'action' keys of the controller array must be set.");
+        // If base url exists
+        if (!isset($controller['controller'])) {
+            $value = reset($controller);
+            if (isset($value['controller'])) {
+                foreach ($controller as $r => $c) {
+                    $r = ($r != '*') ? $route . $r : $r;
+                    $this->routes[$r] = $c;
+                }
+            }
+        // Else, just add routes
+        } else {
+            $this->routes[$route] = $controller;
         }
-        $this->routes[$route] = $controller;
-
         return $this;
     }
 
