@@ -89,7 +89,7 @@ class Application
                 $this->loadServices($arg);
             } else if ($arg instanceof Event\Manager) {
                 $this->loadEvents($arg);
-            } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)){
+            } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)) {
                 $config = $arg;
             }
         }
@@ -121,6 +121,25 @@ class Application
         if (null === $this->events) {
             $this->events = new Event\Manager();
         }
+    }
+
+    /**
+     * Merge new or altered config values with the existing config values
+     *
+     * @param  mixed  $config
+     * @return Application
+     */
+    public function mergeConfig($config)
+    {
+        if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
+            if (null !== $this->config) {
+                $this->config = array_merge_recursive($this->config, $config);
+            } else {
+                $this->config = $config;
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -189,6 +208,24 @@ class Application
                     $this->on($event['name'], $event['action'], ((isset($event['priority'])) ? $event['priority'] : 0));
                 }
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Merge new or altered module config values with the existing module config values
+     *
+     * @param  string $name
+     * @param  mixed  $moduleConfig
+     * @return Application
+     */
+    public function mergeModuleConfig($name, $moduleConfig)
+    {
+        if (!$this->isRegistered($name)) {
+            $this->register($name, $moduleConfig);
+        } else {
+            $this->modules[$name] = array_merge_recursive($this->modules[$name], $moduleConfig);
         }
 
         return $this;
