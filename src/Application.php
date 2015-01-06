@@ -133,7 +133,7 @@ class Application
     {
         if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
             if (null !== $this->config) {
-                $this->config = array_merge_recursive($this->config, $config);
+                $this->config = array_replace_recursive($this->config, $config);
             } else {
                 $this->config = $config;
             }
@@ -225,7 +225,7 @@ class Application
         if (!$this->isRegistered($name)) {
             $this->register($name, $moduleConfig);
         } else {
-            $this->modules[$name] = array_merge_recursive($this->modules[$name], $moduleConfig);
+            $this->modules[$name] = array_replace_recursive($this->modules[$name], $moduleConfig);
         }
 
         return $this;
