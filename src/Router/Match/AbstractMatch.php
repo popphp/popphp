@@ -60,7 +60,7 @@ abstract class AbstractMatch
 
     /**
      * Default controller class string name or closure function
-     * @var array
+     * @var mixed
      */
     protected $defaultController = null;
 
@@ -153,7 +153,7 @@ abstract class AbstractMatch
     /**
      * Get the default controller class name or closure function
      *
-     * @return string
+     * @return mixed
      */
     public function getDefaultController()
     {

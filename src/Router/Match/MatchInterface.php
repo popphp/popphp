@@ -80,7 +80,7 @@ interface MatchInterface
     /**
      * Get the default controller class name
      *
-     * @return string
+     * @return mixed
      */
     public function getDefaultController();
 
