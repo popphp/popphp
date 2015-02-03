@@ -150,7 +150,7 @@ class Cli extends AbstractMatch
         if ((null === $this->controller) && (count($this->wildcards) > 0)) {
             foreach ($this->wildcards as $wildcardRoute => $wildcardController) {
                 $wc = substr($wildcardRoute, 0, -1);
-                if ((substr($this->segmentString, 0, strlen($wc)) == $wc) && isset($wildcardController['controller'])) {
+                if ((substr($this->argumentString, 0, strlen($wc)) == $wc) && isset($wildcardController['controller'])) {
                     $this->route      = $wildcardRoute;
                     $this->controller = $wildcardController['controller'];
                     $controller       = $wildcardController;

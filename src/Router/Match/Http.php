@@ -158,7 +158,7 @@ class Http extends AbstractMatch
         $this->prepareRoutes($routes);
 
         foreach ($this->routes as $route => $controller) {
-            if ((substr($this->segmentString, 0, strlen($route)) == $route) && isset($controller['controller'])) {
+            if (($route != '') && (substr($this->segmentString, 0, strlen($route)) == $route) && isset($controller['controller'])) {
                 if (isset($controller['dispatchParams'])) {
                     $params        = $this->getDispatchParamsFromRoute($route);
                     $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
@@ -194,7 +194,42 @@ class Http extends AbstractMatch
             }
         }
 
-        // If no route or controller found, check for a wildcard/default route
+        // If no route/controller defined yet, check for top level default route
+        if ((null === $this->controller) && ($this->routes['']) && isset($this->routes['']['controller'])) {
+            $route      = '';
+            $controller = $this->routes[''];
+            if (isset($controller['dispatchParams'])) {
+                $params        = $this->getDispatchParamsFromRoute($route);
+                $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
+                if ($matchedParams !== false) {
+                    $this->route      = $route;
+                    $this->controller = $controller['controller'];
+                    if (isset($controller['action'])) {
+                        $this->action = $controller['action'];
+                    }
+                    $this->dispatchParams = $matchedParams;
+                    if (isset($controller['routeParams'])) {
+                        $this->routeParams = (!is_array($controller['routeParams'])) ?
+                            [$controller['routeParams']] : $controller['routeParams'];
+                    }
+                }
+            } else {
+                $suffix = substr($this->segmentString, strlen($route));
+                if (($suffix == '') || ($controller['wildcard'])) {
+                    $this->route      = $route;
+                    $this->controller = $controller['controller'];
+                    if (isset($controller['action'])) {
+                        $this->action = $controller['action'];
+                    }
+                    if (isset($controller['routeParams'])) {
+                        $this->routeParams = (!is_array($controller['routeParams'])) ?
+                            [$controller['routeParams']] : $controller['routeParams'];
+                    }
+                }
+            }
+        }
+
+        // If no route or controller found yet, check for a wildcard/default route
         if ((null === $this->controller) && (count($this->wildcards) > 0)) {
             foreach ($this->wildcards as $wildcardRoute => $wildcardController) {
                 $wc = substr($wildcardRoute, 0, -1);

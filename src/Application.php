@@ -126,14 +126,21 @@ class Application
     /**
      * Merge new or altered config values with the existing config values
      *
-     * @param  mixed  $config
+     * @param  mixed   $config
+     * @param  boolean $replace
      * @return Application
      */
-    public function mergeConfig($config)
+    public function mergeConfig($config, $replace = false)
     {
         if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
             if (null !== $this->config) {
-                $this->config = array_replace_recursive($this->config, $config);
+                if ($replace) {
+                    foreach ($config as $key => $value) {
+                        $this->config[$key] = $value;
+                    }
+                } else {
+                    $this->config = array_replace_recursive($this->config, $config);
+                }
             } else {
                 $this->config = $config;
             }
@@ -216,16 +223,23 @@ class Application
     /**
      * Merge new or altered module config values with the existing module config values
      *
-     * @param  string $name
-     * @param  mixed  $moduleConfig
+     * @param  string  $name
+     * @param  mixed   $moduleConfig
+     * @param  boolean $replace
      * @return Application
      */
-    public function mergeModuleConfig($name, $moduleConfig)
+    public function mergeModuleConfig($name, $moduleConfig, $replace = false)
     {
         if (!$this->isRegistered($name)) {
             $this->register($name, $moduleConfig);
         } else {
-            $this->modules[$name] = array_replace_recursive($this->modules[$name], $moduleConfig);
+            if ($replace) {
+                foreach ($moduleConfig as $key => $value) {
+                    $this->modules[$name][$key] = $value;
+                }
+            } else {
+                $this->modules[$name] = array_replace_recursive($this->modules[$name], $moduleConfig);
+            }
         }
 
         return $this;
