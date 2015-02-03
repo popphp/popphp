@@ -201,11 +201,13 @@ class Http extends AbstractMatch
                 if ((substr($this->segmentString, 0, strlen($wc)) == $wc) && isset($wildcardController['controller'])) {
                     $this->route      = $wildcardRoute;
                     $this->controller = $wildcardController['controller'];
+                    $controller       = $wildcardController;
                 }
             }
             if ((null === $this->controller) && isset($this->wildcards['*']) && isset($this->wildcards['*']['controller'])) {
                 $this->route      = '*';
                 $this->controller = $this->wildcards['*']['controller'];
+                $controller       = $this->wildcards['*'];
             }
 
             if (isset($controller['action'])) {
