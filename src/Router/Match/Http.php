@@ -209,7 +209,7 @@ class Http extends AbstractMatch
             }
 
             if (isset($controller['action'])) {
-                $this->action = $this->routes[$this->route]['action'];
+                $this->action = $controller['action'];
             }
             if (isset($controller['dispatchParams'])) {
                 $params        = $this->getDispatchParamsFromRoute($this->route);
