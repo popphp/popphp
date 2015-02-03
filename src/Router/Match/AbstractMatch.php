@@ -35,6 +35,12 @@ abstract class AbstractMatch
     protected $route = null;
 
     /**
+     * Wildcard route
+     * @var array
+     */
+    protected $wildcards = [];
+
+    /**
      * Controller class string name or closure function
      * @var string
      */

@@ -95,7 +95,13 @@ class Router implements RouterInterface
             $value = reset($controller);
             if (isset($value['controller'])) {
                 foreach ($controller as $r => $c) {
-                    $r = ($r != '*') ? $route . $r : $r;
+                    if ($route != '') {
+                        if ((substr($r, 0, 1) == '/') || (substr($r, 0, 1) == '[')) {
+                            $r = $route . $r;
+                        } else {
+                            $r = $route . '/' . $r;
+                        }
+                    }
                     $this->routes[$r] = $c;
                 }
             }
