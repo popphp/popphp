@@ -157,8 +157,12 @@ class Http extends AbstractMatch
     {
         $this->prepareRoutes($routes);
 
+        $wildcardRoutes = [];
+
         foreach ($this->routes as $route => $controller) {
-            if (($route != '') && (substr($this->segmentString, 0, strlen($route)) == $route) && isset($controller['controller'])) {
+            if (substr($route, -2) == '/*') {
+                $wildcardRoutes[] = $route;
+            } else if (($route != '') && (substr($this->segmentString, 0, strlen($route)) == $route) && isset($controller['controller'])) {
                 if (isset($controller['dispatchParams'])) {
                     $params        = $this->getDispatchParamsFromRoute($route);
                     $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
@@ -191,6 +195,22 @@ class Http extends AbstractMatch
             }
             if (isset($controller['default']) && ($controller['default']) && isset($controller['controller'])) {
                 $this->defaultController = $controller['controller'];
+            }
+        }
+
+        // Check any possible wildcard routes
+        if ((null === $this->controller) && (count($wildcardRoutes) > 0)) {
+            foreach ($wildcardRoutes as $wildcardRoute) {
+                if (isset($this->routes[$wildcardRoute])) {
+                    $route = substr($wildcardRoute, 0, -1);
+                    if ((substr($this->segmentString, 0, strlen($route)) == $route) && isset($this->routes[$wildcardRoute]['controller'])) {
+                        $this->route      = $wildcardRoute;
+                        $this->controller = $this->routes[$wildcardRoute]['controller'];
+                        if (isset($this->routes[$wildcardRoute]['action'])) {
+                            $this->action = $this->routes[$wildcardRoute]['action'];
+                        }
+                    }
+                }
             }
         }
 
