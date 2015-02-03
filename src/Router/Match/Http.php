@@ -215,7 +215,7 @@ class Http extends AbstractMatch
         }
 
         // If no route/controller defined yet, check for top level default route
-        if ((null === $this->controller) && ($this->routes['']) && isset($this->routes['']['controller'])) {
+        if ((null === $this->controller) && isset($this->routes['']) && isset($this->routes['']['controller'])) {
             $route      = '';
             $controller = $this->routes[''];
             if (isset($controller['dispatchParams'])) {
