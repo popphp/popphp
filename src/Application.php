@@ -59,8 +59,8 @@ class Application
     protected $events = null;
 
     /**
-     * Event manager
-     * @var \Composer\Autoload\ClassLoader
+     * Autoloader
+     * @var mixed
      */
     protected $autoloader = null;
 
@@ -81,7 +81,8 @@ class Application
         $config     = null;
 
         foreach ($args as $arg) {
-            if ($arg instanceof \Composer\Autoload\ClassLoader) {
+            $class = get_class($arg);
+            if ((stripos($class, 'classload') !== false) || (stripos($class, 'autoload') !== false)) {
                 $autoloader = $arg;
             } else if ($arg instanceof Router\Router) {
                 $this->loadRouter($arg);
@@ -104,10 +105,10 @@ class Application
     /**
      * Bootstrap the application
      *
-     * @param  \Composer\Autoload\ClassLoader $autoloader
+     * @param  mixed $autoloader
      * @return Application
      */
-    public function bootstrap(\Composer\Autoload\ClassLoader $autoloader = null)
+    public function bootstrap($autoloader = null)
     {
         if (null !== $autoloader) {
             $this->registerAutoloader($autoloader);
@@ -280,7 +281,7 @@ class Application
     /**
      * Get the autoloader object
      *
-     * @return \Composer\Autoload\ClassLoader
+     * @return mixed
      */
     public function autoloader()
     {
@@ -411,11 +412,17 @@ class Application
     /**
      * Register the autoloader object
      *
-     * @param  \Composer\Autoload\ClassLoader $autoloader
+     * @param  mixed $autoloader
+     * @throws Exception
      * @return Application
      */
-    public function registerAutoloader(\Composer\Autoload\ClassLoader $autoloader)
+    public function registerAutoloader($autoloader)
     {
+        if (!method_exists($autoloader, 'add') || !method_exists($autoloader, 'addPsr4')) {
+            throw new Exception(
+                'Error: The autoloader instance must contain the methods \'add\' and \'addPsr4\', as with Composer\Autoload\ClassLoader or Pop\Loader\ClassLoader.'
+            );
+        }
         $this->autoloader = $autoloader;
         return $this;
     }
