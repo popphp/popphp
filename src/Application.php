@@ -81,7 +81,7 @@ class Application
         $config     = null;
 
         foreach ($args as $arg) {
-            $class = get_class($arg);
+            $class = (is_object($arg)) ? get_class($arg) : '';
             if ((stripos($class, 'classload') !== false) || (stripos($class, 'autoload') !== false)) {
                 $autoloader = $arg;
             } else if ($arg instanceof Router\Router) {
