@@ -4,7 +4,7 @@ Welcome to Pop PHP Framework
 RELEASE INFORMATION
 -------------------
 Pop PHP Framework 2.0.0 Alpha  
-Release TBD test
+Release TBD
 
 OVERVIEW
 --------
