@@ -61,7 +61,7 @@ class Manager
     /**
      * Constructor
      *
-     * Instantiate the event Manager object.
+     * Instantiate the event manager object.
      *
      * @param  string $name
      * @param  mixed  $action

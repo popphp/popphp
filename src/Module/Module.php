@@ -1,0 +1,183 @@
+<?php
+/**
+ * Pop PHP Framework (http://www.popphp.org/)
+ *
+ * @link       https://github.com/popphp/popphp
+ * @category   Pop
+ * @package    Pop_Module
+ * @author     Nick Sagona, III <dev@nolainteractive.com>
+ * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @license    http://www.popphp.org/license     New BSD License
+ */
+
+/**
+ * @namespace
+ */
+namespace Pop\Module;
+
+/**
+ * Pop module class
+ *
+ * @category   Pop
+ * @package    Pop_Module
+ * @author     Nick Sagona, III <dev@nolainteractive.com>
+ * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @license    http://www.popphp.org/license     New BSD License
+ * @version    2.0.0a
+ */
+class Module implements ModuleInterface
+{
+
+    /**
+     * Module config
+     * @var mixed
+     */
+    protected $config = null;
+
+    /**
+     * Application
+     * @var \Pop\Application
+     */
+    protected $application = null;
+
+    /**
+     * Constructor
+     *
+     * Instantiate a module object
+     *
+     * @param  mixed            $config
+     * @param  \Pop\Application $application
+     * @return Module
+     */
+    public function __construct($config = null, \Pop\Application $application = null)
+    {
+        if (null !== $application) {
+            $this->bootstrap($application);
+        }
+
+        if (null !== $config) {
+            $this->loadConfig($config);
+        }
+    }
+
+    /**
+     * Bootstrap module
+     *
+     * @param  \Pop\Application $application
+     * @return ModuleInterface
+     */
+    public function bootstrap(\Pop\Application $application)
+    {
+        $this->application = $application;
+        return $this;
+    }
+
+    /**
+     * Load module config
+     *
+     * @param  mixed $config
+     * @throws \InvalidArgumentException
+     * @return Module
+     */
+    public function loadConfig($config)
+    {
+        if (!is_array($config) && !($config instanceof \ArrayAccess) && !($config instanceof \ArrayObject)) {
+            throw new \InvalidArgumentException(
+                'Error: The config must be either an array itself or implement ArrayAccess or extend ArrayObject.'
+            );
+        }
+
+        $this->config = $config;
+
+        // If the autoloader is set and the the module config has a
+        // defined prefix and src, register the module with the autoloader
+        if ((null !== $this->application) && (null !== $this->application->autoloader()) && isset($this->config['prefix']) &&
+            isset($this->config['src']) && file_exists($this->config['src'])) {
+            // Register as PSR-0
+            if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
+                $this->application->autoloader()->add($this->config['prefix'], $this->config['src']);
+            // Else, default to PSR-4
+            } else {
+                $this->application->autoloader()->addPsr4($this->config['prefix'], $this->config['src']);
+            }
+        }
+
+        // If routes are set in the module config, register them with the application
+        if (isset($this->config['routes']) && (null !== $this->application) && (null !== $this->application->router())) {
+            $this->application->router()->addRoutes($this->config['routes']);
+        }
+
+        // If services are set in the module config, register them with the application
+        if (isset($this->config['services']) && (null !== $this->application) && (null !== $this->application->services())) {
+            foreach ($this->config['services'] as $name => $service) {
+                if (isset($service['call']) && isset($service['params'])) {
+                    $this->application->setService($name, $service['call'], $service['params']);
+                } else if (isset($service['call'])) {
+                    $this->application->setService($name, $service['call']);
+                }
+            }
+        }
+
+        // If events are set in the app config, register them with the application
+        if (isset($this->config['events']) && (null !== $this->application) && (null !== $this->application->events())) {
+            foreach ($this->config['events'] as $event) {
+                if (isset($event['name']) && isset($event['action'])) {
+                    $this->application->on(
+                        $event['name'],
+                        $event['action'],
+                        ((isset($event['priority'])) ? $event['priority'] : 0)
+                    );
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Merge new or altered config values with the existing config values
+     *
+     * @param  mixed   $config
+     * @param  boolean $replace
+     * @return Module
+     */
+    public function mergeConfig($config, $replace = false)
+    {
+        if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
+            if (null !== $this->config) {
+                if ($replace) {
+                    foreach ($config as $key => $value) {
+                        $this->config[$key] = $value;
+                    }
+                } else {
+                    $this->config = array_replace_recursive($this->config, $config);
+                }
+            } else {
+                $this->config = $config;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get application
+     *
+     * @return \Pop\Application
+     */
+    public function application()
+    {
+        return $this->application;
+    }
+
+    /**
+     * Access module config
+     *
+     * @return mixed
+     */
+    public function config()
+    {
+        return $this->config;
+    }
+
+}

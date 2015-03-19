@@ -29,12 +29,6 @@ class Application
 {
 
     /**
-     * Application module configs
-     * @var array
-     */
-    protected $modules = [];
-
-    /**
      * Application config
      * @var mixed
      */
@@ -57,6 +51,12 @@ class Application
      * @var Event\Manager
      */
     protected $events = null;
+
+    /**
+     * Module manager
+     * @var Module\Manager
+     */
+    protected $modules = null;
 
     /**
      * Autoloader
@@ -90,6 +90,8 @@ class Application
                 $this->loadServices($arg);
             } else if ($arg instanceof Event\Manager) {
                 $this->loadEvents($arg);
+            } else if ($arg instanceof Module\Manager) {
+                $this->loadModules($arg);
             } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)) {
                 $config = $arg;
             }
@@ -121,6 +123,9 @@ class Application
         }
         if (null === $this->events) {
             $this->events = new Event\Manager();
+        }
+        if (null === $this->modules) {
+            $this->modules = new Module\Manager();
         }
     }
 
@@ -159,123 +164,6 @@ class Application
     {
         $this->trigger('app.init');
         return $this;
-    }
-
-    /**
-     * Register a module config with the application object
-     *
-     * @param  string $name
-     * @param  mixed  $moduleConfig
-     * @throws Exception
-     * @return Application
-     */
-    public function register($name, $moduleConfig)
-    {
-        if (!is_array($moduleConfig) && !($moduleConfig instanceof \ArrayAccess) &&
-            !($moduleConfig instanceof \ArrayObject)) {
-            throw new Exception(
-                'Error: The module config must be either an array itself or implement ArrayAccess or extend ArrayObject.'
-            );
-        }
-
-        $this->modules[$name] = $moduleConfig;
-
-        // If the autoloader is set and the the module config has a
-        // defined prefix and src, register the module with the autoloader
-        if ((null !== $this->autoloader) && isset($moduleConfig['prefix']) &&
-            isset($moduleConfig['src']) && file_exists($moduleConfig['src'])) {
-            // Register as PSR-0
-            if (isset($moduleConfig['psr-0']) && ($moduleConfig['psr-0'])) {
-                $this->autoloader->add($moduleConfig['prefix'], $moduleConfig['src']);
-            // Else, default to PSR-4
-            } else {
-                $this->autoloader->addPsr4($moduleConfig['prefix'], $moduleConfig['src']);
-            }
-        }
-
-        // If routes are set in the module config, register them with the application
-        if (isset($moduleConfig['routes']) && (null !== $this->router)) {
-            $this->router->addRoutes($moduleConfig['routes']);
-        }
-
-        // If services are set in the module config, register them with the application
-        if (isset($moduleConfig['services']) && (null !== $this->services)) {
-            foreach ($moduleConfig['services'] as $name => $service) {
-                if (isset($service['call']) && isset($service['params'])) {
-                    $this->setService($name, $service['call'], $service['params']);
-                } else if (isset($service['call'])) {
-                    $this->setService($name, $service['call']);
-                }
-            }
-        }
-
-        // If events are set in the module config, register them with the application
-        if (isset($moduleConfig['events']) && (null !== $this->events)) {
-            foreach ($moduleConfig['events'] as $event) {
-                if (isset($event['name']) && isset($event['action'])) {
-                    $this->on($event['name'], $event['action'], ((isset($event['priority'])) ? $event['priority'] : 0));
-                }
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Merge new or altered module config values with the existing module config values
-     *
-     * @param  string  $name
-     * @param  mixed   $moduleConfig
-     * @param  boolean $replace
-     * @return Application
-     */
-    public function mergeModuleConfig($name, $moduleConfig, $replace = false)
-    {
-        if (!$this->isRegistered($name)) {
-            $this->register($name, $moduleConfig);
-        } else {
-            if ($replace) {
-                foreach ($moduleConfig as $key => $value) {
-                    $this->modules[$name][$key] = $value;
-                }
-            } else {
-                $this->modules[$name] = array_replace_recursive($this->modules[$name], $moduleConfig);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Determine whether a module is registered with the application object
-     *
-     * @param  string $name
-     * @return boolean
-     */
-    public function isRegistered($name)
-    {
-        return (array_key_exists($name, $this->modules));
-    }
-
-    /**
-     * Access an application module config
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public function module($name)
-    {
-        return (array_key_exists($name, $this->modules)) ? $this->modules[$name] : null;
-    }
-
-    /**
-     * Access all application module configs
-     *
-     * @return array
-     */
-    public function modules()
-    {
-        return $this->modules;
     }
 
     /**
@@ -329,7 +217,17 @@ class Application
     }
 
     /**
-     * Load an application config
+     * Access all application module configs
+     *
+     * @return Module\Manager
+     */
+    public function modules()
+    {
+        return $this->modules;
+    }
+
+    /**
+     * Load application config
      *
      * @param  mixed $config
      * @throws Exception
@@ -410,6 +308,18 @@ class Application
     }
 
     /**
+     * Load a module manager
+     *
+     * @param  Module\Manager $modules
+     * @return Application
+     */
+    public function loadModules(Module\Manager $modules)
+    {
+        $this->modules = $modules;
+        return $this;
+    }
+
+    /**
      * Register the autoloader object
      *
      * @param  mixed $autoloader
@@ -424,6 +334,56 @@ class Application
             );
         }
         $this->autoloader = $autoloader;
+        return $this;
+    }
+
+    /**
+     * Register a module with the application object
+     *
+     * @param  string $name
+     * @param  mixed  $module
+     * @return Application
+     */
+    public function register($name, $module)
+    {
+        if (!($module instanceof Module\ModuleInterface)) {
+            $module = new Module\Module($module, $this);
+        }
+        $this->modules->register($name, $module);
+        return $this;
+    }
+
+    /**
+     * Access a module object
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function module($name)
+    {
+        return (isset($this->modules[$name])) ? $this->modules[$name] : null;
+    }
+
+    /**
+     * Determine whether a module is registered with the application object
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function isRegistered($name)
+    {
+        return $this->modules->isRegistered($name);
+    }
+
+    /**
+     * Unregister a module object
+     *
+     * @param  string $name
+     * @return Application
+     */
+    public function unregister($name)
+    {
+        unset($this->modules[$name]);
         return $this;
     }
 

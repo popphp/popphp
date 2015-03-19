@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp
  * @category   Pop
- * @package    Pop_Router
+ * @package    Pop_Module
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -13,16 +13,27 @@
 /**
  * @namespace
  */
-namespace Pop\Router\Match;
+namespace Pop\Module;
 
 /**
- * Router match exception class
+ * Pop router interface
  *
  * @category   Pop
- * @package    Pop_Router
+ * @package    Pop_Module
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Exception extends \Exception {}
+interface ModuleInterface
+{
+
+    /**
+     * Bootstrap module
+     *
+     * @param  \Pop\Application $application
+     * @return ModuleInterface
+     */
+    public function bootstrap(\Pop\Application $application);
+
+}
