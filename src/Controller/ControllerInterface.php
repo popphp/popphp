@@ -32,7 +32,7 @@ interface ControllerInterface
      * Set the default action
      *
      * @param  string $default
-     * @return \Pop\Controller\Controller
+     * @return ControllerInterface
      */
     public function setDefaultAction($default);
 
@@ -49,7 +49,7 @@ interface ControllerInterface
      * @param  string $action
      * @param  array  $params
      * @throws Exception
-     * @return Controller
+     * @return void
      */
     public function dispatch($action, array $params = null);
 

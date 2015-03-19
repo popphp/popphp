@@ -16,7 +16,7 @@
 namespace Pop\Controller;
 
 /**
- * Pop controller class
+ * Pop abstract controller class
  *
  * @category   Pop
  * @package    Pop_Controller
@@ -25,7 +25,7 @@ namespace Pop\Controller;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Controller implements ControllerInterface
+abstract class AbstractController implements ControllerInterface
 {
 
     /**
@@ -38,7 +38,7 @@ class Controller implements ControllerInterface
      * Set the default action
      *
      * @param  string $default
-     * @return \Pop\Controller\Controller
+     * @return AbstractController
      */
     public function setDefaultAction($default)
     {
