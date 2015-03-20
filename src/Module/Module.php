@@ -38,7 +38,7 @@ class Module implements ModuleInterface, \ArrayAccess
 
     /**
      * Application
-     * @var \Pop\Application
+     * @var Application
      */
     protected $application = null;
 
@@ -65,23 +65,69 @@ class Module implements ModuleInterface, \ArrayAccess
             }
         }
 
-        if (null !== $application) {
-            $this->register($application);
-        }
         if (null !== $config) {
             $this->loadConfig($config);
+        }
+        if (null !== $application) {
+            $this->register($application);
         }
     }
 
     /**
-     * Bootstrap module
+     * Register module
      *
-     * @param  \Pop\Application $application
+     * @param  Application $application
      * @return ModuleInterface
      */
     public function register(Application $application)
     {
         $this->application = $application;
+
+        if (null !== $this->config) {
+            // If the autoloader is set and the the module config has a
+            // defined prefix and src, register the module with the autoloader
+            if ((null !== $this->application) && (null !== $this->application->autoloader()) &&
+                isset($this->config['prefix']) && isset($this->config['src']) && file_exists($this->config['src'])
+            ) {
+                // Register as PSR-0
+                if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
+                    $this->application->autoloader()->add($this->config['prefix'], $this->config['src']);
+                    // Else, default to PSR-4
+                } else {
+                    $this->application->autoloader()->addPsr4($this->config['prefix'], $this->config['src']);
+                }
+            }
+
+            // If routes are set in the module config, register them with the application
+            if (isset($this->config['routes']) && (null !== $this->application) && (null !== $this->application->router())) {
+                $this->application->router()->addRoutes($this->config['routes']);
+            }
+
+            // If services are set in the module config, register them with the application
+            if (isset($this->config['services']) && (null !== $this->application) && (null !== $this->application->services())) {
+                foreach ($this->config['services'] as $name => $service) {
+                    if (isset($service['call']) && isset($service['params'])) {
+                        $this->application->setService($name, $service['call'], $service['params']);
+                    } else if (isset($service['call'])) {
+                        $this->application->setService($name, $service['call']);
+                    }
+                }
+            }
+
+            // If events are set in the app config, register them with the application
+            if (isset($this->config['events']) && (null !== $this->application) && (null !== $this->application->events())) {
+                foreach ($this->config['events'] as $event) {
+                    if (isset($event['name']) && isset($event['action'])) {
+                        $this->application->on(
+                            $event['name'],
+                            $event['action'],
+                            ((isset($event['priority'])) ? $event['priority'] : 0)
+                        );
+                    }
+                }
+            }
+        }
+
         return $this;
     }
 
@@ -101,48 +147,6 @@ class Module implements ModuleInterface, \ArrayAccess
         }
 
         $this->config = $config;
-
-        // If the autoloader is set and the the module config has a
-        // defined prefix and src, register the module with the autoloader
-        if ((null !== $this->application) && (null !== $this->application->autoloader()) &&
-            isset($this->config['prefix']) && isset($this->config['src']) && file_exists($this->config['src'])) {
-            // Register as PSR-0
-            if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
-                $this->application->autoloader()->add($this->config['prefix'], $this->config['src']);
-            // Else, default to PSR-4
-            } else {
-                $this->application->autoloader()->addPsr4($this->config['prefix'], $this->config['src']);
-            }
-        }
-
-        // If routes are set in the module config, register them with the application
-        if (isset($this->config['routes']) && (null !== $this->application) && (null !== $this->application->router())) {
-            $this->application->router()->addRoutes($this->config['routes']);
-        }
-
-        // If services are set in the module config, register them with the application
-        if (isset($this->config['services']) && (null !== $this->application) && (null !== $this->application->services())) {
-            foreach ($this->config['services'] as $name => $service) {
-                if (isset($service['call']) && isset($service['params'])) {
-                    $this->application->setService($name, $service['call'], $service['params']);
-                } else if (isset($service['call'])) {
-                    $this->application->setService($name, $service['call']);
-                }
-            }
-        }
-
-        // If events are set in the app config, register them with the application
-        if (isset($this->config['events']) && (null !== $this->application) && (null !== $this->application->events())) {
-            foreach ($this->config['events'] as $event) {
-                if (isset($event['name']) && isset($event['action'])) {
-                    $this->application->on(
-                        $event['name'],
-                        $event['action'],
-                        ((isset($event['priority'])) ? $event['priority'] : 0)
-                    );
-                }
-            }
-        }
 
         return $this;
     }
@@ -176,7 +180,7 @@ class Module implements ModuleInterface, \ArrayAccess
     /**
      * Get application
      *
-     * @return \Pop\Application
+     * @return Application
      */
     public function application()
     {

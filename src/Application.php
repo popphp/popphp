@@ -357,7 +357,7 @@ class Application
      * Access a module object
      *
      * @param  string $name
-     * @return mixed
+     * @return Module\ModuleInterface
      */
     public function module($name)
     {
