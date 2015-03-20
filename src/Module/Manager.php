@@ -25,7 +25,7 @@ namespace Pop\Module;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Manager implements \ArrayAccess
+class Manager implements \ArrayAccess, \IteratorAggregate
 {
 
     /**
@@ -152,6 +152,15 @@ class Manager implements \ArrayAccess
      */
     public function offsetUnset($offset) {
         return $this->unload($offset);
+    }
+
+    /**
+     * Get iterator
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator() {
+        return new \ArrayIterator($this->modules);
     }
 
 }
