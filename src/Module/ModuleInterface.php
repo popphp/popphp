@@ -15,6 +15,8 @@
  */
 namespace Pop\Module;
 
+use Pop\Application;
+
 /**
  * Pop router interface
  *
@@ -29,11 +31,11 @@ interface ModuleInterface
 {
 
     /**
-     * Bootstrap module
+     * Register the module
      *
-     * @param  \Pop\Application $application
+     * @param  Application $application
      * @return ModuleInterface
      */
-    public function bootstrap(\Pop\Application $application);
+    public function register(Application $application);
 
 }

@@ -15,6 +15,8 @@
  */
 namespace Pop\Module;
 
+use Pop\Application;
+
 /**
  * Pop module class
  *
@@ -45,16 +47,27 @@ class Module implements ModuleInterface
      *
      * Instantiate a module object
      *
-     * @param  mixed            $config
-     * @param  \Pop\Application $application
+     * Optional parameters are an application instance or a configuration object or array
+     *
      * @return Module
      */
-    public function __construct($config = null, \Pop\Application $application = null)
+    public function __construct()
     {
-        if (null !== $application) {
-            $this->bootstrap($application);
+        $args        = func_get_args();
+        $application = null;
+        $config      = null;
+
+        foreach ($args as $arg) {
+            if ($arg instanceof Application) {
+                $application = $arg;
+            } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)) {
+                $config = $arg;
+            }
         }
 
+        if (null !== $application) {
+            $this->register($application);
+        }
         if (null !== $config) {
             $this->loadConfig($config);
         }
@@ -66,7 +79,7 @@ class Module implements ModuleInterface
      * @param  \Pop\Application $application
      * @return ModuleInterface
      */
-    public function bootstrap(\Pop\Application $application)
+    public function register(Application $application)
     {
         $this->application = $application;
         return $this;
@@ -91,8 +104,8 @@ class Module implements ModuleInterface
 
         // If the autoloader is set and the the module config has a
         // defined prefix and src, register the module with the autoloader
-        if ((null !== $this->application) && (null !== $this->application->autoloader()) && isset($this->config['prefix']) &&
-            isset($this->config['src']) && file_exists($this->config['src'])) {
+        if ((null !== $this->application) && (null !== $this->application->autoloader()) &&
+            isset($this->config['prefix']) && isset($this->config['src']) && file_exists($this->config['src'])) {
             // Register as PSR-0
             if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
                 $this->application->autoloader()->add($this->config['prefix'], $this->config['src']);
