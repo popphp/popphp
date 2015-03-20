@@ -27,7 +27,7 @@ use Pop\Application;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0a
  */
-class Module implements ModuleInterface
+class Module implements ModuleInterface, \ArrayAccess
 {
 
     /**
@@ -191,6 +191,47 @@ class Module implements ModuleInterface
     public function config()
     {
         return $this->config;
+    }
+
+    /**
+     * Set a value in the array
+     *
+     * @param  string $offset
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function offsetSet($offset, $value) {
+        return $this;
+    }
+
+    /**
+     * Get a value from the array
+     *
+     * @param  string $offset
+     * @return mixed
+     */
+    public function offsetGet($offset) {
+        return $this->config[$offset];
+    }
+
+    /**
+     * Determine if a value exists
+     *
+     * @param  string $offset
+     * @return mixed
+     */
+    public function offsetExists($offset) {
+        return isset($this->config[$offset]);
+    }
+
+    /**
+     * Unset a value from the array
+     *
+     * @param  string $offset
+     * @return mixed
+     */
+    public function offsetUnset($offset) {
+        return $this;
     }
 
 }
