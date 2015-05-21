@@ -140,7 +140,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Pop\Exception
+     * @expectedException \InvalidArgumentException
      */
     public function testLoadConfigException()
     {

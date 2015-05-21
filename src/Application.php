@@ -230,13 +230,13 @@ class Application
      * Load application config
      *
      * @param  mixed $config
-     * @throws Exception
+     * @throws \InvalidArgumentException
      * @return Application
      */
     public function loadConfig($config)
     {
         if (!is_array($config) && !($config instanceof \ArrayAccess) && !($config instanceof \ArrayObject)) {
-            throw new Exception(
+            throw new \InvalidArgumentException(
                 'Error: The config must be either an array itself or implement ArrayAccess or extend ArrayObject.'
             );
         }
