@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit bootstrap="../vendor/autoload.php">
+    <testsuites>
+        <testsuite name="Pop PHP Framework PHPUnit Test">
+            <directory>./</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <blacklist>
+            <directory suffix=".php">/usr/lib/php</directory>
+            <directory suffix=".php">C:/PHP</directory>
+            <directory suffix=".php">C:/PROGRA~1/PHP</directory>
+        </blacklist>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../src</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="/tmp/popphp-cc-report" charset="UTF-8"
+             yui="true" highlight="false" showUncoveredFiles="true"
+             lowUpperBound="35" highLowerBound="70" />
+    </logging>
+</phpunit>
