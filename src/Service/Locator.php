@@ -269,7 +269,7 @@ class Locator implements \ArrayAccess
      * @return mixed
      */
     public function offsetSet($offset, $value) {
-        return $this->set($offset, $value);
+        return $this->setServices([$offset => $value]);
     }
 
     /**

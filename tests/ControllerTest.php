@@ -4,8 +4,6 @@ namespace PopTest;
 
 use Pop\Controller\AbstractController;
 
-
-
 class ControllerTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -18,7 +16,9 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testDispatch()
     {
-        $controller = $this->getMockForAbstractClass('\Pop\Controller\AbstractController', [], '', false, false, false, ['error', 'login', 'user']);
+        $controller = $this->getMockForAbstractClass(
+            '\Pop\Controller\AbstractController', [], '', false, false, false, ['error', 'login', 'user']
+        );
         $controller->expects($this->once())->method('error');
         $controller->expects($this->once())->method('login');
         $controller->expects($this->once())->method('user');
