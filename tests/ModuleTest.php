@@ -1,6 +1,6 @@
 <?php
 
-namespace PopTest;
+namespace Pop\Test;
 
 use Pop\Application;
 use Pop\Module\Module;

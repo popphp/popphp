@@ -1,28 +1,8 @@
 <?php
 
-namespace PopTest;
+namespace Pop\Test;
 
 use Pop\Service\Locator;
-
-class TestService {
-    public $foo = null;
-    public function __construct($var = null)
-    {
-        $this->foo = $var;
-    }
-    public function bar($var = null)
-    {
-        return (null !== $var) ? $var : 456;
-    }
-    public static function baz()
-    {
-        return 789;
-    }
-    public static function foo($var)
-    {
-        return $var;
-    }
-}
 
 class ServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,7 +11,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     {
         $services = new Locator([
             'foo' => [
-                'call' => 'TestService'
+                'call' => 'Pop\Test\TestAsset\TestService'
             ]
         ]);
         $this->assertInstanceOf('Pop\Service\Locator', $services);
@@ -118,34 +98,34 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                 'params'  => 123
             ],
             'bar' => [
-                'call' => 'PopTest\TestService::foo',
+                'call' => 'Pop\Test\TestAsset\TestService::foo',
                 'params'  => 456
             ],
             'baz' => [
-                'call' => 'PopTest\TestService::foo',
+                'call' => 'Pop\Test\TestAsset\TestService::foo',
                 'params'  => function(){
                     return 789;
                 }
             ],
             'test1' => [
-                'call' => 'PopTest\TestService->bar'
+                'call' => 'Pop\Test\TestAsset\TestService->bar'
             ],
             'test2' => [
-                'call'    => 'PopTest\TestService->bar',
+                'call'    => 'Pop\Test\TestAsset\TestService->bar',
                 'params'  => 123
             ],
             'test3' => [
-                'call'    => 'PopTest\TestService'
+                'call'    => 'Pop\Test\TestAsset\TestService'
             ],
             'test4' => [
-                'call'    => 'PopTest\TestService::baz'
+                'call'    => 'Pop\Test\TestAsset\TestService::baz'
             ],
             'test5' => [
-                'call' => 'PopTest\TestService',
+                'call' => 'Pop\Test\TestAsset\TestService',
                 'params'  => 123
             ],
             'test6' => [
-                'call' => new TestService,
+                'call' => new TestAsset\TestService,
             ]
         ]);
         $test3 = $services['test3'];
@@ -168,13 +148,14 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     public function testRecursionLoop()
     {
         $services = new Locator();
-        $services->setServices([
-            'foo' => function($service){
-                $result = $service;
-            },
-            'params' => $services['foo']
-        ]);
-        $result = $services['foo'];
+        $services->set('service1', function($locator) {
+            return $locator->get('service2');
+        });
+        $services->set('service2', function($locator) {
+            return $locator->get('service1');
+        });
+
+        $result = $services->get('service1');
     }
 
 }

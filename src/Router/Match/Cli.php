@@ -59,7 +59,7 @@ class Cli extends AbstractMatch
      */
     public function setArguments()
     {
-        global $argv;
+        $argv = $_SERVER['argv'];
 
         // Trim the script name out of the arguments array
         array_shift($argv);

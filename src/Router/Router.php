@@ -96,10 +96,11 @@ class Router implements RouterInterface
             if (isset($value['controller'])) {
                 foreach ($controller as $r => $c) {
                     if ($route != '') {
-                        if ((substr($r, 0, 1) == '/') || (substr($r, 0, 1) == '[')) {
+                        $sep = ($this->isHttp()) ? '/' : ' ';
+                        if ((substr($r, 0, 1) == $sep) || (substr($r, 0, 1) == '[')) {
                             $r = $route . $r;
                         } else {
-                            $r = $route . '/' . $r;
+                            $r = $route . $sep . $r;
                         }
                     }
                     $this->routes[$r] = $c;

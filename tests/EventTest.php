@@ -1,27 +1,8 @@
 <?php
 
-namespace PopTest;
+namespace Pop\Test;
 
 use Pop\Event\Manager;
-
-class TestEvent {
-    public function __construct()
-    {
-
-    }
-    public function bar()
-    {
-        return 456;
-    }
-    public static function baz()
-    {
-        return 789;
-    }
-    public static function foo()
-    {
-        return 123;
-    }
-}
 
 class EventTest extends \PHPUnit_Framework_TestCase
 {
@@ -63,9 +44,9 @@ class EventTest extends \PHPUnit_Framework_TestCase
     public function testCallable()
     {
         $events = new Manager();
-        $events->on('foo', 'PopTest\TestEvent::foo', 1000);
-        $events->on('foo', 'PopTest\TestEvent->bar', 1000);
-        $events->on('bar', 'new PopTest\TestEvent', 1000);
+        $events->on('foo', 'Pop\Test\TestAsset\TestEvent::foo', 1000);
+        $events->on('foo', 'Pop\Test\TestAsset\TestEvent->bar', 1000);
+        $events->on('bar', 'new Pop\Test\TestAsset\TestEvent', 1000);
         $events->trigger('foo');
         $this->assertContains(123, $events->getResults('foo'));
         $this->assertContains(456, $events->getResults('foo'));
@@ -77,7 +58,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
     public function testCallableException()
     {
         $events = new Manager();
-        $events->on('foo', TestEvent::baz(), 1000);
+        $events->on('foo', TestAsset\TestEvent::baz(), 1000);
         $events->trigger('foo');
     }
 
