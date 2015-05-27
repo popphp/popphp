@@ -29,6 +29,13 @@ interface MatchInterface
 {
 
     /**
+     * Determine if the route has been matched
+     *
+     * @return boolean
+     */
+    public function hasRoute();
+
+    /**
      * Get the matched route
      *
      * @return string
