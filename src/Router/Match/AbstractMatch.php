@@ -77,6 +77,16 @@ abstract class AbstractMatch
     protected $routes = [];
 
     /**
+     * Determine if the route has been matched
+     *
+     * @return boolean
+     */
+    public function hasRoute()
+    {
+        return (null !== $this->route);
+    }
+
+    /**
      * Get the matched route
      *
      * @return string

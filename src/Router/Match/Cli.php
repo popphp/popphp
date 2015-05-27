@@ -117,6 +117,7 @@ class Cli extends AbstractMatch
                     $params        = $this->getDispatchParamsFromRoute($route);
                     $matchedParams = $this->processDispatchParamsFromRoute($params, $controller['dispatchParams']);
                     if ($matchedParams !== false) {
+                        $this->route      = $route;
                         $this->controller = $controller['controller'];
                         if (isset($controller['action'])) {
                             $this->action = $controller['action'];
@@ -130,6 +131,7 @@ class Cli extends AbstractMatch
                 } else {
                     $suffix = substr($this->argumentString, strlen($route));
                     if (($suffix == '') || ($controller['wildcard'])) {
+                        $this->route      = $route;
                         $this->controller = $controller['controller'];
                         if (isset($controller['action'])) {
                             $this->action = $controller['action'];

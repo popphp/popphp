@@ -6,11 +6,6 @@
         </testsuite>
     </testsuites>
     <filter>
-        <blacklist>
-            <directory suffix=".php">/usr/lib/php</directory>
-            <directory suffix=".php">C:/PHP</directory>
-            <directory suffix=".php">C:/PROGRA~1/PHP</directory>
-        </blacklist>
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">src</directory>
         </whitelist>
