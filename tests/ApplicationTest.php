@@ -210,7 +210,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($application->isRegistered('foo'));
     }
 
-    public function testRun()
+    public function testEventsOnRun()
     {
         $config = [
             'foo'      => 'bar',
@@ -265,6 +265,47 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('app.route.post', $application->events()->getResults('app.route.post'));
         $this->assertContains('app.dispatch.pre', $application->events()->getResults('app.dispatch.pre'));
         $this->assertContains('app.dispatch.post', $application->events()->getResults('app.dispatch.post'));
+    }
+
+    public function testRunClosureController()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'edit', 1001
+        ];
+
+        $config = [
+            'routes' => [
+                'edit <id>' => [
+                    'controller' => function($id) {
+                        echo $id;
+                    }
+                ]
+            ]
+        ];
+        $application = new Application($config);
+        ob_start();
+        $application->run();
+        $result = ob_get_clean();
+        $this->assertEquals(1001, $result);
+    }
+
+    public function testRunClassController()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'edit', 1002
+        ];
+
+        $config = [
+            'routes' => [
+                'edit <id>' => [
+                    'controller' => 'Pop\Test\TestAsset\TestController',
+                    'action'     => 'edit'
+                ]
+            ]
+        ];
+        $application = new Application($config);
+        $application->run();
+        $this->assertEquals(1002, $application->router()->getController()->id);
     }
 
 }
