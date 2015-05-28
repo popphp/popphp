@@ -51,10 +51,10 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
     public function testPsr4()
     {
         $config = [
-            'psr-0'    => true,
-            'prefix'   => 'Test',
-            'src'      => __DIR__,
-            'foo'      => 'bar'
+            'psr-0'  => true,
+            'prefix' => 'Test',
+            'src'    => __DIR__,
+            'foo'    => 'bar'
         ];
 
         $application = new Application(include __DIR__ . '/../vendor/autoload.php');

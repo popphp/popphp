@@ -179,7 +179,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         $config = [
             'services' => [
-                'foo' => [
+                'foo'  => [
                     'call' => function() {
                         return 123;
                     }

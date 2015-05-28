@@ -130,8 +130,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router = new Router();
         $router->addRoute('help', [
-            'controller' => 'Pop\Test\TestAsset\TestController',
-            'action'     => 'help',
+            'controller'  => 'Pop\Test\TestAsset\TestController',
+            'action'      => 'help',
             'routeParams' => [123]
         ]);
 
