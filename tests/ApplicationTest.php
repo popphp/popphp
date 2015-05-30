@@ -270,6 +270,28 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testRunClosureController()
     {
         $_SERVER['argv'] = [
+            'myscript.php', 'edit'
+        ];
+
+        $config = [
+            'routes' => [
+                'edit' => [
+                    'controller' => function() {
+                        echo 'edit';
+                    }
+                ]
+            ]
+        ];
+        $application = new Application($config);
+        ob_start();
+        $application->run();
+        $result = ob_get_clean();
+        $this->assertEquals('edit', $result);
+    }
+
+    public function testRunClosureControllerWithParam()
+    {
+        $_SERVER['argv'] = [
             'myscript.php', 'edit', 1001
         ];
 
@@ -290,6 +312,27 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testRunClassController()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $config = [
+            'routes' => [
+                'help' => [
+                    'controller' => 'Pop\Test\TestAsset\TestController',
+                    'action'     => 'help'
+                ]
+            ]
+        ];
+        $application = new Application($config);
+        ob_start();
+        $application->run();
+        $result = ob_get_clean();
+        $this->assertEquals('help', $result);
+    }
+
+    public function testRunClassControllerWithParam()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'edit', 1002

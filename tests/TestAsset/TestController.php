@@ -22,7 +22,7 @@ class TestController extends AbstractController
 
     public function help()
     {
-        return 'help';
+        echo 'help';
     }
 
 }

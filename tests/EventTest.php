@@ -48,10 +48,15 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $events->on('foo', 'Pop\Test\TestAsset\TestEvent::foo', 1000);
         $events->on('foo', 'Pop\Test\TestAsset\TestEvent->bar', 1000);
         $events->on('bar', 'new Pop\Test\TestAsset\TestEvent', 1000);
+        $events->on('test', 'Pop\Test\TestAsset\TestEvent::test', 1000);
+        $events->on('test', [new TestAsset\TestEvent(), 'bar'], 1000);
         $events->trigger('foo');
         $events->trigger('bar');
+        $events->trigger('test', ['param' => 789]);
         $this->assertContains(123, $events->getResults('foo'));
         $this->assertContains(456, $events->getResults('foo'));
+        $this->assertContains(456, $events->getResults('test'));
+        $this->assertContains(789, $events->getResults('test'));
     }
 
     /**

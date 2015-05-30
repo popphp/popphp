@@ -24,4 +24,9 @@ class TestEvent {
         return 123;
     }
 
+    public static function test($param)
+    {
+        return $param;
+    }
+
 }

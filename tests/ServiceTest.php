@@ -20,6 +20,16 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Pop\Service\Exception
      */
+    public function testNotCallableException()
+    {
+        $services = new Locator();
+        $services->set('badservice', ['bad call']);
+        $result = $services->get('badservice');
+    }
+
+    /**
+     * @expectedException \Pop\Service\Exception
+     */
     public function testSetServicesException()
     {
         $services = new Locator();
