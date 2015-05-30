@@ -72,11 +72,9 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($module->config()['foo'], 456);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testLoadConfigException()
     {
+        $this->setExpectedException('InvalidArgumentException');
         $module = new Module();
         $module->loadConfig('bad');
     }

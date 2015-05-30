@@ -59,11 +59,9 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertContains(789, $events->getResults('test'));
     }
 
-    /**
-     * @expectedException \Pop\Event\Exception
-     */
     public function testCallableException()
     {
+        $this->setExpectedException('Pop\Event\Exception');
         $events = new Manager();
         $events->on('foo', TestAsset\TestEvent::baz(), 1000);
         $events->trigger('foo');

@@ -27,11 +27,9 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         $controller->dispatch();
     }
 
-    /**
-     * @expectedException \Pop\Controller\Exception
-     */
     public function testDispatchException()
     {
+        $this->setExpectedException('Pop\Controller\Exception');
         $controller = $this->getMockForAbstractClass('\Pop\Controller\AbstractController');
         $controller->setDefaultAction('foo');
         $controller->dispatch('foo');

@@ -139,20 +139,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->off('app.init', 'Foo\Bar::factory');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testLoadConfigException()
     {
+        $this->setExpectedException('InvalidArgumentException');
         $application = new Application();
         $application->loadConfig('bad');
     }
 
-    /**
-     * @expectedException \Pop\Exception
-     */
     public function testRegisterAutoloaderException()
     {
+        $this->setExpectedException('Pop\Exception');
         $application = new Application();
         $application->registerAutoloader(new \StdClass());
     }
@@ -172,11 +168,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($application->getService('foo'), 123);
     }
 
-    /**
-     * @expectedException \Pop\Service\Exception
-     */
     public function testRemoveService()
     {
+        $this->setExpectedException('Pop\Service\Exception');
         $config = [
             'services' => [
                 'foo'  => [
