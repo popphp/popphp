@@ -234,7 +234,7 @@ class Http extends AbstractMatch
                     }
                 }
             } else {
-                $suffix = substr($this->segmentString, strlen($route));
+                $suffix = ($route != '') ? substr($this->segmentString, strlen($route)) : '';
                 if (($suffix == '') || ($controller['wildcard'])) {
                     $this->route      = $route;
                     $this->controller = $controller['controller'];

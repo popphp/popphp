@@ -202,57 +202,59 @@ class Cli extends AbstractMatch
                 $controller['wildcard'] = false;
             }
 
-            // Handle params
-            $dash     = strpos($route, '-');
-            $optDash  = strpos($route, '[-');
-            $angle    = strpos($route, '<');
-            $optAngle = strpos($route, '[<');
+            if ($route != '*') {
+                // Handle params
+                $dash = strpos($route, '-');
+                $optDash = strpos($route, '[-');
+                $angle = strpos($route, '<');
+                $optAngle = strpos($route, '[<');
 
-            $match = [];
-            if ($dash !== false) {
-                $match[] = $dash;
-            }
-            if ($optDash !== false) {
-                $match[] = $optDash;
-            }
-            if ($angle !== false) {
-                $match[] = $angle;
-            }
-            if ($optAngle !== false) {
-                $match[] = $optAngle;
-            }
+                $match = [];
+                if ($dash !== false) {
+                    $match[] = $dash;
+                }
+                if ($optDash !== false) {
+                    $match[] = $optDash;
+                }
+                if ($angle !== false) {
+                    $match[] = $angle;
+                }
+                if ($optAngle !== false) {
+                    $match[] = $optAngle;
+                }
 
-            if (count($match) > 0) {
-                $params = substr($route, min($match));
-                $route  = substr($route, 0, min($match) - 1);
-                $params = (strpos($params, ' ') !== false) ? explode(' ', $params) : [$params];
+                if (count($match) > 0) {
+                    $params = substr($route, min($match));
+                    $route = substr($route, 0, min($match) - 1);
+                    $params = (strpos($params, ' ') !== false) ? explode(' ', $params) : [$params];
 
-                $controller['dispatchParams'] = [];
-                foreach ($params as $param) {
-                    if (strpos($param, '[') !== false) {
-                        $param = substr($param, 1);
-                        $param = substr($param, 0, -1);
-                        $controller['dispatchParams'][] = [
-                            'name'       => $param,
-                            'required'   => false
-                        ];
-                    } else {
-                        $controller['dispatchParams'][] = [
-                            'name'       => $param,
-                            'required'   => true
-                        ];
+                    $controller['dispatchParams'] = [];
+                    foreach ($params as $param) {
+                        if (strpos($param, '[') !== false) {
+                            $param = substr($param, 1);
+                            $param = substr($param, 0, -1);
+                            $controller['dispatchParams'][] = [
+                                'name' => $param,
+                                'required' => false
+                            ];
+                        } else {
+                            $controller['dispatchParams'][] = [
+                                'name' => $param,
+                                'required' => true
+                            ];
+                        }
                     }
                 }
-            }
 
-            // Handle optional literals, create regex for route matching
-            if (strpos($route, '[') !== false) {
-                $route = '/' . str_replace(['[', ']', '|', ') '], ['(', ')','\s|', '\s)?'], $route) . '(.*)/';
-            } else {
-                $route = '/' . $route . '(.*)/';
-            }
+                // Handle optional literals, create regex for route matching
+                if (strpos($route, '[') !== false) {
+                    $route = '/' . str_replace(['[', ']', '|', ') '], ['(', ')', '\s|', '\s)?'], $route) . '(.*)/';
+                } else {
+                    $route = '/' . $route . '(.*)/';
+                }
 
-            $this->routes[$route] = $controller;
+                $this->routes[$route] = $controller;
+            }
         }
     }
 

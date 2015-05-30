@@ -160,6 +160,41 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($router->getRouteMatch()->getDispatchParams()));
     }
 
+    public function testRouteParams()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help', [
+            'controller'  => 'Pop\Test\TestAsset\TestController',
+            'action'      => 'help',
+            'routeParams' => [123]
+        ]);
+
+        $router->addRouteParams('*', ['foo' => 123]);
+        $router->route();
+        $this->assertEquals(123, $router->getController()->foo);
+    }
+
+    public function testWildcardRouteParams()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help', [
+            'controller'  => 'Pop\Test\TestAsset\TestController',
+            'action'      => 'help'
+        ]);
+
+        $router->addRouteParams('*', ['foo' => 123]);
+        $router->route();
+        $this->assertEquals(123, $router->getController()->foo);
+    }
+
     public function testCliMatch()
     {
         $_SERVER['argv'] = [
@@ -255,6 +290,40 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($match->hasRoute());
     }
 
+    public function testCliLongValueRoute()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help', '--name=test', '--email=test@test.com'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help --name= [--email=]', [
+            'controller'  => 'Pop\Test\TestAsset\TestController',
+            'action'      => 'help'
+        ]);
+
+        $match = new Match\Cli();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
+    public function testCliMultipleOptionsRoute()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help', '--options1=test', '-o3 test'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help --options1|-o1 [--options2|-o2] [--options3|-o3]', [
+            'controller'  => 'Pop\Test\TestAsset\TestController',
+            'action'      => 'help'
+        ]);
+
+        $match = new Match\Cli();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
     public function testHttpRoute()
     {
         $_SERVER['REQUEST_URI'] = '/help';
@@ -268,6 +337,21 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $match = new Match\Http();
         $match->match($router->getRoutes());
         $this->assertEquals('/help', $match->getRoute());
+    }
+
+    public function testHttpRouteWithParams()
+    {
+        $_SERVER['REQUEST_URI'] = '/edit/1001/';
+
+        $router = new Router();
+        $router->addRoute('/edit/:id', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'edit'
+        ]);
+
+        $match = new Match\Http();
+        $match->match($router->getRoutes());
+        $this->assertEquals('/edit', $match->getRoute());
     }
 
     public function testHttpParamsRoute()
@@ -291,6 +375,21 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router = new Router();
         $router->addRoute('/help/:foo*', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help'
+        ]);
+
+        $match = new Match\Http();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
+    public function testHttpSlashWildcardRoute()
+    {
+        $_SERVER['REQUEST_URI'] = '/help/foo/bar';
+
+        $router = new Router();
+        $router->addRoute('/help/foo/*', [
             'controller' => 'Pop\Test\TestAsset\TestController',
             'action'     => 'help'
         ]);
@@ -341,6 +440,130 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $match = new Match\Http();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
+    public function testHttpAddRouteParams()
+    {
+        $_SERVER['REQUEST_URI'] = '/help/foo';
+
+        $router = new Router();
+        $router->addRoute('/help/foo[/]', [
+            'controller'  => 'Pop\Test\TestAsset\TestController',
+            'action'      => 'help',
+            'routeParams' => [123]
+        ]);
+
+        $match = new Match\Http();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
+    public function testHttpAddDispatchParams()
+    {
+        $_SERVER['REQUEST_URI'] = '/help/foo';
+
+        $router = new Router();
+        $router->addRoute('/help/foo[/]', [
+            'controller'     => 'Pop\Test\TestAsset\TestController',
+            'action'         => 'help',
+            'routeParams'    => [123],
+            'dispatchParams' => [123],
+            'default'        => true
+        ]);
+
+        $match = new Match\Http();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
+    public function testHttpTopRoute()
+    {
+        $_SERVER['REQUEST_URI'] = '/help/foo';
+
+        $router = new Router();
+        $router->addRoute('', [
+            'controller'     => 'Pop\Test\TestAsset\TestController',
+            'action'         => 'help',
+            'routeParams'    => [123]
+        ]);
+
+        $match = new Match\Http();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
+    public function testHttpTopRouteDispatchParams()
+    {
+        $_SERVER['REQUEST_URI'] = '/edit';
+
+        $router = new Router();
+        $router->addRoute('', [
+            'controller'     => 'Pop\Test\TestAsset\TestController',
+            'action'         => 'edit',
+            'routeParams'    => [123],
+            'dispatchParams' => [1001]
+        ]);
+
+        $match = new Match\Http();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
+    public function testHttpTopWildcardRoute()
+    {
+        $_SERVER['REQUEST_URI'] = '/help/foo/bar';
+
+        $router = new Router();
+        $router->addRoute('*', [
+            'controller'     => 'Pop\Test\TestAsset\TestController',
+            'action'         => 'help',
+            'routeParams'    => [123],
+            'dispatchParams' => [1001]
+        ]);
+
+        $match = new Match\Http();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
+    public function testCliMatchRouteParams()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help', [
+            'controller'     => 'Pop\Test\TestAsset\TestController',
+            'action'         => 'help',
+            'routeParams'    => [123],
+            'dispatchParams' => [456],
+            'default'        => true
+        ]);
+
+        $match = new Match\Cli();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
+    public function testCliMatchWildcards()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router();
+        $router->addRoute('*', [
+            'controller'     => 'Pop\Test\TestAsset\TestController',
+            'action'         => 'help',
+            'routeParams'    => [123],
+            'dispatchParams' => [456],
+            'default'        => true
+        ]);
+
+        $match = new Match\Cli();
         $match->match($router->getRoutes());
         $this->assertTrue($match->hasRoute());
     }
