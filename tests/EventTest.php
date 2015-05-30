@@ -45,9 +45,11 @@ class EventTest extends \PHPUnit_Framework_TestCase
     {
         $events = new Manager();
         $events->on('foo', 'Pop\Test\TestAsset\TestEvent::foo', 1000);
+        $events->on('foo', 'Pop\Test\TestAsset\TestEvent::foo', 1000);
         $events->on('foo', 'Pop\Test\TestAsset\TestEvent->bar', 1000);
         $events->on('bar', 'new Pop\Test\TestAsset\TestEvent', 1000);
         $events->trigger('foo');
+        $events->trigger('bar');
         $this->assertContains(123, $events->getResults('foo'));
         $this->assertContains(456, $events->getResults('foo'));
     }
@@ -60,6 +62,24 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $events = new Manager();
         $events->on('foo', TestAsset\TestEvent::baz(), 1000);
         $events->trigger('foo');
+    }
+
+    public function testStop()
+    {
+        $events = new Manager();
+        $events->on('foo', function(){
+            return 123;
+        }, 3);
+        $events->on('foo', function(){
+            return Manager::STOP;
+        }, 2);
+        $events->on('foo', function(){
+            return 456;
+        }, 1);
+        $events->trigger('foo');
+        $results = $events->getResults('foo');
+        $this->assertEquals(2, count($results));
+        $this->assertFalse(in_array(456, $results));
     }
 
 }
