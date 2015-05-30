@@ -17,6 +17,20 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Pop\Service\Locator', $services);
     }
 
+    public function testRecursionLoop()
+    {
+        $this->setExpectedException('Pop\Service\Exception');
+        $services = new Locator();
+        $services->set('service1', function($locator) {
+            return $locator->get('service2');
+        });
+        $services->set('service2', function($locator) {
+            return $locator->get('service1');
+        });
+
+        $result = $services->get('service1');
+    }
+
     public function testNotCallableException()
     {
         $this->setExpectedException('Pop\Service\Exception');
@@ -146,20 +160,6 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(789, $services['test4']);
         $this->assertEquals(123, $test5->foo);
         $this->assertNull($test6->foo);
-    }
-
-    public function testRecursionLoop()
-    {
-        $this->setExpectedException('Pop\Service\Exception');
-        $services = new Locator();
-        $services->set('service1', function($locator) {
-            return $locator->get('service2');
-        });
-        $services->set('service2', function($locator) {
-            return $locator->get('service1');
-        });
-
-        $result = $services->get('service1');
     }
 
 }
