@@ -62,6 +62,7 @@ class Locator implements \ArrayAccess
      */
     public function __construct(array $services = null)
     {
+        self::$depth = 0;
         if (null !== $services) {
             $this->setServices($services);
         }
