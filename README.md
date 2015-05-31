@@ -1,6 +1,8 @@
 Welcome to Pop PHP Framework
 ============================
 
+[![Build Status](https://travis-ci.org/popphp/popphp.svg?branch=master)](https://travis-ci.org/popphp/popphp)
+
 RELEASE INFORMATION
 -------------------
 Pop PHP Framework 2.0.0 Alpha  

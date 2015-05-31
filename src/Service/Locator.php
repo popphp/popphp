@@ -62,7 +62,6 @@ class Locator implements \ArrayAccess
      */
     public function __construct(array $services = null)
     {
-        self::$depth = 0;
         if (null !== $services) {
             $this->setServices($services);
         }
@@ -313,7 +312,7 @@ class Locator implements \ArrayAccess
      */
     protected function load($name)
     {
-        if (self::$depth > 99) {
+        if (self::$depth > 60) {
             throw new Exception(
                 'Error: Possible recursion loop detected when attempting to load these services: ' .
                 implode(', ', self::$called)
