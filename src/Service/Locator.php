@@ -165,7 +165,7 @@ class Locator implements \ArrayAccess
             throw new Exception('Error: That service has not been added to the service locator');
         }
         if (!isset($this->loaded[$name])) {
-            if (self::$depth > 80) {
+            if (self::$depth > 99) {
                 throw new Exception(
                     'Error: Possible recursion loop detected when attempting to load these services: ' .
                     implode(', ', self::$called)
@@ -188,10 +188,26 @@ class Locator implements \ArrayAccess
                     if (!is_array($params)) {
                         $params = [$params];
                     }
-                    $obj = call_user_func_array($call, $params);
-                    // Else, inject $this into the closure
+                    switch (count($params)) {
+                        case 1:
+                            $obj = $call($params[0]);
+                            break;
+                        case 2:
+                            $obj = $call($params[0], $params[1]);
+                            break;
+                        case 3:
+                            $obj = $call($params[0], $params[1], $params[2]);
+                            break;
+                        case 4:
+                            $obj = $call($params[0], $params[1], $params[2], $params[4]);
+                            break;
+                        default:
+                            $obj = call_user_func_array($call, $params);
+                    }
+
+                // Else, inject $this into the closure
                 } else {
-                    $obj = call_user_func_array($call, [$this]);
+                    $obj = $call($this);
                 }
             // If the callable is a string
             } else if (is_string($call)) {
