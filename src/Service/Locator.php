@@ -199,7 +199,7 @@ class Locator implements \ArrayAccess
                             $obj = $call($params[0], $params[1], $params[2]);
                             break;
                         case 4:
-                            $obj = $call($params[0], $params[1], $params[2], $params[4]);
+                            $obj = $call($params[0], $params[1], $params[2], $params[3]);
                             break;
                         default:
                             $obj = call_user_func_array($call, $params);

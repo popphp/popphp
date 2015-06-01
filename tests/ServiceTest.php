@@ -148,6 +148,42 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($test6->foo);
     }
 
+    public function testMultipleClosureParams()
+    {
+        $services = new Locator();
+        $services->setServices([
+            'service1' => [
+                'call' => function($param1, $param2) {
+                    return $param1 + $param2;
+                },
+                'params' => [1, 2]
+            ],
+            'service2' => [
+                'call' => function($param1, $param2, $param3) {
+                    return $param1 + $param2 + $param3;
+                },
+                'params' => [1, 2, 3]
+            ],
+            'service3' => [
+                'call' => function($param1, $param2, $param3, $param4) {
+                    return $param1 + $param2 + $param3 + $param4;
+                },
+                'params' => [1, 2, 3, 4]
+            ],
+            'service4' => [
+                'call' => function($param1, $param2, $param3, $param4, $param5) {
+                    return $param1 + $param2 + $param3 + $param4 + $param5;
+                },
+                'params' => [1, 2, 3, 4, 5]
+            ]
+        ]);
+
+        $this->assertEquals(3, $services->get('service1'));
+        $this->assertEquals(6, $services->get('service2'));
+        $this->assertEquals(10, $services->get('service3'));
+        $this->assertEquals(15, $services->get('service4'));
+    }
+
     public function testRecursionLoop()
     {
         $this->setExpectedException('Pop\Service\Exception');
