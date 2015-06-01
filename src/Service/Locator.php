@@ -165,7 +165,7 @@ class Locator implements \ArrayAccess
             throw new Exception('Error: That service has not been added to the service locator');
         }
         if (!isset($this->loaded[$name])) {
-            if (self::$depth > 99) {
+            if (self::$depth > 40) {
                 throw new Exception(
                     'Error: Possible recursion loop detected when attempting to load these services: ' .
                     implode(', ', self::$called)
