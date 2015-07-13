@@ -105,14 +105,14 @@ Here is a list of possible route options for web applications:
 
 And here is a list of possible route options for CLI applications:
 
-|Route CLI Definition             |What's Expected                                                     |
-|---------------------------------|--------------------------------------------------------------------|
-|foo bar                          |All 2 params are required                                           |
-|foo [bar\|baz]                    |First param required, 2nd param has optional 2 values               |
-|foo -o1 [-o2]                    |First param required, 1st option required, 2nd option optional      |
-|foo --option1|-o1 [--option2\|-o2]|First param required, 1st option required, 2nd option optional      |
-|foo <name> [<email>]             |First param required, 1st value required, 2nd value optional        |
-|foo --name= [--email=]           |First param required, 1st opt value required, 2nd opt value optional|
+|Route CLI Definition               |What's Expected                                                     |
+|-----------------------------------|--------------------------------------------------------------------|
+|foo bar                            |All 2 params are required                                           |
+|foo [bar\|baz]                     |First param required, 2nd param has optional 2 values               |
+|foo -o1 [-o2]                      |First param required, 1st option required, 2nd option optional      |
+|foo --option1\|-o1 [--option2\|-o2]|First param required, 1st option required, 2nd option optional      |
+|foo <name> [<email>]               |First param required, 1st value required, 2nd value optional        |
+|foo --name= [--email=]             |First param required, 1st opt value required, 2nd opt value optional|
 
 ##### Routing for a CLI application
 
