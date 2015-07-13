@@ -11,7 +11,7 @@ and interface with the underlying core components:
  
 * Controller
 * Event Manager
-* Module Manage
+* Module Manager
 * Router
 * Service Locator
 
