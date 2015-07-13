@@ -255,7 +255,7 @@ $app->register('MyModule', new MyModule\Module($app));
 
 ### The Event Manager
 
-The event manager provides a way to hook specific events and functionality into certain point in the
+The event manager provides a way to hook specific events and functionality into certain points in the
 application's life cycle. The default hook points with the application object are:
 
 * app.init
@@ -279,7 +279,8 @@ $app->on('app.route.pre', function($application) {
 ### The Service Locator
 
 The service locator provides a way to make common services available throughout the application's
-life cycle.
+life cycle. You can set them up at the beginning of the application and call them any time during
+the application's life cycle.
 
 ```php
 $app->setService('foo', 'MyApp\FooService');
