@@ -32,6 +32,7 @@ Install `popphp` using Composer.
 * [The Module Manager](#the-module-manager)
 * [The Event Manager](#the-event-manager)
 * [The Service Locator](#the-service-locator)
+* [Configuration Tips](#configuration-tips)
 
 ### The Application Object 
 
@@ -41,6 +42,7 @@ configuration file that defines some basic routes:
 ###### application.php
 
 ```php
+<?php
 return [
     'routes' => [
         '/' => [
@@ -118,6 +120,7 @@ And here is a list of possible route options for CLI applications:
 ###### application.php
 
 ```php
+<?php
 return [
     'routes' => [
         'help' => [
@@ -298,6 +301,62 @@ class IndexController extends AbstractController
         // Do something with the 'foo' service
     }
 }
+```
+
+[Top](#basic-usage)
+
+### Configuration Tips
+
+You've seen in the above examples that both the application and module config arrays can have
+a 'routes' key set that defines the routes of the application or module. Additionally, the keys
+'events' and 'services' are allowed as well, so you can wire up your application and module
+all from the configuration array:
+
+```php
+<?php
+return [
+    'routes'   => [
+        '/' => [
+            'controller' => 'MyApp\Controller\IndexController',
+            'action'     => 'index'
+        ],
+        '/users[/]' => [
+            'controller' => 'MyApp\Controller\IndexController',
+            'action'     => 'users'
+        ],
+        '/edit/:id' => [
+            'controller' => 'MyApp\Controller\IndexController',
+            'action'     => 'edit'
+        ],
+        '*' => [
+            'controller' => 'MyApp\Controller\IndexController',
+            'action'     => 'error'
+        ]
+    ],
+    'services' => [
+        'session' => [
+            'call' => 'Pop\Web\Session::getInstance'
+        ]
+    ],
+    'events' => [
+        [
+            'name'     => 'app.route.post',
+            'action'   => 'MyApp\Event\Foo::bootstrap',
+            'priority' => 1000
+        ]
+    ]
+];
+```
+
+The module config also supports the keys 'prefix', 'psr-0' and 'src' for autoloading purposes.
+The default is to autoload with PSR-4, unless the 'psr-0' key is set to `true`.
+
+```php
+<?php
+return [
+    'prefix'     => 'MyModule\\',
+    'src'        => __DIR__ . '/../src',
+];
 ```
 
 [Top](#basic-usage)

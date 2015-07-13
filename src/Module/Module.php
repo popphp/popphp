@@ -90,7 +90,7 @@ class Module implements ModuleInterface, \ArrayAccess
                 // Register as PSR-0
                 if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
                     $this->application->autoloader()->add($this->config['prefix'], $this->config['src']);
-                    // Else, default to PSR-4
+                // Else, default to PSR-4
                 } else {
                     $this->application->autoloader()->addPsr4($this->config['prefix'], $this->config['src']);
                 }
