@@ -15,7 +15,7 @@ and interface with the underlying core components:
 * Event Manager
 * Service Locator
 
-`popphp` is a component of the [Pop PHP Framework](http://www.popphp.org/).
+`popphp` is the main core component of the [Pop PHP Framework](http://www.popphp.org/).
 
 INSTALL
 -------
@@ -142,12 +142,14 @@ $app->run();
 As before, the actions listed in the `application.php` config above will be routed to methods within the
 `MyApp\Controller\IndexController` object, `help()` and `hello($name)` respectively.
 
+[Top](#basic-usage)
+
 ### The Controller Object
 
 The controller object is the 'C' in the MVC design pattern and gives you the ability to encapsulate
 the behavior and functionality of how the routes behave and are handled. But it should be noted that
-you don't have to use a full Controller Object. For smaller applications, you can use closures as well.
-An example of that would be:
+you don't have to use a full controller object. For smaller applications, you can use anything that is
+callable, like a closure. An example of that would be:
 
 ```php
 use Pop\Application;
@@ -214,3 +216,88 @@ class IndexController extends AbstractController
 }
 ```
 
+[Top](#basic-usage)
+
+### The Module Manager
+
+The module manager provides a way to extend the core functionality of your application. The module manager
+object is really a collection object of actual module objects that serves as the bridge to integrate the
+modules with the application. You can think of the module objects themselves as "mini application objects"
+because, like the application object, they can take a configuration array that will wire up routes and other
+settings specific to the module.
+
+Here's an example of a way to inject a module into an application. You'll want to register the autoloader
+with the application so that it can register the modules with the application. 
+
+```php
+// Using Composer's autoloader
+$autoloader = require __DIR__  . APP_PATH . '/vendor/autoload.php';
+
+$app = new Pop\Application($autoloader, include __DIR__ . '/config/application.php');
+
+// $myModuleConfig contains the config settings for the
+// module, such the autoload prefix and the routes 
+$app->register('MyModule', $myModuleConfig);
+```
+
+The `$myModuleConfig` will be injected into a basic module object and registered with the application.
+If you wish to have your own module object with customized configuration and functionality, you can
+inject that directly: 
+ 
+```php
+$app->register('MyModule', new MyModule\Module($app));
+```
+
+[Top](#basic-usage)
+
+### The Event Manager
+
+The event manager provides a way to hook specific events and functionality into certain point in the
+application's life cycle. The default hook points with the application object are:
+
+* app.init
+* app.route.pre
+* app.route.post
+* app.dispatch.pre
+* app.dispatch.post
+* app.error
+
+You can simply register callable objects with the event manager to have them be called at that time
+in the application's life cycle:
+
+```php
+$app->on('app.route.pre', function($application) {
+    // Do some pre-route stuff
+});
+```
+
+[Top](#basic-usage)
+
+### The Service Locator
+
+The service locator provides a way to make common services available throughout the application's
+life cycle.
+
+```php
+$app->setService('foo', 'MyApp\FooService');
+```
+
+Inside of a controller object:
+
+```php
+<?php
+namespace MyApp\Controller;
+
+use Pop\Controller\AbstractController;
+
+class IndexController extends AbstractController
+{
+    public function list()
+    {
+        $foo = $this->application->getService('foo');
+        // Do something with the 'foo' service
+    }
+}
+```
+
+[Top](#basic-usage)
