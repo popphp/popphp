@@ -310,7 +310,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     public function testCliMultipleOptionsRoute()
     {
         $_SERVER['argv'] = [
-            'myscript.php', 'help', '--options1=test', '-o3 test'
+            'myscript.php', 'help', '--options1', '-o3'
         ];
 
         $router = new Router();

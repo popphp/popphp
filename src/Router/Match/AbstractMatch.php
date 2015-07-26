@@ -199,7 +199,6 @@ abstract class AbstractMatch
      */
     abstract protected function prepareRoutes($routes);
 
-
     /**
      * Get parameters from the route string
      *

@@ -83,11 +83,15 @@ class Router implements RouterInterface
      * Add a route
      *
      * @param  string $route
-     * @param  array  $controller
+     * @param  mixed  $controller
      * @return Router
      */
-    public function addRoute($route, array $controller)
+    public function addRoute($route, $controller)
     {
+        if (is_callable($controller)) {
+            $controller = ['controller' => $controller];
+        }
+
         // If base url exists
         if (!isset($controller['controller'])) {
             $value = reset($controller);

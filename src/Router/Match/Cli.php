@@ -191,10 +191,7 @@ class Cli extends AbstractMatch
     {
         foreach ($routes as $route => $controller) {
             // Handle wildcard route
-            if (($route != '*') && (substr($route, -1) == '*')) {
-                $this->wildcards[$route] = $controller;
-                $controller['wildcard']  = true;
-            } else if ($route == '*') {
+            if ($route == '*') {
                 $this->wildcards[$route] = $controller;
             } else {
                 $controller['wildcard'] = false;
@@ -202,9 +199,9 @@ class Cli extends AbstractMatch
 
             if ($route != '*') {
                 // Handle params
-                $dash = strpos($route, '-');
-                $optDash = strpos($route, '[-');
-                $angle = strpos($route, '<');
+                $dash     = strpos($route, '-');
+                $optDash  = strpos($route, '[-');
+                $angle    = strpos($route, '<');
                 $optAngle = strpos($route, '[<');
 
                 $match = [];
@@ -223,7 +220,6 @@ class Cli extends AbstractMatch
 
                 if (count($match) > 0) {
                     $params = substr($route, min($match));
-                    $route = substr($route, 0, min($match) - 1);
                     $params = (strpos($params, ' ') !== false) ? explode(' ', $params) : [$params];
 
                     $controller['dispatchParams'] = [];
@@ -232,28 +228,119 @@ class Cli extends AbstractMatch
                             $param = substr($param, 1);
                             $param = substr($param, 0, -1);
                             $controller['dispatchParams'][] = [
-                                'name' => $param,
+                                'name'     => $param,
                                 'required' => false
                             ];
                         } else {
+                            if ((substr($param, 0, 1) == '<') && (substr($param, -1) == '>')) {
+                                $param = substr($param, 1, -1);
+                            }
                             $controller['dispatchParams'][] = [
-                                'name' => $param,
+                                'name'     => $param,
                                 'required' => true
                             ];
                         }
                     }
                 }
 
-                // Handle optional literals, create regex for route matching
-                if (strpos($route, '[') !== false) {
-                    $route = '/' . str_replace(['[', ']', '|', ') '], ['(', ')', '\s|', '\s)?'], $route) . '(.*)/';
-                } else {
-                    $route = '/' . $route . '(.*)/';
+                $regex  = '/^';
+                $ary    = explode(' ', $route);
+                foreach ($ary as $key => $value) {
+                    if ($this->isOptional($value)) {
+                        if ($this->isCommand($value) || $this->isOption($value)) {
+                            if ($this->hasAlternate($value)) {
+                                $value = '(' .$value . ')';
+                                $regex .= str_replace(['[', ']'], ['\s(', ')'], $value) . '?';
+                            } else {
+                                $regex .= '(' . str_replace(['[', ']'], ['\s', ''], $value) . ')?';
+                            }
+                        } else if ($this->isValue($value)) {
+                            $regex .= '(\s.(.*))?';
+                        } else if ($this->isOptionValue($value)) {
+                            $regex .= '(\s' . str_replace(['[', ']'], ['', ''], $value) . '(.*))?';
+                        }
+                    } else {
+                        if ($this->isCommand($value) || $this->isOption($value)) {
+                            if ($this->hasAlternate($value)) {
+                                $value = '(' .$value . ')';
+                            }
+                            $regex .= (($key > 0) ? ' ' : '') . $value;
+                        } else if ($this->isValue($value)) {
+                            $regex .= (($key > 0) ? ' ' : '') . '.(.*)';
+                        } else if ($this->isOptionValue($value)) {
+                            $regex .= (($key > 0) ? ' ' : '') . $value . '(.*)';
+                        }
+                    }
+                }
+                $regex .= '$/';
+
+                if (substr($regex, -4) == ' *$/') {
+                    $regex = substr($regex, 0, -4) . '(.*)$/';
                 }
 
-                $this->routes[$route] = $controller;
+                $this->routes[$regex] = $controller;
             }
         }
+    }
+
+    /**
+     * Determine if the route segment is optional
+     *
+     * @param  string $route
+     * @return boolean
+     */
+    protected function isOptional($route) {
+        return (strpos($route, '[') !== false);
+    }
+
+    /**
+     * Determine if the route segment is a command
+     *
+     * @param  string $route
+     * @return boolean
+     */
+    protected function isCommand($route) {
+        return ((strpos($route, '-') === false) && (strpos($route, '<') === false));
+    }
+
+    /**
+     * Determine if the route segment is an option
+     *
+     * @param  string $route
+     * @return boolean
+     */
+    protected function isOption($route) {
+        return ((strpos($route, '-') !== false) && (strpos($route, '=') === false));
+    }
+
+    /**
+     * Determine if the route segment is a value
+     *
+     * @param  string $route
+     * @return boolean
+     */
+    protected function isValue($route) {
+        return (strpos($route, '<') !== false);
+    }
+
+    /**
+     * Determine if the route segment is option value
+     *
+     * @param  string $route
+     * @return boolean
+     */
+    protected function isOptionValue($route) {
+        return ((strpos($route, '-') !== false) && (strpos($route, '=') !== false));
+    }
+
+    /**
+     * Determine if the route segment has an alternate
+     *
+     * @param  string $value
+     * @return boolean
+     */
+    protected function hasAlternate($value) {
+        return (strpos($value, '|') !== false);
     }
 
     /**
@@ -266,8 +353,15 @@ class Cli extends AbstractMatch
     {
         $params = [];
 
-        foreach ($this->arguments as $arg) {
-            if (strpos($route, $arg) === false) {
+        foreach ($this->arguments as $i => $arg) {
+            if (substr($arg, 0, 1) == '-') {
+                if (strpos($arg, '=') !== false) {
+                    $ary = explode('=', $arg);
+                    $params[] = $ary[1];
+                } else {
+                    $params[] = true;
+                }
+            } else if (strpos($route, $arg) === false) {
                 $params[] = $arg;
             }
         }
@@ -289,68 +383,34 @@ class Cli extends AbstractMatch
         $offset        = 0;
 
         foreach ($routeParams as $i => $param) {
-            if (($param['required']) && !isset($params[$i])) {
+            if (($param['required']) && !isset($params[$i - $offset])) {
                 $result = false;
-            } else if (isset($params[$i])) {
-                // If value
-                if (substr($param['name'], 0, 1) == '<') {
-                    $p = substr($param['name'], 1);
-                    $p = substr($p, 0, -1);
-                    $matchedParams[$p] = $params[$i];
-                // Option with value
-                } else if (substr($param['name'], -1) == '=') {
-                    foreach ($params as $value) {
-                        if (substr($value, 0, strlen($param['name'])) == $param['name']) {
-                            $p = explode('=', $value);
-                            $matchedParams[str_replace('-', '', $p[0])] = $p[1];
-                        }
-                    }
-                // Option
-                } else if (substr($param['name'], 0, 1) == '-') {
-                    $p = explode('|', $param['name']);
-                    $whichOpt = null;
-                    $optValue = null;
-                    foreach ($p as $opt) {
-                        if (in_array($opt, $params)) {
-                            $whichOpt = $opt;
-                        } else {
-                            // Check if a value is passed with the parameter option
+                break;
+            }
 
-                            foreach ($params as $searchParam) {
-                                if (substr($searchParam, 0, strlen($opt)) == $opt) {
-                                    $whichOpt = $opt;
-                                    if (strlen($searchParam) > strlen($opt)) {
-                                        $optValue = (strpos($searchParam, '=') !== false) ?
-                                            substr($searchParam, (strpos($searchParam, '=') + 1)) :
-                                            substr($searchParam, (strpos($searchParam, $whichOpt) + strlen($whichOpt)));
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (null !== $whichOpt) {
-                        $key = array_search($whichOpt, $params);
-                        // Look ahead for a value
-                        if (isset($params[$key + 1]) && (substr($params[$key + 1], 0, 1) != '-')) {
-                            if (isset($routeParams[($key + 1 - $offset)])) {
-                                // Value is meant for the next arg place
-                                if (substr($routeParams[($key + 1 - $offset)]['name'], 0, 1) == '<') {
-                                    $matchedParams[str_replace('-', '', $whichOpt)] = (null !== $optValue) ? $optValue : true;
-                                // Value is meant for the option
-                                } else {
-                                    $matchedParams[str_replace('-', '', $whichOpt)] = $params[$key + 1];
-                                    $offset++;
-                                }
-                            } else {
-                                $matchedParams[str_replace('-', '', $whichOpt)] = $params[$key + 1];
-                                $offset++;
-                            }
-                        // Else, just set to true
-                        } else {
-                            $matchedParams[str_replace('-', '', $whichOpt)] = (null !== $optValue) ? $optValue : true;
-                        }
-                    }
+            // Is option
+            if ($this->isOption($param['name'])) {
+                if (isset($params[$i - $offset]) && is_bool($params[$i - $offset])) {
+                    $matchedParams[$param['name']] = $params[$i - $offset];
+                } else {
+                    $matchedParams[$param['name']] = null;
+                    $offset++;
+                }
+            // Is option value
+            } else if ($this->isOptionValue($param['name'])) {
+                if (isset($params[$i - $offset])) {
+                    $matchedParams[$param['name']] = $params[$i - $offset];
+                } else {
+                    $matchedParams[$param['name']] = null;
+                    $offset++;
+                }
+            // Is value
+            } else {
+                if (isset($params[$i - $offset])) {
+                    $matchedParams[$param['name']] = $params[$i - $offset];
+                } else {
+                    $matchedParams[$param['name']] = null;
+                    $offset++;
                 }
             }
         }
