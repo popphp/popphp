@@ -512,7 +512,7 @@ class Application
                 // Trigger any app.dispatch.post events
                 $this->trigger('app.dispatch.pre');
 
-                // If controller exists, dispatch it
+                // If route has been found and controller exists, dispatch it
                 if (null !== $controller) {
                     // If the controller is a closure
                     if ($controller instanceof \Closure) {
@@ -543,6 +543,8 @@ class Application
                             $this->router->getController()->dispatch($action);
                         }
                     }
+                } else {
+                    $this->router->getRouteMatch()->noRouteFound();
                 }
 
                 // Trigger any app.dispatch.post events

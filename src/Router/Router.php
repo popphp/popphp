@@ -207,7 +207,7 @@ class Router implements RouterInterface
      */
     public function hasRoute()
     {
-        return $this->routeMatch->match($this->routes);
+        return $this->routeMatch->hasRoute();
     }
 
     /**

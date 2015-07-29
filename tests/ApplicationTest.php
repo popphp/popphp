@@ -206,13 +206,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function testEventsOnRun()
     {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
         $config = [
             'foo'      => 'bar',
             'routes'   => [
-                'help' => [
-                    'controller' => 'Foo\Controller\IndexController',
-                    'action'     => 'help'
-                ]
+                'help' => function() {
+                    return 'help';
+                }
             ],
             'events'   => [
                 [

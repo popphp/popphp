@@ -283,6 +283,25 @@ class Http extends AbstractMatch
     }
 
     /**
+     * Method to process if a route was not found
+     *
+     * @return void
+     */
+    public function noRouteFound()
+    {
+        header('HTTP/1.1 404 Not Found');
+        echo '<!DOCTYPE html>' . PHP_EOL;
+        echo '<html>' . PHP_EOL;
+        echo '    <head>' . PHP_EOL;
+        echo '        <title>Page Not Found</title>' . PHP_EOL;
+        echo '    </head>' . PHP_EOL;
+        echo '<body>' . PHP_EOL;
+        echo '    <h1>Page Not Found</h1>' . PHP_EOL;
+        echo '</body>' . PHP_EOL;
+        echo '</html>'. PHP_EOL;
+    }
+
+    /**
      * Prepare the routes
      *
      * @param  array $routes

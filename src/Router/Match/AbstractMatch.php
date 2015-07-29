@@ -192,6 +192,13 @@ abstract class AbstractMatch
     abstract public function match($routes);
 
     /**
+     * Method to process if a route was not found
+     *
+     * @return void
+     */
+    abstract public function noRouteFound();
+
+    /**
      * Prepare the routes
      *
      * @param  array $routes

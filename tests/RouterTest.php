@@ -205,6 +205,22 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('help', $match->getArgumentString());
     }
 
+    /**
+     * @runInSeparateProcess
+     */
+    public function testCliNoMatch()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+        $match = new Match\Cli();
+        $this->assertFalse($match->match(['foo' => ['controller' => function() {}]]));
+        ob_start();
+        $match->noRouteFound(false);
+        $result = ob_get_clean();
+        $this->assertFalse(ctype_print($result));
+    }
+
     public function testHttpMatch()
     {
         $_SERVER['REQUEST_URI'] = '/system/?id=123';
@@ -212,6 +228,20 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $match->getBasePath());
         $this->assertContains('system', $match->getSegments());
         $this->assertEquals('/system/', $match->getSegmentString());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testHttpNoMatch()
+    {
+        $_SERVER['REQUEST_URI'] = '/system';
+        $match = new Match\Http();
+        $this->assertFalse($match->match(['/' => ['controller' => function() {}]]));
+        ob_start();
+        $match->noRouteFound();
+        $result = ob_get_clean();
+        $this->assertContains('Page Not Found', $result);
     }
 
     public function testHttpMatchIndex()
@@ -239,7 +269,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($match->hasRoute());
     }
 
-    public function testCliWildcardRoute()
+    public function testCliOptionsRoute()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'help', '-o1', '-o2'
@@ -256,7 +286,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($match->hasRoute());
     }
 
-    public function testCliOptionsRoute()
+    public function testCliWildcardRoute()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'help', 'foo'

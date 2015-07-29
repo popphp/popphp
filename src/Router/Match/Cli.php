@@ -182,6 +182,27 @@ class Cli extends AbstractMatch
     }
 
     /**
+     * Method to process if a route was not found
+     *
+     * @param  boolean $exit
+     * @return void
+     */
+    public function noRouteFound($exit = true)
+    {
+        if (stripos(PHP_OS, 'win') === false) {
+            $string  = "    \x1b[1;37m\x1b[41m                          \x1b[0m" . PHP_EOL;
+            $string .= "    \x1b[1;37m\x1b[41m    Command not found.    \x1b[0m" . PHP_EOL;
+            $string .= "    \x1b[1;37m\x1b[41m                          \x1b[0m";
+        } else {
+            $string = 'Command Not Found.';
+        }
+        echo PHP_EOL . $string . PHP_EOL . PHP_EOL;
+        if ($exit) {
+            exit(127);
+        }
+    }
+
+    /**
      * Prepare the routes
      *
      * @param  array $routes

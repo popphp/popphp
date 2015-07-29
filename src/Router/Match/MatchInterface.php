@@ -97,4 +97,11 @@ interface MatchInterface
      */
     public function match($routes);
 
+    /**
+     * Method to process if a route was not found
+     *
+     * @return void
+     */
+    public function noRouteFound();
+
 }
