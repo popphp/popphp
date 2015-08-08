@@ -157,7 +157,7 @@ action method within that class. You could define a dynamic web route like this:
 return [
     'routes' => [
         '/:controller/:action[/:param]' => [
-            'namespace' => 'MyApp\Controller\\'
+            'prefix' => 'MyApp\Controller\\'
         ]
     ]
 ];
@@ -175,7 +175,7 @@ A dynamic CLI route like would work in a similar fashion:
 return [
     'routes' => [
         'foo <controller> <action> [<param>]' => [
-            'namespace' => 'MyApp\Controller\\'
+            'prefix' => 'MyApp\Controller\\'
         ]
     ]
 ];
