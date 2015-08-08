@@ -51,6 +51,16 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(array_key_exists('/login', $router->getRoutes()));
     }
 
+    public function testAddDynamicRoute()
+    {
+        $router = new Router();
+        $router->addRoute('foo <controller> <action>', [
+            'prefix' => 'MyApp\Controller\\'
+        ]);
+
+        $this->assertTrue(array_key_exists('foo <controller> <action>', $router->getRoutes()));
+    }
+
     public function testAddRouteParams()
     {
         $router = new Router();
@@ -228,6 +238,35 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $match->getBasePath());
         $this->assertContains('system', $match->getSegments());
         $this->assertEquals('/system/', $match->getSegmentString());
+    }
+
+    public function testHttpDynamicMatch()
+    {
+        $_SERVER['REQUEST_URI'] = '/test/edit/1001';
+
+        $router = new Router();
+        $router->addRoute('/:controller/:action/:param', [
+            'prefix' => 'Pop\Test\TestAsset\\'
+        ]);
+
+        $match = new Match\Http();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
+    }
+
+    public function testCliDynamicMatch()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'foo', 'test', 'edit', '1001'
+        ];
+        $router = new Router();
+        $router->addRoute('foo <controller> <action> <param>', [
+            'prefix' => 'Pop\Test\TestAsset\\'
+        ]);
+
+        $match = new Match\Cli();
+        $match->match($router->getRoutes());
+        $this->assertTrue($match->hasRoute());
     }
 
     /**

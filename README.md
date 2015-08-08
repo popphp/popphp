@@ -136,7 +136,7 @@ return [
 ];
 ```
 
-###### index.php
+###### app.php
 
 ```php
 $app = new Pop\Application(include __DIR__ . '/config/application.php');
@@ -145,6 +145,46 @@ $app->run();
 
 As before, the actions listed in the `application.php` config above will be routed to methods within the
 `MyApp\Controller\IndexController` object, `help()` and `hello($name)` respectively.
+
+##### Dynamic Routing
+
+There is support for dynamic routing for both web and CLI applications. The reserved route keywords
+`controller` and `action` are used to map the route to a matched controller class and respective
+action method within that class. You could define a dynamic web route like this:
+
+```php
+<?php
+return [
+    'routes' => [
+        '/:controller/:action[/:param]' => [
+            'namespace' => 'MyApp\Controller\\'
+        ]
+    ]
+];
+```
+
+which will map a route like
+
+    /users/edit/1001
+    MyApp\Controller\UsersController->edit($id)
+
+A dynamic CLI route like would work in a similar fashion:
+
+```php
+<?php
+return [
+    'routes' => [
+        'foo <controller> <action> [<param>]' => [
+            'namespace' => 'MyApp\Controller\\'
+        ]
+    ]
+];
+```
+
+which will map a route like
+
+    foo users edit 1001
+    MyApp\Controller\UsersController->edit($id)
 
 [Top](#basic-usage)
 

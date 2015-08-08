@@ -21,7 +21,7 @@ namespace Pop\Router;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.0
+ * @version    2.0.1
  */
 class Router implements RouterInterface
 {
@@ -94,24 +94,31 @@ class Router implements RouterInterface
 
         // If base url exists
         if (!isset($controller['controller'])) {
-            $value = reset($controller);
-            if (isset($value['controller'])) {
-                foreach ($controller as $r => $c) {
-                    if ($route != '') {
-                        $sep = ($this->isHttp()) ? '/' : ' ';
-                        if ((substr($r, 0, 1) == $sep) || (substr($r, 0, 1) == '[')) {
-                            $r = $route . $r;
-                        } else {
-                            $r = $route . $sep . $r;
+            // If dynamic routing
+            if ((strpos($route, ':controller') !== false) || (strpos($route, '<controller') !== false)) {
+                $this->routes[$route] = $controller;
+            // Else, nested routing
+            } else {
+                $value = reset($controller);
+                if (isset($value['controller'])) {
+                    foreach ($controller as $r => $c) {
+                        if ($route != '') {
+                            $sep = ($this->isHttp()) ? '/' : ' ';
+                            if ((substr($r, 0, 1) == $sep) || (substr($r, 0, 1) == '[')) {
+                                $r = $route . $r;
+                            } else {
+                                $r = $route . $sep . $r;
+                            }
                         }
+                        $this->routes[$r] = $c;
                     }
-                    $this->routes[$r] = $c;
                 }
             }
         // Else, just add routes
         } else {
             $this->routes[$route] = $controller;
         }
+
         return $this;
     }
 
