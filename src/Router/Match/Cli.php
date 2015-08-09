@@ -466,7 +466,9 @@ class Cli extends AbstractMatch
         }
 
         if (isset($matchedParams['action'])) {
-            $this->action = $matchedParams['action'];
+            $action = lcfirst(ucwords(str_replace(['-', '_'], [' ', ' '], $matchedParams['action'])));
+            $action = str_replace(' ', '', $action);
+            $this->action = $action;
             unset($matchedParams['action']);
         } else if (null !== $dynamicController) {
             if (method_exists($dynamicController, 'index')) {
