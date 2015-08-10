@@ -25,6 +25,10 @@ Install `popphp` using Composer.
 
     composer require popphp/popphp
 
+## DISCUSSION
+
+There is an IRC channel for Pop over at irc://freenode/popphp.
+
 ## BASIC USAGE
 
 * [The Application Object](#the-application-object)
