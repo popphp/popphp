@@ -27,7 +27,7 @@ Install `popphp` using Composer.
 
 ## DISCUSSION
 
-There is an IRC channel for Pop over at irc://freenode/popphp.
+There is an IRC channel for Pop over at [irc://freenode/popphp](irc://freenode/popphp).
 
 ## BASIC USAGE
 
