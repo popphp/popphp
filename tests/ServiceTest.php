@@ -83,7 +83,22 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($services->isLoaded('foo'));
     }
 
-    public function testOffsets()
+    public function testMagicMethods()
+    {
+        $services = new Locator();
+        $services->foo = [
+            'call'   => function(){
+                return 123;
+            }
+        ];
+
+        $this->assertTrue(isset($services->foo));
+        $this->assertEquals(123, $services->foo);
+        unset($services->foo);
+        $this->assertFalse(isset($services->foo));
+    }
+
+    public function testOffsetMethods()
     {
         $services = new Locator();
         $services['foo'] = [

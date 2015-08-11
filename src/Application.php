@@ -21,9 +21,9 @@ namespace Pop;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.1
+ * @version    2.0.2
  */
-class Application
+class Application implements \ArrayAccess
 {
 
     /**
@@ -554,6 +554,172 @@ class Application
             // Trigger any app.error events
             $this->trigger('app.error', ['exception' => $exception]);
         }
+    }
+
+    /**
+     * Set a value in the array
+     *
+     * @param  string $name
+     * @param  mixed  $value
+     * @return Application
+     */
+    public function __set($name, $value) {
+        switch ($name) {
+            case 'config':
+                $this->loadConfig($value);
+                break;
+            case 'router':
+                $this->loadRouter($value);
+                break;
+            case 'services':
+                $this->loadServices($value);
+                break;
+            case 'events':
+                $this->loadEvents($value);
+                break;
+            case 'modules':
+                $this->loadModules($value);
+                break;
+            case 'autoloader':
+                $this->registerAutoloader($value);
+                break;
+
+        }
+        return $this;
+    }
+
+    /**
+     * Get a value from the array
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function __get($name) {
+        switch ($name) {
+            case 'config':
+                return $this->config;
+                break;
+            case 'router':
+                return $this->router;
+                break;
+            case 'services':
+                return $this->services;
+                break;
+            case 'events':
+                return $this->events;
+                break;
+            case 'modules':
+                return $this->modules;
+                break;
+            case 'autoloader':
+                return $this->autoloader;
+                break;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Determine if a value exists
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function __isset($name) {
+        switch ($name) {
+            case 'config':
+                return (null !== $this->config);
+                break;
+            case 'router':
+                return (null !== $this->router);
+                break;
+            case 'services':
+                return (null !== $this->services);
+                break;
+            case 'events':
+                return (null !== $this->events);
+                break;
+            case 'modules':
+                return (null !== $this->modules);
+                break;
+            case 'autoloader':
+                return (null !== $this->autoloader);
+                break;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Unset a value from the array
+     *
+     * @param  string $name
+     * @return Application
+     */
+    public function __unset($name) {
+        switch ($name) {
+            case 'config':
+                $this->config = null;
+                break;
+            case 'router':
+                $this->router = null;
+                break;
+            case 'services':
+                $this->services = null;
+                break;
+            case 'events':
+                $this->events = null;
+                break;
+            case 'modules':
+                $this->modules = null;
+                break;
+            case 'autoloader':
+                $this->autoloader = null;
+                break;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set a value in the array
+     *
+     * @param  string $offset
+     * @param  mixed  $value
+     * @return Application
+     */
+    public function offsetSet($offset, $value) {
+        return $this->__set($offset, $value);
+    }
+
+    /**
+     * Get a value from the array
+     *
+     * @param  string $offset
+     * @return mixed
+     */
+    public function offsetGet($offset) {
+        return $this->__get($offset);
+    }
+
+    /**
+     * Determine if a value exists
+     *
+     * @param  string $offset
+     * @return boolean
+     */
+    public function offsetExists($offset) {
+        return $this->__isset($offset);
+    }
+
+    /**
+     * Unset a value from the array
+     *
+     * @param  string $offset
+     * @return Application
+     */
+    public function offsetUnset($offset) {
+        return $this->__unset($offset);
     }
 
 }

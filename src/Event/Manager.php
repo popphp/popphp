@@ -21,9 +21,9 @@ namespace Pop\Event;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.1
+ * @version    2.0.2
  */
-class Manager
+class Manager implements \ArrayAccess
 {
 
     /**
@@ -270,6 +270,94 @@ class Manager
                 }
             }
         }
+    }
+
+    /**
+     * Set a value in the array
+     *
+     * @param  string $name
+     * @param  mixed  $value
+     * @return Manager
+     */
+    public function __set($name, $value) {
+        return $this->on($name, $value);
+    }
+
+    /**
+     * Get a value from the array
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function __get($name) {
+        return $this->get($name);
+    }
+
+    /**
+     * Determine if a value exists
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function __isset($name) {
+        return $this->has($name);
+    }
+
+    /**
+     * Unset a value from the array
+     *
+     * @param  string $name
+     * @return Manager
+     */
+    public function __unset($name) {
+        if (isset($this->listeners[$name])) {
+            unset($this->listeners[$name]);
+        }
+        return $this;
+    }
+
+    /**
+     * Set a value in the array
+     *
+     * @param  string $offset
+     * @param  mixed  $value
+     * @return Manager
+     */
+    public function offsetSet($offset, $value) {
+        return $this->on($offset, $value);
+    }
+
+    /**
+     * Get a value from the array
+     *
+     * @param  string $offset
+     * @return mixed
+     */
+    public function offsetGet($offset) {
+        return $this->get($offset);
+    }
+
+    /**
+     * Determine if a value exists
+     *
+     * @param  string $offset
+     * @return boolean
+     */
+    public function offsetExists($offset) {
+        return $this->has($offset);
+    }
+
+    /**
+     * Unset a value from the array
+     *
+     * @param  string $offset
+     * @return Manager
+     */
+    public function offsetUnset($offset) {
+        if (isset($this->listeners[$offset])) {
+            unset($this->listeners[$offset]);
+        }
+        return $this;
     }
 
 }

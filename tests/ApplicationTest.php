@@ -29,6 +29,89 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Pop\Module\Manager', $application->modules());
         $this->assertInstanceOf('Composer\Autoload\ClassLoader', $application->autoloader());
         $this->assertEquals($application->config()['foo'], 'bar');
+
+        $this->assertInstanceOf('Pop\Router\Router', $application['router']);
+        $this->assertInstanceOf('Pop\Service\Locator', $application['services']);
+        $this->assertInstanceOf('Pop\Event\Manager', $application['events']);
+        $this->assertInstanceOf('Pop\Module\Manager', $application['modules']);
+        $this->assertInstanceOf('Composer\Autoload\ClassLoader', $application['autoloader']);
+        $this->assertEquals($application['config']['foo'], 'bar');
+
+        $this->assertInstanceOf('Pop\Router\Router', $application->router);
+        $this->assertInstanceOf('Pop\Service\Locator', $application->services);
+        $this->assertInstanceOf('Pop\Event\Manager', $application->events);
+        $this->assertInstanceOf('Pop\Module\Manager', $application->modules);
+        $this->assertInstanceOf('Composer\Autoload\ClassLoader', $application->autoloader);
+        $this->assertNull($application->foo);
+        $this->assertEquals($application->config['foo'], 'bar');
+    }
+
+    public function testMagicMethods()
+    {
+        $application = new Application();
+
+        $application->router     = new Router();
+        $application->services   = new Locator();
+        $application->events     = new Event\Manager();
+        $application->modules    = new Module\Manager();
+        $application->autoloader = include __DIR__ . '/../vendor/autoload.php';
+        $application->config     = ['foo' => 'bar'];
+
+        $this->assertTrue(isset($application->router));
+        $this->assertTrue(isset($application->services));
+        $this->assertTrue(isset($application->events));
+        $this->assertTrue(isset($application->modules));
+        $this->assertTrue(isset($application->autoloader));
+        $this->assertTrue(isset($application->config));
+
+        unset($application->router);
+        unset($application->services);
+        unset($application->events);
+        unset($application->modules);
+        unset($application->autoloader);
+        unset($application->config);
+
+        $this->assertFalse(isset($application->router));
+        $this->assertFalse(isset($application->services));
+        $this->assertFalse(isset($application->events));
+        $this->assertFalse(isset($application->modules));
+        $this->assertFalse(isset($application->autoloader));
+        $this->assertFalse(isset($application->config));
+        $this->assertFalse(isset($application->foo));
+    }
+
+    public function testOffsetMethods()
+    {
+        $application = new Application();
+
+        $application['router']     = new Router();
+        $application['services']   = new Locator();
+        $application['events']     = new Event\Manager();
+        $application['modules']    = new Module\Manager();
+        $application['autoloader'] = include __DIR__ . '/../vendor/autoload.php';
+        $application['config']     = ['foo' => 'bar'];
+
+        $this->assertTrue(isset($application['router']));
+        $this->assertTrue(isset($application['services']));
+        $this->assertTrue(isset($application['events']));
+        $this->assertTrue(isset($application['modules']));
+        $this->assertTrue(isset($application['autoloader']));
+        $this->assertTrue(isset($application['config']));
+
+        unset($application['router']);
+        unset($application['services']);
+        unset($application['events']);
+        unset($application['modules']);
+        unset($application['autoloader']);
+        unset($application['config']);
+
+        $this->assertFalse(isset($application['router']));
+        $this->assertFalse(isset($application['services']));
+        $this->assertFalse(isset($application['events']));
+        $this->assertFalse(isset($application['modules']));
+        $this->assertFalse(isset($application['autoloader']));
+        $this->assertFalse(isset($application['config']));
+        $this->assertFalse(isset($application['foo']));
     }
 
     public function testBootstrap()

@@ -15,6 +15,30 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Pop\Event\Manager', $events);
     }
 
+    public function testMagicMethods()
+    {
+        $events = new Manager();
+        $events->foo = function(){
+            return 'bar';
+        };
+        $this->assertTrue(isset($events->foo));
+        $this->assertInstanceOf('SplPriorityQueue', $events->foo);
+        unset($events->foo);
+        $this->assertFalse(isset($events->foo));
+    }
+
+    public function testOffsetMethods()
+    {
+        $events = new Manager();
+        $events['foo'] = function(){
+            return 'bar';
+        };
+        $this->assertTrue(isset($events['foo']));
+        $this->assertInstanceOf('SplPriorityQueue', $events['foo']);
+        unset($events['foo']);
+        $this->assertFalse(isset($events['foo']));
+    }
+
     public function testOff()
     {
         $events = new Manager();

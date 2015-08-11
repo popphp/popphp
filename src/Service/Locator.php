@@ -21,7 +21,7 @@ namespace Pop\Service;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.1
+ * @version    2.0.2
  */
 class Locator implements \ArrayAccess
 {
@@ -364,9 +364,50 @@ class Locator implements \ArrayAccess
     /**
      * Set a value in the array
      *
+     * @param  string $name
+     * @param  mixed  $value
+     * @return Locator
+     */
+    public function __set($name, $value) {
+        return $this->setServices([$name => $value]);
+    }
+
+    /**
+     * Get a value from the array
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function __get($name) {
+        return $this->get($name);
+    }
+
+    /**
+     * Determine if a value exists
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function __isset($name) {
+        return isset($this->services[$name]);
+    }
+
+    /**
+     * Unset a value from the array
+     *
+     * @param  string $name
+     * @return Locator
+     */
+    public function __unset($name) {
+        return $this->remove($name);
+    }
+
+    /**
+     * Set a value in the array
+     *
      * @param  string $offset
      * @param  mixed  $value
-     * @return mixed
+     * @return Locator
      */
     public function offsetSet($offset, $value) {
         return $this->setServices([$offset => $value]);
@@ -386,7 +427,7 @@ class Locator implements \ArrayAccess
      * Determine if a value exists
      *
      * @param  string $offset
-     * @return mixed
+     * @return boolean
      */
     public function offsetExists($offset) {
         return isset($this->services[$offset]);
@@ -396,7 +437,7 @@ class Locator implements \ArrayAccess
      * Unset a value from the array
      *
      * @param  string $offset
-     * @return mixed
+     * @return Locator
      */
     public function offsetUnset($offset) {
         return $this->remove($offset);
