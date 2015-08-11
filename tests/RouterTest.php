@@ -70,13 +70,40 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             }
         ]);
 
-        $router->addControllerParams('/user', 1000);
-        $router->addControllerParams('/user', 2000);
-        $router->addControllerParams('/user', [3000, 4000]);
+        $router->addControllerParams('/user', [1000, 'append' => true]);
+        $router->addControllerParams('/user', [2000, 'append' => true]);
+        $router->addControllerParams('/user', [3000, 4000, 'append' => true]);
         $this->assertContains(1000, $router->getControllerParams('/user'));
         $this->assertContains(2000, $router->getControllerParams('/user'));
         $this->assertContains(3000, $router->getControllerParams('/user'));
         $this->assertContains(4000, $router->getControllerParams('/user'));
+    }
+
+    public function testAddControllerParamsNoAppend()
+    {
+        $router = new Router();
+        $router->addRoute('/user', [
+            'controller' => function($id) {
+                echo $id;
+            }
+        ]);
+
+        $router->addControllerParams('/user', 1000);
+        $this->assertContains(1000, $router->getControllerParams('/user'));
+    }
+
+    public function testAddControllerParamsNull()
+    {
+        $router = new Router();
+        $router->addRoute('/user', [
+            'controller' => function($id) {
+                echo $id;
+            }
+        ]);
+
+        $router->addControllerParams('/user', 1000);
+        $router->addControllerParams('/user', null);
+        $this->assertEquals(0, count($router->getControllerParams('/user')));
     }
 
     public function testAddDispatchParams()

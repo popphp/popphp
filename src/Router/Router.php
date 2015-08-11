@@ -146,16 +146,28 @@ class Router implements RouterInterface
      * @param  mixed  $params
      * @return Router
      */
-    public function addControllerParams($controller, $params)
+    public function addControllerParams($controller, $params = null)
     {
-        if (isset($this->controllerParams[$controller])) {
-            if (is_array($params)) {
-                $this->controllerParams[$controller] = array_merge($this->controllerParams[$controller], $params);
-            } else {
-                $this->controllerParams[$controller][] = $params;
-            }
+        // Clear parameters
+        if ((null === $params) && isset($this->controllerParams[$controller])) {
+            $this->controllerParams[$controller] = [];
         } else {
-            $this->controllerParams[$controller] = (!is_array($params)) ? [$params] : $params;
+            if (!is_array($params)) {
+                $params = [$params];
+            }
+
+            // Append parameters to any that exist
+            if (isset($params['append']) && ($params['append'])) {
+                unset($params['append']);
+                if (isset($this->controllerParams[$controller])) {
+                    $this->controllerParams[$controller] = array_merge($this->controllerParams[$controller], $params);
+                } else {
+                    $this->controllerParams[$controller] = $params;
+                }
+            // Override existing parameters
+            } else {
+                $this->controllerParams[$controller] = $params;
+            }
         }
 
         return $this;
@@ -310,15 +322,15 @@ class Router implements RouterInterface
                     $this->addControllerParams($controller, $this->routeMatch->getControllerParams());
                 }
 
-                // If the controller has route parameters
-                if (isset($this->controllerParams['*']) || isset($this->controllerParams[$controller])) {
-                    if (isset($this->controllerParams['*']) && isset($this->controllerParams[$controller])) {
-                        $controllerParams = array_merge($this->controllerParams['*'], $this->controllerParams[$controller]);
-                    } else if (isset($this->controllerParams['*'])) {
-                        $controllerParams = $this->controllerParams['*'];
-                    } else {
-                        $controllerParams = $this->controllerParams[$controller];
-                    }
+                $controllerParams = [];
+                                if (isset($this->controllerParams[$controller])) {
+                    $controllerParams = $this->controllerParams[$controller];
+                } else if (isset($this->controllerParams['*'])) {
+                    $controllerParams = $this->controllerParams['*'];
+                }
+
+                // If the controller has parameters
+                if (is_array($controllerParams) && (count($controllerParams) > 0)) {
                     $reflect          = new \ReflectionClass($controller);
                     $this->controller = $reflect->newInstanceArgs($controllerParams);
                 // Else, just instantiate the controller
