@@ -55,18 +55,18 @@ interface MatchInterface
     public function getAction();
 
     /**
-     * Get the matched route params
+     * Get the matched controller params
      *
      * @return array
      */
-    public function getRouteParams();
+    public function getControllerParams();
 
     /**
-     * Determine if there are matched route params
+     * Determine if there are matched controller params
      *
      * @return boolean
      */
-    public function hasRouteParams();
+    public function hasControllerParams();
 
     /**
      * Get the matched dispatch params

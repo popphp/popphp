@@ -33,10 +33,10 @@ class Router implements RouterInterface
     protected $routes = [];
 
     /**
-     * Array of route parameters
+     * Array of controller parameters
      * @var array
      */
-    protected $routeParams = [];
+    protected $controllerParams = [];
 
     /**
      * Array of dispatch parameters
@@ -138,24 +138,24 @@ class Router implements RouterInterface
     }
 
     /**
-     * Add route params to be passed into a new controller instance
+     * Add controller params to be passed into a new controller instance
      *
-     *     $router->addRouteParams('MyApp\Controller\IndexController', ['foo', 'bar']);
+     *     $router->addControllerParams('MyApp\Controller\IndexController', ['foo', 'bar']);
      *
-     * @param  string $route
+     * @param  string $controller
      * @param  mixed  $params
      * @return Router
      */
-    public function addRouteParams($route, $params)
+    public function addControllerParams($controller, $params)
     {
-        if (isset($this->routeParams[$route])) {
+        if (isset($this->controllerParams[$controller])) {
             if (is_array($params)) {
-                $this->routeParams[$route] = array_merge($this->routeParams[$route], $params);
+                $this->controllerParams[$controller] = array_merge($this->controllerParams[$controller], $params);
             } else {
-                $this->routeParams[$route][] = $params;
+                $this->controllerParams[$controller][] = $params;
             }
         } else {
-            $this->routeParams[$route] = (!is_array($params)) ? [$params] : $params;
+            $this->controllerParams[$controller] = (!is_array($params)) ? [$params] : $params;
         }
 
         return $this;
@@ -186,14 +186,14 @@ class Router implements RouterInterface
     }
 
     /**
-     * Get the params assigned to the route
+     * Get the params assigned to the controller
      *
-     * @param  string $route
+     * @param  string $controller
      * @return mixed
      */
-    public function getRouterParams($route)
+    public function getControllerParams($controller)
     {
-        return (isset($this->routeParams[$route])) ? $this->routeParams[$route] : null;
+        return (isset($this->controllerParams[$controller])) ? $this->controllerParams[$controller] : null;
     }
 
     /**
@@ -306,21 +306,21 @@ class Router implements RouterInterface
                 $this->controllerClass = $controller;
 
                 // If parameters are found, add them for dispatch
-                if ($this->routeMatch->hasRouteParams()) {
-                    $this->addRouteParams($controller, $this->routeMatch->getRouteParams());
+                if ($this->routeMatch->hasControllerParams()) {
+                    $this->addControllerParams($controller, $this->routeMatch->getControllerParams());
                 }
 
                 // If the controller has route parameters
-                if (isset($this->routeParams['*']) || isset($this->routeParams[$controller])) {
-                    if (isset($this->routeParams['*']) && isset($this->routeParams[$controller])) {
-                        $routeParams = array_merge($this->routeParams['*'], $this->routeParams[$controller]);
-                    } else if (isset($this->routeParams['*'])) {
-                        $routeParams = $this->routeParams['*'];
+                if (isset($this->controllerParams['*']) || isset($this->controllerParams[$controller])) {
+                    if (isset($this->controllerParams['*']) && isset($this->controllerParams[$controller])) {
+                        $controllerParams = array_merge($this->controllerParams['*'], $this->controllerParams[$controller]);
+                    } else if (isset($this->controllerParams['*'])) {
+                        $controllerParams = $this->controllerParams['*'];
                     } else {
-                        $routeParams = $this->routeParams[$controller];
+                        $controllerParams = $this->controllerParams[$controller];
                     }
                     $reflect          = new \ReflectionClass($controller);
-                    $this->controller = $reflect->newInstanceArgs($routeParams);
+                    $this->controller = $reflect->newInstanceArgs($controllerParams);
                 // Else, just instantiate the controller
                 } else {
                     $this->controller = new $controller();

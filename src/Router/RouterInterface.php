@@ -44,13 +44,14 @@ interface RouterInterface
     public function addRoutes(array $routes);
 
     /**
-     * Add route params
+     * Add controller params
      *
-     * @param  string $route
+     * @param  string $controller
      * @param  mixed  $params
      * @return RouterInterface
      */
-    public function addRouteParams($route, $params);
+    public function addControllerParams($controller, $params);
+
     /**
      * Add route params
      *
@@ -61,12 +62,12 @@ interface RouterInterface
     public function addDispatchParams($action, $params);
 
     /**
-     * Get the params assigned to the route
+     * Get the params assigned to the controller
      *
-     * @param  string $route
+     * @param  string $controller
      * @return mixed
      */
-    public function getRouterParams($route);
+    public function getControllerParams($controller);
 
     /**
      * Get the params assigned to the dispatch

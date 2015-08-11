@@ -174,9 +174,9 @@ class Http extends AbstractMatch
                         if (isset($controller['action'])) {
                             $this->action = $controller['action'];
                         }
-                        if (isset($controller['routeParams'])) {
-                            $this->routeParams = (!is_array($controller['routeParams'])) ?
-                                [$controller['routeParams']] : $controller['routeParams'];
+                        if (isset($controller['controllerParams'])) {
+                            $this->controllerParams = (!is_array($controller['controllerParams'])) ?
+                                [$controller['controllerParams']] : $controller['controllerParams'];
                         }
                     }
                 }
@@ -223,9 +223,9 @@ class Http extends AbstractMatch
                     if (isset($controller['action'])) {
                         $this->action = $controller['action'];
                     }
-                    if (isset($controller['routeParams'])) {
-                        $this->routeParams = (!is_array($controller['routeParams'])) ?
-                            [$controller['routeParams']] : $controller['routeParams'];
+                    if (isset($controller['controllerParams'])) {
+                        $this->controllerParams = (!is_array($controller['controllerParams'])) ?
+                            [$controller['controllerParams']] : $controller['controllerParams'];
                     }
                 }
             }
@@ -257,9 +257,9 @@ class Http extends AbstractMatch
                     $this->dispatchParams  = $matchedParams;
                 }
             }
-            if (isset($this->routes[$this->route]['routeParams'])) {
-                $this->routeParams = (!is_array($this->routes[$this->route]['routeParams'])) ?
-                    [$this->routes[$this->route]['routeParams']] : $this->routes[$this->route]['routeParams'];
+            if (isset($this->routes[$this->route]['controllerParams'])) {
+                $this->controllerParams = (!is_array($this->routes[$this->route]['controllerParams'])) ?
+                    [$this->routes[$this->route]['controllerParams']] : $this->routes[$this->route]['controllerParams'];
             }
         }
 
@@ -392,23 +392,23 @@ class Http extends AbstractMatch
      * Process parameters from the route string
      *
      * @param  array $params
-     * @param  array $routeParams
+     * @param  array $dispatchParams
      * @return mixed
      */
-    protected function processDispatchParamsFromRoute($params, $routeParams)
+    protected function processDispatchParamsFromRoute($params, $dispatchParams)
     {
         $result        = true;
         $hasCollection = false;
         $matchedParams = [];
 
         // If there's a direct match
-        if (count($params) == count($routeParams)) {
+        if (count($params) == count($dispatchParams)) {
             foreach ($params as $i => $param) {
-                $matchedParams[$routeParams[$i]['name']] = ($routeParams[$i]['collection']) ? [$param] : $param;
+                $matchedParams[$dispatchParams[$i]['name']] = ($dispatchParams[$i]['collection']) ? [$param] : $param;
             }
         // Else, loop through and verify the parameters
-        } else if (count($params) < count($routeParams)) {
-            foreach ($routeParams as $i => $param) {
+        } else if (count($params) < count($dispatchParams)) {
+            foreach ($dispatchParams as $i => $param) {
                 if (($param['required']) && !isset($params[$i])) {
                     $result = false;
                 } else if (isset($params[$i])) {
@@ -416,8 +416,8 @@ class Http extends AbstractMatch
                 }
             }
         // Else, check for a collection of parameters
-        } else if (count($params) > count($routeParams)) {
-            foreach ($routeParams as $param) {
+        } else if (count($params) > count($dispatchParams)) {
+            foreach ($dispatchParams as $param) {
                 if ($param['collection']) {
                     $hasCollection = true;
                 }
@@ -425,12 +425,12 @@ class Http extends AbstractMatch
             if ($hasCollection) {
                 $collectionName = null;
                 foreach ($params as $i => $param) {
-                    if (isset($routeParams[$i])) {
-                        if ($routeParams[$i]['collection']) {
-                            $collectionName = $routeParams[$i]['name'];
+                    if (isset($dispatchParams[$i])) {
+                        if ($dispatchParams[$i]['collection']) {
+                            $collectionName = $dispatchParams[$i]['name'];
                             $matchedParams[$collectionName] = [$param];
                         } else {
-                            $matchedParams[$routeParams[$i]['name']] = $param;
+                            $matchedParams[$dispatchParams[$i]['name']] = $param;
                         }
                     } else if ((null !== $collectionName) && isset($matchedParams[$collectionName])) {
                         $matchedParams[$collectionName][] = $param;
@@ -485,9 +485,9 @@ class Http extends AbstractMatch
         }
 
         $this->dispatchParams = $matchedParams;
-        if (isset($controller['routeParams'])) {
-            $this->routeParams = (!is_array($controller['routeParams'])) ?
-                [$controller['routeParams']] : $controller['routeParams'];
+        if (isset($controller['controllerParams'])) {
+            $this->controllerParams = (!is_array($controller['controllerParams'])) ?
+                [$controller['controllerParams']] : $controller['controllerParams'];
         }
     }
 

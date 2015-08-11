@@ -51,10 +51,10 @@ abstract class AbstractMatch
     protected $action = null;
 
     /**
-     * Matched route parameters
+     * Matched controller parameters
      * @var array
      */
-    protected $routeParams = [];
+    protected $controllerParams = [];
 
     /**
      * Matched dispatch parameters
@@ -125,23 +125,23 @@ abstract class AbstractMatch
     }
 
     /**
-     * Get the matched route params
+     * Get the matched controller params
      *
      * @return array
      */
-    public function getRouteParams()
+    public function getControllerParams()
     {
-        return $this->routeParams;
+        return $this->controllerParams;
     }
 
     /**
-     * Determine if there are matched route params
+     * Determine if there are matched controller params
      *
      * @return boolean
      */
-    public function hasRouteParams()
+    public function hasControllerParams()
     {
-        return (count($this->routeParams) > 0);
+        return (count($this->controllerParams) > 0);
     }
 
     /**

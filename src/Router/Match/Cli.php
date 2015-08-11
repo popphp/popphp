@@ -126,9 +126,9 @@ class Cli extends AbstractMatch
                         if (isset($controller['action'])) {
                             $this->action = $controller['action'];
                         }
-                        if (isset($controller['routeParams'])) {
-                            $this->routeParams = (!is_array($controller['routeParams'])) ?
-                                [$controller['routeParams']] : $controller['routeParams'];
+                        if (isset($controller['controllerParams'])) {
+                            $this->controllerParams = (!is_array($controller['controllerParams'])) ?
+                                [$controller['controllerParams']] : $controller['controllerParams'];
                         }
                     }
                 }
@@ -164,9 +164,9 @@ class Cli extends AbstractMatch
                     $this->dispatchParams  = $matchedParams;
                 }
             }
-            if (isset($this->routes[$this->route]['routeParams'])) {
-                $this->routeParams = (!is_array($this->routes[$this->route]['routeParams'])) ?
-                    [$this->routes[$this->route]['routeParams']] : $this->routes[$this->route]['routeParams'];
+            if (isset($this->routes[$this->route]['controllerParams'])) {
+                $this->controllerParams = (!is_array($this->routes[$this->route]['controllerParams'])) ?
+                    [$this->routes[$this->route]['controllerParams']] : $this->routes[$this->route]['controllerParams'];
             }
         }
 
@@ -392,16 +392,16 @@ class Cli extends AbstractMatch
      * Process parameters from the route string
      *
      * @param  array  $params
-     * @param  array  $routeParams
+     * @param  array  $dispatchParams
      * @return mixed
      */
-    protected function processDispatchParamsFromRoute($params, $routeParams)
+    protected function processDispatchParamsFromRoute($params, $dispatchParams)
     {
         $result        = true;
         $matchedParams = [];
         $offset        = 0;
 
-        foreach ($routeParams as $i => $param) {
+        foreach ($dispatchParams as $i => $param) {
             if (($param['required']) && !isset($params[$i - $offset])) {
                 $result = false;
                 break;
@@ -479,9 +479,9 @@ class Cli extends AbstractMatch
         }
 
         $this->dispatchParams = $matchedParams;
-        if (isset($controller['routeParams'])) {
-            $this->routeParams = (!is_array($controller['routeParams'])) ?
-                [$controller['routeParams']] : $controller['routeParams'];
+        if (isset($controller['controllerParams'])) {
+            $this->controllerParams = (!is_array($controller['controllerParams'])) ?
+                [$controller['controllerParams']] : $controller['controllerParams'];
         }
     }
 
