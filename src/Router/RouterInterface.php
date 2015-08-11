@@ -120,6 +120,13 @@ interface RouterInterface
     public function isHttp();
 
     /**
+     * Execute the route match
+     *
+     * @return RouterInterface
+     */
+    public function match();
+
+    /**
      * Route to the correct controller
      *
      * @return void

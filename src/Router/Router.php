@@ -290,13 +290,24 @@ class Router implements RouterInterface
     }
 
     /**
+     * Execute the route match
+     *
+     * @return Router
+     */
+    public function match()
+    {
+        $this->routeMatch->match($this->routes);
+        return $this;
+    }
+
+    /**
      * Route to the correct controller
      *
      * @return void
      */
     public function route()
     {
-        $this->routeMatch->match($this->routes);
+        $this->match();
 
         $controller = $this->routeMatch->getController();
         if (null === $controller) {
