@@ -61,7 +61,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(array_key_exists('foo <controller> <action>', $router->getRoutes()));
     }
 
-    public function testAddRouteParams()
+    public function testAddControllerParams()
     {
         $router = new Router();
         $router->addRoute('/user', [
@@ -70,13 +70,13 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             }
         ]);
 
-        $router->addRouteParams('/user', 1000);
-        $router->addRouteParams('/user', 2000);
-        $router->addRouteParams('/user', [3000, 4000]);
-        $this->assertContains(1000, $router->getRouterParams('/user'));
-        $this->assertContains(2000, $router->getRouterParams('/user'));
-        $this->assertContains(3000, $router->getRouterParams('/user'));
-        $this->assertContains(4000, $router->getRouterParams('/user'));
+        $router->addControllerParams('/user', 1000);
+        $router->addControllerParams('/user', 2000);
+        $router->addControllerParams('/user', [3000, 4000]);
+        $this->assertContains(1000, $router->getControllerParams('/user'));
+        $this->assertContains(2000, $router->getControllerParams('/user'));
+        $this->assertContains(3000, $router->getControllerParams('/user'));
+        $this->assertContains(4000, $router->getControllerParams('/user'));
     }
 
     public function testAddDispatchParams()
@@ -140,9 +140,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router = new Router();
         $router->addRoute('help', [
-            'controller'  => 'Pop\Test\TestAsset\TestController',
-            'action'      => 'help',
-            'routeParams' => [123]
+            'controller'       => 'Pop\Test\TestAsset\TestController',
+            'action'           => 'help',
+            'controllerParams' => [123]
         ]);
 
         $router->route();
@@ -166,11 +166,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($router->getRouteMatch()->getRoutes()));
         $this->assertEquals('help', $router->getRouteMatch()->getAction());
         $this->assertContains('help', $router->getRouteMatch()->getRoute());
-        $this->assertTrue(is_array($router->getRouteMatch()->getRouteParams()));
+        $this->assertTrue(is_array($router->getRouteMatch()->getControllerParams()));
         $this->assertTrue(is_array($router->getRouteMatch()->getDispatchParams()));
     }
 
-    public function testRouteParams()
+    public function testControllerParams()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'help'
@@ -178,17 +178,17 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router = new Router();
         $router->addRoute('help', [
-            'controller'  => 'Pop\Test\TestAsset\TestController',
-            'action'      => 'help',
-            'routeParams' => [123]
+            'controller'       => 'Pop\Test\TestAsset\TestController',
+            'action'           => 'help',
+            'controllerParams' => [123]
         ]);
 
-        $router->addRouteParams('*', ['foo' => 123]);
+        $router->addControllerParams('*', ['foo' => 123]);
         $router->route();
         $this->assertEquals(123, $router->getController()->foo);
     }
 
-    public function testWildcardRouteParams()
+    public function testWildcardControllerParams()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'help'
@@ -200,7 +200,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             'action'      => 'help'
         ]);
 
-        $router->addRouteParams('*', ['foo' => 123]);
+        $router->addControllerParams('*', ['foo' => 123]);
         $router->route();
         $this->assertEquals(123, $router->getController()->foo);
     }
@@ -513,15 +513,15 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($match->hasRoute());
     }
 
-    public function testHttpAddRouteParams()
+    public function testHttpAddControllerParams()
     {
         $_SERVER['REQUEST_URI'] = '/help/foo';
 
         $router = new Router();
         $router->addRoute('/help/foo[/]', [
-            'controller'  => 'Pop\Test\TestAsset\TestController',
-            'action'      => 'help',
-            'routeParams' => [123]
+            'controller'       => 'Pop\Test\TestAsset\TestController',
+            'action'           => 'help',
+            'controllerParams' => [123]
         ]);
 
         $match = new Match\Http();
@@ -535,11 +535,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router = new Router();
         $router->addRoute('/help/foo[/]', [
-            'controller'     => 'Pop\Test\TestAsset\TestController',
-            'action'         => 'help',
-            'routeParams'    => [123],
-            'dispatchParams' => [123],
-            'default'        => true
+            'controller'       => 'Pop\Test\TestAsset\TestController',
+            'action'           => 'help',
+            'controllerParams' => [123],
+            'dispatchParams'   => [123],
+            'default'          => true
         ]);
 
         $match = new Match\Http();
@@ -553,9 +553,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router = new Router();
         $router->addRoute('', [
-            'controller'     => 'Pop\Test\TestAsset\TestController',
-            'action'         => 'help',
-            'routeParams'    => [123]
+            'controller'          => 'Pop\Test\TestAsset\TestController',
+            'action'              => 'help',
+            'controllerParams'    => [123]
         ]);
 
         $match = new Match\Http();
@@ -569,10 +569,10 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router = new Router();
         $router->addRoute('', [
-            'controller'     => 'Pop\Test\TestAsset\TestController',
-            'action'         => 'edit',
-            'routeParams'    => [123],
-            'dispatchParams' => [1001]
+            'controller'       => 'Pop\Test\TestAsset\TestController',
+            'action'           => 'edit',
+            'controllerParams' => [123],
+            'dispatchParams'   => [1001]
         ]);
 
         $match = new Match\Http();
@@ -586,10 +586,10 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router = new Router();
         $router->addRoute('*', [
-            'controller'     => 'Pop\Test\TestAsset\TestController',
-            'action'         => 'help',
-            'routeParams'    => [123],
-            'dispatchParams' => [1001]
+            'controller'       => 'Pop\Test\TestAsset\TestController',
+            'action'           => 'help',
+            'controllerParams' => [123],
+            'dispatchParams'   => [1001]
         ]);
 
         $match = new Match\Http();
@@ -597,7 +597,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($match->hasRoute());
     }
 
-    public function testCliMatchRouteParams()
+    public function testCliMatchControllerParams()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'help'
@@ -605,11 +605,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router = new Router();
         $router->addRoute('help', [
-            'controller'     => 'Pop\Test\TestAsset\TestController',
-            'action'         => 'help',
-            'routeParams'    => [123],
-            'dispatchParams' => [456],
-            'default'        => true
+            'controller'       => 'Pop\Test\TestAsset\TestController',
+            'action'           => 'help',
+            'controllerParams' => [123],
+            'dispatchParams'   => [456],
+            'default'          => true
         ]);
 
         $match = new Match\Cli();
@@ -625,11 +625,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router = new Router();
         $router->addRoute('*', [
-            'controller'     => 'Pop\Test\TestAsset\TestController',
-            'action'         => 'help',
-            'routeParams'    => [123],
-            'dispatchParams' => [456],
-            'default'        => true
+            'controller'       => 'Pop\Test\TestAsset\TestController',
+            'action'           => 'help',
+            'controllerParams' => [123],
+            'dispatchParams'   => [456],
+            'default'          => true
         ]);
 
         $match = new Match\Cli();
