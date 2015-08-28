@@ -161,6 +161,8 @@ class Router implements RouterInterface
                 unset($params['append']);
                 if (isset($this->controllerParams[$controller])) {
                     $this->controllerParams[$controller] = array_merge($this->controllerParams[$controller], $params);
+                } else if (isset($this->controllerParams['*'])) {
+                    $this->controllerParams['*'] = array_merge($this->controllerParams['*'], $params);
                 } else {
                     $this->controllerParams[$controller] = $params;
                 }
