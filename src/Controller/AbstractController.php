@@ -64,15 +64,15 @@ abstract class AbstractController implements ControllerInterface
      */
     public function dispatch($action = null, array $params = null)
     {
-        if (null === $action) {
-            $action = $this->defaultAction;
-        }
-        if (method_exists($this, $action)) {
+        if ((null !== $action) && method_exists($this, $action)) {
             if (null !== $params) {
                 call_user_func_array([$this, $action], $params);
             } else {
                 $this->$action();
             }
+        } else if ((null !== $this->defaultAction) && method_exists($this, $this->defaultAction)) {
+            $action = $this->defaultAction;
+            $this->$action();
         } else {
             throw new Exception('That action is not defined in the controller.');
         }

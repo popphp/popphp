@@ -28,7 +28,7 @@ abstract class AbstractMatch
 
     /**
      * Matched route
-     * @var array
+     * @var string
      */
     protected $route = null;
 

@@ -165,6 +165,14 @@ class Http extends AbstractMatch
                     if ($matchedParams !== false) {
                         $this->route = $route;
                         $this->processMatchedParams($matchedParams, $controller);
+                    } else if (isset($controller['dispatchParams'][0]) && ($controller['dispatchParams'][0]['name'] == 'controller') &&
+                        isset($controller['dispatchParams'][1]) && ($controller['dispatchParams'][1]['name'] == 'action')) {
+                        $this->route = $route;
+                        $this->resetSegments();
+                        $this->processMatchedParams([
+                            'controller' => $this->segments[0],
+                            'action'     => (isset($this->segments[1]) ? $this->segments[1] : 'index')
+                        ], $controller);
                     }
                 } else {
                     $suffix = substr($this->segmentString, strlen($route));
@@ -212,6 +220,13 @@ class Http extends AbstractMatch
                 if ($matchedParams !== false) {
                     $this->route = $route;
                     $this->processMatchedParams($matchedParams, $controller);
+                } else if (isset($controller['dispatchParams'][0]) && ($controller['dispatchParams'][0]['name'] == 'controller') &&
+                    isset($controller['dispatchParams'][1]) && ($controller['dispatchParams'][1]['name'] == 'action') && isset($this->segments[0])) {
+                    $this->route = $route;
+                    $this->processMatchedParams([
+                        'controller' => $this->segments[0],
+                        'action'     => (isset($this->segments[1]) ? $this->segments[1] : 'index')
+                    ], $controller);
                 }
             } else {
                 $suffix = ($route != '') ? substr($this->segmentString, strlen($route)) : '';
@@ -488,6 +503,34 @@ class Http extends AbstractMatch
         if (isset($controller['controllerParams'])) {
             $this->controllerParams = (!is_array($controller['controllerParams'])) ?
                 [$controller['controllerParams']] : $controller['controllerParams'];
+        }
+    }
+
+    /**
+     * Reset URL segments based on route
+     *
+     * @return void
+     */
+    protected function resetSegments()
+    {
+        if (substr($this->segmentString, 0, strlen($this->route)) == $this->route) {
+            $this->segmentString = substr($this->segmentString, strlen($this->route));
+        }
+
+        // Trim trailing slash, if present
+        if (substr($this->segmentString, -1) == '/') {
+            $this->segmentString = substr($this->segmentString, 0, -1);
+            $trailingSlash = '/';
+        } else {
+            $trailingSlash = null;
+        }
+
+        if ($this->segmentString == '') {
+            $this->segments      = ['index'];
+            $this->segmentString = '/';
+        } else {
+            $this->segments      = explode('/', substr($this->segmentString, 1));
+            $this->segmentString = '/' . implode('/', $this->segments) . $trailingSlash;
         }
     }
 
