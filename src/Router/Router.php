@@ -336,7 +336,7 @@ class Router implements RouterInterface
                 }
 
                 $controllerParams = [];
-                                if (isset($this->controllerParams[$controller])) {
+                if (isset($this->controllerParams[$controller])) {
                     $controllerParams = $this->controllerParams[$controller];
                 } else if (isset($this->controllerParams['*'])) {
                     $controllerParams = $this->controllerParams['*'];
