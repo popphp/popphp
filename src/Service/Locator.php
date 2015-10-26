@@ -21,7 +21,7 @@ namespace Pop\Service;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.2
+ * @version    2.0.3
  */
 class Locator implements \ArrayAccess
 {
@@ -66,82 +66,52 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Set service objects from an configuration array
-     *
-     * The $services parameter can contain a closure or an array of
-     * call/param keys that define what to call when the service is
-     * needed. Valid examples are ('params' are optional):
-     *
-     *     $services = [
-     *         // Basic object of SomeClass, no parameters
-     *         'service1' => [
-     *             'call'   => 'SomeClass'
-     *         ],
-     *         // Object instance of SomeClass that's already instantiated
-     *         'service2' => [
-     *             'call' => new SomeClass('foo')
-     *         ],
-     *         // Object of SomeClass, parameters injected into constructor
-     *         'service3' => [
-     *             'call'   => 'SomeClass',
-     *             'params' => ['foo', ['bar' => 'baz']]
-     *         ],
-     *         // Object of SomeClass method called, parameters injected into method
-     *         'service4' => [
-     *             'call'   => 'SomeClass->foo',
-     *             'params' => function() { return 'bar'; }
-     *         ],
-     *         // Static call of SomeClass::foo, parameters injected into the static method
-     *         'service5' => [
-     *             'call'   => 'SomeClass::foo',
-     *             'params' => ['foo', ['bar' => 'baz']]
-     *         ],
-     *         // Call a closure, injecting the parameters into it
-     *         'service6' => [
-     *             'call'   => function($foo, $bar) {
-     *                 return new SomeClass($foo, $bar);
-     *             },
-     *             'params' => ['foo', 'bar']
-     *         ],
-     *         // Closure called that returns a services that is dependent on another service
-     *         'service6' => [
-     *             'call' => function($locator) {
-     *                 return new SomeClass($locator->get('other.service'));
-     *             }
-     *         ]
-     *     ];
+     * Set service objects from an array of services
      *
      * @param  array $services
-     * @throws Exception
      * @return Locator
      */
     public function setServices(array $services)
     {
         foreach ($services as $name => $service) {
-            if (isset($service['call'])) {
-                $call   = $service['call'];
-                $params = (isset($service['params'])) ? $service['params'] : null;
-            } else {
-                throw new Exception('Error: A service configuration parameter was not valid.');
-            }
-
-            $this->set($name, $call, $params);
+            $this->set($name, $service);
         }
 
         return $this;
     }
 
     /**
-     * Set a service object. It will overwrite
-     * any previous service with the same name.
+     * Set a service object. It will overwrite any previous service with the same name.
+     *
+     * A service can be a callable string, or an array that contains a 'call' key and
+     * an optional 'params' key. Valid callable strings are:
+     *
+     *     'SomeClass'
+     *     'SomeClass->foo'
+     *     'SomeClass::bar'
      *
      * @param  string $name
-     * @param  mixed  $call
-     * @param  mixed  $params
+     * @param  mixed  $service
+     * @throws Exception
      * @return Locator
      */
-    public function set($name, $call, $params = null)
+    public function set($name, $service)
     {
+        $call   = null;
+        $params = null;
+
+        if (!is_array($service)) {
+            $call   = $service;
+            $params = null;
+        } else if (isset($service['call'])) {
+            $call   = $service['call'];
+            $params = (isset($service['params']) ? $service['params'] : null);
+        }
+
+        if (null === $call) {
+            throw new Exception('Error: A callable service was not passed.');
+        }
+
         $this->services[$name] = [
             'call'   => $call,
             'params' => $params
@@ -176,6 +146,7 @@ class Locator implements \ArrayAccess
                 self::$called[] = $name;
             }
 
+            $obj    = null;
             $call   = $this->services[$name]['call'];
             $params = $this->services[$name]['params'];
 
@@ -232,10 +203,12 @@ class Locator implements \ArrayAccess
                         $ary    = explode('->', $call);
                         $class  = $ary[0];
                         $method = $ary[1];
-                        $obj    = call_user_func_array([new $class(), $method], $params);
+                        if (class_exists($class) && method_exists($class, $method)) {
+                            $obj = call_user_func_array([new $class(), $method], $params);
+                        }
                     // Else, if the callable is a new instance/construct call,
                     // injecting the $params into the constructor
-                    } else {
+                    } else if (class_exists($call)) {
                         $reflect = new \ReflectionClass($call);
                         $obj     = $reflect->newInstanceArgs($params);
                     }
@@ -249,17 +222,20 @@ class Locator implements \ArrayAccess
                         $ary    = explode('->', $call);
                         $class  = $ary[0];
                         $method = $ary[1];
-                        $obj    = call_user_func([new $class(), $method]);
+                        if (class_exists($class) && method_exists($class, $method)) {
+                            $obj = call_user_func([new $class(), $method]);
+                        }
                     // Else, if the callable is a new instance/construct call
-                    } else {
+                    } else if (class_exists($call)) {
                         $obj = new $call();
                     }
                 }
             // If the callable is already an instantiated object
             } else if (is_object($call)) {
                 $obj = $call;
-            // Else, throw exception
-            } else {
+            }
+
+            if (null === $obj) {
                 throw new Exception('Error: The call parameter must be an object or something callable.');
             }
 
@@ -271,7 +247,7 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Get a service's callable
+     * Get a service's callable string or object
      *
      * @param  string $name
      * @return mixed
@@ -282,7 +258,7 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Get a service's params
+     * Get a service's parameters
      *
      * @param  string $name
      * @return mixed
@@ -293,7 +269,7 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Get a service's callable
+     * Set a service's callable string or object
      *
      * @param  string $name
      * @param  mixed  $call
@@ -308,7 +284,7 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Get a service's callable
+     * Set a service's parameters
      *
      * @param  string $name
      * @param  mixed  $params
@@ -362,18 +338,18 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Set a value in the array
+     * Set a service
      *
      * @param  string $name
      * @param  mixed  $value
      * @return Locator
      */
     public function __set($name, $value) {
-        return $this->setServices([$name => $value]);
+        return $this->set($name, $value);
     }
 
     /**
-     * Get a value from the array
+     * Get a service
      *
      * @param  string $name
      * @return mixed
@@ -383,7 +359,7 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Determine if a value exists
+     * Determine if a service is available
      *
      * @param  string $name
      * @return boolean
@@ -393,7 +369,7 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Unset a value from the array
+     * Unset a service
      *
      * @param  string $name
      * @return Locator
@@ -403,18 +379,18 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Set a value in the array
+     * Set a service
      *
      * @param  string $offset
      * @param  mixed  $value
      * @return Locator
      */
     public function offsetSet($offset, $value) {
-        return $this->setServices([$offset => $value]);
+        return $this->set($offset, $value);
     }
 
     /**
-     * Get a value from the array
+     * Get a service
      *
      * @param  string $offset
      * @return mixed
@@ -424,7 +400,7 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Determine if a value exists
+     * Determine if a service is available
      *
      * @param  string $offset
      * @return boolean
@@ -434,7 +410,7 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Unset a value from the array
+     * Unset a service
      *
      * @param  string $offset
      * @return Locator

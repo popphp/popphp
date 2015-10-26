@@ -21,7 +21,7 @@ namespace Pop\Event;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.2
+ * @version    2.0.3
  */
 class Manager implements \ArrayAccess
 {
@@ -273,7 +273,7 @@ class Manager implements \ArrayAccess
     }
 
     /**
-     * Set a value in the array
+     * Set an event
      *
      * @param  string $name
      * @param  mixed  $value
@@ -284,7 +284,7 @@ class Manager implements \ArrayAccess
     }
 
     /**
-     * Get a value from the array
+     * Get an event
      *
      * @param  string $name
      * @return mixed
@@ -294,7 +294,7 @@ class Manager implements \ArrayAccess
     }
 
     /**
-     * Determine if a value exists
+     * Determine if an event exists
      *
      * @param  string $name
      * @return boolean
@@ -304,7 +304,7 @@ class Manager implements \ArrayAccess
     }
 
     /**
-     * Unset a value from the array
+     * Unset an event
      *
      * @param  string $name
      * @return Manager
@@ -317,7 +317,7 @@ class Manager implements \ArrayAccess
     }
 
     /**
-     * Set a value in the array
+     * Set an event
      *
      * @param  string $offset
      * @param  mixed  $value
@@ -328,7 +328,7 @@ class Manager implements \ArrayAccess
     }
 
     /**
-     * Get a value from the array
+     * Get an event
      *
      * @param  string $offset
      * @return mixed
@@ -338,7 +338,7 @@ class Manager implements \ArrayAccess
     }
 
     /**
-     * Determine if a value exists
+     * Determine if an event exists
      *
      * @param  string $offset
      * @return boolean
@@ -348,7 +348,7 @@ class Manager implements \ArrayAccess
     }
 
     /**
-     * Unset a value from the array
+     * Unset an event
      *
      * @param  string $offset
      * @return Manager

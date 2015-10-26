@@ -21,7 +21,7 @@ namespace Pop\Module;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.2
+ * @version    2.0.3
  */
 class Manager implements \ArrayAccess, \IteratorAggregate
 {
@@ -112,7 +112,7 @@ class Manager implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Set a value in the array
+     * Set a module
      *
      * @param  string $offset
      * @param  mixed  $value
@@ -123,7 +123,7 @@ class Manager implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Get a value from the array
+     * Get a module
      *
      * @param  string $offset
      * @return mixed
@@ -133,7 +133,7 @@ class Manager implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Determine if a value exists
+     * Determine if a module exists
      *
      * @param  string $offset
      * @return mixed
@@ -143,7 +143,7 @@ class Manager implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Unset a value from the array
+     * Unset a module
      *
      * @param  string $offset
      * @return mixed

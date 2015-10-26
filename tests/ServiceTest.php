@@ -10,9 +10,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $services = new Locator([
-            'foo' => [
-                'call' => 'Pop\Test\TestAsset\TestService'
-            ]
+            'foo' => 'Pop\Test\TestAsset\TestService'
         ]);
         $this->assertInstanceOf('Pop\Service\Locator', $services);
     }
@@ -21,7 +19,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Pop\Service\Exception');
         $services = new Locator();
-        $services->set('badservice', ['bad call']);
+        $services->set('badservice', ['call' => 'bad call']);
         $result = $services->get('badservice');
     }
 

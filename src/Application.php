@@ -21,7 +21,7 @@ namespace Pop;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.2
+ * @version    2.0.3
  */
 class Application implements \ArrayAccess
 {
@@ -249,11 +249,7 @@ class Application implements \ArrayAccess
         // If services are set in the app config, register them with the application
         if (isset($this->config['services']) && (null !== $this->services)) {
             foreach ($this->config['services'] as $name => $service) {
-                if (isset($service['call']) && isset($service['params'])) {
-                    $this->setService($name, $service['call'], $service['params']);
-                } else if (isset($service['call'])) {
-                    $this->setService($name, $service['call']);
-                }
+                $this->setService($name, $service);
             }
         }
 
@@ -389,13 +385,12 @@ class Application implements \ArrayAccess
      * Set a service
      *
      * @param  string $name
-     * @param  mixed  $call
-     * @param  mixed  $params
+     * @param  mixed  $service
      * @return Application
      */
-    public function setService($name, $call, $params = null)
+    public function setService($name, $service)
     {
-        $this->services->set($name, $call, $params);
+        $this->services->set($name, $service);
         return $this;
     }
 
