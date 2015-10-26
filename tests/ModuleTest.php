@@ -43,6 +43,7 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
 
         $application = new Application(include __DIR__ . '/../vendor/autoload.php');
         $module = new Module($config, $application);
+        $this->assertTrue($module->isRegistered());
         $this->assertEquals('bar', $module->config()['foo']);
         $this->assertInstanceOf('Pop\Module\Module', $module);
         $this->assertInstanceOf('Pop\Application', $module->application());

@@ -276,6 +276,14 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($application->isRegistered('foo'));
     }
 
+    public function testRegisterCustomModule()
+    {
+        $application = new Application();
+        $application->register('test', new TestAsset\TestModule());
+        $this->assertNotNull($application->module('test'));
+        $this->assertTrue($application->isRegistered('test'));
+    }
+
     public function testUnregisterModule()
     {
         $application = new Application();

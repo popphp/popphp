@@ -342,6 +342,8 @@ class Application implements \ArrayAccess
     {
         if (!($module instanceof Module\ModuleInterface)) {
             $module = new Module\Module($module, $this);
+        } else if (!$module->isRegistered()) {
+            $module->register($this);
         }
         $this->modules->register($name, $module);
         return $this;

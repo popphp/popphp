@@ -66,6 +66,7 @@ class Module implements ModuleInterface, \ArrayAccess
         if (null !== $config) {
             $this->loadConfig($config);
         }
+
         if (null !== $application) {
             $this->register($application);
         }
@@ -193,6 +194,16 @@ class Module implements ModuleInterface, \ArrayAccess
     public function config()
     {
         return $this->config;
+    }
+
+    /**
+     * Determine if the module has been registered with an application object
+     *
+     * @return boolean
+     */
+    public function isRegistered()
+    {
+        return (null !== $this->application);
     }
 
     /**
