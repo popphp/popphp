@@ -238,7 +238,7 @@ class Cli extends AbstractMatch
                             $routeParam = substr($routeParam, 1, -1);
                             $required   = true;
                         // Required value param
-                        } else if ((substr($routeParam, 0, 1) == '--') && (strpos($routeParam, '=') !== false)) {
+                        } else if ((substr($routeParam, 0, 2) == '--') && (strpos($routeParam, '=') !== false)) {
                             $routeParam = substr($routeParam, 2, -1);
                             $required   = true;
                         // Required optional param
