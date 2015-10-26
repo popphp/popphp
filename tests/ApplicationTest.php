@@ -165,6 +165,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             ]
         ];
         $application = new Application($config);
+        $application->addRoute('/logout', [
+            'controller' => 'Foo\Controller\IndexController',
+            'action'     => 'logout'
+        ]);
+        $application->addRoutes([
+            '/save' => [
+                'controller' => 'Foo\Controller\IndexController',
+                'action'     => 'save'
+            ]
+        ]);
         $this->assertEquals($application->config()['foo'], 'bar');
     }
 

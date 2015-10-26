@@ -332,6 +332,17 @@ class Application implements \ArrayAccess
     }
 
     /**
+     * Access a module object
+     *
+     * @param  string $name
+     * @return Module\ModuleInterface
+     */
+    public function module($name)
+    {
+        return (isset($this->modules[$name])) ? $this->modules[$name] : null;
+    }
+
+    /**
      * Register a module with the application object
      *
      * @param  string $name
@@ -350,14 +361,15 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Access a module object
+     * Unregister a module object
      *
      * @param  string $name
-     * @return Module\ModuleInterface
+     * @return Application
      */
-    public function module($name)
+    public function unregister($name)
     {
-        return (isset($this->modules[$name])) ? $this->modules[$name] : null;
+        unset($this->modules[$name]);
+        return $this;
     }
 
     /**
@@ -372,14 +384,27 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Unregister a module object
+     * Add a route
      *
-     * @param  string $name
+     * @param  string $route
+     * @param  mixed  $controller
      * @return Application
      */
-    public function unregister($name)
+    public function addRoute($route, $controller)
     {
-        unset($this->modules[$name]);
+        $this->router->addRoute($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add routes
+     *
+     * @param  array $routes
+     * @return Application
+     */
+    public function addRoutes(array $routes)
+    {
+        $this->router->addRoutes($routes);
         return $this;
     }
 
@@ -441,24 +466,6 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Trigger an event
-     *
-     * @param  string $name
-     * @param  array  $args
-     * @return Application
-     */
-    public function trigger($name, array $args = [])
-    {
-        if (count($args) == 0) {
-            $args = ['application' => $this];
-        } else if (!in_array($this, $args, true)) {
-            $args['application'] = $this;
-        }
-        $this->events->trigger($name, $args);
-        return $this;
-    }
-
-    /**
      * Detach an event. Default hook-points are:
      *
      *   app.init
@@ -475,6 +482,24 @@ class Application implements \ArrayAccess
     public function off($name, $action)
     {
         $this->events->off($name, $action);
+        return $this;
+    }
+
+    /**
+     * Trigger an event
+     *
+     * @param  string $name
+     * @param  array  $args
+     * @return Application
+     */
+    public function trigger($name, array $args = [])
+    {
+        if (count($args) == 0) {
+            $args = ['application' => $this];
+        } else if (!in_array($this, $args, true)) {
+            $args['application'] = $this;
+        }
+        $this->events->trigger($name, $args);
         return $this;
     }
 
