@@ -162,9 +162,57 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
                     },
                     'priority' => 1000
                 ]
-            ]
+            ],
+            'prefix' => 'TestAsset\\',
+            'src'    => __DIR__ . '/TestAsset'
         ];
-        $application = new Application($config);
+        $application = new Application($config, include __DIR__ . '/../vendor/autoload.php');
+        $application->addRoute('/logout', [
+            'controller' => 'Foo\Controller\IndexController',
+            'action'     => 'logout'
+        ]);
+        $application->addRoutes([
+            '/save' => [
+                'controller' => 'Foo\Controller\IndexController',
+                'action'     => 'save'
+            ]
+        ]);
+        $this->assertEquals($application->config()['foo'], 'bar');
+    }
+
+    public function testLoadConfig2()
+    {
+        $config = [
+            'foo'      => 'bar',
+            'routes'   => [
+                '/login[/]' => [
+                    'controller' => 'Foo\Controller\IndexController',
+                    'action'     => 'login'
+                ]
+            ],
+            'services' => [
+                'session' => [
+                    'call' => 'Pop\Web\Session::getInstance'
+                ],
+                'foo' => [
+                    'call'   => 'Foo\Service::factory',
+                    'params' => ['foo' => 'bar']
+                ]
+            ],
+            'events'   => [
+                [
+                    'name'   => 'app.init',
+                    'action' => function() {
+                        return 123;
+                    },
+                    'priority' => 1000
+                ]
+            ],
+            'prefix' => 'TestAsset',
+            'src'    => __DIR__ . '/TestAsset',
+            'psr-0'  => true
+        ];
+        $application = new Application($config, include __DIR__ . '/../vendor/autoload.php');
         $application->addRoute('/logout', [
             'controller' => 'Foo\Controller\IndexController',
             'action'     => 'logout'

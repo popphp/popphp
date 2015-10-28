@@ -241,6 +241,19 @@ class Application implements \ArrayAccess
 
         $this->config = $config;
 
+        // If the autoloader is set and the the application config has a
+        // defined prefix and src, register with the autoloader
+        if ((null !== $this->autoloader) && isset($this->config['prefix']) &&
+            isset($this->config['src']) && file_exists($this->config['src'])) {
+            // Register as PSR-0
+            if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
+                $this->autoloader->add($this->config['prefix'], $this->config['src']);
+            // Else, default to PSR-4
+            } else {
+                $this->autoloader->addPsr4($this->config['prefix'], $this->config['src']);
+            }
+        }
+
         // If routes are set in the app config, register them with the application
         if (isset($this->config['routes']) && (null !== $this->router)) {
             $this->router->addRoutes($this->config['routes']);
