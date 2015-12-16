@@ -90,8 +90,7 @@ class Application implements \ArrayAccess
                 $this->loadEvents($arg);
             } else if ($arg instanceof Module\Manager) {
                 $this->loadModules($arg);
-            } else if (!($arg instanceof Module\Module) &&
-                ((is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)))) {
+            } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)) {
                 $config = $arg;
             }
         }
