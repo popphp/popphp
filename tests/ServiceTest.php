@@ -201,12 +201,18 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Pop\Service\Exception');
         $services = new Locator();
-        $services->set('service1', function($locator) {
-            return $locator->get('service2');
-        });
-        $services->set('service2', function($locator) {
-            return $locator->get('service1');
-        });
+        $services->set('service1', [
+            'call' => function($locator) {
+                return $locator->get('service2');
+            },
+            'params' => [$services]
+        ]);
+        $services->set('service2', [
+            'call' => function($locator) {
+                return $locator->get('service1');
+            },
+            'params' => [$services]
+        ]);
 
         $result = $services->get('service1');
     }
