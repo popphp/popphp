@@ -147,6 +147,7 @@ class Locator implements \ArrayAccess
             }
 
             $obj    = null;
+            $called = false;
             $call   = $this->services[$name]['call'];
             $params = $this->services[$name]['params'];
 
@@ -173,10 +174,11 @@ class Locator implements \ArrayAccess
                         default:
                             $obj = call_user_func_array($call, $params);
                     }
-
+                    $called = true;
                 // Else, inject $this into the closure
                 } else {
-                    $obj = $call($this);
+                    $obj    = $call();
+                    $called = true;
                 }
             // If the callable is a string
             } else if (is_string($call)) {
@@ -196,7 +198,8 @@ class Locator implements \ArrayAccess
                     // If the callable is a static call, i.e. SomeClass::foo,
                     // injecting the $params into the static method
                     if (strpos($call, '::')) {
-                        $obj = call_user_func_array($call, $params);
+                        $obj    = call_user_func_array($call, $params);
+                        $called = true;
                     // If the callable is a instance call, i.e. SomeClass->foo,
                     // call the object and method, injecting the $params into the method
                     } else if (strpos($call, '->')) {
@@ -204,39 +207,45 @@ class Locator implements \ArrayAccess
                         $class  = $ary[0];
                         $method = $ary[1];
                         if (class_exists($class) && method_exists($class, $method)) {
-                            $obj = call_user_func_array([new $class(), $method], $params);
+                            $obj    = call_user_func_array([new $class(), $method], $params);
+                            $called = true;
                         }
                     // Else, if the callable is a new instance/construct call,
                     // injecting the $params into the constructor
                     } else if (class_exists($call)) {
                         $reflect = new \ReflectionClass($call);
                         $obj     = $reflect->newInstanceArgs($params);
+                        $called  = true;
                     }
                 // Else, no params, just call it
                 } else {
                     // If the callable is a static call
                     if (strpos($call, '::')) {
-                        $obj = call_user_func($call);
+                        $obj    = call_user_func($call);
+                        $called = true;
                     // If the callable is a instance call
                     } else if (strpos($call, '->')) {
                         $ary    = explode('->', $call);
                         $class  = $ary[0];
                         $method = $ary[1];
                         if (class_exists($class) && method_exists($class, $method)) {
-                            $obj = call_user_func([new $class(), $method]);
+                            $obj    = call_user_func([new $class(), $method]);
+                            $called = true;
                         }
                     // Else, if the callable is a new instance/construct call
                     } else if (class_exists($call)) {
-                        $obj = new $call();
+                        $obj    = new $call();
+                        $called = true;
                     }
                 }
             // If the callable is already an instantiated object
             } else if (is_object($call)) {
-                $obj = $call;
+                $obj    = $call;
+                $called = true;
             }
 
-            if (null === $obj) {
-                throw new Exception('Error: The call parameter must be an object or something callable.');
+            if (!$called) {
+                throw new Exception('Error: Unable to call service. The call parameter must be an object or something callable.');
             }
 
             $this->loaded[$name] = $obj;
