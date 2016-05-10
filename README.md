@@ -2,7 +2,7 @@ popphp
 ======
 
 [![Build Status](https://travis-ci.org/popphp/popphp.svg?branch=master)](https://travis-ci.org/popphp/popphp)
-[![Coverage Status](http://www.popphp.org/cc/coverage.php?comp=popphp)](http://www.popphp.org/cc/popphp/)
+[![Coverage Status](http://cc.popphp.org/coverage.php?comp=popphp)](http://cc.popphp.org/popphp/)
 
 [![Join the chat at https://gitter.im/popphp/2](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/popphp/2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -11,7 +11,7 @@ OVERVIEW
 `popphp` is the main set of core components for the Pop PHP Framework.
 It provides the main Application object that can be configured to manage
 and interface with the underlying core components:
- 
+
 * Router
 * Controller
 * Module Manager
@@ -41,7 +41,7 @@ There is an IRC channel for Pop PHP over at irc://freenode/popphp.
 * [The Service Locator](#the-service-locator)
 * [Configuration Tips](#configuration-tips)
 
-### The Application Object 
+### The Application Object
 
 Here's a simple example of wiring a web application object with a
 configuration file that defines some basic routes:
@@ -277,7 +277,7 @@ because, like the application object, they can take a configuration array that w
 settings specific to the module.
 
 Here's an example of a way to inject a module into an application. You'll want to register the autoloader
-with the application so that it can register the modules with the application. 
+with the application so that it can register the modules with the application.
 
 ```php
 // Using Composer's autoloader
@@ -286,14 +286,14 @@ $autoloader = require __DIR__  . APP_PATH . '/vendor/autoload.php';
 $app = new Pop\Application($autoloader, include __DIR__ . '/config/application.php');
 
 // $myModuleConfig contains the config settings for the
-// module, such the autoload prefix and the routes 
+// module, such the autoload prefix and the routes
 $app->register('MyModule', $myModuleConfig);
 ```
 
 The `$myModuleConfig` will be injected into a basic module object and registered with the application.
 If you wish to have your own module object with customized configuration and functionality, you can
-inject that directly: 
- 
+inject that directly:
+
 ```php
 $app->register('MyModule', new MyModule\Module($app));
 ```
