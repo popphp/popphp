@@ -105,11 +105,7 @@ class Module implements ModuleInterface, \ArrayAccess
             // If services are set in the module config, register them with the application
             if (isset($this->config['services']) && (null !== $this->application) && (null !== $this->application->services())) {
                 foreach ($this->config['services'] as $name => $service) {
-                    if (isset($service['call']) && isset($service['params'])) {
-                        $this->application->setService($name, $service['call'], $service['params']);
-                    } else if (isset($service['call'])) {
-                        $this->application->setService($name, $service['call']);
-                    }
+                    $this->application->setService($name, $service);
                 }
             }
 
