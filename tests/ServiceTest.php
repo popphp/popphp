@@ -15,6 +15,11 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Pop\Service\Locator', $services);
     }
 
+    public function testGetInstance()
+    {
+        $this->assertInstanceOf('Pop\Service\Locator', Locator::getInstance());
+    }
+
     public function testNotCallableException()
     {
         $this->setExpectedException('Pop\Service\Exception');
