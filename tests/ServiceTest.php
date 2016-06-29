@@ -2,6 +2,7 @@
 
 namespace Pop\Test;
 
+use Pop\Service\Container;
 use Pop\Service\Locator;
 
 class ServiceTest extends \PHPUnit_Framework_TestCase
@@ -15,9 +16,33 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Pop\Service\Locator', $services);
     }
 
-    public function testGetInstance()
+    public function testContainer()
     {
-        $this->assertInstanceOf('Pop\Service\Locator', Locator::getInstance());
+        $services = new Locator([
+            'foo' => [
+                'call'   => function(){
+                    return 123;
+                }
+            ]
+        ]);
+
+        Container::set('foo', new Locator());
+
+        $this->assertTrue(Container::has('default'));
+        $this->assertTrue(Container::has('foo'));
+        $this->assertFalse(Container::has('bad'));
+        $this->assertInstanceOf('Pop\Service\Locator', Container::get('default'));
+        $this->assertInstanceOf('Pop\Service\Locator', Container::get('foo'));
+
+        Container::remove('foo');
+
+        $this->assertFalse(Container::has('foo'));
+    }
+
+    public function testContainerException()
+    {
+        $this->setExpectedException('Pop\Service\Exception');
+        Container::get('bar');
     }
 
     public function testNotCallableException()
