@@ -27,12 +27,6 @@ class Locator implements \ArrayAccess
 {
 
     /**
-     * Instance of the service locator
-     * @var Locator
-     */
-    private static $instance = null;
-
-    /**
      * Recursion depth level tracker
      * @var array
      */
@@ -69,25 +63,10 @@ class Locator implements \ArrayAccess
         if (null !== $services) {
             $this->setServices($services);
         }
-
-        if (null === self::$instance) {
-            self::$instance = $this;
+        
+        if (!Container::has('default')) {
+            Container::set('default', $this);
         }
-    }
-
-    /**
-     * Determine whether or not an instance of the service locator object
-     * exists already, and instantiate the object if it does not exist.
-     *
-     * @param  array $services
-     * @return Locator
-     */
-    public static function getInstance(array $services = null)
-    {
-        if (null === self::$instance) {
-            self::$instance = new Locator($services);
-        }
-        return self::$instance;
     }
 
     /**
