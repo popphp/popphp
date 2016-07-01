@@ -21,7 +21,7 @@ namespace Pop\Service;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2016 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.0.4
+ * @version    2.1.0
  */
 class Locator implements \ArrayAccess
 {
@@ -63,7 +63,7 @@ class Locator implements \ArrayAccess
         if (null !== $services) {
             $this->setServices($services);
         }
-        
+
         if (!Container::has('default')) {
             Container::set('default', $this);
         }
