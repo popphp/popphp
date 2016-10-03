@@ -21,7 +21,7 @@ namespace Pop;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2016 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    2.1.0
+ * @version    3.0.0
  */
 class Application implements \ArrayAccess
 {
@@ -69,8 +69,6 @@ class Application implements \ArrayAccess
      *
      * Optional parameters are a service locator instance, a router instance,
      * an event manager instance or a configuration object or array
-     *
-     * @return Application
      */
     public function __construct()
     {
@@ -125,6 +123,8 @@ class Application implements \ArrayAccess
         if (null === $this->modules) {
             $this->modules = new Module\Manager();
         }
+
+        return $this;
     }
 
     /**
