@@ -2,6 +2,9 @@ before_script:
     - composer self-update
     - composer install
 language: php
+branches:
+  only:
+  - master
 php:
     - 5.4
     - 5.5
