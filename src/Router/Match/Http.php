@@ -45,6 +45,12 @@ class Http extends AbstractMatch
     protected $segmentString = null;
 
     /**
+     * Flat map of routes
+     * @var array
+     */
+    protected $flatRoutes = [];
+
+    /**
      * Constructor
      *
      * Instantiate the HTTP match object
@@ -111,14 +117,34 @@ class Http extends AbstractMatch
     }
 
     /**
+     * Prepare the routes
+     *
+     * @return Http
+     */
+    public function prepare()
+    {
+        $this->flattenRoutes($this->routes);
+
+        foreach ($this->flatRoutes as $route => $controller) {
+            $route = $this->getRouteRegex($route);
+            $this->preparedRoutes[$route] = $controller;
+        }
+
+        return $this;
+    }
+
+    /**
      * Match the route
      *
-     * @param  array $routes
      * @return boolean
      */
-    public function match($routes)
+    public function match()
     {
         $matched = false;
+
+        if (count($this->preparedRoutes) == 0) {
+            $this->prepare();
+        }
 
         return $matched;
     }
@@ -126,9 +152,10 @@ class Http extends AbstractMatch
     /**
      * Method to process if a route was not found
      *
+     * @param  boolean $exit
      * @return void
      */
-    public function noRouteFound()
+    public function noRouteFound($exit = true)
     {
         header('HTTP/1.1 404 Not Found');
         echo '<!DOCTYPE html>' . PHP_EOL;
@@ -140,6 +167,64 @@ class Http extends AbstractMatch
         echo '    <h1>Page Not Found</h1>' . PHP_EOL;
         echo '</body>' . PHP_EOL;
         echo '</html>'. PHP_EOL;
+
+        if ($exit) {
+            exit();
+        }
+    }
+
+    /**
+     * Flatten the nested routes
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @return void
+     */
+    protected function flattenRoutes($route, $controller = null)
+    {
+        if (is_array($route)) {
+            foreach ($route as $r => $c) {
+                $this->flattenRoutes($r, $c);
+            }
+        } else if (null !== $controller) {
+            if (!isset($controller['controller'])) {
+                foreach ($controller as $r => $c) {
+                    $this->flattenRoutes($route . $r, $c);
+                }
+            } else {
+                $this->flatRoutes[$route] = $controller;
+            }
+        }
+    }
+
+    /**
+     * Get the REGEX pattern for the route string
+     *
+     * @param  string $route
+     * @return string
+     */
+    protected function getRouteRegex($route)
+    {
+        $required = [];
+        $optional = [];
+
+        preg_match_all('/\[\/\:[^\[]+\]/', $route, $optional, PREG_OFFSET_CAPTURE);
+        preg_match_all('/(?<!\[)\/\:+\w*/', $route, $required, PREG_OFFSET_CAPTURE);
+
+        foreach ($required[0] as $required) {
+            $route = str_replace($required[0], '/.[a-zA-Z0-9_-]*', $route);
+        }
+        foreach ($optional[0] as $optional) {
+            $route = str_replace($optional[0], '(|/[a-zA-Z0-9_-]*)', $route);
+        }
+
+        $route = '^' . str_replace('/', '\/', $route) . '$';
+
+        if (substr($route, -5) == '[\/]$') {
+            $route = str_replace('[\/]$', '(|\/)$', $route);
+        }
+
+        return $route;
     }
 
 }

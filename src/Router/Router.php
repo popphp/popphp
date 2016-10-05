@@ -27,28 +27,10 @@ class Router
 {
 
     /**
-     * Available routes
-     * @var array
-     */
-    protected $routes = [];
-
-    /**
      * Route match object
      * @var Match\MatchInterface
      */
     protected $routeMatch = null;
-
-    /**
-     * Controller parameters
-     * @var array
-     */
-    protected $controllerParams = [];
-
-    /**
-     * Dispatch parameters
-     * @var array
-     */
-    protected $dispatchParams = [];
 
     /**
      * Constructor
@@ -76,7 +58,7 @@ class Router
      */
     public function addRoute($route, $controller)
     {
-        $this->routes[$route] = $controller;
+        $this->routeMatch->addRoute($route, $controller);
         return $this;
     }
 
@@ -88,10 +70,7 @@ class Router
      */
     public function addRoutes(array $routes)
     {
-        foreach ($routes as $route => $controller) {
-            $this->addRoute($route, $controller);
-        }
-
+        $this->routeMatch->addRoutes($routes);
         return $this;
     }
 
@@ -104,11 +83,7 @@ class Router
      */
     public function addControllerParams($controller, $params)
     {
-        if (!is_array($params)) {
-            $params = [$params];
-        }
-        $this->controllerParams[$controller] = $params;
-
+        $this->routeMatch->addControllerParams($controller, $params);
         return $this;
     }
 
@@ -121,14 +96,7 @@ class Router
      */
     public function appendControllerParams($controller, $params)
     {
-        if (!is_array($params)) {
-            $params = [$params];
-        }
-        if (isset($this->controllerParams[$controller])) {
-            $this->controllerParams[$controller] = array_merge($this->controllerParams[$controller], $params);
-        } else {
-            $this->controllerParams[$controller] = $params;
-        }
+        $this->routeMatch->appendControllerParams($controller, $params);
         return $this;
     }
 
@@ -140,7 +108,7 @@ class Router
      */
     public function getControllerParams($controller)
     {
-        return (isset($this->controllerParams[$controller])) ? $this->controllerParams[$controller] : null;
+        return $this->routeMatch->getControllerParams($controller);
     }
 
     /**
@@ -151,7 +119,7 @@ class Router
      */
     public function hasControllerParams($controller)
     {
-        return (isset($this->controllerParams[$controller]));
+        return $this->routeMatch->hasControllerParams($controller);
     }
 
     /**
@@ -162,9 +130,7 @@ class Router
      */
     public function removeControllerParams($controller)
     {
-        if (isset($this->controllerParams[$controller])) {
-            unset($this->controllerParams[$controller]);
-        }
+        $this->routeMatch->removeControllerParams($controller);
         return $this;
     }
 
@@ -178,14 +144,7 @@ class Router
      */
     public function addDispatchParams($controller, $action, $params)
     {
-        if (!is_array($params)) {
-            $params = [$params];
-        }
-        if (!isset($this->dispatchParams[$controller])) {
-            $this->dispatchParams[$controller] = [];
-        }
-        $this->dispatchParams[$controller][$action] = $params;
-
+        $this->routeMatch->addDispatchParams($controller, $action, $params);
         return $this;
     }
 
@@ -199,14 +158,7 @@ class Router
      */
     public function appendDispatchParams($controller, $action, $params)
     {
-        if (!is_array($params)) {
-            $params = [$params];
-        }
-        if (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action])) {
-            $this->dispatchParams[$controller][$action] = array_merge($this->dispatchParams[$controller][$action], $params);
-        } else {
-            $this->addDispatchParams($controller, $action, $params);
-        }
+        $this->routeMatch->appendDispatchParams($controller, $action, $params);
         return $this;
     }
 
@@ -219,8 +171,7 @@ class Router
      */
     public function getDispatchParams($controller, $action)
     {
-        return (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action])) ?
-            $this->dispatchParams[$controller][$action] : null;
+        return $this->routeMatch->getDispatchParams($controller, $action);
     }
 
     /**
@@ -232,7 +183,7 @@ class Router
      */
     public function hasDispatchParams($controller, $action)
     {
-        return (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action]));
+        return $this->routeMatch->hasDispatchParams($controller, $action);
     }
 
     /**
@@ -244,12 +195,7 @@ class Router
      */
     public function removeDispatchParams($controller, $action)
     {
-        if (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action])) {
-            unset($this->dispatchParams[$controller][$action]);
-            if (count($this->dispatchParams[$controller]) == 0) {
-                unset($this->dispatchParams[$controller]);
-            }
-        }
+        $this->routeMatch->removeDispatchParams($controller, $action);
         return $this;
     }
 
@@ -260,7 +206,7 @@ class Router
      */
     public function getRoutes()
     {
-        return $this->routes;
+        return $this->routeMatch->getRoutes();
     }
 
     /**
@@ -304,13 +250,13 @@ class Router
     }
 
     /**
-     * Execute the route match on the available routes
+     * Prepare routes
      *
      * @return Router
      */
-    public function match()
+    public function prepare()
     {
-        $this->routeMatch->match($this->routes);
+        $this->routeMatch->prepare();
         return $this;
     }
 
@@ -321,7 +267,9 @@ class Router
      */
     public function route()
     {
-        $this->match();
+        if ($this->routeMatch->match()) {
+
+        }
     }
 
 }

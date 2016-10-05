@@ -77,14 +77,27 @@ class Cli extends AbstractMatch
     }
 
     /**
+     * Prepare the routes
+     *
+     * @return Cli
+     */
+    public function prepare()
+    {
+        return $this;
+    }
+
+    /**
      * Match the route
      *
-     * @param  array $routes
      * @return boolean
      */
-    public function match($routes)
+    public function match()
     {
         $matched = false;
+
+        if (count($this->preparedRoutes) == 0) {
+            $this->prepare();
+        }
 
         return $matched;
     }
@@ -105,6 +118,7 @@ class Cli extends AbstractMatch
             $string = 'Command Not Found.';
         }
         echo PHP_EOL . $string . PHP_EOL . PHP_EOL;
+
         if ($exit) {
             exit(127);
         }
