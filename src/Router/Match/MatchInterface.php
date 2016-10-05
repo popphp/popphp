@@ -27,72 +27,16 @@ interface MatchInterface
 {
 
     /**
-     * Determine if the route has been matched
+     * Determine if there is a route match
      *
      * @return boolean
      */
     public function hasRoute();
 
     /**
-     * Get the matched route
+     * Match the route
      *
-     * @return string
-     */
-    public function getRoute();
-
-    /**
-     * Get the matched controller class name
-     *
-     * @return string
-     */
-    public function getController();
-
-    /**
-     * Get the matched action name
-     *
-     * @return string
-     */
-    public function getAction();
-
-    /**
-     * Get the matched controller params
-     *
-     * @return array
-     */
-    public function getControllerParams();
-
-    /**
-     * Determine if there are matched controller params
-     *
-     * @return boolean
-     */
-    public function hasControllerParams();
-
-    /**
-     * Get the matched dispatch params
-     *
-     * @return array
-     */
-    public function getDispatchParams();
-
-    /**
-     * Determine if there are matched dispatch params
-     *
-     * @return boolean
-     */
-    public function hasDispatchParams();
-
-    /**
-     * Get the default controller class name
-     *
-     * @return mixed
-     */
-    public function getDefaultController();
-
-    /**
-     * Match the route to the controller class
-     *
-     * @param  array   $routes
+     * @param  array $routes
      * @return boolean
      */
     public function match($routes);

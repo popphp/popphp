@@ -23,26 +23,14 @@ namespace Pop\Router;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-class Router implements RouterInterface
+class Router
 {
 
     /**
-     * Array of available routes
+     * Available routes
      * @var array
      */
     protected $routes = [];
-
-    /**
-     * Array of controller parameters
-     * @var array
-     */
-    protected $controllerParams = [];
-
-    /**
-     * Array of dispatch parameters
-     * @var array
-     */
-    protected $dispatchParams = [];
 
     /**
      * Route match object
@@ -51,16 +39,16 @@ class Router implements RouterInterface
     protected $routeMatch = null;
 
     /**
-     * Controller class name
-     * @var string
+     * Controller parameters
+     * @var array
      */
-    protected $controllerClass = null;
+    protected $controllerParams = [];
 
     /**
-     * Controller object
-     * @var \Pop\Controller\ControllerInterface
+     * Dispatch parameters
+     * @var array
      */
-    protected $controller = null;
+    protected $dispatchParams = [];
 
     /**
      * Constructor
@@ -88,37 +76,7 @@ class Router implements RouterInterface
      */
     public function addRoute($route, $controller)
     {
-        if (is_callable($controller)) {
-            $controller = ['controller' => $controller];
-        }
-
-        // If base url exists
-        if (!isset($controller['controller'])) {
-            // If dynamic routing
-            if ((strpos($route, ':controller') !== false) || (strpos($route, '<controller') !== false)) {
-                $this->routes[$route] = $controller;
-            // Else, nested routing
-            } else {
-                $value = reset($controller);
-                if (isset($value['controller'])) {
-                    foreach ($controller as $r => $c) {
-                        if ($route != '') {
-                            $sep = ($this->isHttp()) ? '/' : ' ';
-                            if ((substr($r, 0, 1) == $sep) || (substr($r, 0, 1) == '[')) {
-                                $r = $route . $r;
-                            } else {
-                                $r = $route . $sep . $r;
-                            }
-                        }
-                        $this->routes[$r] = $c;
-                    }
-                }
-            }
-        // Else, just add routes
-        } else {
-            $this->routes[$route] = $controller;
-        }
-
+        $this->routes[$route] = $controller;
         return $this;
     }
 
@@ -140,62 +98,37 @@ class Router implements RouterInterface
     /**
      * Add controller params to be passed into a new controller instance
      *
-     *     $router->addControllerParams('MyApp\Controller\IndexController', ['foo', 'bar']);
-     *
      * @param  string $controller
      * @param  mixed  $params
      * @return Router
      */
-    public function addControllerParams($controller, $params = null)
+    public function addControllerParams($controller, $params)
     {
-        // Clear parameters
-        if ((null === $params) && isset($this->controllerParams[$controller])) {
-            $this->controllerParams[$controller] = [];
-        } else {
-            if (!is_array($params)) {
-                $params = [$params];
-            }
-
-            // Append parameters to any that exist
-            if (isset($params['append']) && ($params['append'])) {
-                unset($params['append']);
-                if (isset($this->controllerParams[$controller])) {
-                    $this->controllerParams[$controller] = array_merge($this->controllerParams[$controller], $params);
-                } else if (isset($this->controllerParams['*'])) {
-                    $this->controllerParams['*'] = array_merge($this->controllerParams['*'], $params);
-                } else {
-                    $this->controllerParams[$controller] = $params;
-                }
-            // Override existing parameters
-            } else {
-                $this->controllerParams[$controller] = $params;
-            }
+        if (!is_array($params)) {
+            $params = [$params];
         }
+        $this->controllerParams[$controller] = $params;
 
         return $this;
     }
 
     /**
-     * Add dispatch params to be passed into the dispatched method of the controller instance
+     * Append controller params to be passed into a new controller instance
      *
-     *     $router->addDispatchParams('MyApp\Controller\IndexController->foo', ['bar', 'baz']);
-     *
-     * @param  string $dispatch
+     * @param  string $controller
      * @param  mixed  $params
      * @return Router
      */
-    public function addDispatchParams($dispatch, $params)
+    public function appendControllerParams($controller, $params)
     {
-        if (isset($this->dispatchParams[$dispatch])) {
-            if (is_array($params)) {
-                $this->dispatchParams[$dispatch] = array_merge($this->dispatchParams[$dispatch], $params);
-            } else {
-                $this->dispatchParams[$dispatch][] = $params;
-            }
-        } else {
-            $this->dispatchParams[$dispatch] = (!is_array($params)) ? [$params] : $params;
+        if (!is_array($params)) {
+            $params = [$params];
         }
-
+        if (isset($this->controllerParams[$controller])) {
+            $this->controllerParams[$controller] = array_merge($this->controllerParams[$controller], $params);
+        } else {
+            $this->controllerParams[$controller] = $params;
+        }
         return $this;
     }
 
@@ -211,24 +144,113 @@ class Router implements RouterInterface
     }
 
     /**
-     * Get the params assigned to the dispatch
+     * Determine if the controller has params
      *
-     * @param  string $dispatch
-     * @return mixed
+     * @param  string $controller
+     * @return boolean
      */
-    public function getDispatchParams($dispatch)
+    public function hasControllerParams($controller)
     {
-        return (isset($this->dispatchParams[$dispatch])) ? $this->dispatchParams[$dispatch] : null;
+        return (isset($this->controllerParams[$controller]));
     }
 
     /**
-     * Determine if a route is set for the current request
+     * Remove controller params
      *
+     * @param  string $controller
+     * @return Router
+     */
+    public function removeControllerParams($controller)
+    {
+        if (isset($this->controllerParams[$controller])) {
+            unset($this->controllerParams[$controller]);
+        }
+        return $this;
+    }
+
+    /**
+     * Add dispatch params to be passed into the dispatch method of the controller instance
+     *
+     * @param  string $controller
+     * @param  string $action
+     * @param  mixed  $params
+     * @return Router
+     */
+    public function addDispatchParams($controller, $action, $params)
+    {
+        if (!is_array($params)) {
+            $params = [$params];
+        }
+        if (!isset($this->dispatchParams[$controller])) {
+            $this->dispatchParams[$controller] = [];
+        }
+        $this->dispatchParams[$controller][$action] = $params;
+
+        return $this;
+    }
+
+    /**
+     * Append dispatch params to be passed into the dispatch method of the controller instance
+     *
+     * @param  string $controller
+     * @param  string $action
+     * @param  mixed  $params
+     * @return Router
+     */
+    public function appendDispatchParams($controller, $action, $params)
+    {
+        if (!is_array($params)) {
+            $params = [$params];
+        }
+        if (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action])) {
+            $this->dispatchParams[$controller][$action] = array_merge($this->dispatchParams[$controller][$action], $params);
+        } else {
+            $this->addDispatchParams($controller, $action, $params);
+        }
+        return $this;
+    }
+
+    /**
+     * Get the params assigned to the dispatch
+     *
+     * @param  string $controller
+     * @param  string $action
+     * @return mixed
+     */
+    public function getDispatchParams($controller, $action)
+    {
+        return (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action])) ?
+            $this->dispatchParams[$controller][$action] : null;
+    }
+
+    /**
+     * Determine if the dispatch has params
+     *
+     * @param  string $controller
+     * @param  string $action
      * @return boolean
      */
-    public function hasRoute()
+    public function hasDispatchParams($controller, $action)
     {
-        return $this->routeMatch->hasRoute();
+        return (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action]));
+    }
+
+    /**
+     * Remove dispatch params from a dispatch method
+     *
+     * @param  string $controller
+     * @param  string $action
+     * @return Router
+     */
+    public function removeDispatchParams($controller, $action)
+    {
+        if (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action])) {
+            unset($this->dispatchParams[$controller][$action]);
+            if (count($this->dispatchParams[$controller]) == 0) {
+                unset($this->dispatchParams[$controller]);
+            }
+        }
+        return $this;
     }
 
     /**
@@ -252,23 +274,13 @@ class Router implements RouterInterface
     }
 
     /**
-     * Get the current controller object
+     * Determine if there is a route match
      *
-     * @return \Pop\Controller\ControllerInterface
+     * @return boolean
      */
-    public function getController()
+    public function hasRoute()
     {
-        return $this->controller;
-    }
-
-    /**
-     * Get the current controller class name
-     *
-     * @return string
-     */
-    public function getControllerClass()
-    {
-        return $this->controllerClass;
+        return $this->routeMatch->hasRoute();
     }
 
     /**
@@ -292,7 +304,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Execute the route match
+     * Execute the route match on the available routes
      *
      * @return Router
      */
@@ -310,54 +322,6 @@ class Router implements RouterInterface
     public function route()
     {
         $this->match();
-
-        $controller = $this->routeMatch->getController();
-        if (null === $controller) {
-            $controller = $this->routeMatch->getDefaultController();
-        }
-
-        if (null !== $controller) {
-            // If controller is a closure
-            if ($controller instanceof \Closure) {
-                $this->controller      = $controller;
-                $this->controllerClass = $controller;
-                if ($this->routeMatch->hasDispatchParams()) {
-                    $this->addDispatchParams(
-                        $this->routeMatch->getRoute(), $this->routeMatch->getDispatchParams()
-                    );
-                }
-            // Else if controller is a class
-            } else if (class_exists($controller)) {
-                $this->controllerClass = $controller;
-
-                // If parameters are found, add them for dispatch
-                if ($this->routeMatch->hasControllerParams()) {
-                    $this->addControllerParams($controller, $this->routeMatch->getControllerParams());
-                }
-
-                $controllerParams = [];
-                if (isset($this->controllerParams[$controller])) {
-                    $controllerParams = $this->controllerParams[$controller];
-                } else if (isset($this->controllerParams['*'])) {
-                    $controllerParams = $this->controllerParams['*'];
-                }
-
-                // If the controller has parameters
-                if (is_array($controllerParams) && (count($controllerParams) > 0)) {
-                    $reflect          = new \ReflectionClass($controller);
-                    $this->controller = $reflect->newInstanceArgs($controllerParams);
-                // Else, just instantiate the controller
-                } else {
-                    $this->controller = new $controller();
-                }
-
-                if ($this->routeMatch->hasDispatchParams() && (null !== $this->routeMatch->getAction())) {
-                    $this->addDispatchParams(
-                        $this->routeMatch->getRoute(), $this->routeMatch->getDispatchParams()
-                    );
-                }
-            }
-        }
     }
 
 }
