@@ -81,27 +81,28 @@ class Application implements \ArrayAccess
             if ((stripos($class, 'classload') !== false) || (stripos($class, 'autoload') !== false)) {
                 $autoloader = $arg;
             } else if ($arg instanceof Router\Router) {
-                $this->loadRouter($arg);
+                $this->registerRouter($arg);
             } else if ($arg instanceof Service\Locator) {
-                $this->loadServices($arg);
+                $this->registerServices($arg);
             } else if ($arg instanceof Event\Manager) {
-                $this->loadEvents($arg);
+                $this->registerEvents($arg);
             } else if ($arg instanceof Module\Manager) {
-                $this->loadModules($arg);
+                $this->registerModules($arg);
             } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)) {
                 $config = $arg;
             }
         }
 
-        $this->bootstrap($autoloader);
-
         if (null !== $config) {
-            $this->loadConfig($config);
+            $this->registerConfig($config);
         }
+
+        $this->bootstrap($autoloader);
     }
 
     /**
-     * Bootstrap the application
+     * Bootstrap the application, creating the required objects if they haven't been created yet
+     * and registering with the autoloader, adding routes, services and events
      *
      * @param  mixed $autoloader
      * @return Application
@@ -112,16 +113,50 @@ class Application implements \ArrayAccess
             $this->registerAutoloader($autoloader);
         }
         if (null === $this->router) {
-            $this->router = new Router\Router();
+            $this->registerRouter(new Router\Router());
         }
         if (null === $this->services) {
-            $this->services = new Service\Locator();
+            $this->registerServices(new Service\Locator());
         }
         if (null === $this->events) {
-            $this->events = new Event\Manager();
+            $this->registerEvents(new Event\Manager());
         }
         if (null === $this->modules) {
-            $this->modules = new Module\Manager();
+            $this->registerModules(new Module\Manager());
+        }
+
+        // If the autoloader is set and the the application config has a
+        // defined prefix and src, register with the autoloader
+        if ((null !== $this->autoloader) && isset($this->config['prefix']) &&
+            isset($this->config['src']) && file_exists($this->config['src'])) {
+            // Register as PSR-0
+            if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
+                $this->autoloader->add($this->config['prefix'], $this->config['src']);
+            // Else, default to PSR-4
+            } else {
+                $this->autoloader->addPsr4($this->config['prefix'], $this->config['src']);
+            }
+        }
+
+        // If routes are set in the app config, register them with the application
+        if (isset($this->config['routes']) && (null !== $this->router)) {
+            $this->router->addRoutes($this->config['routes']);
+        }
+
+        // If services are set in the app config, register them with the application
+        if (isset($this->config['services']) && (null !== $this->services)) {
+            foreach ($this->config['services'] as $name => $service) {
+                $this->setService($name, $service);
+            }
+        }
+
+        // If events are set in the app config, register them with the application
+        if (isset($this->config['events']) && (null !== $this->events)) {
+            foreach ($this->config['events'] as $event) {
+                if (isset($event['name']) && isset($event['action'])) {
+                    $this->on($event['name'], $event['action'], ((isset($event['priority'])) ? $event['priority'] : 0));
+                }
+            }
         }
 
         return $this;
@@ -131,20 +166,17 @@ class Application implements \ArrayAccess
      * Merge new or altered config values with the existing config values
      *
      * @param  mixed   $config
-     * @param  boolean $replace
+     * @param  boolean $preserve
      * @return Application
      */
-    public function mergeConfig($config, $replace = false)
+    public function mergeConfig($config, $preserve = false)
     {
-        if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
+        if ($this->config instanceof \Pop\Config\Config) {
+            $this->config->merge($config, $preserve);
+        } else if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
             if (null !== $this->config) {
-                if ($replace) {
-                    foreach ($config as $key => $value) {
-                        $this->config[$key] = $value;
-                    }
-                } else {
-                    $this->config = array_replace_recursive($this->config, $config);
-                }
+                $this->config = ($preserve) ? array_merge_recursive($this->config, $config) :
+                    array_replace_recursive($this->config, $config);
             } else {
                 $this->config = $config;
             }
@@ -225,109 +257,75 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Load application config
+     * Register a new configuration with the application
      *
      * @param  mixed $config
      * @throws \InvalidArgumentException
      * @return Application
      */
-    public function loadConfig($config)
+    public function registerConfig($config)
     {
         if (!is_array($config) && !($config instanceof \ArrayAccess) && !($config instanceof \ArrayObject)) {
             throw new \InvalidArgumentException(
-                'Error: The config must be either an array itself or implement ArrayAccess or extend ArrayObject.'
+                'Error: The config must be either an array itself or implement ArrayAccess or extend ArrayObject'
             );
         }
 
         $this->config = $config;
 
-        // If the autoloader is set and the the application config has a
-        // defined prefix and src, register with the autoloader
-        if ((null !== $this->autoloader) && isset($this->config['prefix']) &&
-            isset($this->config['src']) && file_exists($this->config['src'])) {
-            // Register as PSR-0
-            if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
-                $this->autoloader->add($this->config['prefix'], $this->config['src']);
-            // Else, default to PSR-4
-            } else {
-                $this->autoloader->addPsr4($this->config['prefix'], $this->config['src']);
-            }
-        }
-
-        // If routes are set in the app config, register them with the application
-        if (isset($this->config['routes']) && (null !== $this->router)) {
-            $this->router->addRoutes($this->config['routes']);
-        }
-
-        // If services are set in the app config, register them with the application
-        if (isset($this->config['services']) && (null !== $this->services)) {
-            foreach ($this->config['services'] as $name => $service) {
-                $this->setService($name, $service);
-            }
-        }
-
-        // If events are set in the app config, register them with the application
-        if (isset($this->config['events']) && (null !== $this->events)) {
-            foreach ($this->config['events'] as $event) {
-                if (isset($event['name']) && isset($event['action'])) {
-                    $this->on($event['name'], $event['action'], ((isset($event['priority'])) ? $event['priority'] : 0));
-                }
-            }
-        }
-
         return $this;
     }
 
     /**
-     * Load a router
+     * Register a new router object with the application
      *
      * @param  Router\Router $router
      * @return Application
      */
-    public function loadRouter(Router\Router $router)
+    public function registerRouter(Router\Router $router)
     {
         $this->router = $router;
         return $this;
     }
 
     /**
-     * Load a service locator
+     * Register a new service locator object with the application
      *
      * @param  Service\Locator $services
      * @return Application
      */
-    public function loadServices(Service\Locator $services)
+    public function registerServices(Service\Locator $services)
     {
         $this->services = $services;
         return $this;
     }
 
     /**
-     * Load an event manager
+     * Register a new event manager object with the application
      *
      * @param  Event\Manager $events
      * @return Application
      */
-    public function loadEvents(Event\Manager $events)
+    public function registerEvents(Event\Manager $events)
     {
         $this->events = $events;
         return $this;
     }
 
     /**
-     * Load a module manager
+     * Register a new module manager object with the application
      *
      * @param  Module\Manager $modules
      * @return Application
      */
-    public function loadModules(Module\Manager $modules)
+    public function registerModules(Module\Manager $modules)
     {
         $this->modules = $modules;
         return $this;
     }
 
     /**
-     * Register the autoloader object
+     * Register the autoloader object with the application
      *
      * @param  mixed $autoloader
      * @throws Exception
@@ -337,7 +335,8 @@ class Application implements \ArrayAccess
     {
         if (!method_exists($autoloader, 'add') || !method_exists($autoloader, 'addPsr4')) {
             throw new Exception(
-                'Error: The autoloader instance must contain the methods \'add\' and \'addPsr4\', as with Composer\Autoload\ClassLoader or Pop\Loader\ClassLoader.'
+                'Error: The autoloader instance must contain the methods \'add\' and \'addPsr4\', ' .
+                'as with Composer\Autoload\ClassLoader or Pop\Loader\ClassLoader.'
             );
         }
         $this->autoloader = $autoloader;
@@ -356,7 +355,7 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Register a module with the application object
+     * Register a module with the module manager object
      *
      * @param  string $name
      * @param  mixed  $module
@@ -374,7 +373,7 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Unregister a module object
+     * Unregister a module with the module manager object
      *
      * @param  string $name
      * @return Application
@@ -592,28 +591,29 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Set a value in the array
+     * Set a pre-designated value in the application object
      *
      * @param  string $name
      * @param  mixed  $value
      * @return Application
      */
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         switch ($name) {
             case 'config':
-                $this->loadConfig($value);
+                $this->registerConfig($value);
                 break;
             case 'router':
-                $this->loadRouter($value);
+                $this->registerRouter($value);
                 break;
             case 'services':
-                $this->loadServices($value);
+                $this->registerServices($value);
                 break;
             case 'events':
-                $this->loadEvents($value);
+                $this->registerEvents($value);
                 break;
             case 'modules':
-                $this->loadModules($value);
+                $this->registerModules($value);
                 break;
             case 'autoloader':
                 $this->registerAutoloader($value);
@@ -624,12 +624,13 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Get a value from the array
+     * Get a pre-designated value from the application object
      *
      * @param  string $name
      * @return mixed
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         switch ($name) {
             case 'config':
                 return $this->config;
@@ -655,12 +656,13 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Determine if a value exists
+     * Determine if a pre-designated value in the application object exists
      *
      * @param  string $name
      * @return boolean
      */
-    public function __isset($name) {
+    public function __isset($name)
+    {
         switch ($name) {
             case 'config':
                 return (null !== $this->config);
@@ -686,12 +688,13 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Unset a value from the array
+     * Unset a pre-designated value in the application object
      *
      * @param  string $name
      * @return Application
      */
-    public function __unset($name) {
+    public function __unset($name)
+    {
         switch ($name) {
             case 'config':
                 $this->config = null;
@@ -717,43 +720,47 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Set a value in the array
+     * Set a pre-designated value in the application object
      *
      * @param  string $offset
      * @param  mixed  $value
      * @return Application
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         return $this->__set($offset, $value);
     }
 
     /**
-     * Get a value from the array
+     * Get a pre-designated value from the application object
      *
      * @param  string $offset
      * @return mixed
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->__get($offset);
     }
 
     /**
-     * Determine if a value exists
+     * Determine if a pre-designated value in the application object exists
      *
      * @param  string $offset
      * @return boolean
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return $this->__isset($offset);
     }
 
     /**
-     * Unset a value from the array
+     * Unset a pre-designated value in the application object
      *
      * @param  string $offset
      * @return Application
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         return $this->__unset($offset);
     }
 

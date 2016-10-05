@@ -23,7 +23,7 @@ namespace Pop\Event;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-class Manager implements \ArrayAccess
+class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
 {
 
     /**
@@ -64,7 +64,6 @@ class Manager implements \ArrayAccess
      * @param  string $name
      * @param  mixed  $action
      * @param  int    $priority
-     * @return Manager
      */
     public function __construct($name = null, $action = null, $priority = 0)
     {
@@ -212,27 +211,27 @@ class Manager implements \ArrayAccess
                     if (is_string($action)) {
                         // If a static call
                         if (strpos($action, '::')) {
-                            $ary  = explode('::', $action);
-                            $cls  = $ary[0];
-                            $mthd = $ary[1];
+                            $ary    = explode('::', $action);
+                            $class  = $ary[0];
+                            $method = $ary[1];
                         // If an instance call
                         } else if (strpos($action, '->')) {
                             $ary    = explode('->', $action);
-                            $cls    = $ary[0];
-                            $mthd   = $ary[1];
-                            $action = [new $cls, $mthd];
+                            $class  = $ary[0];
+                            $method = $ary[1];
+                            $action = [new $class, $method];
                         // Else, if a new/construct call
                         } else {
                             $action = str_replace('new ', null, $action);
-                            $cls  = $action;
-                            $mthd = '__construct';
+                            $class  = $action;
+                            $method = '__construct';
                         }
                     } else {
-                        $cls  = substr($callable_name, 0, strpos($callable_name, ':'));
-                        $mthd = substr($callable_name, (strrpos($callable_name, ':') + 1));
+                        $class  = substr($callable_name, 0, strpos($callable_name, ':'));
+                        $method = substr($callable_name, (strrpos($callable_name, ':') + 1));
                     }
 
-                    $methodExport = \ReflectionMethod::export($cls, $mthd, true);
+                    $methodExport = \ReflectionMethod::export($class, $method, true);
                     // Get the method parameters
                     if (stripos($methodExport, 'Parameter') !== false) {
                         $matches = [];
@@ -247,7 +246,7 @@ class Manager implements \ArrayAccess
                         }
                     }
                 } else {
-                    throw new Exception('Error: The action must be callable, i.e. a closure or class/method combination.');
+                    throw new Exception('Error: The action must be callable, i.e. a closure or class/method combination');
                 }
 
                 foreach ($params as $value) {
@@ -255,7 +254,7 @@ class Manager implements \ArrayAccess
                 }
 
                 // If the method is the constructor, create object
-                if (isset($mthd) && ($mthd == '__construct')) {
+                if (isset($method) && ($method == '__construct')) {
                     $reflect  = new \ReflectionClass($action);
                     $result   = $reflect->newInstanceArgs($realArgs);
                     $this->results[$name][] = $result;
@@ -279,7 +278,8 @@ class Manager implements \ArrayAccess
      * @param  mixed  $value
      * @return Manager
      */
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         return $this->on($name, $value);
     }
 
@@ -289,7 +289,8 @@ class Manager implements \ArrayAccess
      * @param  string $name
      * @return mixed
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         return $this->get($name);
     }
 
@@ -299,7 +300,8 @@ class Manager implements \ArrayAccess
      * @param  string $name
      * @return boolean
      */
-    public function __isset($name) {
+    public function __isset($name)
+    {
         return $this->has($name);
     }
 
@@ -309,7 +311,8 @@ class Manager implements \ArrayAccess
      * @param  string $name
      * @return Manager
      */
-    public function __unset($name) {
+    public function __unset($name)
+    {
         if (isset($this->listeners[$name])) {
             unset($this->listeners[$name]);
         }
@@ -323,7 +326,8 @@ class Manager implements \ArrayAccess
      * @param  mixed  $value
      * @return Manager
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         return $this->on($offset, $value);
     }
 
@@ -333,7 +337,8 @@ class Manager implements \ArrayAccess
      * @param  string $offset
      * @return mixed
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->get($offset);
     }
 
@@ -343,7 +348,8 @@ class Manager implements \ArrayAccess
      * @param  string $offset
      * @return boolean
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return $this->has($offset);
     }
 
@@ -353,11 +359,32 @@ class Manager implements \ArrayAccess
      * @param  string $offset
      * @return Manager
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         if (isset($this->listeners[$offset])) {
             unset($this->listeners[$offset]);
         }
         return $this;
+    }
+
+    /**
+     * Return count
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->listeners);
+    }
+
+    /**
+     * Get iterator
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->listeners);
     }
 
 }

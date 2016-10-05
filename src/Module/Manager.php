@@ -23,7 +23,7 @@ namespace Pop\Module;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-class Manager implements \ArrayAccess, \IteratorAggregate
+class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
 {
 
     /**
@@ -38,7 +38,6 @@ class Manager implements \ArrayAccess, \IteratorAggregate
      * Instantiate the module manager object.
      *
      * @param  array $modules
-     * @return Manager
      */
     public function __construct(array $modules = null)
     {
@@ -75,7 +74,7 @@ class Manager implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Determine if a module object is registered
+     * Determine if a module object is registered with the manager by $name
      *
      * @param  string $name
      * @return boolean
@@ -86,24 +85,63 @@ class Manager implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Load a module
+     * Determine if a module object is registered with the manager by $module object comparison
+     *
+     * @param  ModuleInterface $module
+     * @return boolean
+     */
+    public function hasModule(ModuleInterface $module)
+    {
+        $result = false;
+
+        foreach ($this->modules as $name => $mod) {
+            if ($mod === $module) {
+                $result = true;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get a module object's registered name
+     *
+     * @param  ModuleInterface $module
+     * @return string
+     */
+    public function getModuleName(ModuleInterface $module)
+    {
+        $moduleName = null;
+
+        foreach ($this->modules as $name => $mod) {
+            if ($mod === $module) {
+                $moduleName = $name;
+                break;
+            }
+        }
+
+        return $moduleName;
+    }
+
+    /**
+     * Get a module
      *
      * @param  string $name
-     * @throws Exception
      * @return mixed
      */
-    public function load($name)
+    public function get($name)
     {
         return (isset($this->modules[$name])) ? $this->modules[$name] : null;
     }
 
     /**
-     * Unload a module
+     * Unregister a module
      *
      * @param  string $name
      * @return Manager
      */
-    public function unload($name)
+    public function unregister($name)
     {
         if (isset($this->modules[$name])) {
             unset($this->modules[$name]);
@@ -112,44 +150,103 @@ class Manager implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Set a module
+     * Register a module with the manager
+     *
+     * @param  string $name
+     * @param  mixed  $value
+     * @return Manager
+     */
+    public function __set($name, $value)
+    {
+        return $this->register($name, $value);
+    }
+
+    /**
+     * Get a registered module
+     *
+     * @param  string $name
+     * @return Module
+     */
+    public function __get($name)
+    {
+        return $this->get($name);
+    }
+
+    /**
+     * Determine if a module is registered with the manager object
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function __isset($name)
+    {
+        return isset($this->modules[$name]);
+    }
+
+    /**
+     * Unregister a module with the manager
+     *
+     * @param  string $name
+     * @return Manager
+     */
+    public function __unset($name)
+    {
+        return $this->unregister($name);
+    }
+
+    /**
+     * Register a module with the manager
      *
      * @param  string $offset
      * @param  mixed  $value
-     * @return mixed
+     * @return Manager
      */
-    public function offsetSet($offset, $value) {
-        return $this->register($offset, $value);
+    public function offsetSet($offset, $value)
+    {
+        return $this->__set($offset, $value);
     }
 
     /**
-     * Get a module
+     * Get a registered module
      *
      * @param  string $offset
-     * @return mixed
+     * @return Module
      */
-    public function offsetGet($offset) {
-        return $this->load($offset);
+    public function offsetGet($offset)
+    {
+        return $this->__get($offset);
     }
 
     /**
-     * Determine if a module exists
+     * Determine if a module is registered with the manager object
      *
      * @param  string $offset
-     * @return mixed
+     * @return boolean
      */
-    public function offsetExists($offset) {
-        return isset($this->modules[$offset]);
+    public function offsetExists($offset)
+    {
+        return $this->__isset($offset);
     }
 
     /**
-     * Unset a module
+     * Unregister a module with the manager
      *
      * @param  string $offset
-     * @return mixed
+     * @return Manager
      */
-    public function offsetUnset($offset) {
-        return $this->unload($offset);
+    public function offsetUnset($offset)
+    {
+        return $this->__unset($offset);
+    }
+
+    /**
+     * Return count
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->modules);
     }
 
     /**
@@ -157,7 +254,8 @@ class Manager implements \ArrayAccess, \IteratorAggregate
      *
      * @return \ArrayIterator
      */
-    public function getIterator() {
+    public function getIterator()
+    {
         return new \ArrayIterator($this->modules);
     }
 

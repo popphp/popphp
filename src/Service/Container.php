@@ -65,7 +65,7 @@ class Container
     public static function get($name = 'default')
     {
         if (!isset(self::$locators[$name]) || (isset(self::$locators[$name]) && (null === self::$locators[$name]))) {
-            throw new Exception('Error: That service locator has not been added.');
+            throw new Exception('Error: That service locator has not been added');
         }
         return self::$locators[$name];
     }

@@ -62,7 +62,7 @@ class Module implements ModuleInterface, \ArrayAccess
         }
 
         if (null !== $config) {
-            $this->loadConfig($config);
+            $this->registerConfig($config);
         }
 
         if (null !== $application) {
@@ -71,10 +71,30 @@ class Module implements ModuleInterface, \ArrayAccess
     }
 
     /**
+     * Register a configuration with the module object
+     *
+     * @param  mixed $config
+     * @throws \InvalidArgumentException
+     * @return Module
+     */
+    public function registerConfig($config)
+    {
+        if (!is_array($config) && !($config instanceof \ArrayAccess) && !($config instanceof \ArrayObject)) {
+            throw new \InvalidArgumentException(
+                'Error: The config must be either an array itself or implement ArrayAccess or extend ArrayObject.'
+            );
+        }
+
+        $this->config = $config;
+
+        return $this;
+    }
+
+    /**
      * Register module
      *
      * @param  Application $application
-     * @return ModuleInterface
+     * @return Module
      */
     public function register(Application $application)
     {
@@ -125,43 +145,20 @@ class Module implements ModuleInterface, \ArrayAccess
     }
 
     /**
-     * Load module config
-     *
-     * @param  mixed $config
-     * @throws \InvalidArgumentException
-     * @return Module
-     */
-    public function loadConfig($config)
-    {
-        if (!is_array($config) && !($config instanceof \ArrayAccess) && !($config instanceof \ArrayObject)) {
-            throw new \InvalidArgumentException(
-                'Error: The config must be either an array itself or implement ArrayAccess or extend ArrayObject.'
-            );
-        }
-
-        $this->config = $config;
-
-        return $this;
-    }
-
-    /**
      * Merge new or altered config values with the existing config values
      *
      * @param  mixed   $config
-     * @param  boolean $replace
+     * @param  boolean $preserve
      * @return Module
      */
-    public function mergeConfig($config, $replace = false)
+    public function mergeConfig($config, $preserve = false)
     {
-        if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
+        if ($this->config instanceof \Pop\Config\Config) {
+            $this->config->merge($config, $preserve);
+        } else if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
             if (null !== $this->config) {
-                if ($replace) {
-                    foreach ($config as $key => $value) {
-                        $this->config[$key] = $value;
-                    }
-                } else {
-                    $this->config = array_replace_recursive($this->config, $config);
-                }
+                $this->config = ($preserve) ? array_merge_recursive($this->config, $config) :
+                    array_replace_recursive($this->config, $config);
             } else {
                 $this->config = $config;
             }
@@ -197,7 +194,77 @@ class Module implements ModuleInterface, \ArrayAccess
      */
     public function isRegistered()
     {
-        return (null !== $this->application);
+        return ((null !== $this->application) &&
+            (null !== $this->application->modules()) && ($this->application->modules()->hasModule($this)));
+    }
+
+    /**
+     * Set a pre-designated value in the module object
+     *
+     * @param  string $name
+     * @param  mixed  $value
+     * @return Module
+     */
+    public function __set($name, $value)
+    {
+        switch ($name) {
+            case 'config':
+                $this->registerConfig($value);
+                break;
+
+        }
+        return $this;
+    }
+
+    /**
+     * Get a pre-designated value from the module object
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        switch ($name) {
+            case 'config':
+                return $this->config;
+                break;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Determine if a pre-designated value in the module object exists
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function __isset($name)
+    {
+        switch ($name) {
+            case 'config':
+                return (null !== $this->config);
+                break;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Unset a pre-designated value in the module object
+     *
+     * @param  string $name
+     * @return Module
+     */
+    public function __unset($name)
+    {
+        switch ($name) {
+            case 'config':
+                $this->config = null;
+                break;
+        }
+
+        return $this;
     }
 
     /**
@@ -205,10 +272,11 @@ class Module implements ModuleInterface, \ArrayAccess
      *
      * @param  string $offset
      * @param  mixed  $value
-     * @return mixed
+     * @return Module
      */
-    public function offsetSet($offset, $value) {
-        return $this;
+    public function offsetSet($offset, $value)
+    {
+        return $this->__set($offset, $value);
     }
 
     /**
@@ -217,28 +285,31 @@ class Module implements ModuleInterface, \ArrayAccess
      * @param  string $offset
      * @return mixed
      */
-    public function offsetGet($offset) {
-        return $this->config[$offset];
+    public function offsetGet($offset)
+    {
+        return $this->__get($offset);
     }
 
     /**
      * Determine if a value exists
      *
      * @param  string $offset
-     * @return mixed
+     * @return boolean
      */
-    public function offsetExists($offset) {
-        return isset($this->config[$offset]);
+    public function offsetExists($offset)
+    {
+        return $this->__isset($offset);
     }
 
     /**
      * Unset a value from the array
      *
      * @param  string $offset
-     * @return mixed
+     * @return Module
      */
-    public function offsetUnset($offset) {
-        return $this;
+    public function offsetUnset($offset)
+    {
+        return $this->__unset($offset);
     }
 
 }

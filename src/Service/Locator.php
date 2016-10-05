@@ -23,7 +23,7 @@ namespace Pop\Service;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.0.0
  */
-class Locator implements \ArrayAccess
+class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
 {
 
     /**
@@ -56,7 +56,6 @@ class Locator implements \ArrayAccess
      * Instantiate the service locator object.
      *
      * @param  array $services
-     * @return Locator
      */
     public function __construct(array $services = null)
     {
@@ -85,7 +84,7 @@ class Locator implements \ArrayAccess
     }
 
     /**
-     * Set a service object. It will overwrite any previous service with the same name.
+     * Set a service. It will overwrite any previous service with the same name.
      *
      * A service can be a callable string, or an array that contains a 'call' key and
      * an optional 'params' key. Valid callable strings are:
@@ -113,7 +112,7 @@ class Locator implements \ArrayAccess
         }
 
         if (null === $call) {
-            throw new Exception('Error: A callable service was not passed.');
+            throw new Exception('Error: A callable service was not passed');
         }
 
         $this->services[$name] = [
@@ -249,7 +248,7 @@ class Locator implements \ArrayAccess
             }
 
             if (!$called) {
-                throw new Exception('Error: Unable to call service. The call parameter must be an object or something callable.');
+                throw new Exception('Error: Unable to call service. The call parameter must be an object or something callable');
             }
 
             $this->loaded[$name] = $obj;
@@ -357,7 +356,8 @@ class Locator implements \ArrayAccess
      * @param  mixed  $value
      * @return Locator
      */
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         return $this->set($name, $value);
     }
 
@@ -367,7 +367,8 @@ class Locator implements \ArrayAccess
      * @param  string $name
      * @return mixed
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         return $this->get($name);
     }
 
@@ -377,7 +378,8 @@ class Locator implements \ArrayAccess
      * @param  string $name
      * @return boolean
      */
-    public function __isset($name) {
+    public function __isset($name)
+    {
         return isset($this->services[$name]);
     }
 
@@ -387,7 +389,8 @@ class Locator implements \ArrayAccess
      * @param  string $name
      * @return Locator
      */
-    public function __unset($name) {
+    public function __unset($name)
+    {
         return $this->remove($name);
     }
 
@@ -398,7 +401,8 @@ class Locator implements \ArrayAccess
      * @param  mixed  $value
      * @return Locator
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         return $this->set($offset, $value);
     }
 
@@ -408,7 +412,8 @@ class Locator implements \ArrayAccess
      * @param  string $offset
      * @return mixed
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->get($offset);
     }
 
@@ -418,7 +423,8 @@ class Locator implements \ArrayAccess
      * @param  string $offset
      * @return boolean
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return isset($this->services[$offset]);
     }
 
@@ -428,8 +434,29 @@ class Locator implements \ArrayAccess
      * @param  string $offset
      * @return Locator
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         return $this->remove($offset);
+    }
+
+    /**
+     * Return count
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->services);
+    }
+
+    /**
+     * Get iterator
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->services);
     }
 
 }
