@@ -42,8 +42,6 @@ class Cli extends AbstractMatch
      * Constructor
      *
      * Instantiate the CLI match object
-     *
-     * @return Cli
      */
     public function __construct()
     {
@@ -443,7 +441,7 @@ class Cli extends AbstractMatch
      *
      * @param  array $matchedParams
      * @param  array $controller
-     * @return mixed
+     * @return void
      */
     protected function processMatchedParams(array $matchedParams, array $controller)
     {

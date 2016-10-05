@@ -67,13 +67,13 @@ class Router implements RouterInterface
      *
      * Instantiate the router object
      *
-     * @param  array   $routes
-     * @return Router
+     * @param  array $routes
      */
     public function __construct(array $routes = null)
     {
         $this->routeMatch = ((stripos(php_sapi_name(), 'cli') !== false) && (stripos(php_sapi_name(), 'server') === false)) ?
             new Match\Cli() : new Match\Http();
+
         if (null !== $routes) {
             $this->addRoutes($routes);
         }

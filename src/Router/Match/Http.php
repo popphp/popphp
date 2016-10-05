@@ -48,8 +48,6 @@ class Http extends AbstractMatch
      * Constructor
      *
      * Instantiate the HTTP match object
-     *
-     * @return Http
      */
     public function __construct()
     {
@@ -464,7 +462,7 @@ class Http extends AbstractMatch
      *
      * @param  array $matchedParams
      * @param  array $controller
-     * @return mixed
+     * @return void
      */
     protected function processMatchedParams(array $matchedParams, array $controller)
     {
