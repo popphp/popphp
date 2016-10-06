@@ -86,53 +86,6 @@ interface MatchInterface
     public function removeControllerParams($controller);
 
     /**
-     * Add dispatch params to be passed into the dispatch method of the controller instance
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @param  mixed  $params
-     * @return MatchInterface
-     */
-    public function addDispatchParams($controller, $action, $params);
-
-    /**
-     * Append dispatch params to be passed into the dispatch method of the controller instance
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @param  mixed  $params
-     * @return MatchInterface
-     */
-    public function appendDispatchParams($controller, $action, $params);
-
-    /**
-     * Get the params assigned to the dispatch
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @return mixed
-     */
-    public function getDispatchParams($controller, $action);
-
-    /**
-     * Determine if the dispatch has params
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @return boolean
-     */
-    public function hasDispatchParams($controller, $action);
-
-    /**
-     * Remove dispatch params from a dispatch method
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @return MatchInterface
-     */
-    public function removeDispatchParams($controller, $action);
-
-    /**
      * Get routes
      *
      * @return array
@@ -145,6 +98,48 @@ interface MatchInterface
      * @return boolean
      */
     public function hasRoute();
+
+    /**
+     * Get the params discovered from the route
+     *
+     * @return array
+     */
+    public function getRouteParams();
+
+    /**
+     * Determine if the route has params
+     *
+     * @return boolean
+     */
+    public function hasRouteParams();
+
+    /**
+     * Get the controller
+     *
+     * @return mixed
+     */
+    public function getController();
+
+    /**
+     * Determine if there is a controller
+     *
+     * @return boolean
+     */
+    public function hasController();
+
+    /**
+     * Get the action
+     *
+     * @return mixed
+     */
+    public function getAction();
+
+    /**
+     * Determine if there is an action
+     *
+     * @return boolean
+     */
+    public function hasAction();
 
     /**
      * Match the route

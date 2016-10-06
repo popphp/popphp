@@ -33,6 +33,24 @@ class Router
     protected $routeMatch = null;
 
     /**
+     * Controller object
+     * @var mixed
+     */
+    protected $controller = null;
+
+    /**
+     * Action
+     * @var mixed
+     */
+    protected $action = null;
+
+    /**
+     * Controller class
+     * @var string
+     */
+    protected $controllerClass = null;
+
+    /**
      * Constructor
      *
      * Instantiate the router object
@@ -135,71 +153,6 @@ class Router
     }
 
     /**
-     * Add dispatch params to be passed into the dispatch method of the controller instance
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @param  mixed  $params
-     * @return Router
-     */
-    public function addDispatchParams($controller, $action, $params)
-    {
-        $this->routeMatch->addDispatchParams($controller, $action, $params);
-        return $this;
-    }
-
-    /**
-     * Append dispatch params to be passed into the dispatch method of the controller instance
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @param  mixed  $params
-     * @return Router
-     */
-    public function appendDispatchParams($controller, $action, $params)
-    {
-        $this->routeMatch->appendDispatchParams($controller, $action, $params);
-        return $this;
-    }
-
-    /**
-     * Get the params assigned to the dispatch
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @return mixed
-     */
-    public function getDispatchParams($controller, $action)
-    {
-        return $this->routeMatch->getDispatchParams($controller, $action);
-    }
-
-    /**
-     * Determine if the dispatch has params
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @return boolean
-     */
-    public function hasDispatchParams($controller, $action)
-    {
-        return $this->routeMatch->hasDispatchParams($controller, $action);
-    }
-
-    /**
-     * Remove dispatch params from a dispatch method
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @return Router
-     */
-    public function removeDispatchParams($controller, $action)
-    {
-        $this->routeMatch->removeDispatchParams($controller, $action);
-        return $this;
-    }
-
-    /**
      * Get routes
      *
      * @return array
@@ -227,6 +180,76 @@ class Router
     public function hasRoute()
     {
         return $this->routeMatch->hasRoute();
+    }
+
+    /**
+     * Get the params discovered from the route
+     *
+     * @return mixed
+     */
+    public function getRouteParams()
+    {
+        return $this->routeMatch->getRouteParams();
+    }
+
+    /**
+     * Determine if the route has params
+     *
+     * @return boolean
+     */
+    public function hasRouteParams()
+    {
+        return $this->routeMatch->hasRouteParams();
+    }
+
+    /**
+     * Get the current controller object
+     *
+     * @return mixed
+     */
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    /**
+     * Determine if the router has a controller
+     *
+     * @return boolean
+     */
+    public function hasController()
+    {
+        return (null !== $this->controller);
+    }
+
+    /**
+     * Get the action
+     *
+     * @return mixed
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * Determine if the router has an action
+     *
+     * @return boolean
+     */
+    public function hasAction()
+    {
+        return (null !== $this->action);
+    }
+
+    /**
+     * Get the current controller class name
+     *
+     * @return string
+     */
+    public function getControllerClass()
+    {
+        return $this->controllerClass;
     }
 
     /**
@@ -263,12 +286,44 @@ class Router
     /**
      * Route to the correct controller
      *
+     * @throws Exception
      * @return void
      */
     public function route()
     {
         if ($this->routeMatch->match()) {
+            if ($this->routeMatch->hasController()) {
+                $controller = $this->routeMatch->getController();
 
+                if (class_exists($controller)) {
+                    $this->controllerClass = $controller;
+                    $controllerParams      = null;
+
+                    if ($this->routeMatch->hasControllerParams($controller)) {
+                        $controllerParams = $this->routeMatch->getControllerParams($controller);
+                    } else if ($this->routeMatch->hasControllerParams('*')) {
+                        $controllerParams = $this->routeMatch->getControllerParams('*');
+                    }
+
+                    if (null !== $controllerParams) {
+                        $this->controller = (new \ReflectionClass($controller))->newInstanceArgs($controllerParams);
+                    } else {
+                        $this->controller = new $controller();
+                    }
+
+                    if (!($this->controller instanceof \Pop\Controller\ControllerInterface)) {
+                        throw new Exception('Error: The controller must be an instance of Pop\Controller\Interface');
+                    }
+
+                    if (!$this->routeMatch->hasAction()) {
+                        throw new Exception('Error: There was no action assigned with the controller class');
+                    }
+                    $this->action = $this->routeMatch->getAction();
+                } else if ($controller instanceof \Closure) {
+                    $this->controllerClass = 'Closure';
+                    $this->controller      = $controller;
+                }
+            }
         }
     }
 

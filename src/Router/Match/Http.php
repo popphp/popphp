@@ -39,10 +39,10 @@ class Http extends AbstractMatch
     protected $segments = [];
 
     /**
-     * URI Segment string
+     * URI  string
      * @var string
      */
-    protected $segmentString = null;
+    protected $uriString = null;
 
     /**
      * Constructor
@@ -72,11 +72,11 @@ class Http extends AbstractMatch
         }
 
         if ($path == '') {
-            $this->segments      = ['index'];
-            $this->segmentString = '/';
+            $this->segments  = ['index'];
+            $this->uriString = '/';
         } else {
-            $this->segments      = explode('/', substr($path, 1));
-            $this->segmentString = '/' . implode('/', $this->segments) . $trailingSlash;
+            $this->segments  = explode('/', substr($path, 1));
+            $this->uriString = '/' . implode('/', $this->segments) . $trailingSlash;
         }
     }
 
@@ -105,9 +105,9 @@ class Http extends AbstractMatch
      *
      * @return string
      */
-    public function getSegmentString()
+    public function getUriString()
     {
-        return $this->segmentString;
+        return $this->uriString;
     }
 
     /**
@@ -128,20 +128,22 @@ class Http extends AbstractMatch
      */
     public function match()
     {
-        $matched = false;
-
         if (count($this->preparedRoutes) == 0) {
             $this->prepare();
         }
 
         foreach ($this->preparedRoutes as $regex => $controller) {
-            if (preg_match($regex, $this->segmentString) != 0) {
+            if (preg_match($regex, $this->uriString) != 0) {
                 $this->route = $regex;
                 break;
             }
         }
 
-        return $matched;
+        if ($this->hasRoute()) {
+            $this->parseRouteParams();
+        }
+
+        return $this->hasRoute();
     }
 
     /**
@@ -189,9 +191,8 @@ class Http extends AbstractMatch
             } else {
                 $routeRegex = $this->getRouteRegex($route);
                 $this->preparedRoutes[$routeRegex['regex']] = array_merge($controller, [
-                    'required' => $routeRegex['required'],
-                    'optional' => $routeRegex['optional'],
-                    'route'    => $route
+                    'route'  => $route,
+                    'params' => $routeRegex['params'],
                 ]);
             }
         }
@@ -205,26 +206,34 @@ class Http extends AbstractMatch
      */
     protected function getRouteRegex($route)
     {
-        $required       = [];
-        $optional       = [];
-        $requiredParams = [];
-        $optionalParams = [];
+        $required = [];
+        $optional = [];
+        $params   = [];
+        $offsets  = [];
 
         preg_match_all('/\[\/\:[^\[]+\]/', $route, $optional, PREG_OFFSET_CAPTURE);
         preg_match_all('/(?<!\[)\/\:+\w*/', $route, $required, PREG_OFFSET_CAPTURE);
 
         foreach ($required[0] as $req) {
-            $route = str_replace($req[0], '/.[a-zA-Z0-9_-]*', $route);
-            $requiredParams[] = [
-                'param'  => $req[0],
-                'offset' => $req[1]
+            $name      = substr($req[0], (strpos($req[0], ':') + 1));
+            $route     = str_replace($req[0], '/.[a-zA-Z0-9_-]*', $route);
+            $offsets[] = $req[1];
+            $params[]  = [
+                'param'    => $req[0],
+                'name'     => $name,
+                'offset'   => $req[1],
+                'required' => true
             ];
         }
         foreach ($optional[0] as $opt) {
-            $route = str_replace($opt[0], '(|/[a-zA-Z0-9_-]*)', $route);
-            $optionalParams[] = [
-                'param'  => $opt[0],
-                'offset' => $opt[1]
+            $name      = substr($opt[0], (strpos($opt[0], ':') + 1), -1);
+            $route     = str_replace($opt[0], '(|/[a-zA-Z0-9_-]*)', $route);
+            $offsets[] = $opt[1];
+            $params[]  = [
+                'param'    => $opt[0],
+                'name'     => $name,
+                'offset'   => $opt[1],
+                'required' => false
             ];
         }
 
@@ -234,11 +243,34 @@ class Http extends AbstractMatch
             $route = str_replace('[\/]$', '(|\/)$', $route);
         }
 
+        array_multisort($offsets, SORT_ASC, $params);
+
         return [
-            'regex'    => '/' . $route . '/',
-            'required' => $requiredParams,
-            'optional' => $optionalParams
+            'regex'  => '/' . $route . '/',
+            'params' => $params
         ];
+    }
+
+    /**
+     * Parse route dispatch parameters
+     *
+     * @return void
+     */
+    protected function parseRouteParams()
+    {
+        if (count($this->preparedRoutes[$this->route]['params']) > 0) {
+            $offset = 0;
+            foreach ($this->preparedRoutes[$this->route]['params'] as $i => $param) {
+                $value = substr($this->uriString, ($param['offset'] + $offset + 1));
+                if (strpos($value, '/') !== false) {
+                    $value = substr($value, 0, strpos($value, '/'));
+                    $offset += strlen($value) - strlen($param['param']) + 1;
+                }
+                if (!empty($value)) {
+                    $this->routeParams[$param['name']] = $value;
+                }
+            }
+        }
     }
 
 }

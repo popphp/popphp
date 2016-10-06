@@ -63,10 +63,10 @@ abstract class AbstractMatch implements MatchInterface
     protected $controllerParams = [];
 
     /**
-     * Dispatch parameters
+     * Route parameters
      * @var array
      */
-    protected $dispatchParams = [];
+    protected $routeParams = [];
 
     /**
      * Add a route
@@ -179,91 +179,6 @@ abstract class AbstractMatch implements MatchInterface
     }
 
     /**
-     * Add dispatch params to be passed into the dispatch method of the controller instance
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @param  mixed  $params
-     * @return AbstractMatch
-     */
-    public function addDispatchParams($controller, $action, $params)
-    {
-        if (!is_array($params)) {
-            $params = [$params];
-        }
-        if (!isset($this->dispatchParams[$controller])) {
-            $this->dispatchParams[$controller] = [];
-        }
-        $this->dispatchParams[$controller][$action] = $params;
-
-        return $this;
-    }
-
-    /**
-     * Append dispatch params to be passed into the dispatch method of the controller instance
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @param  mixed  $params
-     * @return AbstractMatch
-     */
-    public function appendDispatchParams($controller, $action, $params)
-    {
-        if (!is_array($params)) {
-            $params = [$params];
-        }
-        if (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action])) {
-            $this->dispatchParams[$controller][$action] = array_merge($this->dispatchParams[$controller][$action], $params);
-        } else {
-            $this->addDispatchParams($controller, $action, $params);
-        }
-        return $this;
-    }
-
-    /**
-     * Get the params assigned to the dispatch
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @return mixed
-     */
-    public function getDispatchParams($controller, $action)
-    {
-        return (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action])) ?
-            $this->dispatchParams[$controller][$action] : null;
-    }
-
-    /**
-     * Determine if the dispatch has params
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @return boolean
-     */
-    public function hasDispatchParams($controller, $action)
-    {
-        return (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action]));
-    }
-
-    /**
-     * Remove dispatch params from a dispatch method
-     *
-     * @param  string $controller
-     * @param  string $action
-     * @return AbstractMatch
-     */
-    public function removeDispatchParams($controller, $action)
-    {
-        if (isset($this->dispatchParams[$controller]) && isset($this->dispatchParams[$controller][$action])) {
-            unset($this->dispatchParams[$controller][$action]);
-            if (count($this->dispatchParams[$controller]) == 0) {
-                unset($this->dispatchParams[$controller]);
-            }
-        }
-        return $this;
-    }
-
-    /**
      * Get routes
      *
      * @return array
@@ -281,6 +196,70 @@ abstract class AbstractMatch implements MatchInterface
     public function hasRoute()
     {
         return (null !== $this->route);
+    }
+
+    /**
+     * Get the params discovered from the route
+     *
+     * @return array
+     */
+    public function getRouteParams()
+    {
+        return $this->routeParams;
+    }
+
+    /**
+     * Determine if the route has params
+     *
+     * @return boolean
+     */
+    public function hasRouteParams()
+    {
+        return (count($this->routeParams) > 0);
+    }
+
+    /**
+     * Get the controller
+     *
+     * @return mixed
+     */
+    public function getController()
+    {
+        return ((null !== $this->route) && isset($this->preparedRoutes[$this->route]) &&
+            isset($this->preparedRoutes[$this->route]['controller'])) ? $this->preparedRoutes[$this->route]['controller'] : null;
+    }
+
+    /**
+     * Determine if there is a controller
+     *
+     * @return boolean
+     */
+    public function hasController()
+    {
+        return ((null !== $this->route) && isset($this->preparedRoutes[$this->route]) &&
+            isset($this->preparedRoutes[$this->route]['controller']));
+    }
+
+    /**
+     * Get the action
+     *
+     * @return mixed
+     */
+    public function getAction()
+    {
+        return ((null !== $this->route) && isset($this->preparedRoutes[$this->route]) &&
+            isset($this->preparedRoutes[$this->route]['action'])) ? $this->preparedRoutes[$this->route]['action'] : null;
+    }
+
+    /**
+     * Determine if there is an action
+     *
+     * @return boolean
+     */
+    public function hasAction()
+    {
+        return ((null !== $this->route) && isset($this->preparedRoutes[$this->route]) &&
+            isset($this->preparedRoutes[$this->route]['action']));
     }
 
     /**

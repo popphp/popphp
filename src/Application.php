@@ -482,7 +482,6 @@ class Application implements \ArrayAccess
      *
      *   app.init
      *   app.route.pre
-     *   app.route.post
      *   app.dispatch.pre
      *   app.dispatch.post
      *   app.error
@@ -531,51 +530,20 @@ class Application implements \ArrayAccess
             if ((null !== $this->router)) {
                 $this->router->route();
 
-                // Trigger any app.route.post events
-                $this->trigger('app.route.post');
-
-                $controller = null;
-                $action     = null;
-
-                // Get the routed controller
-                if (null !== $this->router->getController()) {
-                    $controller = $this->router->getControllerClass();
-                    $action     = $this->router->getRouteMatch()->getAction();
-                }
-
                 // Trigger any app.dispatch.post events
                 $this->trigger('app.dispatch.pre');
 
-                // If route has been found and controller exists, dispatch it
-                if (null !== $controller) {
-                    // If the controller is a closure
-                    if ($controller instanceof \Closure) {
-                        // If the controller->action has dispatch parameters
-                        $params = $this->router()->getDispatchParams($this->router()->getRouteMatch()->getRoute());
-                        if (null !== $params) {
-                            if (!is_array($params)) {
-                                $params = [$params];
-                            }
-                            call_user_func_array($controller, $params);
-                        // Else, just dispatch it
+                if ($this->router->hasController()) {
+                    $controller = $this->router->getController();
+                    if ($this->router->getControllerClass() == 'Closure') {
+                        if ($this->router->hasRouteParams()) {
+                            call_user_func_array($controller, $this->router->getRouteParams());
                         } else {
                             $controller();
                         }
-                    // Else, if it's a class
                     } else {
-                        // If the controller->action has dispatch parameters
-                        $params = $this->router()->getDispatchParams($this->router()->getRouteMatch()->getRoute());
-                        if (null !== $params) {
-                            if (!is_array($params)) {
-                                $params = [$action, [$params]];
-                            } else {
-                                $params = array_merge([$action], [$params]);
-                            }
-                            call_user_func_array([$this->router->getController(), 'dispatch'], $params);
-                        // Else, just dispatch it
-                        } else {
-                            $this->router->getController()->dispatch($action);
-                        }
+                        $params = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
+                        $controller->dispatch($this->router->getAction(), $params);
                     }
                 } else {
                     $this->router->getRouteMatch()->noRouteFound();
