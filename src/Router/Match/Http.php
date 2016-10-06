@@ -187,11 +187,11 @@ class Http extends AbstractMatch
                     $this->flattenRoutes($route . $r, $c);
                 }
             } else {
-                $regex = $this->getRouteRegex($route);
-                $this->preparedRoutes[$regex['route']] = array_merge($controller, [
-                    'required' => $regex['required'],
-                    'optional' => $regex['optional'],
-                    'original' => $route
+                $routeRegex = $this->getRouteRegex($route);
+                $this->preparedRoutes[$routeRegex['regex']] = array_merge($controller, [
+                    'required' => $routeRegex['required'],
+                    'optional' => $routeRegex['optional'],
+                    'route'    => $route
                 ]);
             }
         }
@@ -235,7 +235,7 @@ class Http extends AbstractMatch
         }
 
         return [
-            'route'    => '/' . $route . '/',
+            'regex'    => '/' . $route . '/',
             'required' => $requiredParams,
             'optional' => $optionalParams
         ];
