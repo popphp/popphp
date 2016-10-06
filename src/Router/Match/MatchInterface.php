@@ -114,6 +114,48 @@ interface MatchInterface
     public function hasRouteParams();
 
     /**
+     * Get the default route
+     *
+     * @return array
+     */
+    public function getDefaultRoute();
+
+    /**
+     * Determine if there is a default route
+     *
+     * @return boolean
+     */
+    public function hasDefaultRoute();
+
+    /**
+     * Get the dynamic route
+     *
+     * @return array
+     */
+    public function getDynamicRoute();
+
+    /**
+     * Get the dynamic route prefix
+     *
+     * @return array
+     */
+    public function getDynamicRoutePrefix();
+
+    /**
+     * Determine if there is a dynamic route
+     *
+     * @return boolean
+     */
+    public function hasDynamicRoute();
+
+    /**
+     * Determine if it is a dynamic route
+     *
+     * @return boolean
+     */
+    public function isDynamicRoute();
+
+    /**
      * Get the controller
      *
      * @return mixed

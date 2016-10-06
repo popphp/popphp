@@ -517,9 +517,10 @@ class Application implements \ArrayAccess
     /**
      * Run the application.
      *
+     * @param  boolean $exit
      * @return void
      */
-    public function run()
+    public function run($exit = true)
     {
         try {
             $this->init();
@@ -546,7 +547,7 @@ class Application implements \ArrayAccess
                         $controller->dispatch($this->router->getAction(), $params);
                     }
                 } else {
-                    $this->router->getRouteMatch()->noRouteFound();
+                    $this->router->noRouteFound($exit);
                 }
 
                 // Trigger any app.dispatch.post events

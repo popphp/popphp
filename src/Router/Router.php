@@ -295,7 +295,10 @@ class Router
             if ($this->routeMatch->hasController()) {
                 $controller = $this->routeMatch->getController();
 
-                if (class_exists($controller)) {
+                if ($controller instanceof \Closure) {
+                    $this->controllerClass = 'Closure';
+                    $this->controller      = $controller;
+                } else if (class_exists($controller)) {
                     $this->controllerClass = $controller;
                     $controllerParams      = null;
 
@@ -316,15 +319,25 @@ class Router
                     }
 
                     if (!$this->routeMatch->hasAction()) {
-                        throw new Exception('Error: There was no action assigned with the controller class');
+                        throw new Exception('Error: There was no action assigned with the controller class \'' . $controller . '\'');
                     }
-                    $this->action = $this->routeMatch->getAction();
-                } else if ($controller instanceof \Closure) {
-                    $this->controllerClass = 'Closure';
-                    $this->controller      = $controller;
+                    $action = $this->routeMatch->getAction();
+                    $this->action = ((null === $action) && ($this->routeMatch->isDynamicRoute())) ?
+                        'index' : $action;
                 }
             }
         }
+    }
+
+    /**
+     * Method to process if a route was not found
+     *
+     * @param  boolean $exit
+     * @return void
+     */
+    public function noRouteFound($exit = true)
+    {
+        $this->routeMatch->noRouteFound($exit);
     }
 
 }

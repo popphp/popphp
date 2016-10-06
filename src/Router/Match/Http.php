@@ -33,12 +33,6 @@ class Http extends AbstractMatch
     protected $basePath = null;
 
     /**
-     * URI segments
-     * @var array
-     */
-    protected $segments = [];
-
-    /**
      * URI  string
      * @var string
      */
@@ -91,16 +85,6 @@ class Http extends AbstractMatch
     }
 
     /**
-     * Get the route segments
-     *
-     * @return array
-     */
-    public function getSegments()
-    {
-        return $this->segments;
-    }
-
-    /**
      * Get the route segment string
      *
      * @return string
@@ -139,9 +123,7 @@ class Http extends AbstractMatch
             }
         }
 
-        if ($this->hasRoute()) {
-            $this->parseRouteParams();
-        }
+        $this->parseRouteParams();
 
         return $this->hasRoute();
     }
@@ -190,6 +172,9 @@ class Http extends AbstractMatch
                 }
             } else {
                 $routeRegex = $this->getRouteRegex($route);
+                if (isset($controller['default']) && ($controller['default'])) {
+                    $this->defaultRoute = $controller;
+                }
                 $this->preparedRoutes[$routeRegex['regex']] = array_merge($controller, [
                     'route'  => $route,
                     'params' => $routeRegex['params'],
@@ -258,7 +243,7 @@ class Http extends AbstractMatch
      */
     protected function parseRouteParams()
     {
-        if (count($this->preparedRoutes[$this->route]['params']) > 0) {
+        if (isset($this->preparedRoutes[$this->route]['params']) && (count($this->preparedRoutes[$this->route]['params']) > 0)) {
             $offset = 0;
             foreach ($this->preparedRoutes[$this->route]['params'] as $i => $param) {
                 $value = substr($this->uriString, ($param['offset'] + $offset + 1));
@@ -270,6 +255,8 @@ class Http extends AbstractMatch
                     $this->routeParams[$param['name']] = $value;
                 }
             }
+        } else if ((null !== $this->dynamicRoute) && (count($this->segments) >= 3)) {
+            $this->routeParams = array_slice($this->segments, 2);
         }
     }
 
