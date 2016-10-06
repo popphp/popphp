@@ -27,18 +27,6 @@ class Cli extends AbstractMatch
 {
 
     /**
-     * CLI arguments
-     * @var array
-     */
-    protected $arguments = [];
-
-    /**
-     * CLI Argument string
-     * @var string
-     */
-    protected $argumentString = null;
-
-    /**
      * Constructor
      *
      * Instantiate the CLI match object
@@ -50,30 +38,10 @@ class Cli extends AbstractMatch
         // Trim the script name out of the arguments array
         array_shift($argv);
 
-        $this->arguments      = $argv;
-        $this->argumentString = implode(' ', $argv);
+        $this->segments    = $argv;
+        $this->routeString = implode(' ', $argv);
 
         return $this;
-    }
-
-    /**
-     * Get the CLI route arguments
-     *
-     * @return array
-     */
-    public function getArguments()
-    {
-        return $this->arguments;
-    }
-
-    /**
-     * Get the CLI route argument string
-     *
-     * @return string
-     */
-    public function getArgumentString()
-    {
-        return $this->argumentString;
     }
 
     /**
@@ -83,6 +51,7 @@ class Cli extends AbstractMatch
      */
     public function prepare()
     {
+        $this->flattenRoutes($this->routes);
         return $this;
     }
 
@@ -93,13 +62,20 @@ class Cli extends AbstractMatch
      */
     public function match()
     {
-        $matched = false;
-
         if (count($this->preparedRoutes) == 0) {
             $this->prepare();
         }
 
-        return $matched;
+        foreach ($this->preparedRoutes as $regex => $controller) {
+            if (preg_match($regex, $this->routeString) != 0) {
+                $this->route = $regex;
+                break;
+            }
+        }
+
+        $this->parseRouteParams();
+
+        return $this->hasRoute();
     }
 
     /**
@@ -122,6 +98,102 @@ class Cli extends AbstractMatch
         if ($exit) {
             exit(127);
         }
+    }
+
+    /**
+     * Flatten the nested routes
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @return void
+     */
+    protected function flattenRoutes($route, $controller = null)
+    {
+        if (is_array($route)) {
+            foreach ($route as $r => $c) {
+                $this->flattenRoutes($r, $c);
+            }
+        } else if (null !== $controller) {
+            if (!isset($controller['controller'])) {
+                foreach ($controller as $r => $c) {
+                    $this->flattenRoutes($route . $r, $c);
+                }
+            } else {
+                $routeRegex = $this->getRouteRegex($route);
+                if (isset($controller['default']) && ($controller['default'])) {
+                    $this->defaultRoute = $controller;
+                }
+                $this->preparedRoutes[$routeRegex['regex']] = array_merge($controller, [
+                    'route'  => $route,
+                    'params' => $routeRegex['params'],
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Get the REGEX pattern for the route string
+     *
+     * @param  string $route
+     * @return array
+     */
+    protected function getRouteRegex($route)
+    {
+
+        //$required = [];
+        //$optional = [];
+        //$params   = [];
+        //$offsets  = [];
+
+        //preg_match_all('/\[\/\:[^\[]+\]/', $route, $optional, PREG_OFFSET_CAPTURE);
+        //preg_match_all('/(?<!\[)\/\:+\w*/', $route, $required, PREG_OFFSET_CAPTURE);
+        /*
+        foreach ($required[0] as $req) {
+            $name      = substr($req[0], (strpos($req[0], ':') + 1));
+            $route     = str_replace($req[0], '/.[a-zA-Z0-9_-]*', $route);
+            $offsets[] = $req[1];
+            $params[]  = [
+                'param'    => $req[0],
+                'name'     => $name,
+                'offset'   => $req[1],
+                'required' => true
+            ];
+        }
+        foreach ($optional[0] as $opt) {
+            $name      = substr($opt[0], (strpos($opt[0], ':') + 1), -1);
+            $route     = str_replace($opt[0], '(|/[a-zA-Z0-9_-]*)', $route);
+            $offsets[] = $opt[1];
+            $params[]  = [
+                'param'    => $opt[0],
+                'name'     => $name,
+                'offset'   => $opt[1],
+                'required' => false
+            ];
+        }
+
+        $route = '^' . str_replace('/', '\/', $route) . '$';
+
+        if (substr($route, -5) == '[\/]$') {
+            $route = str_replace('[\/]$', '(|\/)$', $route);
+        }
+
+        array_multisort($offsets, SORT_ASC, $params);
+
+        return [
+            'regex'  => '/' . $route . '/',
+            'params' => $params
+        ];
+        */
+    }
+
+    /**
+     * Parse route dispatch parameters
+     *
+     * @return void
+     */
+    protected function parseRouteParams()
+    {
+
     }
 
 }

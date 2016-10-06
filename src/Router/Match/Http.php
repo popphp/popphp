@@ -33,12 +33,6 @@ class Http extends AbstractMatch
     protected $basePath = null;
 
     /**
-     * URI  string
-     * @var string
-     */
-    protected $uriString = null;
-
-    /**
      * Constructor
      *
      * Instantiate the HTTP match object
@@ -67,10 +61,10 @@ class Http extends AbstractMatch
 
         if ($path == '') {
             $this->segments  = ['index'];
-            $this->uriString = '/';
+            $this->routeString = '/';
         } else {
             $this->segments  = explode('/', substr($path, 1));
-            $this->uriString = '/' . implode('/', $this->segments) . $trailingSlash;
+            $this->routeString = '/' . implode('/', $this->segments) . $trailingSlash;
         }
     }
 
@@ -82,16 +76,6 @@ class Http extends AbstractMatch
     public function getBasePath()
     {
         return $this->basePath;
-    }
-
-    /**
-     * Get the route segment string
-     *
-     * @return string
-     */
-    public function getUriString()
-    {
-        return $this->uriString;
     }
 
     /**
@@ -117,7 +101,7 @@ class Http extends AbstractMatch
         }
 
         foreach ($this->preparedRoutes as $regex => $controller) {
-            if (preg_match($regex, $this->uriString) != 0) {
+            if (preg_match($regex, $this->routeString) != 0) {
                 $this->route = $regex;
                 break;
             }
@@ -246,7 +230,7 @@ class Http extends AbstractMatch
         if (isset($this->preparedRoutes[$this->route]['params']) && (count($this->preparedRoutes[$this->route]['params']) > 0)) {
             $offset = 0;
             foreach ($this->preparedRoutes[$this->route]['params'] as $i => $param) {
-                $value = substr($this->uriString, ($param['offset'] + $offset + 1));
+                $value = substr($this->routeString, ($param['offset'] + $offset + 1));
                 if (strpos($value, '/') !== false) {
                     $value = substr($value, 0, strpos($value, '/'));
                     $offset += strlen($value) - strlen($param['param']) + 1;

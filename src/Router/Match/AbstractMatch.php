@@ -27,7 +27,13 @@ abstract class AbstractMatch implements MatchInterface
 {
 
     /**
-     * Segments
+     * Route string
+     * @var string
+     */
+    protected $routeString = null;
+
+    /**
+     * Segments of route string
      * @var array
      */
     protected $segments = [];
@@ -206,7 +212,17 @@ abstract class AbstractMatch implements MatchInterface
     }
 
     /**
-     * Get the route segments
+     * Get the route string
+     *
+     * @return array
+     */
+    public function getRouteString()
+    {
+        return $this->routeString;
+    }
+
+    /**
+     * Get the route string segments
      *
      * @return array
      */
@@ -216,7 +232,7 @@ abstract class AbstractMatch implements MatchInterface
     }
 
     /**
-     * Get a route segment
+     * Get a route string segment
      *
      * @param  int $i
      * @return string
