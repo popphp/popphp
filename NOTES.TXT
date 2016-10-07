@@ -5,7 +5,7 @@ user    reset   -n=|--name=  [-v|--verbose] <email>   [<company>]
 user reset -n=something --verbose nicks3123@gmail.com
 user reset --name=something -v nicks3123@gmail.com MyCompany
 
-user reset -n|--name= [-v|--verbose] <email> [<company>]
+user reset [-n|--name=] [-i|--id=*] [-v|--verbose] <email> [<company>]
 
 
 [-v|--verbose]
@@ -17,6 +17,11 @@ options = \[\-[a-zA-Z0-9-_:|]*\]
 [--name=]
 [-n=]
 optionValues = \[\-[a-zA-Z0-9-_:|=]*=\]
+
+[-i=|--id=*]
+[--id=*]
+[-i=*]
+optionValueArray = \[\-[a-zA-Z0-9-_:|=]*=\*\]
 
 <email>
 requiredParameters = (?<!\[)<[a-zA-Z0-9-_:|]*>

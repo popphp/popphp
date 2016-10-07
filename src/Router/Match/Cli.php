@@ -139,6 +139,21 @@ class Cli extends AbstractMatch
      */
     protected function getRouteRegex($route)
     {
+        $command            = '';
+        $options            = [];
+        $optionValues       = [];
+        $optionValueArray   = [];
+        $requiredParameters = [];
+        $optionalParameters = [];
+        $params             = [];
+        $offsets            = [];
+
+
+        preg_match_all('/\[\-[a-zA-Z0-9-_:|]*\]/', $route, $options, PREG_OFFSET_CAPTURE);
+        preg_match_all('/\[\-[a-zA-Z0-9-_:|=]*=\]/', $route, $optionValues, PREG_OFFSET_CAPTURE);
+        preg_match_all('/\[\-[a-zA-Z0-9-_:|=]*=\*\]/', $route, $optionValueArray, PREG_OFFSET_CAPTURE);
+        preg_match_all('/(?<!\[)<[a-zA-Z0-9-_:|]*>/', $route, $requiredParameters, PREG_OFFSET_CAPTURE);
+        preg_match_all('/\[<[a-zA-Z0-9-_:|]*>\]/', $route, $optionalParameters, PREG_OFFSET_CAPTURE);
 
         //$required = [];
         //$optional = [];
