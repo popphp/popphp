@@ -28,3 +28,25 @@ requiredParameters = (?<!\[)<[a-zA-Z0-9-_:|]*>
 
 [<company>]
 optionalParameters = \[<[a-zA-Z0-9-_:|]*>\]
+
+
+
+#!/usr/bin/php
+<?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$app = new Pop\Application([
+    'routes' => [
+        'user reset [-n|--name=] [-c|--company=] [-i|--id=*] [-b|--baz=*] [-v|--verbose] [-o|--options] <email> <bar> [<company>] [<foo>]' => function($email, $bar, $company = null, $foo = null, $options = null) {
+            echo $email . PHP_EOL;
+            echo $bar . PHP_EOL;
+            echo $company . PHP_EOL;
+            echo $foo . PHP_EOL;
+            print_r($options);
+        }
+    ]
+]);
+
+$app->run();
+
