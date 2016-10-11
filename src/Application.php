@@ -461,7 +461,6 @@ class Application implements \ArrayAccess
      *
      *   app.init
      *   app.route.pre
-     *   app.route.post
      *   app.dispatch.pre
      *   app.dispatch.post
      *   app.error
