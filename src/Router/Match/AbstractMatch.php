@@ -253,16 +253,6 @@ abstract class AbstractMatch implements MatchInterface
     }
 
     /**
-     * Determine if the route has been matched
-     *
-     * @return boolean
-     */
-    public function hasRoute()
-    {
-        return (null !== $this->route) || (null !== $this->dynamicRoute) || (null !== $this->defaultRoute);
-    }
-
-    /**
      * Get the params discovered from the route
      *
      * @return array
@@ -439,6 +429,13 @@ abstract class AbstractMatch implements MatchInterface
 
         return $result;
     }
+
+    /**
+     * Determine if the route has been matched
+     *
+     * @return boolean
+     */
+    abstract public function hasRoute();
 
     /**
      * Prepare the routes

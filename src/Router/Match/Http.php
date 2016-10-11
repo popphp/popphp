@@ -113,6 +113,16 @@ class Http extends AbstractMatch
     }
 
     /**
+     * Determine if the route has been matched
+     *
+     * @return boolean
+     */
+    public function hasRoute()
+    {
+        return (null !== $this->route) || (null !== $this->dynamicRoute) || (null !== $this->defaultRoute);
+    }
+
+    /**
      * Method to process if a route was not found
      *
      * @param  boolean $exit
