@@ -107,6 +107,16 @@ class Cli extends AbstractMatch
     }
 
     /**
+     * Get the route commands
+     *
+     * @return array
+     */
+    public function getCommands()
+    {
+        return $this->commands;
+    }
+
+    /**
      * Method to process if a route was not found
      *
      * @param  boolean $exit
