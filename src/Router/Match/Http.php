@@ -188,10 +188,16 @@ class Http extends AbstractMatch
      */
     protected function getRouteRegex($route)
     {
-        $required = [];
-        $optional = [];
-        $params   = [];
-        $offsets  = [];
+        $required   = [];
+        $optional   = [];
+        $params     = [];
+        $offsets    = [];
+        $paramArray = false;
+
+        if (strpos($route, '*') !== false) {
+            $paramArray = true;
+            $route      = str_replace('*', '', $route);
+        }
 
         preg_match_all('/\[\/\:[^\[]+\]/', $route, $optional, PREG_OFFSET_CAPTURE);
         preg_match_all('/(?<!\[)\/\:+\w*/', $route, $required, PREG_OFFSET_CAPTURE);
@@ -204,9 +210,11 @@ class Http extends AbstractMatch
                 'param'    => $req[0],
                 'name'     => $name,
                 'offset'   => $req[1],
-                'required' => true
+                'required' => true,
+                'array'    => false
             ];
         }
+
         foreach ($optional[0] as $opt) {
             $name      = substr($opt[0], (strpos($opt[0], ':') + 1), -1);
             $route     = str_replace($opt[0], '(|/[a-zA-Z0-9_-]*)', $route);
@@ -215,7 +223,8 @@ class Http extends AbstractMatch
                 'param'    => $opt[0],
                 'name'     => $name,
                 'offset'   => $opt[1],
-                'required' => false
+                'required' => false,
+                'array'    => false
             ];
         }
 
@@ -226,6 +235,11 @@ class Http extends AbstractMatch
         }
 
         array_multisort($offsets, SORT_ASC, $params);
+
+        if (($paramArray) && (count($params) > 0)) {
+            $params[(count($params) - 1)]['array'] = true;
+            $route = str_replace('$', '.*', $route);
+        }
 
         return [
             'regex'  => '/' . $route . '/',
@@ -244,9 +258,17 @@ class Http extends AbstractMatch
             $offset = 0;
             foreach ($this->preparedRoutes[$this->route]['params'] as $i => $param) {
                 $value = substr($this->routeString, ($param['offset'] + $offset + 1));
-                if (strpos($value, '/') !== false) {
-                    $value = substr($value, 0, strpos($value, '/'));
-                    $offset += strlen($value) - strlen($param['param']) + 1;
+                if ($param['array']) {
+                    if ($value === false) {
+                        $value = [];
+                    } else {
+                        $value = (strpos($value, '/') !== false) ? explode('/', $value) : [$value];
+                    }
+                } else {
+                    if (strpos($value, '/') !== false) {
+                        $value = substr($value, 0, strpos($value, '/'));
+                        $offset += strlen($value) - strlen($param['param']) + 1;
+                    }
                 }
                 if (!empty($value)) {
                     $this->routeParams[$param['name']] = $value;
