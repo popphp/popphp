@@ -27,6 +27,12 @@ class Cli extends AbstractMatch
 {
 
     /**
+     * Route commands
+     * @var array
+     */
+    protected $commands = [];
+
+    /**
      * Allowed route options
      * @var array
      */
@@ -146,7 +152,7 @@ class Cli extends AbstractMatch
                     $this->defaultRoute = $controller;
                 }
                 $this->preparedRoutes[$routeRegex['regex']] = array_merge($controller, [
-                    'route'  => $route
+                    'route' => $route
                 ]);
             }
         }
@@ -182,7 +188,8 @@ class Cli extends AbstractMatch
             }
         }
 
-        $routeRegex .= '(.*)$';
+        $this->commands = $commands;
+        $routeRegex    .= '(.*)$';
 
         foreach ($options[0] as $option) {
             if (strpos($option[0], '--') !== false) {
@@ -253,7 +260,9 @@ class Cli extends AbstractMatch
 
         array_multisort($offsets, SORT_ASC, $this->parameters);
 
-        return ['regex'  => '/' . $routeRegex . '/'];
+        return [
+            'regex' => '/' . $routeRegex . '/'
+        ];
     }
 
     /**
@@ -314,7 +323,7 @@ class Cli extends AbstractMatch
             }
         }
 
-        $i = $start + 1;
+        $i = (count($options) > 0) ? $start + 1 : $start + count($this->commands) + 1;
 
         foreach ($this->parameters as $name => $parameter) {
             if ($parameter['required']) {
