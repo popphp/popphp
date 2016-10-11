@@ -41,13 +41,13 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testContainerException()
     {
-        $this->setExpectedException('Pop\Service\Exception');
+        $this->expectException('Pop\Service\Exception');
         Container::get('bar');
     }
 
     public function testNotCallableException()
     {
-        $this->setExpectedException('Pop\Service\Exception');
+        $this->expectException('Pop\Service\Exception');
         $services = new Locator();
         $services->set('badservice', ['call' => 'bad call']);
         $result = $services->get('badservice');
@@ -55,7 +55,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testSetServicesException()
     {
-        $this->setExpectedException('Pop\Service\Exception');
+        $this->expectException('Pop\Service\Exception');
         $services = new Locator();
         $services->setServices(['foo' => ['bar' => 123]]);
     }
@@ -229,7 +229,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testRecursionLoop()
     {
-        $this->setExpectedException('Pop\Service\Exception');
+        $this->expectException('Pop\Service\Exception');
         $services = new Locator();
         $services->set('service1', [
             'call' => function($locator) {

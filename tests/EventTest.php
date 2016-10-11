@@ -85,7 +85,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
 
     public function testCallableException()
     {
-        $this->setExpectedException('Pop\Event\Exception');
+        $this->expectException('Pop\Event\Exception');
         $events = new Manager();
         $events->on('foo', TestAsset\TestEvent::baz(), 1000);
         $events->trigger('foo');

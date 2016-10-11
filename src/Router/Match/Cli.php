@@ -398,7 +398,7 @@ class Cli extends AbstractMatch
                 }
             }
 
-            $i = (count($options) > 0) ? $start + 1 : $start + count($this->commands) + 1;
+            $i = (count($options) > 0) ? $start + 1 : $start + count($this->commands);
 
             foreach ($this->parameters as $name => $parameter) {
                 if ($parameter['required']) {

@@ -42,14 +42,16 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         ];
 
         $application = new Application(include __DIR__ . '/../vendor/autoload.php');
-        $module = new Module($config, $application);
+        $module = new Module($config);
+        $application->register('foo', $module);
         $this->assertTrue($module->isRegistered());
+        $this->assertTrue($application->isRegistered('foo'));
         $this->assertEquals('bar', $module->config()['foo']);
         $this->assertInstanceOf('Pop\Module\Module', $module);
         $this->assertInstanceOf('Pop\Application', $module->application());
     }
 
-    public function testPsr4()
+    public function testPsr0()
     {
         $config = [
             'psr-0'  => true,
@@ -69,24 +71,22 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         $module->mergeConfig(['foo' => 'bar']);
         $module->mergeConfig(['baz' => 123]);
         $this->assertEquals($module->config()['baz'], 123);
-        $module->mergeConfig(['foo' => 456], true);
+        $module->mergeConfig(['foo' => 456]);
         $this->assertEquals($module->config()['foo'], 456);
     }
 
     public function testLoadConfigException()
     {
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         $module = new Module();
-        $module->loadConfig('bad');
+        $module->registerConfig('bad');
     }
 
     public function testOffsets()
     {
         $module = new Module(['foo' => 'bar']);
-        $module['bar'] = 123;
-        unset($module['bar']);
-        $this->assertEquals('bar', $module['foo']);
-        $this->assertTrue(isset($module['foo']));
+        $this->assertEquals('bar', $module['config']['foo']);
+        $this->assertTrue(isset($module['config']));
     }
 
     public function testManagerConstructor()

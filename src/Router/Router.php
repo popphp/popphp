@@ -55,12 +55,17 @@ class Router
      *
      * Instantiate the router object
      *
-     * @param  array $routes
+     * @param  array               $routes
+     * @param  Match\AbstractMatch $match
      */
-    public function __construct(array $routes = null)
+    public function __construct(array $routes = null, Match\AbstractMatch $match = null)
     {
-        $this->routeMatch = ((stripos(php_sapi_name(), 'cli') !== false) && (stripos(php_sapi_name(), 'server') === false)) ?
-            new Match\Cli() : new Match\Http();
+        if (null !== $match) {
+            $this->routeMatch = $match;
+        } else {
+            $this->routeMatch = ((stripos(php_sapi_name(), 'cli') !== false) && (stripos(php_sapi_name(), 'server') === false)) ?
+                new Match\Cli() : new Match\Http();
+        }
 
         if (null !== $routes) {
             $this->addRoutes($routes);

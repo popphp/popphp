@@ -120,6 +120,11 @@ abstract class AbstractMatch implements MatchInterface
             }
             $this->routes[$route] = $controller;
         }
+
+        if (isset($controller['params'])) {
+            $this->addControllerParams($controller['controller'], $controller['params']);
+        }
+
         return $this;
     }
 
@@ -240,6 +245,16 @@ abstract class AbstractMatch implements MatchInterface
     public function getSegment($i)
     {
         return (isset($this->segments[$i])) ? $this->segments[$i] : null;
+    }
+
+    /**
+     * Get route string
+     *
+     * @return string
+     */
+    public function getRoute()
+    {
+        return $this->route;
     }
 
     /**

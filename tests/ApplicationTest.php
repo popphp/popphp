@@ -131,11 +131,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->mergeConfig(['foo' => 'bar']);
         $application->mergeConfig(['baz' => 123]);
         $this->assertEquals($application->config()['baz'], 123);
-        $application->mergeConfig(['foo' => 456], true);
+        $application->mergeConfig(['foo' => 456]);
         $this->assertEquals($application->config()['foo'], 456);
     }
 
-    public function testLoadConfig()
+    public function testRegisterConfig()
     {
         $config = [
             'foo'      => 'bar',
@@ -180,7 +180,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($application->config()['foo'], 'bar');
     }
 
-    public function testLoadConfig2()
+    public function testRegisterConfig2()
     {
         $config = [
             'foo'      => 'bar',
@@ -280,16 +280,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->off('app.init', 'Foo\Bar::factory');
     }
 
-    public function testLoadConfigException()
+    public function testRegisterConfigException()
     {
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         $application = new Application();
-        $application->loadConfig('bad');
+        $application->registerConfig('bad');
     }
 
     public function testRegisterAutoloaderException()
     {
-        $this->setExpectedException('Pop\Exception');
+        $this->expectException('Pop\Exception');
         $application = new Application();
         $application->registerAutoloader(new \StdClass());
     }
@@ -311,7 +311,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveService()
     {
-        $this->setExpectedException('Pop\Service\Exception');
+        $this->expectException('Pop\Service\Exception');
         $config = [
             'services' => [
                 'foo'  => [
@@ -381,13 +381,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
                     'priority' => 1000
                 ],
                 [
-                    'name'   => 'app.route.post',
-                    'action' => function() {
-                        return 'app.route.post';
-                    },
-                    'priority' => 1000
-                ],
-                [
                     'name'   => 'app.dispatch.pre',
                     'action' => function() {
                         return 'app.dispatch.pre';
@@ -407,7 +400,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->run();
         $this->assertContains('app.init', $application->events()->getResults('app.init'));
         $this->assertContains('app.route.pre', $application->events()->getResults('app.route.pre'));
-        $this->assertContains('app.route.post', $application->events()->getResults('app.route.post'));
         $this->assertContains('app.dispatch.pre', $application->events()->getResults('app.dispatch.pre'));
         $this->assertContains('app.dispatch.post', $application->events()->getResults('app.dispatch.post'));
     }
