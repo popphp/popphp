@@ -318,9 +318,6 @@ class Router
                         throw new Exception('Error: The controller must be an instance of Pop\Controller\Interface');
                     }
 
-                    if (!$this->routeMatch->hasAction()) {
-                        throw new Exception('Error: There was no action assigned with the controller class \'' . $controller . '\'');
-                    }
                     $action = $this->routeMatch->getAction();
                     $this->action = ((null === $action) && ($this->routeMatch->isDynamicRoute())) ?
                         'index' : $action;

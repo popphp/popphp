@@ -166,13 +166,16 @@ class Http extends AbstractMatch
                 }
             } else {
                 $routeRegex = $this->getRouteRegex($route);
-                if (isset($controller['default']) && ($controller['default'])) {
-                    $this->defaultRoute = $controller;
-                }
                 $this->preparedRoutes[$routeRegex['regex']] = array_merge($controller, [
                     'route'  => $route,
                     'params' => $routeRegex['params'],
                 ]);
+                if (isset($controller['default']) && ($controller['default'])) {
+                    if (isset($controller['action'])) {
+                        unset($controller['action']);
+                    }
+                    $this->defaultRoute = $controller;
+                }
             }
         }
     }
