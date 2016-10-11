@@ -319,8 +319,12 @@ class Router
                     }
 
                     $action = $this->routeMatch->getAction();
-                    $this->action = ((null === $action) && ($this->routeMatch->isDynamicRoute())) ?
-                        'index' : $action;
+
+                    if ((null === $action) && ($this->routeMatch->isDynamicRoute())) {
+                        $action = 'index';
+                    }
+
+                    $this->action = $action;
                 }
             }
         }

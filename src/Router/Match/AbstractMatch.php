@@ -402,7 +402,6 @@ abstract class AbstractMatch implements MatchInterface
             $action = $this->defaultRoute['action'];
         }
 
-
         return $action;
     }
 
