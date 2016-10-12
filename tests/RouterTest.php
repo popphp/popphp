@@ -10,12 +10,25 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorRoutes()
     {
-        $router = new Router(['/' => [
-            'controller' => function() {
-                echo 'index';
+        $router = new Router([
+            '/' => [
+                'controller' => function() {
+                    echo 'index';
+                }
+            ],
+            '*' => function() {
+                echo 'default';
             }
-        ]]);
+        ]);
         $this->assertInstanceOf('Pop\Router\Router', $router);
+        $this->assertInstanceOf('Closure', $router->getRouteMatch()->getDefaultRoute()['controller']);
+        $this->assertInstanceOf('Closure', $router->getRouteMatch()->getController());
+        $this->assertTrue($router->getRouteMatch()->hasController());
+        $this->assertTrue($router->getRouteMatch()->hasDefaultRoute());
+        $this->assertNull($router->getRouteMatch()->getDynamicRoute());
+        $this->assertNull($router->getRouteMatch()->getDynamicRoutePrefix());
+        $this->assertFalse($router->getRouteMatch()->hasDynamicRoute());
+        $this->assertFalse($router->getRouteMatch()->isDynamicRoute());
     }
 
     public function testAddRoute()
@@ -50,12 +63,25 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $router->addControllerParams('/user', [1000, 'append' => true]);
-        $router->addControllerParams('/user', [2000, 'append' => true]);
-        $router->addControllerParams('/user', [3000, 4000, 'append' => true]);
+        $router->appendControllerParams('/user', [2000, 'append' => true]);
         $this->assertContains(1000, $router->getControllerParams('/user'));
         $this->assertContains(2000, $router->getControllerParams('/user'));
-        $this->assertContains(3000, $router->getControllerParams('/user'));
-        $this->assertContains(4000, $router->getControllerParams('/user'));
+        $this->assertTrue($router->hasControllerParams('/user'));
+        $router->removeControllerParams('/user');
+        $this->assertFalse($router->hasControllerParams('/user'));
+    }
+
+    public function testAppendControllerParams()
+    {
+        $router = new Router();
+        $router->addRoute('/user', [
+            'controller' => function($id) {
+                echo $id;
+            }
+        ]);
+
+        $router->appendControllerParams('/user', 1000);
+        $this->assertContains(1000, $router->getControllerParams('/user'));
     }
 
     public function testAddControllerParamsNoAppend()
@@ -101,6 +127,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         ]);
         $router->route();
         $this->assertInstanceOf('Pop\Router\Match\AbstractMatch', $router->getRouteMatch());
+        $this->assertNull($router->getRouteMatch()->getSegment(0));
     }
 
     public function testHasRoute()
@@ -133,9 +160,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             'params'     => [123]
         ]);
 
+        $router->prepare();
         $router->route();
         $this->assertEquals('Pop\Test\TestAsset\TestController', $router->getControllerClass());
         $this->assertEquals(123, $router->getController()->foo);
+        $this->assertTrue($router->hasAction());
     }
 
     public function testRouteMatch()
@@ -152,6 +181,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router->route();
         $this->assertTrue(is_array($router->getRouteMatch()->getRoutes()));
+        $this->assertTrue($router->getRouteMatch()->hasAction());
         $this->assertEquals('help', $router->getRouteMatch()->getAction());
         $this->assertContains('help', $router->getRouteMatch()->getRoute());
     }
@@ -234,7 +264,10 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             'prefix' => 'Pop\Test\TestAsset\\'
         ]);
 
+        $router->route();
         $this->assertTrue($router->hasRoute());
+        $this->assertEquals('Pop\Test\TestAsset\TestController', $router->getControllerClass());
+        $this->assertInstanceOf('Pop\Test\TestAsset\TestController', $router->getController());
     }
 
     public function testCliDynamicMatch()
@@ -249,21 +282,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($router->hasRoute());
     }
-
-//    /**
-//     * @runInSeparateProcess
-//     */
-//    public function testHttpNoMatch()
-//    {
-//        $_SERVER['REQUEST_URI'] = '/system';
-//        $match = new Match\Http();
-//        $match->addRoutes(['/' => ['controller' => function() {}]]);
-//        ob_start();
-//        $this->assertFalse($match->match());
-//        $match->noRouteFound();
-//        $result = ob_get_clean();
-//        $this->assertContains('Page Not Found', $result);
-//    }
 
     public function testHttpMatchIndex()
     {
@@ -343,13 +361,71 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         ];
 
         $router = new Router();
-        $router->addRoute('help --options1|-o1 [--options2|-o2] [--options3|-o3]', [
+        $router->addRoute('help [--o1|options1] [--o2|options2] [--o3|options3]', [
             'controller'  => 'Pop\Test\TestAsset\TestController',
             'action'      => 'help'
         ]);
 
         $router->route();
         $this->assertTrue($router->hasRoute());
+        $this->assertEquals(1, count($router->getRouteMatch()->getCommands()));
+        $this->assertEquals(1, count($router->getRouteMatch()->getOptions()));
+        $this->assertEquals(0, count($router->getRouteMatch()->getParameters()));
+        $this->assertNull($router->getRouteMatch()->getOption('foo'));
+        $this->assertNull($router->getRouteMatch()->getParameter('foo'));
     }
+
+    public function testCliArrays()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help', '--id=1', '--id=2'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help [-i|--id=*]', [
+            'controller'  => function() {}
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals(1, count($router->getRouteMatch()->getOptions()));
+        $this->assertEquals(2, count($router->getRouteMatch()->getOption('id')));
+    }
+
+    public function testNoRoute()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'foo'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help'
+        ]);
+        $router->route();
+        $this->assertFalse($router->hasRoute());
+
+        ob_start();
+        $router->noRouteFound(false);
+        $result = ob_get_clean();
+        $this->assertFalse(ctype_print($result));
+    }
+
+    public function testNotController()
+    {
+        $this->expectException('Pop\Router\Exception');
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestNotController',
+            'action'     => 'help'
+        ]);
+        $router->route();
+    }
+
 
 }

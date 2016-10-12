@@ -323,13 +323,8 @@ class Router
                         throw new Exception('Error: The controller must be an instance of Pop\Controller\Interface');
                     }
 
-                    $action = $this->routeMatch->getAction();
-
-                    if ((null === $action) && ($this->routeMatch->isDynamicRoute())) {
-                        $action = 'index';
-                    }
-
-                    $this->action = $action;
+                    $action       = $this->routeMatch->getAction();
+                    $this->action = ((null === $action) && ($this->routeMatch->isDynamicRoute())) ? 'index' : $action;
                 }
             }
         }
