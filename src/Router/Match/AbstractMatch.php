@@ -248,7 +248,18 @@ abstract class AbstractMatch implements MatchInterface
     }
 
     /**
-     * Get route string
+     * Get original route string
+     *
+     * @return string
+     */
+    public function getOriginalRoute()
+    {
+        return (isset($this->preparedRoutes[$this->route]) && isset($this->preparedRoutes[$this->route]['route'])) ?
+            $this->preparedRoutes[$this->route]['route'] : null;
+    }
+
+    /**
+     * Get route regex
      *
      * @return string
      */

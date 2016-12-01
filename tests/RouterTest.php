@@ -184,6 +184,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($router->getRouteMatch()->hasAction());
         $this->assertEquals('help', $router->getRouteMatch()->getAction());
         $this->assertContains('help', $router->getRouteMatch()->getRoute());
+        $this->assertContains('help', $router->getRouteMatch()->getOriginalRoute());
     }
 
     public function testControllerParams()
