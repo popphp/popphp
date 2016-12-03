@@ -258,7 +258,7 @@ class Cli extends AbstractMatch
         preg_match_all('/(?<!\[)<[a-zA-Z0-9-_:|]*>/', $route, $requiredParameters, PREG_OFFSET_CAPTURE);
         preg_match_all('/\[<[a-zA-Z0-9-_:|]*>\]/', $route, $optionalParameters, PREG_OFFSET_CAPTURE);
 
-        $this->commands = $commands;
+        $this->commands[$route] = $commands;
         $routeRegex    .= '(.*)$';
 
         foreach ($options[0] as $option) {
@@ -269,7 +269,10 @@ class Cli extends AbstractMatch
                 $name = substr($option[0], (strpos($option[0], '-') + 1));
                 $name = (strpos($name, '|') !== false) ? substr($name, 0, strpos($name, '|')) : substr($name, 0, strpos($name, ']'));
             }
-            $this->options['options'][$name] = '/' . str_replace(['[', ']'], ['(', ')'], $option[0]) . '/';
+            if (!isset($this->options['options'][$route])) {
+                $this->options['options'][$route] = [];
+            }
+            $this->options['options'][$route][$name] = '/' . str_replace(['[', ']'], ['(', ')'], $option[0]) . '/';
         }
 
         foreach ($optionValues[0] as $option) {
@@ -287,7 +290,10 @@ class Cli extends AbstractMatch
             } else {
                 $optionRegex = '(' . $opt . '[a-zA-Z0-9-_:|.@]+|' . $opt . '"(.*)")';
             }
-            $this->options['values'][$name] = '/' . $optionRegex . '/';
+            if (!isset($this->options['values'][$route])) {
+                $this->options['values'][$route] = [];
+            }
+            $this->options['values'][$route][$name] = '/' . $optionRegex . '/';
         }
 
         foreach ($optionValueArray[0] as $option) {
@@ -305,11 +311,17 @@ class Cli extends AbstractMatch
             } else {
                 $optionRegex = '(' . $opt . '[a-zA-Z0-9-_:|.@]+|' . $opt . '"(.*)")';
             }
-            $this->options['arrays'][$name] = '/' . $optionRegex . '/';
+            if (!isset($this->options['arrays'][$route])) {
+                $this->options['arrays'][$route] = [];
+            }
+            $this->options['arrays'][$route][$name] = '/' . $optionRegex . '/';
         }
 
         foreach ($requiredParameters[0] as $i => $parameter) {
-            $this->parameters[substr($parameter[0], 1, -1)] = [
+            if (!isset($this->parameters[$route])) {
+                $this->parameters[$route] = [];
+            }
+            $this->parameters[$route][substr($parameter[0], 1, -1)] = [
                 'position' => ($i + 1),
                 'offset'   => $parameter[1],
                 'required' => true
@@ -320,7 +332,10 @@ class Cli extends AbstractMatch
         $cur = count($this->parameters);
 
         foreach ($optionalParameters[0] as $j => $parameter) {
-            $this->parameters[substr($parameter[0], 2, -2)] = [
+            if (!isset($this->parameters[$route])) {
+                $this->parameters[$route] = [];
+            }
+            $this->parameters[$route][substr($parameter[0], 2, -2)] = [
                 'position' => ($j + 1 + $cur),
                 'offset'   => $parameter[1],
                 'required' => false
@@ -328,8 +343,8 @@ class Cli extends AbstractMatch
             $offsets[] = $parameter[1];
         }
 
-        if ((count($offsets) > 0) && (count($offsets) == count($this->parameters))) {
-            array_multisort($offsets, SORT_ASC, $this->parameters);
+        if ((count($offsets) > 0) && (count($offsets) == count($this->parameters[$route]))) {
+            array_multisort($offsets, SORT_ASC, $this->parameters[$route]);
         }
 
         return [
@@ -349,71 +364,80 @@ class Cli extends AbstractMatch
         } else {
             $options = [];
             $start   = 0;
-
-            foreach ($this->options['options'] as $option => $regex) {
-                $match = [];
-                preg_match($regex, $this->routeString, $match);
-                if (isset($match[0]) && !empty($match[0])) {
-                    $options[$option] = true;
-                    if (array_search($match[0], $this->segments) > $start) {
-                        $start = array_search($match[0], $this->segments);
+            $route   = $this->preparedRoutes[$this->route]['route'];
+            if (isset($this->options[$route]) && isset($this->options[$route]['options'])) {
+                foreach ($this->options[$route]['options'] as $option => $regex) {
+                    $match = [];
+                    preg_match($regex, $this->routeString, $match);
+                    if (isset($match[0]) && !empty($match[0])) {
+                        $options[$option] = true;
+                        if (array_search($match[0], $this->segments) > $start) {
+                            $start = array_search($match[0], $this->segments);
+                        }
                     }
                 }
             }
 
-            foreach ($this->options['values'] as $option => $regex) {
-                $match = [];
-                preg_match($regex, $this->routeString, $match);
-                if (isset($match[0]) && !empty($match[0])) {
-                    if (strpos($match[0], '=') !== false) {
-                        $value = substr($match[0], (strpos($match[0], '=') + 1));
-                    } else {
-                        $value = substr($match[0], 2);
-                    }
-                    $options[$option] = $value;
-                    if (array_search($match[0], $this->segments) > $start) {
-                        $start = array_search($match[0], $this->segments);
-                    }
-                }
-            }
-            foreach ($this->options['arrays'] as $option => $regex) {
-                $matches = [];
-                $values  = [];
-                preg_match_all($regex, $this->routeString, $matches);
-                if (isset($matches[0]) && !empty($matches[0])) {
-                    foreach ($matches[0] as $match) {
-                        if (strpos($match, '=') !== false) {
-                            $value = substr($match, (strpos($match, '=') + 1));
+            if (isset($this->options[$route]) && isset($this->options[$route]['values'])) {
+                foreach ($this->options[$route]['values'] as $option => $regex) {
+                    $match = [];
+                    preg_match($regex, $this->routeString, $match);
+                    if (isset($match[0]) && !empty($match[0])) {
+                        if (strpos($match[0], '=') !== false) {
+                            $value = substr($match[0], (strpos($match[0], '=') + 1));
                         } else {
-                            $value = substr($match, 2);
+                            $value = substr($match[0], 2);
                         }
-                        $values[] = $value;
-                        if (array_search($match, $this->segments) > $start) {
-                            $start = array_search($match, $this->segments);
+                        $options[$option] = $value;
+                        if (array_search($match[0], $this->segments) > $start) {
+                            $start = array_search($match[0], $this->segments);
                         }
                     }
                 }
-                if (count($values) > 0) {
-                    $options[$option] = $values;
+            }
+
+            if (isset($this->options[$route]) && isset($this->options[$route]['arrays'])) {
+                foreach ($this->options[$route]['arrays'] as $option => $regex) {
+                    $matches = [];
+                    $values  = [];
+                    preg_match_all($regex, $this->routeString, $matches);
+                    if (isset($matches[0]) && !empty($matches[0])) {
+                        foreach ($matches[0] as $match) {
+                            if (strpos($match, '=') !== false) {
+                                $value = substr($match, (strpos($match, '=') + 1));
+                            } else {
+                                $value = substr($match, 2);
+                            }
+                            $values[] = $value;
+                            if (array_search($match, $this->segments) > $start) {
+                                $start = array_search($match, $this->segments);
+                            }
+                        }
+                    }
+                    if (count($values) > 0) {
+                        $options[$option] = $values;
+                    }
                 }
             }
 
             $i = (count($options) > 0) ? $start + 1 : $start + count($this->commands);
 
-            foreach ($this->parameters as $name => $parameter) {
-                if ($parameter['required']) {
-                    $required[$name] = null;
-                }
-                if (isset($this->segments[$i])) {
-                    $this->routeParams[$name] = $this->segments[$i];
-                    $required[$name] = true;
-                    $i++;
-                } else {
-                    $this->routeParams[$name] = null;
-                }
+            if (isset($this->parameters[$route])) {
+                foreach ($this->parameters[$route] as $name => $parameter) {
+                    if ($parameter['required']) {
+                        $required[$name] = null;
+                    }
+                    if (isset($this->segments[$i])) {
+                        $this->routeParams[$name] = $this->segments[$i];
+                        $required[$name] = true;
+                        $i++;
+                    } else {
+                        $this->routeParams[$name] = null;
+                    }
 
-                if (($parameter['required']) && (null === $this->routeParams[$name])) {
-                    $this->hasAllRequired = false;
+                    if (($parameter['required']) && (null === $this->routeParams[$name])) {
+                        $this->hasAllRequired = false;
+                    }
                 }
             }
 
