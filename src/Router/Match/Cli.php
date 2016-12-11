@@ -101,7 +101,9 @@ class Cli extends AbstractMatch
             }
         }
 
-        $this->parseRouteParams();
+        if (null !== $this->route) {
+            $this->parseRouteParams();
+        }
 
         return $this->hasRoute();
     }
@@ -238,18 +240,22 @@ class Cli extends AbstractMatch
         $optionValueArray   = [];
         $requiredParameters = [];
         $optionalParameters = [];
-        $offsets            = [];
+
+        if (!isset($this->commands[$route])) {
+            $this->commands[$route] = [];
+        }
 
         if ((strpos($route, '<') !== false) || (strpos($route, '[') !== false)) {
             preg_match_all('/[a-zA-Z0-9-_:|]*(?=\s)/', $route, $commands, PREG_OFFSET_CAPTURE);
             foreach ($commands[0] as $i => $command) {
                 if (!empty($command[0])) {
                     $routeRegex .= $command[0] . ' ';
+                    $this->commands[$route][] = $command[0];
                 }
             }
         } else {
-            $commands    = explode(' ', $route);
-            $routeRegex .= $route . '$';
+            $this->commands[$route] = explode(' ', $route);
+            $routeRegex            .= $route . '$';
         }
 
         preg_match_all('/\[\-[a-zA-Z0-9-_:|]*\]/', $route, $options, PREG_OFFSET_CAPTURE);
@@ -258,8 +264,7 @@ class Cli extends AbstractMatch
         preg_match_all('/(?<!\[)<[a-zA-Z0-9-_:|]*>/', $route, $requiredParameters, PREG_OFFSET_CAPTURE);
         preg_match_all('/\[<[a-zA-Z0-9-_:|]*>\]/', $route, $optionalParameters, PREG_OFFSET_CAPTURE);
 
-        $this->commands[$route] = $commands;
-        $routeRegex    .= '(.*)$';
+        $routeRegex .= '(.*)$';
 
         foreach ($options[0] as $option) {
             if (strpos($option[0], '--') !== false) {
@@ -323,28 +328,18 @@ class Cli extends AbstractMatch
             }
             $this->parameters[$route][substr($parameter[0], 1, -1)] = [
                 'position' => ($i + 1),
-                'offset'   => $parameter[1],
                 'required' => true
             ];
-            $offsets[] = $parameter[1];
         }
-
-        $cur = count($this->parameters);
 
         foreach ($optionalParameters[0] as $j => $parameter) {
             if (!isset($this->parameters[$route])) {
                 $this->parameters[$route] = [];
             }
             $this->parameters[$route][substr($parameter[0], 2, -2)] = [
-                'position' => ($j + 1 + $cur),
-                'offset'   => $parameter[1],
+                'position' => ($j + 1 + count($this->parameters[$route])),
                 'required' => false
             ];
-            $offsets[] = $parameter[1];
-        }
-
-        if ((count($offsets) > 0) && (count($offsets) == count($this->parameters[$route]))) {
-            array_multisort($offsets, SORT_ASC, $this->parameters[$route]);
         }
 
         return [
@@ -365,8 +360,8 @@ class Cli extends AbstractMatch
             $options = [];
             $start   = 0;
             $route   = $this->preparedRoutes[$this->route]['route'];
-            if (isset($this->options[$route]) && isset($this->options[$route]['options'])) {
-                foreach ($this->options[$route]['options'] as $option => $regex) {
+            if (isset($this->options['options'][$route])) {
+                foreach ($this->options['options'][$route] as $option => $regex) {
                     $match = [];
                     preg_match($regex, $this->routeString, $match);
                     if (isset($match[0]) && !empty($match[0])) {
@@ -378,8 +373,8 @@ class Cli extends AbstractMatch
                 }
             }
 
-            if (isset($this->options[$route]) && isset($this->options[$route]['values'])) {
-                foreach ($this->options[$route]['values'] as $option => $regex) {
+            if (isset($this->options['values'][$route])) {
+                foreach ($this->options['values'][$route] as $option => $regex) {
                     $match = [];
                     preg_match($regex, $this->routeString, $match);
                     if (isset($match[0]) && !empty($match[0])) {
@@ -396,8 +391,8 @@ class Cli extends AbstractMatch
                 }
             }
 
-            if (isset($this->options[$route]) && isset($this->options[$route]['arrays'])) {
-                foreach ($this->options[$route]['arrays'] as $option => $regex) {
+            if (isset($this->options['arrays'][$route])) {
+                foreach ($this->options['arrays'][$route] as $option => $regex) {
                     $matches = [];
                     $values  = [];
                     preg_match_all($regex, $this->routeString, $matches);
