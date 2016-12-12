@@ -332,12 +332,14 @@ class Cli extends AbstractMatch
             ];
         }
 
+        $cur = (isset($this->parameters[$route])) ? count($this->parameters[$route]) : 0;
+
         foreach ($optionalParameters[0] as $j => $parameter) {
             if (!isset($this->parameters[$route])) {
                 $this->parameters[$route] = [];
             }
             $this->parameters[$route][substr($parameter[0], 2, -2)] = [
-                'position' => ($j + 1 + count($this->parameters[$route])),
+                'position' => ($j + 1 + $cur),
                 'required' => false
             ];
         }
@@ -415,7 +417,7 @@ class Cli extends AbstractMatch
                 }
             }
 
-            $i = (count($options) > 0) ? $start + 1 : $start + count($this->commands);
+            $i = (count($options) > 0) ? $start + 1 : $start + count($this->commands[$route]);
 
             if (isset($this->parameters[$route])) {
                 foreach ($this->parameters[$route] as $name => $parameter) {
