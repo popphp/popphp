@@ -1,6 +1,9 @@
 popphp
 ======
 
+[![Build Status](https://travis-ci.org/popphp/popphp.svg?branch=master)](https://travis-ci.org/popphp/popphp)
+[![Coverage Status](http://cc.popphp.org/coverage.php?comp=popphp)](http://cc.popphp.org/popphp/)
+
 [![Join the chat at https://gitter.im/popphp/2](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/popphp/2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 OVERVIEW
