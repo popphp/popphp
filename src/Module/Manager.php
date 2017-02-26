@@ -54,8 +54,8 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      */
     public function registerModules(array $modules)
     {
-        foreach ($modules as $name => $module) {
-            $this->register($name, $module);
+        foreach ($modules as $module) {
+            $this->register($module);
         }
         return $this;
     }
@@ -63,13 +63,17 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Register a module object
      *
-     * @param  string          $name
      * @param  ModuleInterface $module
+     * @throws Exception
      * @return Manager
      */
-    public function register($name, ModuleInterface $module)
+    public function register(ModuleInterface $module)
     {
-        $this->modules[$name] = $module;
+        if (!$module->hasName()) {
+            throw new Exception('Error: That module does not have a name');
+        }
+
+        $this->modules[$module->getName()] = $module;
         return $this;
     }
 
@@ -158,7 +162,10 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      */
     public function __set($name, $value)
     {
-        return $this->register($name, $value);
+        if ($value instanceof ModuleInterface) {
+            $value->setName($name);
+        }
+        return $this->register($value);
     }
 
     /**

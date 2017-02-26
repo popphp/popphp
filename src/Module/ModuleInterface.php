@@ -29,6 +29,37 @@ interface ModuleInterface
 {
 
     /**
+     * Set module name
+     *
+     * @param  string $name
+     * @return ModuleInterface
+     */
+    public function setName($name);
+
+    /**
+     * Get module name
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Determine if module has name
+     *
+     * @return boolean
+     */
+    public function hasName();
+
+    /**
+     * Register a configuration with the module object
+     *
+     * @param  mixed $config
+     * @throws \InvalidArgumentException
+     * @return Module
+     */
+    public function registerConfig($config);
+
+    /**
      * Register the module
      *
      * @param  Application $application

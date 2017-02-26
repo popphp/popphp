@@ -42,8 +42,8 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         ];
 
         $application = new Application(include __DIR__ . '/../vendor/autoload.php');
-        $module = new Module($config);
-        $application->register('foo', $module);
+        $module = new Module($config, 'foo');
+        $application->register($module);
         $this->assertTrue($module->isRegistered());
         $this->assertTrue($application->isRegistered('foo'));
         $this->assertEquals('bar', $module->config()['foo']);
@@ -61,7 +61,7 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         ];
 
         $application = new Application(include __DIR__ . '/../vendor/autoload.php');
-        $module = new Module($config, $application);
+        $module = new Module($config, $application, 'foo');
         $this->assertEquals('bar', $module->config()['foo']);
     }
 
@@ -91,7 +91,7 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
 
     public function testManagerConstructor()
     {
-        $manager = new Manager(['foo' => new Module(['foo' => 'bar'])]);
+        $manager = new Manager([new Module(['foo' => 'bar'], 'foo')]);
         $manager['bar'] = new Module(['baz' => 123]);
 
         $this->assertInstanceOf('Pop\Module\Manager', $manager);

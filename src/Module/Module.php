@@ -41,6 +41,12 @@ class Module implements ModuleInterface, \ArrayAccess
     protected $application = null;
 
     /**
+     * Module name
+     * @var string
+     */
+    protected $name = null;
+
+    /**
      * Constructor
      *
      * Instantiate a module object
@@ -52,13 +58,20 @@ class Module implements ModuleInterface, \ArrayAccess
         $args        = func_get_args();
         $application = null;
         $config      = null;
+        $name        = null;
 
         foreach ($args as $arg) {
             if ($arg instanceof Application) {
                 $application = $arg;
             } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)) {
                 $config = $arg;
+            } else if (is_string($arg)) {
+                $name = $arg;
             }
+        }
+
+        if (null !== $name) {
+            $this->setName($name);
         }
 
         if (null !== $config) {
@@ -68,6 +81,38 @@ class Module implements ModuleInterface, \ArrayAccess
         if (null !== $application) {
             $this->register($application);
         }
+    }
+
+    /**
+     * Set module name
+     *
+     * @param  string $name
+     * @return Module
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * Get module name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Determine if module has name
+     *
+     * @return boolean
+     */
+    public function hasName()
+    {
+        return (null !== $this->name);
     }
 
     /**
@@ -140,6 +185,8 @@ class Module implements ModuleInterface, \ArrayAccess
                 }
             }
         }
+
+        $this->application->modules->register($this);
 
         return $this;
     }
