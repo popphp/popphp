@@ -291,9 +291,9 @@ class Cli extends AbstractMatch
             }
             if (strpos($opt, '|') !== false) {
                 $opts = explode('|', $opt);
-                $optionRegex = '(' . $opts[0] . '[a-zA-Z0-9-_:|.@]+|' . $opts[0] . '"(.*)"|' . $opts[1] . '[a-zA-Z0-9-_:|.@]+|' . $opts[1] . '"(.*)")';
+                $optionRegex = '(' . $opts[0] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[0] . '"(.*)"|' . $opts[1] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[1] . '"(.*)")';
             } else {
-                $optionRegex = '(' . $opt . '[a-zA-Z0-9-_:|.@]+|' . $opt . '"(.*)")';
+                $optionRegex = '(' . $opt . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt . '"(.*)")';
             }
             if (!isset($this->options['values'][$route])) {
                 $this->options['values'][$route] = [];
@@ -312,9 +312,9 @@ class Cli extends AbstractMatch
             }
             if (strpos($opt, '|') !== false) {
                 $opts = explode('|', $opt);
-                $optionRegex = '(' . $opts[0] . '[a-zA-Z0-9-_:|.@]+|' . $opts[0] . '"(.*)"|' . $opts[1] . '[a-zA-Z0-9-_:|.@]+|' . $opts[1] . '"(.*)")';
+                $optionRegex = '(' . $opts[0] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[0] . '"(.*)"|' . $opts[1] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[1] . '"(.*)")';
             } else {
-                $optionRegex = '(' . $opt . '[a-zA-Z0-9-_:|.@]+|' . $opt . '"(.*)")';
+                $optionRegex = '(' . $opt . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt . '"(.*)")';
             }
             if (!isset($this->options['arrays'][$route])) {
                 $this->options['arrays'][$route] = [];
