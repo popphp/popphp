@@ -13,6 +13,7 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
     {
         $config = [
             'prefix'   => 'Test\\',
+            'name'     => 'foo',
             'src'      => __DIR__,
             'foo'      => 'bar',
             'routes'   => [

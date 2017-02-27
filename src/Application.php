@@ -358,12 +358,17 @@ class Application implements \ArrayAccess
      * Register a module with the module manager object
      *
      * @param  mixed  $module
+     * @param  string $name
      * @return Application
      */
-    public function register($module)
+    public function register($module, $name = null)
     {
         if (!($module instanceof Module\ModuleInterface)) {
             $module = new Module\Module($module, $this);
+        }
+
+        if (null !== $name) {
+            $module->setName($name);
         }
 
         if (!$module->isRegistered()) {

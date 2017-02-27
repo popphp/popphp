@@ -146,6 +146,11 @@ class Module implements ModuleInterface, \ArrayAccess
         $this->application = $application;
 
         if (null !== $this->config) {
+            // Set the name, if available
+            if (isset($this->config['name'])) {
+                $this->setName($this->config['name']);
+            }
+
             // If the autoloader is set and the the module config has a
             // defined prefix and src, register the module with the autoloader
             if ((null !== $this->application) && (null !== $this->application->autoloader()) &&
