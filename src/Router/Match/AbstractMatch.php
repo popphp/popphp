@@ -298,7 +298,8 @@ abstract class AbstractMatch implements MatchInterface
         $routes = [];
         foreach ($this->preparedRoutes as $key => $value) {
             if (isset($value['route'])) {
-                $routes[] = $value['route'];
+                $routes[$value['route']] = $value;
+                unset($routes[$value['route']]['route']);
             }
         }
         return $routes;
