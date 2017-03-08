@@ -107,6 +107,20 @@ interface MatchInterface
     public function getRoutes();
 
     /**
+     * Get prepared routes
+     *
+     * @return array
+     */
+    public function getPreparedRoutes();
+
+    /**
+     * Get flattened routes
+     *
+     * @return array
+     */
+    public function getFlattenedRoutes();
+
+    /**
      * Determine if there is a route match
      *
      * @return boolean
