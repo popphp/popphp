@@ -279,6 +279,32 @@ abstract class AbstractMatch implements MatchInterface
     }
 
     /**
+     * Get prepared routes
+     *
+     * @return array
+     */
+    public function getPreparedRoutes()
+    {
+        return $this->preparedRoutes;
+    }
+
+    /**
+     * Get flattened routes
+     *
+     * @return array
+     */
+    public function getFlattenedRoutes()
+    {
+        $routes = [];
+        foreach ($this->preparedRoutes as $key => $value) {
+            if (isset($value['route'])) {
+                $routes[] = $value['route'];
+            }
+        }
+        return $routes;
+    }
+
+    /**
      * Get the params discovered from the route
      *
      * @return array
