@@ -118,7 +118,9 @@ abstract class AbstractMatch implements MatchInterface
             if (is_callable($controller)) {
                 $controller = ['controller' => $controller];
             }
-            $this->routes[$route] = $controller;
+
+            $this->routes[$route] = (isset($this->routes[$route])) ?
+                array_merge($this->routes[$route], $controller) : $controller;
         }
 
         if (isset($controller['params'])) {
