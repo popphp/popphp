@@ -268,6 +268,8 @@ class Http extends AbstractMatch
                     if (strpos($value, '/') !== false) {
                         $value = substr($value, 0, strpos($value, '/'));
                         $offset += strlen($value) - strlen($param['param']) + 1;
+                    } else {
+                        $offset += strlen($value) - strlen($param['param']) + 1;
                     }
                 }
                 if (!empty($value)) {
