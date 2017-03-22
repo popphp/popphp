@@ -272,7 +272,7 @@ class Http extends AbstractMatch
                         $offset += strlen($value) - strlen($param['param']) + 1;
                     }
                 }
-                if (!empty($value)) {
+                if ($value != '') {
                     $this->routeParams[$param['name']] = $value;
                 }
             }
