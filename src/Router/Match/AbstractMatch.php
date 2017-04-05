@@ -115,12 +115,18 @@ abstract class AbstractMatch implements MatchInterface
             $this->defaultRoute = $controller;
         // Else, regular route
         } else {
-            if (is_callable($controller)) {
-                $controller = ['controller' => $controller];
-            }
+            if (is_array($controller) && !isset($controller['controller'])) {
+                foreach ($controller as $r => $c) {
+                    $this->addRoute($route . $r, $c);
+                }
+            } else {
+                if (is_callable($controller)) {
+                    $controller = ['controller' => $controller];
+                }
 
-            $this->routes[$route] = (isset($this->routes[$route])) ?
-                array_merge($this->routes[$route], $controller) : $controller;
+                $this->routes[$route] = (isset($this->routes[$route])) ?
+                    array_merge($this->routes[$route], $controller) : $controller;
+            }
         }
 
         if (isset($controller['params'])) {
