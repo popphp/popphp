@@ -23,7 +23,7 @@ use Pop\Application;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2017 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.0.0
+ * @version    3.1.0
  */
 class Module implements ModuleInterface, \ArrayAccess
 {
@@ -72,6 +72,8 @@ class Module implements ModuleInterface, \ArrayAccess
 
         if (null !== $name) {
             $this->setName($name);
+        } else {
+            $this->setName(str_replace('\\', '_', strtolower(get_called_class())));
         }
 
         if (null !== $config) {
@@ -193,6 +195,50 @@ class Module implements ModuleInterface, \ArrayAccess
 
         $this->application->modules->register($this);
 
+        return $this;
+    }
+
+    /**
+     * Add new value to config
+     *
+     * @param  string $name
+     * @param  string $value
+     * @return Module
+     */
+    public function addConfigValue($name, $value)
+    {
+        if (!isset($this->config[$name])) {
+            $this->config[$name] = $value;
+        }
+        return $this;
+    }
+
+    /**
+     * Update existing value in config
+     *
+     * @param  string $name
+     * @param  string $value
+     * @return Module
+     */
+    public function updateConfigValue($name, $value)
+    {
+        if (isset($this->config[$name])) {
+            $this->config[$name] = $value;
+        }
+        return $this;
+    }
+
+    /**
+     * Replace existing value in config
+     *
+     * @param  string $name
+     * @return Module
+     */
+    public function deleteConfigValue($name)
+    {
+        if (isset($this->config[$name])) {
+            unset($this->config[$name]);
+        }
         return $this;
     }
 

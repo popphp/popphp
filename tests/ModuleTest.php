@@ -66,6 +66,28 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $module->config()['foo']);
     }
 
+    public function testAddConfigValue()
+    {
+        $module = new Module(['foo' => 'bar']);
+        $module->addConfigValue('baz', 123);
+        $this->assertEquals($module['config']['baz'], 123);
+    }
+
+    public function testUpdateConfigValue()
+    {
+        $module = new Module(['foo' => 'bar']);
+        $module->updateConfigValue('foo', 123);
+        $this->assertEquals($module['config']['foo'], 123);
+    }
+
+    public function testDeleteConfigValue()
+    {
+        $module = new Module(['foo' => 'bar']);
+        $module->addConfigValue('baz', 123);
+        $module->deleteConfigValue('baz');
+        $this->assertFalse(isset($module['config']['baz']));
+    }
+
     public function testMergeConfig()
     {
         $module = new Module();

@@ -231,9 +231,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('help', $match->getRouteString());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testCliNoMatch()
     {
         $_SERVER['argv'] = [

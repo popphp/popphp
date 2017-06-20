@@ -21,7 +21,7 @@ namespace Pop\Router\Match;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2017 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.0.0
+ * @version    3.1.0
  */
 class Cli extends AbstractMatch
 {
@@ -291,7 +291,8 @@ class Cli extends AbstractMatch
             }
             if (strpos($opt, '|') !== false) {
                 $opts = explode('|', $opt);
-                $optionRegex = '(' . $opts[0] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[0] . '"(.*)"|' . $opts[1] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[1] . '"(.*)")';
+                $optionRegex = '(' . $opts[0] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[0] . '"(.*)"|' . $opts[1] .
+                    '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[1] . '"(.*)")';
             } else {
                 $optionRegex = '(' . $opt . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt . '"(.*)")';
             }
@@ -312,7 +313,8 @@ class Cli extends AbstractMatch
             }
             if (strpos($opt, '|') !== false) {
                 $opts = explode('|', $opt);
-                $optionRegex = '(' . $opts[0] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[0] . '"(.*)"|' . $opts[1] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[1] . '"(.*)")';
+                $optionRegex = '(' . $opts[0] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[0] . '"(.*)"|' . $opts[1] .
+                    '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[1] . '"(.*)")';
             } else {
                 $optionRegex = '(' . $opt . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt . '"(.*)")';
             }

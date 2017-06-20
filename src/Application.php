@@ -21,7 +21,7 @@ namespace Pop;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2017 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.0.0
+ * @version    3.1.0
  */
 class Application implements \ArrayAccess
 {
@@ -159,6 +159,50 @@ class Application implements \ArrayAccess
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * Add new value to config
+     *
+     * @param  string $name
+     * @param  string $value
+     * @return Application
+     */
+    public function addConfigValue($name, $value)
+    {
+        if (!isset($this->config[$name])) {
+            $this->config[$name] = $value;
+        }
+        return $this;
+    }
+
+    /**
+     * Update existing value in config
+     *
+     * @param  string $name
+     * @param  string $value
+     * @return Application
+     */
+    public function updateConfigValue($name, $value)
+    {
+        if (isset($this->config[$name])) {
+            $this->config[$name] = $value;
+        }
+        return $this;
+    }
+
+    /**
+     * Replace existing value in config
+     *
+     * @param  string $name
+     * @return Application
+     */
+    public function deleteConfigValue($name)
+    {
+        if (isset($this->config[$name])) {
+            unset($this->config[$name]);
+        }
         return $this;
     }
 

@@ -125,6 +125,28 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Composer\Autoload\ClassLoader', $application->autoloader());
     }
 
+    public function testAddConfigValue()
+    {
+        $application = new Application(['foo' => 'bar']);
+        $application->addConfigValue('baz', 123);
+        $this->assertEquals($application['config']['baz'], 123);
+    }
+
+    public function testUpdateConfigValue()
+    {
+        $application = new Application(['foo' => 'bar']);
+        $application->updateConfigValue('foo', 123);
+        $this->assertEquals($application['config']['foo'], 123);
+    }
+
+    public function testDeleteConfigValue()
+    {
+        $application = new Application(['foo' => 'bar']);
+        $application->addConfigValue('baz', 123);
+        $application->deleteConfigValue('baz');
+        $this->assertFalse(isset($application['config']['baz']));
+    }
+
     public function testMergeConfig()
     {
         $application = new Application();
