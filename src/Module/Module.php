@@ -72,7 +72,7 @@ class Module implements ModuleInterface, \ArrayAccess
 
         if (null !== $name) {
             $this->setName($name);
-        } else {
+        } else if (null === $this->name) {
             $this->setName(str_replace('\\', '_', strtolower(get_called_class())));
         }
 
