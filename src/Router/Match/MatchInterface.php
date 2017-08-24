@@ -86,6 +86,28 @@ interface MatchInterface
     public function removeControllerParams($controller);
 
     /**
+     * Get the route string
+     *
+     * @return string
+     */
+    public function getRouteString();
+
+    /**
+     * Get the route string segments
+     *
+     * @return array
+     */
+    public function getSegments();
+
+    /**
+     * Get a route string segment
+     *
+     * @param  int $i
+     * @return string
+     */
+    public function getSegment($i);
+
+    /**
      * Get original route string
      *
      * @return string
