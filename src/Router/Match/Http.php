@@ -100,10 +100,29 @@ class Http extends AbstractMatch
             $this->prepare();
         }
 
-        foreach ($this->preparedRoutes as $regex => $controller) {
-            if (preg_match($regex, $this->routeString) != 0) {
-                $this->route = $regex;
-                break;
+        $directMatch = null;
+
+        if (array_key_exists($this->routeString, $this->routes)) {
+            $directMatch = $this->routeString;
+        } else if (array_key_exists($this->routeString . '/', $this->routes)) {
+            $directMatch = $this->routeString . '/';
+        } else if (array_key_exists($this->routeString . '[/]', $this->routes)) {
+            $directMatch = $this->routeString . '[/]';
+        }
+
+        if (null !== $directMatch) {
+            foreach ($this->preparedRoutes as $regex => $controller) {
+                if ($directMatch == $controller['route']) {
+                    $this->route = $regex;
+                    break;
+                }
+            }
+        } else {
+            foreach ($this->preparedRoutes as $regex => $controller) {
+                if (preg_match($regex, $this->routeString) != 0) {
+                    $this->route = $regex;
+                    break;
+                }
             }
         }
 
