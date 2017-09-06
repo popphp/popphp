@@ -268,7 +268,7 @@ class Cli extends AbstractMatch
         preg_match_all('/(?<!\[)<[a-zA-Z0-9-_:|]*>/', $route, $requiredParameters, PREG_OFFSET_CAPTURE);
         preg_match_all('/\[<[a-zA-Z0-9-_:|]*>\]/', $route, $optionalParameters, PREG_OFFSET_CAPTURE);
 
-        $routeRegex .= '(.*)$';
+        $routeRegex .= (isset($requiredParameters[0]) && isset($requiredParameters[0][0])) ? ' (.*)$' : '(.*)$';
 
         foreach ($options[0] as $option) {
             if (strpos($option[0], '--') !== false) {
