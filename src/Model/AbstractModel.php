@@ -21,7 +21,7 @@ namespace Pop\Model;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2017 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.1.0
+ * @version    3.2.0
  */
 abstract class AbstractModel implements \ArrayAccess, \Countable, \IteratorAggregate
 {

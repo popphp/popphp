@@ -11,13 +11,13 @@
 /**
  * @namespace
  */
-namespace Pop\Service;
+namespace Pop\Model;
 
 /**
- * Service locator exception class
+ * Pop model exception class
  *
  * @category   Pop
- * @package    Pop\Service
+ * @package    Pop\Model
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2017 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
