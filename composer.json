@@ -8,7 +8,7 @@
         "pop php"
     ],
     "homepage": "http://www.popphp.org/",
-    "license": "New BSD",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Nick Sagona",
