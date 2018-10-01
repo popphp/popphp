@@ -127,4 +127,11 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($manager->isRegistered('bar'));
     }
 
+    public function testVersion()
+    {
+        $module = new Module('1.0.0');
+        $this->assertEquals('1.0.0', $module->getVersion());
+        $this->assertTrue($module->hasVersion());
+    }
+
 }

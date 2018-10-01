@@ -47,6 +47,12 @@ class Module implements ModuleInterface, \ArrayAccess
     protected $name = null;
 
     /**
+     * Module version
+     * @var string
+     */
+    protected $version = null;
+
+    /**
      * Constructor
      *
      * Instantiate a module object
@@ -59,12 +65,15 @@ class Module implements ModuleInterface, \ArrayAccess
         $application = null;
         $config      = null;
         $name        = null;
+        $version        = null;
 
         foreach ($args as $arg) {
             if ($arg instanceof Application) {
                 $application = $arg;
             } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)) {
                 $config = $arg;
+            } else if (preg_match('/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/', $arg)) {
+                $version = $arg;
             } else if (is_string($arg)) {
                 $name = $arg;
             }
@@ -74,6 +83,10 @@ class Module implements ModuleInterface, \ArrayAccess
             $this->setName($name);
         } else if (null === $this->name) {
             $this->setName(str_replace('\\', '_', strtolower(get_called_class())));
+        }
+
+        if (null !== $version) {
+            $this->setVersion($version);
         }
 
         if (null !== $config) {
@@ -115,6 +128,38 @@ class Module implements ModuleInterface, \ArrayAccess
     public function hasName()
     {
         return (null !== $this->name);
+    }
+
+    /**
+     * Set module version
+     *
+     * @param  string $version
+     * @return Module
+     */
+    public function setVersion($version)
+    {
+        $this->version = $version;
+        return $this;
+    }
+
+    /**
+     * Get module version
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Determine if module has version
+     *
+     * @return boolean
+     */
+    public function hasVersion()
+    {
+        return (null !== $this->version);
     }
 
     /**

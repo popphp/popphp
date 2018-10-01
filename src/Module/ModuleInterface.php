@@ -51,6 +51,28 @@ interface ModuleInterface
     public function hasName();
 
     /**
+     * Set module version
+     *
+     * @param  string $version
+     * @return ModuleInterface
+     */
+    public function setVersion($version);
+
+    /**
+     * Get module version
+     *
+     * @return string
+     */
+    public function getVersion();
+
+    /**
+     * Determine if module has version
+     *
+     * @return boolean
+     */
+    public function hasVersion();
+
+    /**
      * Register a configuration with the module object
      *
      * @param  mixed $config
