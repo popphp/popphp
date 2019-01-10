@@ -6,13 +6,13 @@
         </testsuite>
     </testsuites>
     <filter>
-        <whitelist addUncoveredFilesFromWhitelist="true">
+        <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">src</directory>
         </whitelist>
     </filter>
     <logging>
-        <log type="coverage-html" target="/tmp/popphp-cc" charset="UTF-8"
-             yui="true" highlight="false" showUncoveredFiles="true"
-             lowUpperBound="35" highLowerBound="70" />
+        <log type="coverage-html" target="/tmp/popphp-cc" lowUpperBound="35"
+             highLowerBound="70"/>
+        <log type="coverage-text" showUncoveredFiles="true"/>
     </logging>
 </phpunit>

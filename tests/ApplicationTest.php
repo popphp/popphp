@@ -7,8 +7,9 @@ use Pop\Router\Router;
 use Pop\Service\Locator;
 use Pop\Event;
 use Pop\Module;
+use PHPUnit\Framework\TestCase;
 
-class ApplicationTest extends \PHPUnit_Framework_TestCase
+class ApplicationTest extends TestCase
 {
 
     public function testConstructor()

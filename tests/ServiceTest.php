@@ -4,8 +4,9 @@ namespace Pop\Test;
 
 use Pop\Service\Container;
 use Pop\Service\Locator;
+use PHPUnit\Framework\TestCase;
 
-class ServiceTest extends \PHPUnit_Framework_TestCase
+class ServiceTest extends TestCase
 {
 
     public function testConstructor()

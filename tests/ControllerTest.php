@@ -1,8 +1,9 @@
 <?php
 
 namespace Pop\Test;
+use PHPUnit\Framework\TestCase;
 
-class ControllerTest extends \PHPUnit_Framework_TestCase
+class ControllerTest extends TestCase
 {
 
     public function testSetAndGetDefaultAction()

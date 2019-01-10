@@ -4,8 +4,9 @@ namespace Pop\Test;
 
 use Pop\Router\Router;
 use Pop\Router\Match;
+use PHPUnit\Framework\TestCase;
 
-class RouterTest extends \PHPUnit_Framework_TestCase
+class RouterTest extends TestCase
 {
 
     public function testConstructorRoutes()

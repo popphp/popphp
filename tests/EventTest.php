@@ -3,8 +3,9 @@
 namespace Pop\Test;
 
 use Pop\Event\Manager;
+use PHPUnit\Framework\TestCase;
 
-class EventTest extends \PHPUnit_Framework_TestCase
+class EventTest extends TestCase
 {
 
     public function testConstructor()

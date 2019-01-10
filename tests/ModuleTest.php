@@ -5,8 +5,9 @@ namespace Pop\Test;
 use Pop\Application;
 use Pop\Module\Module;
 use Pop\Module\Manager;
+use PHPUnit\Framework\TestCase;
 
-class ModuleTest extends \PHPUnit_Framework_TestCase
+class ModuleTest extends TestCase
 {
 
     public function testConstructor()
