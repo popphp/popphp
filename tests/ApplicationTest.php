@@ -301,6 +301,7 @@ class ApplicationTest extends TestCase
         ];
         $application = new Application($config);
         $application->off('app.init', 'Foo\Bar::factory');
+        $this->assertInstanceOf('Pop\Application', $application);
     }
 
     public function testRegisterConfigException()

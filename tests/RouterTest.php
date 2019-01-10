@@ -128,7 +128,7 @@ class RouterTest extends TestCase
         ]);
         $router->route();
         $this->assertInstanceOf('Pop\Router\Match\AbstractMatch', $router->getRouteMatch());
-        $this->assertNull($router->getRouteMatch()->getSegment(0));
+        $this->assertEquals('edit', $router->getRouteMatch()->getSegment(0));
     }
 
     public function testHasRoute()

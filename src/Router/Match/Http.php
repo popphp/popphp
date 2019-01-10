@@ -60,10 +60,10 @@ class Http extends AbstractMatch
         }
 
         if ($path == '') {
-            $this->segments  = ['index'];
+            $this->segments    = ['index'];
             $this->routeString = '/';
         } else {
-            $this->segments  = explode('/', substr($path, 1));
+            $this->segments    = explode('/', substr($path, 1));
             $this->routeString = '/' . implode('/', $this->segments) . $trailingSlash;
         }
     }
@@ -168,8 +168,8 @@ class Http extends AbstractMatch
     /**
      * Flatten the nested routes
      *
-     * @param  string $route
-     * @param  mixed  $controller
+     * @param  array|string $route
+     * @param  mixed        $controller
      * @return void
      */
     protected function flattenRoutes($route, $controller = null)

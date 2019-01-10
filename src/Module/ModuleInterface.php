@@ -73,13 +73,18 @@ interface ModuleInterface
     public function hasVersion();
 
     /**
-     * Register a configuration with the module object
+     * Get application
      *
-     * @param  mixed $config
-     * @throws \InvalidArgumentException
-     * @return Module
+     * @return Application
      */
-    public function registerConfig($config);
+    public function application();
+
+    /**
+     * Determine if the module has been registered with an application object
+     *
+     * @return boolean
+     */
+    public function isRegistered();
 
     /**
      * Register the module

@@ -198,8 +198,8 @@ class Cli extends AbstractMatch
     /**
      * Flatten the nested routes
      *
-     * @param  string $route
-     * @param  mixed  $controller
+     * @param  array|string $route
+     * @param  mixed        $controller
      * @return void
      */
     protected function flattenRoutes($route, $controller = null)
