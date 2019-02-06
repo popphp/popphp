@@ -178,8 +178,9 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Trigger an event listener priority
      *
      * @param  string $name
-     * @param  array  $args
+     * @param  array $args
      * @throws Exception
+     * @throws \ReflectionException
      * @return void
      */
     public function trigger($name, array $args = [])

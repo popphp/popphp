@@ -292,6 +292,7 @@ class Router
      * Route to the correct controller
      *
      * @throws Exception
+     * @throws \ReflectionException
      * @return void
      */
     public function route()

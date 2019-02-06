@@ -38,6 +38,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Instantiate the module manager object.
      *
      * @param  array $modules
+     * @throws Exception
      */
     public function __construct(array $modules = null)
     {
@@ -49,7 +50,8 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Register module objects
      *
-     * @param  array  $modules
+     * @param  array $modules
+     * @throws Exception
      * @return Manager
      */
     public function registerModules(array $modules)
@@ -157,7 +159,8 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Register a module with the manager
      *
      * @param  string $name
-     * @param  mixed  $value
+     * @param  mixed $value
+     * @throws Exception
      * @return Manager
      */
     public function __set($name, $value)
@@ -205,7 +208,8 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Register a module with the manager
      *
      * @param  string $offset
-     * @param  mixed  $value
+     * @param  mixed $value
+     * @throws Exception
      * @return Manager
      */
     public function offsetSet($offset, $value)

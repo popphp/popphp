@@ -56,6 +56,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      * Instantiate the service locator object.
      *
      * @param  array $services
+     * @throws Exception
      */
     public function __construct(array $services = null)
     {
@@ -72,6 +73,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      * Set service objects from an array of services
      *
      * @param  array $services
+     * @throws Exception
      * @return Locator
      */
     public function setServices(array $services)
@@ -128,6 +130,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param  string $name
      * @throws Exception
+     * @throws \ReflectionException
      * @return mixed
      */
     public function get($name)
@@ -353,7 +356,8 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      * Set a service
      *
      * @param  string $name
-     * @param  mixed  $value
+     * @param  mixed $value
+     * @throws Exception
      * @return Locator
      */
     public function __set($name, $value)
@@ -365,6 +369,8 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      * Get a service
      *
      * @param  string $name
+     * @throws Exception
+     * @throws \ReflectionException
      * @return mixed
      */
     public function __get($name)
@@ -398,7 +404,8 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      * Set a service
      *
      * @param  string $offset
-     * @param  mixed  $value
+     * @param  mixed $value
+     * @throws Exception
      * @return Locator
      */
     public function offsetSet($offset, $value)
@@ -410,6 +417,8 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      * Get a service
      *
      * @param  string $offset
+     * @throws Exception
+     * @throws \ReflectionException
      * @return mixed
      */
     public function offsetGet($offset)

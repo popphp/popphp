@@ -109,8 +109,9 @@ abstract class AbstractApplication implements ApplicationInterface
     /**
      * Merge new or altered config values with the existing config values
      *
-     * @param  mixed   $config
+     * @param  mixed $config
      * @param  boolean $preserve
+     * @throws Config\Exception
      * @return AbstractApplication
      */
     public function mergeConfig($config, $preserve = false)

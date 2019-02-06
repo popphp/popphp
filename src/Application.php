@@ -22,6 +22,7 @@ namespace Pop;
  * @copyright  Copyright (c) 2009-2019 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.3.0
+ * @property   $config mixed
  */
 class Application extends AbstractApplication implements \ArrayAccess
 {
@@ -99,6 +100,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * and registering with the autoloader, adding routes, services and events
      *
      * @param  mixed $autoloader
+     * @throws Exception
+     * @throws Module\Exception
+     * @throws Service\Exception
      * @return Application
      */
     public function bootstrap($autoloader = null)
@@ -159,6 +163,8 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Initialize the application
      *
+     * @throws Event\Exception
+     * @throws \ReflectionException
      * @return Application
      */
     public function init()
@@ -298,8 +304,10 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Register a module with the module manager object
      *
-     * @param  mixed  $module
+     * @param  mixed $module
      * @param  string $name
+     * @throws Module\Exception
+     * @throws Service\Exception
      * @return Application
      */
     public function register($module, $name = null)
@@ -371,7 +379,8 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Set a service
      *
      * @param  string $name
-     * @param  mixed  $service
+     * @param  mixed $service
+     * @throws Service\Exception
      * @return Application
      */
     public function setService($name, $service)
@@ -384,6 +393,8 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Get a service
      *
      * @param  string $name
+     * @throws Service\Exception
+     * @throws \ReflectionException
      * @return mixed
      */
     public function getService($name)
@@ -446,7 +457,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Trigger an event
      *
      * @param  string $name
-     * @param  array  $args
+     * @param  array $args
+     * @throws Event\Exception
+     * @throws \ReflectionException
      * @return Application
      */
     public function trigger($name, array $args = [])
@@ -464,6 +477,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Run the application.
      *
      * @param  boolean $exit
+     * @throws Event\Exception
+     * @throws Router\Exception
+     * @throws \ReflectionException
      * @return void
      */
     public function run($exit = true)
@@ -509,7 +525,8 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Set a pre-designated value in the application object
      *
      * @param  string $name
-     * @param  mixed  $value
+     * @param  mixed $value
+     * @throws Exception
      * @return Application
      */
     public function __set($name, $value)
@@ -638,7 +655,8 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Set a pre-designated value in the application object
      *
      * @param  string $offset
-     * @param  mixed  $value
+     * @param  mixed $value
+     * @throws Exception
      * @return Application
      */
     public function offsetSet($offset, $value)

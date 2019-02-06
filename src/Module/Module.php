@@ -78,6 +78,8 @@ class Module extends AbstractModule implements \ArrayAccess
      * Register module
      *
      * @param  Application $application
+     * @throws Exception
+     * @throws \Pop\Service\Exception
      * @return Module
      */
     public function register(Application $application)
