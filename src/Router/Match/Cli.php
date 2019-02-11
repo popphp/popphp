@@ -129,6 +129,26 @@ class Cli extends AbstractMatch
     }
 
     /**
+     * Get the command parameters
+     *
+     * @return array
+     */
+    public function getCommandParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * Get the command options
+     *
+     * @return array
+     */
+    public function getCommandOptions()
+    {
+        return $this->options;
+    }
+
+    /**
      * Get the parsed route params
      *
      * @return array

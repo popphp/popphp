@@ -230,6 +230,8 @@ class RouterTest extends TestCase
         ];
         $match = new Match\Cli();
         $this->assertEquals('help', $match->getRouteString());
+        $this->assertTrue(is_array($match->getCommandParameters()));
+        $this->assertTrue(is_array($match->getCommandOptions()));
     }
 
     public function testCliNoMatch()
