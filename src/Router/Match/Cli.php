@@ -86,16 +86,19 @@ class Cli extends AbstractMatch
     /**
      * Match the route
      *
+     * @param  string $forceRoute
      * @return boolean
      */
-    public function match()
+    public function match($forceRoute = null)
     {
         if (count($this->preparedRoutes) == 0) {
             $this->prepare();
         }
 
+        $routeToMatch = (null !== $forceRoute) ? $forceRoute : $this->routeString;
+
         foreach ($this->preparedRoutes as $regex => $controller) {
-            if (preg_match($regex, $this->routeString) != 0) {
+            if (preg_match($regex, $routeToMatch) != 0) {
                 $this->route = $regex;
                 break;
             }

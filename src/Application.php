@@ -477,12 +477,13 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Run the application.
      *
      * @param  boolean $exit
+     * @param  string  $forceRoute
      * @throws Event\Exception
      * @throws Router\Exception
      * @throws \ReflectionException
      * @return void
      */
-    public function run($exit = true)
+    public function run($exit = true, $forceRoute = null)
     {
         try {
             $this->init();
@@ -491,7 +492,7 @@ class Application extends AbstractApplication implements \ArrayAccess
             $this->trigger('app.route.pre');
 
             if ((null !== $this->router)) {
-                $this->router->route();
+                $this->router->route($forceRoute);
 
                 // Trigger any app.dispatch.post events
                 $this->trigger('app.dispatch.pre');

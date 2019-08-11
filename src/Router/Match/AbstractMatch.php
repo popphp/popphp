@@ -507,9 +507,10 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Match the route
      *
+     * @param  string $forceRoute
      * @return boolean
      */
-    abstract public function match();
+    abstract public function match($forceRoute = null);
 
     /**
      * Method to process if a route was not found

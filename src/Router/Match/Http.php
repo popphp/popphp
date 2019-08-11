@@ -92,22 +92,24 @@ class Http extends AbstractMatch
     /**
      * Match the route
      *
+     * @param  string $forceRoute
      * @return boolean
      */
-    public function match()
+    public function match($forceRoute = null)
     {
         if (count($this->preparedRoutes) == 0) {
             $this->prepare();
         }
 
-        $directMatch = null;
+        $routeToMatch = (null !== $forceRoute) ? $forceRoute : $this->routeString;
+        $directMatch  = null;
 
-        if (array_key_exists($this->routeString, $this->routes)) {
-            $directMatch = $this->routeString;
-        } else if (array_key_exists($this->routeString . '/', $this->routes)) {
-            $directMatch = $this->routeString . '/';
-        } else if (array_key_exists($this->routeString . '[/]', $this->routes)) {
-            $directMatch = $this->routeString . '[/]';
+        if (array_key_exists($routeToMatch, $this->routes)) {
+            $directMatch = $routeToMatch;
+        } else if (array_key_exists($routeToMatch . '/', $this->routes)) {
+            $directMatch = $routeToMatch . '/';
+        } else if (array_key_exists($routeToMatch . '[/]', $this->routes)) {
+            $directMatch = $routeToMatch . '[/]';
         }
 
         if (null !== $directMatch) {
@@ -119,7 +121,7 @@ class Http extends AbstractMatch
             }
         } else {
             foreach ($this->preparedRoutes as $regex => $controller) {
-                if (preg_match($regex, $this->routeString) != 0) {
+                if (preg_match($regex, $routeToMatch) != 0) {
                     $this->route = $regex;
                     break;
                 }

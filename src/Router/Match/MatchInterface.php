@@ -243,9 +243,10 @@ interface MatchInterface
     /**
      * Prepare the routes
      *
+     * @param  string $forceRoute
      * @return boolean
      */
-    public function match();
+    public function match($forceRoute = null);
 
     /**
      * Method to process if a route was not found
