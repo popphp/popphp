@@ -14,6 +14,7 @@ and interface with the underlying core components:
 
 * Router
 * Controller
+* Model
 * Module Manager
 * Event Manager
 * Service Locator
@@ -36,6 +37,7 @@ There is an IRC channel for Pop PHP over at irc://freenode/popphp.
 * [The Application Object](#the-application-object)
 * [The Router Object](#the-router-object)
 * [The Controller Object](#the-controller-object)
+* [The Model Object](#the-model-object)
 * [The Module Manager](#the-module-manager)
 * [The Event Manager](#the-event-manager)
 * [The Service Locator](#the-service-locator)
@@ -261,6 +263,33 @@ class IndexController extends AbstractController
     public function error()
     {
         // Handle a non-match route request
+    }
+
+}
+```
+
+[Top](#basic-usage)
+
+### The Model Object
+
+The model object is the 'M' in the MVC design pattern and gives you the ability to map your data to
+an object that can be consumed and utilized by the other parts of you application. An abstract model
+class is provided, `Pop\Model\AbstractModel`, and it represents a basic data object that. From there,
+you can extend it within your application to handle the business as needed.
+
+```php
+<?php
+
+namespace MyApp\Model;
+
+use Pop\Model\AbstractModel;
+
+class User extends AbstractModel
+{
+
+    public function getById($id)
+    {
+        // Perform the logic to get a user by $id
     }
 
 }
