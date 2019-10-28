@@ -512,4 +512,52 @@ class ApplicationTest extends TestCase
         $this->assertEquals(1002, $application->router()->getController()->id);
     }
 
+    public function testNoRouteFound()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'bad'
+        ];
+
+        $config = [
+            'routes' => [
+                'bad' => [
+                    'controller' => 'Pop\Test\TestAsset\BadController',
+                    'action'     => 'bad'
+                ]
+            ]
+        ];
+        $application = new Application($config);
+
+        ob_start();
+        $application->run(false);
+        $result = ob_get_clean();
+
+        $this->assertContains('Command not found', $result);
+        $_SERVER['argv'] = [
+            'myscript.php', 'edit', 1002
+        ];
+    }
+
+    public function testRunException()
+    {
+        $this->expectException('Exception');
+        $config = [
+            'routes' => [
+                'bad' => [
+                    'controller' => function() {
+                        throw new \Exception('Whoops!');
+                    }
+                ]
+            ]
+        ];
+        $application = new Application($config);
+        $application->on('app.error', function(Application $application, \Exception $exception){
+            file_put_contents(__DIR__ . '/tmp/error.log', $exception->getMessage());
+        });
+
+        $application->run(false, 'bad');
+        $this->assertContains('Whoops!', file_get_contents(__DIR__ . '/tmp/error.log'));
+        unlink(__DIR__ . '/tmp/error.log');
+    }
+
 }

@@ -213,14 +213,14 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
                     // If the callable action is a string, parse the class/method from it
                     if (is_string($action)) {
                         // If a static call
-                        if (strpos($action, '::')) {
+                        if (strpos($action, '::') !== false) {
                             [$class, $method] = explode('::', $action);
                         // If an instance call
-                        } else if (strpos($action, '->')) {
+                        } else if (strpos($action, '->') !== false) {
                             [$class, $method] = explode('->', $action);
                             $action = [new $class, $method];
                         // Else, if a new/construct call
-                        } else if (strpos($action, 'new ')) {
+                        } else if (strpos($action, 'new ') !== false) {
                             $action = str_replace('new ', null, $action);
                             $class  = $action;
                             $method = '__construct';

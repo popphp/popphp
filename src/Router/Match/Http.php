@@ -150,7 +150,9 @@ class Http extends AbstractMatch
      */
     public function noRouteFound($exit = true)
     {
-        header('HTTP/1.1 404 Not Found');
+        if (!headers_sent()) {
+            header('HTTP/1.1 404 Not Found');
+        }
         echo '<!DOCTYPE html>' . PHP_EOL;
         echo '<html>' . PHP_EOL;
         echo '    <head>' . PHP_EOL;
