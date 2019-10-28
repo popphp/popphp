@@ -53,7 +53,7 @@ abstract class AbstractApplication implements ApplicationInterface
     {
         if (!is_array($config) && !($config instanceof \ArrayAccess) && !($config instanceof \ArrayObject)) {
             throw new \InvalidArgumentException(
-                'Error: The config must be either an array itself or implement ArrayAccess or extend ArrayObject'
+                'Error: The config must be either an array itself, implement ArrayAccess or extend ArrayObject'
             );
         }
 

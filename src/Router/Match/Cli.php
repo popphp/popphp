@@ -317,9 +317,9 @@ class Cli extends AbstractMatch
                 $name = substr($name, 0, strpos($name, '='));
             }
             if (strpos($opt, '|') !== false) {
-                $opts = explode('|', $opt);
-                $optionRegex = '(' . $opts[0] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[0] . '"(.*)"|' . $opts[1] .
-                    '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[1] . '"(.*)")';
+                [$opt1, $opt2] = explode('|', $opt);
+                $optionRegex   = '(' . $opt1 . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt1 . '"(.*)"|' . $opt2 .
+                    '[a-zA-Z0-9-_:|.@,\/]+|' . $opt2 . '"(.*)")';
             } else {
                 $optionRegex = '(' . $opt . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt . '"(.*)")';
             }
@@ -339,9 +339,9 @@ class Cli extends AbstractMatch
                 $name = substr($name, 0, strpos($name, '='));
             }
             if (strpos($opt, '|') !== false) {
-                $opts = explode('|', $opt);
-                $optionRegex = '(' . $opts[0] . '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[0] . '"(.*)"|' . $opts[1] .
-                    '[a-zA-Z0-9-_:|.@,\/]+|' . $opts[1] . '"(.*)")';
+                [$opt1, $opt2] = explode('|', $opt);
+                $optionRegex   = '(' . $opt1 . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt1 . '"(.*)"|' . $opt2 .
+                    '[a-zA-Z0-9-_:|.@,\/]+|' . $opt2 . '"(.*)")';
             } else {
                 $optionRegex = '(' . $opt . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt . '"(.*)")';
             }

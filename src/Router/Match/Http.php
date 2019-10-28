@@ -43,8 +43,7 @@ class Http extends AbstractMatch
         $this->basePath = (!empty($basePath) ? $basePath : '');
 
         $path = ($this->basePath != '') ?
-            substr($_SERVER['REQUEST_URI'], strlen($this->basePath)) :
-            $_SERVER['REQUEST_URI'];
+            substr($_SERVER['REQUEST_URI'], strlen($this->basePath)) : $_SERVER['REQUEST_URI'];
 
         // Trim query string, if present
         if (strpos($path, '?')) {
@@ -250,7 +249,6 @@ class Http extends AbstractMatch
         }
 
         $route = '^' . str_replace('/', '\/', $route) . '$';
-
         if (substr($route, -5) == '[\/]$') {
             $route = str_replace('[\/]$', '(|\/)$', $route);
         }
@@ -275,7 +273,8 @@ class Http extends AbstractMatch
      */
     protected function parseRouteParams()
     {
-        if (isset($this->preparedRoutes[$this->route]['params']) && (count($this->preparedRoutes[$this->route]['params']) > 0)) {
+        if (isset($this->preparedRoutes[$this->route]['params']) &&
+            (count($this->preparedRoutes[$this->route]['params']) > 0)) {
             $offset = 0;
             foreach ($this->preparedRoutes[$this->route]['params'] as $i => $param) {
                 $value = substr($this->routeString, ($param['offset'] + $offset + 1));

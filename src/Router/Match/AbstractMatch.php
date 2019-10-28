@@ -406,7 +406,8 @@ abstract class AbstractMatch implements MatchInterface
             isset($this->preparedRoutes[$this->route]['controller'])) {
             $controller = $this->preparedRoutes[$this->route]['controller'];
         } else {
-            if ((null === $controller) && (null !== $this->dynamicRoute) && (null !== $this->dynamicRoutePrefix) && (count($this->segments) >= 1)) {
+            if ((null === $controller) && (null !== $this->dynamicRoute) &&
+                (null !== $this->dynamicRoutePrefix) && (count($this->segments) >= 1)) {
                 $controller = $this->dynamicRoutePrefix . ucfirst(strtolower($this->segments[0])) . 'Controller';
                 if (!class_exists($controller)) {
                     $controller           = null;
@@ -415,7 +416,7 @@ abstract class AbstractMatch implements MatchInterface
                     $this->isDynamicRoute = true;
                 }
             }
-            if ((null === $controller) && (null !== $this->defaultRoute) && isset($this->defaultRoute['controller']))  {
+            if ((null === $controller) && (null !== $this->defaultRoute) && isset($this->defaultRoute['controller'])) {
                 $controller = $this->defaultRoute['controller'];
             }
         }
@@ -457,7 +458,8 @@ abstract class AbstractMatch implements MatchInterface
         if ((null !== $this->route) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['action'])) {
             $action = $this->preparedRoutes[$this->route]['action'];
-        } else if ((null !== $this->dynamicRoute) && (null !== $this->dynamicRoutePrefix) && (count($this->segments) >= 1)) {
+        } else if ((null !== $this->dynamicRoute) && (null !== $this->dynamicRoutePrefix) &&
+            (count($this->segments) >= 1)) {
             $action = (isset($this->segments[1])) ? $this->segments[1] : null;
         } else if ((null !== $this->defaultRoute) && isset($this->defaultRoute['action'])) {
             $action = $this->defaultRoute['action'];
@@ -479,7 +481,8 @@ abstract class AbstractMatch implements MatchInterface
             isset($this->preparedRoutes[$this->route]['action'])) {
             $result = true;
         } else {
-            if (!($result) && (null !== $this->dynamicRoute) && (null !== $this->dynamicRoutePrefix) && (count($this->segments) >= 2)) {
+            if (!($result) && (null !== $this->dynamicRoute) && (null !== $this->dynamicRoutePrefix) &&
+                (count($this->segments) >= 2)) {
                 $result = method_exists($this->getController(), $this->getAction());
             }
             if (!($result) && (null !== $this->defaultRoute) && isset($this->defaultRoute['action'])) {

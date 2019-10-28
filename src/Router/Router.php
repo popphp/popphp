@@ -63,7 +63,8 @@ class Router
         if (null !== $match) {
             $this->routeMatch = $match;
         } else {
-            $this->routeMatch = ((stripos(php_sapi_name(), 'cli') !== false) && (stripos(php_sapi_name(), 'server') === false)) ?
+            $this->routeMatch = ((stripos(php_sapi_name(), 'cli') !== false) &&
+                (stripos(php_sapi_name(), 'server') === false)) ?
                 new Match\Cli() : new Match\Http();
         }
 

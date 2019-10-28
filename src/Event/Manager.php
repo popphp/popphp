@@ -198,6 +198,8 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
                 $args['result'] = end($this->results[$name]);
                 $realArgs       = [];
                 $params         = [];
+                $class          = null;
+                $method         = null;
 
                 // Get and arrange the argument values in the correct order
                 // If the action is a closure object
@@ -212,39 +214,38 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
                     if (is_string($action)) {
                         // If a static call
                         if (strpos($action, '::')) {
-                            $ary    = explode('::', $action);
-                            $class  = $ary[0];
-                            $method = $ary[1];
+                            [$class, $method] = explode('::', $action);
                         // If an instance call
                         } else if (strpos($action, '->')) {
-                            $ary    = explode('->', $action);
-                            $class  = $ary[0];
-                            $method = $ary[1];
+                            [$class, $method] = explode('->', $action);
                             $action = [new $class, $method];
                         // Else, if a new/construct call
-                        } else {
+                        } else if (strpos($action, 'new ')) {
                             $action = str_replace('new ', null, $action);
                             $class  = $action;
                             $method = '__construct';
                         }
-                    } else {
-                        $class  = substr($callable_name, 0, strpos($callable_name, ':'));
-                        $method = substr($callable_name, (strrpos($callable_name, ':') + 1));
+                    } else if (isset($callable_name)) {
+                        [$class, $method] = explode('::', $callable_name);
                     }
 
-                    $methodExport = \ReflectionMethod::export($class, $method, true);
-                    // Get the method parameters
-                    if (stripos($methodExport, 'Parameter') !== false) {
-                        $matches = [];
-                        preg_match_all('/Parameter \#(.*)\]/m', $methodExport, $matches);
-                        if (isset($matches[0][0])) {
-                            foreach ($matches[0] as $param) {
-                                // Get name
-                                $argName  = substr($param, strpos($param, '$'));
-                                $argName  = trim(substr($argName, 0, strpos($argName, ' ')));
-                                $params[] = str_replace('$', '', $argName);
+                    if ((null !== $class) && (null !== $method)) {
+                        $methodExport = \ReflectionMethod::export($class, $method, true);
+                        // Get the method parameters
+                        if (stripos($methodExport, 'Parameter') !== false) {
+                            $matches = [];
+                            preg_match_all('/Parameter \#(.*)\]/m', $methodExport, $matches);
+                            if (isset($matches[0][0])) {
+                                foreach ($matches[0] as $param) {
+                                    // Get name
+                                    $argName  = substr($param, strpos($param, '$'));
+                                    $argName  = trim(substr($argName, 0, strpos($argName, ' ')));
+                                    $params[] = str_replace('$', '', $argName);
+                                }
                             }
                         }
+                    } else {
+                        throw new Exception('Error: Could not determine the class and method from the callable passed');
                     }
                 } else {
                     throw new Exception('Error: The action must be callable, i.e. a closure or class/method combination');

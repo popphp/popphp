@@ -74,7 +74,7 @@ abstract class AbstractController implements ControllerInterface
             $action = $this->defaultAction;
             $this->$action();
         } else {
-            throw new Exception('That action is not defined in the controller.');
+            throw new Exception("The action '" . $action . "' is not defined in the controller.");
         }
     }
 

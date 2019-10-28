@@ -136,7 +136,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
     public function get($name)
     {
         if (!isset($this->services[$name])) {
-            throw new Exception('Error: That service has not been added to the service locator');
+            throw new Exception("Error: The service '" . $name . "' has not been added to the service locator");
         }
         if (!isset($this->loaded[$name])) {
             if (self::$depth > 40) {
@@ -190,9 +190,8 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
             } else if (is_string($call)) {
                 // If there are params
                 if (null !== $params) {
-                    // If the params are a closure, call the $params,
-                    // injecting the locator into the closure, to get the
-                    // required $params for the service from the closure
+                    // If the params are a closure, call the $params, injecting the locator into the closure,
+                    // to get the required $params for the service from the closure
                     if ($params instanceof \Closure) {
                         $params = call_user_func_array($params, [$this]);
                     }
@@ -209,9 +208,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
                     // If the callable is a instance call, i.e. SomeClass->foo,
                     // call the object and method, injecting the $params into the method
                     } else if (strpos($call, '->')) {
-                        $ary    = explode('->', $call);
-                        $class  = $ary[0];
-                        $method = $ary[1];
+                        [$class, $method] = explode('->', $call);
                         if (class_exists($class) && method_exists($class, $method)) {
                             $obj    = call_user_func_array([new $class(), $method], $params);
                             $called = true;
@@ -231,9 +228,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
                         $called = true;
                     // If the callable is a instance call
                     } else if (strpos($call, '->')) {
-                        $ary    = explode('->', $call);
-                        $class  = $ary[0];
-                        $method = $ary[1];
+                        [$class, $method] = explode('->', $call);
                         if (class_exists($class) && method_exists($class, $method)) {
                             $obj    = call_user_func([new $class(), $method]);
                             $called = true;
@@ -251,7 +246,9 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
             }
 
             if (!$called) {
-                throw new Exception('Error: Unable to call service. The call parameter must be an object or something callable');
+                throw new Exception(
+                    'Error: Unable to call service. The call parameter must be an object or something callable'
+                );
             }
 
             $this->loaded[$name] = $obj;
@@ -269,7 +266,8 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      */
     public function getCall($name)
     {
-        return (isset($this->services[$name]) && isset($this->services[$name]['call'])) ? $this->services[$name]['call'] : null;
+        return (isset($this->services[$name]) && isset($this->services[$name]['call'])) ?
+            $this->services[$name]['call'] : null;
     }
 
     /**
@@ -280,7 +278,8 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      */
     public function getParams($name)
     {
-        return (isset($this->services[$name]) && isset($this->services[$name]['params'])) ? $this->services[$name]['params'] : null;
+        return (isset($this->services[$name]) && isset($this->services[$name]['params'])) ?
+            $this->services[$name]['params'] : null;
     }
 
     /**
