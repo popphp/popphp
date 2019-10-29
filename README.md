@@ -413,7 +413,7 @@ return [
     ],
     'services' => [
         'session' => [
-            'call' => 'Pop\Web\Session::getInstance'
+            'call' => 'Pop\Session\Session::getInstance'
         ]
     ],
     'events' => [
