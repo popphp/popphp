@@ -25,7 +25,7 @@ class ModuleTest extends TestCase
             ],
             'services' => [
                 'session' => [
-                    'call' => 'Pop\Web\Session::getInstance'
+                    'call' => 'Pop\Session\Session::getInstance'
                 ],
                 'foo' => [
                     'call'   => 'Foo\Service::factory',
