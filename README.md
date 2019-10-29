@@ -274,8 +274,10 @@ class IndexController extends AbstractController
 
 The model object is the 'M' in the MVC design pattern and gives you the ability to map your data to
 an object that can be consumed and utilized by the other parts of you application. An abstract model
-class is provided, `Pop\Model\AbstractModel`, and it represents a basic data object that. From there,
-you can extend it within your application to handle the business as needed.
+class is provided, `Pop\Model\AbstractModel`, and it represents a basic data object the acts more or
+less like any array or value object. It has a single property `data`, implements `ArrayAccess`,
+`Countable` and `IteratorAggregate`. Once you extend the abstract model class, you can extend it
+within your application to handle the business logic as needed.
 
 ```php
 <?php
