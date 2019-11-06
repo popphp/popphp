@@ -104,7 +104,7 @@ class Cli extends AbstractMatch
             }
         }
 
-        if (null !== $this->route) {
+        if ((null !== $this->route) || (null !== $this->dynamicRoute)) {
             $this->parseRouteParams();
         }
 
@@ -386,7 +386,8 @@ class Cli extends AbstractMatch
     protected function parseRouteParams()
     {
         if ((null !== $this->dynamicRoute) && (count($this->segments) >= 3)) {
-            $this->routeParams = array_slice($this->segments, 2);
+            $this->routeParams = (strpos($this->dynamicRoute, 'param*') !==  false) ?
+                [array_slice($this->segments, 2)] : array_slice($this->segments, 2);
         } else {
             $options = [];
             $start   = 0;
