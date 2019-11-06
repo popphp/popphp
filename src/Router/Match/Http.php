@@ -300,7 +300,7 @@ class Http extends AbstractMatch
             }
         } else if ((null !== $this->dynamicRoute) && (count($this->segments) >= 3)) {
             $this->routeParams = (strpos($this->dynamicRoute, '/:param*') !==  false) ?
-                [array_slice($this->segments, 2)] : array_slice($this->segments, 2);;
+                [array_slice($this->segments, 2)] : array_slice($this->segments, 2);
         }
     }
 
