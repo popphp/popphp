@@ -313,6 +313,39 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
+     * Add to a service's parameters
+     *
+     * @param  string $name
+     * @param  mixed  $param
+     * @param  mixed  $key
+     * @return Locator
+     */
+    public function addParam($name, $param, $key = null)
+    {
+        if (isset($this->services[$name])) {
+            if (isset($this->services[$name]['params'])) {
+                if (!is_array($this->services[$name]['params'])) {
+                    $this->services[$name]['params'] = [$this->services[$name]['params']];
+                }
+                if (null !== $key) {
+                    $this->services[$name]['params'][$key] = $param;
+                } else {
+                    $this->services[$name]['params'][] = $param;
+                }
+            } else {
+                if (null !== $key) {
+                    $this->services[$name]['params'] = [$key => $param];
+                } else {
+                    $this->services[$name]['params'] = $param;
+                }
+            }
+
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine of a service object is available (but not loaded)
      *
      * @param  string $name

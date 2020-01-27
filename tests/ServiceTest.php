@@ -84,6 +84,55 @@ class ServiceTest extends TestCase
         $this->assertEquals(456, $services->getParams('foo'));
     }
 
+    public function testAddParam1()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call'   => 'Foo',
+                'params' => 123
+            ]
+        ]);
+        $services->addParam('foo', 456);
+        $this->assertTrue(is_array($services->getParams('foo')));
+    }
+
+    public function testAddParam2()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call'   => 'Foo',
+                'params' => [123]
+            ]
+        ]);
+        $services->addParam('foo', 456, 'test');
+        $this->assertTrue(is_array($services->getParams('foo')));
+        $this->assertEquals(456, $services->getParams('foo')['test']);
+    }
+
+    public function testAddParam3()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call' => 'Foo'
+            ]
+        ]);
+        $services->addParam('foo', 456);
+        $this->assertFalse(is_array($services->getParams('foo')));
+        $this->assertEquals(456, $services->getParams('foo'));
+    }
+
+    public function testAddParam4()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call' => 'Foo'
+            ]
+        ]);
+        $services->addParam('foo', 456, 'test');
+        $this->assertTrue(is_array($services->getParams('foo')));
+        $this->assertEquals(456, $services->getParams('foo')['test']);
+    }
+
     public function testIsAvailable()
     {
         $services = new Locator([
