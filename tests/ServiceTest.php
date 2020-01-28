@@ -15,6 +15,13 @@ class ServiceTest extends TestCase
             'foo' => 'Pop\Test\TestAsset\TestService'
         ]);
         $this->assertInstanceOf('Pop\Service\Locator', $services);
+        $this->assertEquals(1, count($services));
+        $i = 0;
+
+        foreach ($services as $service) {
+            $i++;
+        }
+        $this->assertEquals(1, $i);
     }
 
     public function testContainer()
@@ -131,6 +138,56 @@ class ServiceTest extends TestCase
         $services->addParam('foo', 456, 'test');
         $this->assertTrue(is_array($services->getParams('foo')));
         $this->assertEquals(456, $services->getParams('foo')['test']);
+    }
+
+    public function testRemoveParam1()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call'   => 'Foo',
+                'params' => 123
+            ]
+        ]);
+        $services->removeParam('foo', 123);
+        $this->assertFalse($services->hasParams('foo'));
+    }
+
+    public function testRemoveParam2()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call'   => 'Foo',
+                'params' => [123]
+            ]
+        ]);
+        $services->removeParam('foo', 123, 0);
+        $this->assertFalse($services->hasParams('foo'));
+    }
+
+    public function testRemoveParam3()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call'   => 'Foo',
+                'params' => [123]
+            ]
+        ]);
+        $services->removeParam('foo', 123);
+        $this->assertFalse($services->hasParams('foo'));
+    }
+
+    public function testRemoveParam4()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call'   => 'Foo',
+                'params' => [
+                    'test' => 123
+                ]
+            ]
+        ]);
+        $services->removeParam('foo', 123, 'test');
+        $this->assertFalse($services->hasParams('foo'));
     }
 
     public function testIsAvailable()

@@ -271,6 +271,17 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
+     * Check if  a service has parameters
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function hasParams($name)
+    {
+        return (isset($this->services[$name]) && isset($this->services[$name]['params']));
+    }
+
+    /**
      * Get a service's parameters
      *
      * @param  string $name
@@ -340,6 +351,40 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
                 }
             }
 
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove a service's parameters
+     *
+     * @param  string $name
+     * @param  mixed  $param
+     * @param  mixed  $key
+     * @return Locator
+     */
+    public function removeParam($name, $param, $key = null)
+    {
+        if (isset($this->services[$name]) && isset($this->services[$name]['params'])) {
+            if (is_array($this->services[$name]['params'])) {
+                if (null === $key) {
+                    $k = array_search($param, $this->services[$name]['params']);
+                    if ($k !== false) {
+                        unset($this->services[$name]['params'][$k]);
+                    }
+                } else if ((null !== $key) && array_key_exists($key, $this->services[$name]['params'])) {
+                    unset($this->services[$name]['params'][$key]);
+                }
+            } else {
+                if ($param == $this->services[$name]['params']) {
+                    unset($this->services[$name]['params']);
+                }
+            }
+        }
+
+        if (isset($this->services[$name]) && isset($this->services[$name]['params']) && empty($this->services[$name]['params'])) {
+            unset($this->services[$name]['params']);
         }
 
         return $this;
