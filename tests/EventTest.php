@@ -14,6 +14,12 @@ class EventTest extends TestCase
             return 'bar';
         }, 1000);
         $this->assertInstanceOf('Pop\Event\Manager', $events);
+        $this->assertEquals(1, count($events));
+        $i = 0;
+        foreach ($events as $event) {
+            $i++;
+        }
+        $this->assertEquals(1, $i);
     }
 
     public function testMagicMethods()
@@ -86,7 +92,7 @@ class EventTest extends TestCase
 
     public function testCallableException()
     {
-        $this->expectException('Pop\Event\Exception');
+        $this->expectException('Pop\Utils\Exception');
         $events = new Manager();
         $events->on('foo', TestAsset\TestEvent::baz(), 1000);
         $events->trigger('foo');

@@ -5,6 +5,7 @@ namespace Pop\Test;
 use Pop\Service\Container;
 use Pop\Service\Locator;
 use PHPUnit\Framework\TestCase;
+use Pop\Utils\CallableObject;
 
 class ServiceTest extends TestCase
 {
@@ -53,9 +54,16 @@ class ServiceTest extends TestCase
         Container::get('bar');
     }
 
+    public function testSetWithCallableObject()
+    {
+        $services = new Locator();
+        $services->set('foo', new CallableObject('trim'));
+        $this->assertTrue($services->isAvailable('foo'));
+    }
+
     public function testNotCallableException()
     {
-        $this->expectException('Pop\Service\Exception');
+        $this->expectException('Pop\Utils\Exception');
         $services = new Locator();
         $services->set('badservice', ['call' => 'bad call']);
         $result = $services->get('badservice');
@@ -79,6 +87,29 @@ class ServiceTest extends TestCase
         $this->assertEquals('Bar', $services->getCall('foo'));
     }
 
+    public function testSetParams1()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call'   => 'Foo'
+            ]
+        ]);
+        $services->setParams('foo', 456);
+        $this->assertEquals(456, $services->getParams('foo')[0]);
+    }
+
+    public function testSetParams2()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call'   => 'Foo'
+            ]
+        ]);
+        $services->setParams('foo', [123, 456]);
+        $this->assertEquals(123, $services->getParams('foo')[0]);
+        $this->assertEquals(456, $services->getParams('foo')[1]);
+    }
+
     public function testSetAndGetParam()
     {
         $services = new Locator([
@@ -87,8 +118,8 @@ class ServiceTest extends TestCase
                 'params' => 123
             ]
         ]);
-        $services->setParams('foo', 456);
-        $this->assertEquals(456, $services->getParams('foo'));
+        $services->addParam('foo', 456);
+        $this->assertEquals(456, $services->getParams('foo')[1]);
     }
 
     public function testAddParam1()
@@ -124,8 +155,7 @@ class ServiceTest extends TestCase
             ]
         ]);
         $services->addParam('foo', 456);
-        $this->assertFalse(is_array($services->getParams('foo')));
-        $this->assertEquals(456, $services->getParams('foo'));
+        $this->assertEquals(456, $services->getParams('foo')[0]);
     }
 
     public function testAddParam4()

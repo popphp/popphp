@@ -13,6 +13,8 @@
  */
 namespace Pop\Event;
 
+use Pop\Utils\CallableObject;
+
 /**
  * Event manager class
  *
@@ -75,6 +77,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Attach an event listener
      *
+     *     $event->on('event.name', 'someFunction');
      *     $event->on('event.name', function() { ... });
      *     $event->on('event.name', new SomeClass());
      *     $event->on('event.name', [new SomeClass, 'foo']);
@@ -92,7 +95,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
         if (!isset($this->listeners[$name])) {
             $this->listeners[$name] = new \SplPriorityQueue();
         }
-        $this->listeners[$name]->insert($action, (int)$priority);
+        $this->listeners[$name]->insert(new CallableObject($action), (int)$priority);
 
         return $this;
     }
@@ -178,12 +181,10 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Trigger an event listener priority
      *
      * @param  string $name
-     * @param  array $args
-     * @throws Exception
-     * @throws \ReflectionException
+     * @param  array  $params
      * @return void
      */
-    public function trigger($name, array $args = [])
+    public function trigger($name, array $params = [])
     {
         if (isset($this->listeners[$name])) {
             if (!isset($this->results[$name])) {
@@ -195,76 +196,9 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
                     return;
                 }
 
-                $args['result'] = end($this->results[$name]);
-                $realArgs       = [];
-                $params         = [];
-                $class          = null;
-                $method         = null;
-
-                // Get and arrange the argument values in the correct order
-                // If the action is a closure object
-                if ($action instanceof \Closure) {
-                    $refFunc = new \ReflectionFunction($action);
-                    foreach ($refFunc->getParameters() as $key => $refParameter) {
-                        $params[] = $refParameter->getName();
-                    }
-                // Else, if the action is a callable class/method combination
-                } else if (is_string($action) || is_callable($action, false, $callable_name)) {
-                    // If the callable action is a string, parse the class/method from it
-                    if (is_string($action)) {
-                        // If a static call
-                        if (strpos($action, '::') !== false) {
-                            [$class, $method] = explode('::', $action);
-                        // If an instance call
-                        } else if (strpos($action, '->') !== false) {
-                            [$class, $method] = explode('->', $action);
-                            $action = [new $class, $method];
-                        // Else, if a new/construct call
-                        } else if (strpos($action, 'new ') !== false) {
-                            $action = str_replace('new ', null, $action);
-                            $class  = $action;
-                            $method = '__construct';
-                        }
-                    } else if (isset($callable_name)) {
-                        [$class, $method] = explode('::', $callable_name);
-                    }
-
-                    if ((null !== $class) && (null !== $method)) {
-                        $methodExport = \ReflectionMethod::export($class, $method, true);
-                        // Get the method parameters
-                        if (stripos($methodExport, 'Parameter') !== false) {
-                            $matches = [];
-                            preg_match_all('/Parameter \#(.*)\]/m', $methodExport, $matches);
-                            if (isset($matches[0][0])) {
-                                foreach ($matches[0] as $param) {
-                                    // Get name
-                                    $argName  = substr($param, strpos($param, '$'));
-                                    $argName  = trim(substr($argName, 0, strpos($argName, ' ')));
-                                    $params[] = str_replace('$', '', $argName);
-                                }
-                            }
-                        }
-                    } else {
-                        throw new Exception('Error: Could not determine the class and method from the callable passed');
-                    }
-                } else {
-                    throw new Exception('Error: The action must be callable, i.e. a closure or class/method combination');
-                }
-
-                foreach ($params as $value) {
-                    $realArgs[$value] = $args[$value];
-                }
-
-                // If the method is the constructor, create object
-                if (isset($method) && ($method == '__construct')) {
-                    $reflect  = new \ReflectionClass($action);
-                    $result   = $reflect->newInstanceArgs($realArgs);
-                    $this->results[$name][] = $result;
-                // Else, just call it
-                } else {
-                    $result = call_user_func_array($action, $realArgs);
-                    $this->results[$name][] = $result;
-                }
+                $params['result']       = end($this->results[$name]);
+                $result                 = $action->call($params);
+                $this->results[$name][] = $result;
 
                 if ($result == self::KILL) {
                     $this->alive = false;
