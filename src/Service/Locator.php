@@ -55,16 +55,17 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * Instantiate the service locator object.
      *
-     * @param  array $services
+     * @param  array   $services
+     * @param  boolean $default
      * @throws Exception
      */
-    public function __construct(array $services = null)
+    public function __construct(array $services = null, $default = true)
     {
         if (null !== $services) {
             $this->setServices($services);
         }
 
-        if (!Container::has('default')) {
+        if (($default) && !(Container::has('default'))) {
             Container::set('default', $this);
         }
     }
