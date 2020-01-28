@@ -394,7 +394,6 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @param  string $name
      * @throws Service\Exception
-     * @throws \ReflectionException
      * @return mixed
      */
     public function getService($name)
@@ -458,8 +457,6 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @param  string $name
      * @param  array $args
-     * @throws Event\Exception
-     * @throws \ReflectionException
      * @return Application
      */
     public function trigger($name, array $args = [])
