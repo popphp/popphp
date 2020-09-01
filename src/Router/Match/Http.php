@@ -226,7 +226,7 @@ class Http extends AbstractMatch
 
         foreach ($required[0] as $req) {
             $name      = substr($req[0], (strpos($req[0], ':') + 1));
-            $route     = str_replace($req[0], '/.[a-zA-Z0-9_-]*', $route);
+            $route     = str_replace($req[0], '/.[a-zA-Z0-9_\-\p{L}]*', $route);
             $offsets[] = $req[1];
             $params[]  = [
                 'param'    => $req[0],
@@ -239,7 +239,7 @@ class Http extends AbstractMatch
 
         foreach ($optional[0] as $opt) {
             $name      = substr($opt[0], (strpos($opt[0], ':') + 1), -1);
-            $route     = str_replace($opt[0], '(|/[a-zA-Z0-9_-]*)', $route);
+            $route     = str_replace($opt[0], '(|/[a-zA-Z0-9_\-\p{L}]*)', $route);
             $offsets[] = $opt[1];
             $params[]  = [
                 'param'    => $opt[0],
@@ -263,7 +263,7 @@ class Http extends AbstractMatch
         }
 
         return [
-            'regex'  => '/' . $route . '/',
+            'regex'  => '/' . $route . '/u',
             'params' => $params
         ];
     }

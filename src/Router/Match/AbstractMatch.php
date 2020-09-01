@@ -116,11 +116,7 @@ abstract class AbstractMatch implements MatchInterface
             $this->defaultRoute = $controller;
         // Else, regular route
         } else {
-            if ($this instanceof Http) {
-                $route = preg_replace_callback('/[\p{L}]/u', function($matches) {
-                    return urlencode($matches[0]);
-                }, $route);
-            }
+            $this->routeString = urldecode($this->routeString);
             if (is_array($controller) && !isset($controller['controller'])) {
                 foreach ($controller as $r => $c) {
                     $this->addRoute($route . $r, $c);
