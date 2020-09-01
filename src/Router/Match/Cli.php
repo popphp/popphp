@@ -270,7 +270,7 @@ class Cli extends AbstractMatch
 
         if ((strpos($route, '<') !== false) || (strpos($route, '[') !== false)) {
             $regexCommands = [];
-            preg_match_all('/[a-zA-Z0-9-_:|]*(?=\s)/', $route, $commands, PREG_OFFSET_CAPTURE);
+            preg_match_all('/[a-zA-Z0-9-_:|\p{L}]*(?=\s)/u', $route, $commands, PREG_OFFSET_CAPTURE);
             foreach ($commands[0] as $i => $command) {
                 if (!empty($command[0])) {
                     $regexCommands[] = $command[0];
