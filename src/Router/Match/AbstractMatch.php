@@ -102,7 +102,8 @@ abstract class AbstractMatch implements MatchInterface
     public function addRoute($route, $controller)
     {
         // If is dynamic route
-        if ((strpos($route, ':controller') !== false) || (strpos($route, '<controller') !== false)) {
+        if ((($this instanceof Http) && (strpos($route, ':controller') !== false)) ||
+            (($this instanceof Cli) && (strpos($route, '<controller') !== false))) {
             $this->dynamicRoute = $route;
             if (isset($controller['prefix'])) {
                 $this->dynamicRoutePrefix = $controller['prefix'];
