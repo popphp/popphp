@@ -14,7 +14,7 @@
 namespace Pop\Router;
 
 /**
- * Router exception class
+ * Pop route class
  *
  * @category   Pop
  * @package    Pop\Router
@@ -23,4 +23,44 @@ namespace Pop\Router;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    3.5.0
  */
-class Exception extends \Exception {}
+class Route
+{
+
+    /**
+     * Router object
+     * @var Router
+     */
+    protected static $router = null;
+
+    /**
+     * Method to set the router
+     *
+     * @param  Router $router
+     * @return void
+     */
+    public static function setRouter(Router $router)
+    {
+        static::$router = $router;
+    }
+
+    /**
+     * Method to get the router
+     *
+     * @return Router
+     */
+    public static function getRouter()
+    {
+        return static::$router;
+    }
+
+    /**
+     * Method to check  the router
+     *
+     * @return boolean
+     */
+    public static function hasRouter()
+    {
+        return (null !== static::$router);
+    }
+
+}
