@@ -99,6 +99,46 @@ class Router
     }
 
     /**
+     * Add a route name
+     *
+     * @param  string $routeName
+     * @return Router
+     */
+    public function name($routeName)
+    {
+        $this->routeMatch->name($routeName);
+        return $this;
+    }
+
+    /**
+     * Has a route name
+     *
+     * @param  string $routeName
+     * @return boolean
+     */
+    public function hasName($routeName)
+    {
+        return $this->routeMatch->hasName($routeName);
+    }
+
+    /**
+     * Get URL for the named route
+     *
+     * @param  string  $routeName
+     * @param  mixed   $params
+     * @param  boolean $fqdn
+     * @throws Exception
+     * @return string
+     */
+    public function getUrl($routeName, $params = null, $fqdn = false)
+    {
+        if (!$this->isHttp()) {
+            throw new Exception('Error: The route is not HTTP.');
+        }
+        return $this->routeMatch->getUrl($routeName, $params, $fqdn);
+    }
+
+    /**
      * Add controller params to be passed into a new controller instance
      *
      * @param  string $controller

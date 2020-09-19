@@ -54,13 +54,31 @@ class Route
     }
 
     /**
-     * Method to check  the router
+     * Method to check if the router has been registered
      *
      * @return boolean
      */
     public static function hasRouter()
     {
         return (null !== static::$router);
+    }
+
+    /**
+     * Get URL route string for the named route
+     *
+     * @param  string  $routeName
+     * @param  mixed   $params
+     * @param  boolean $fqdn
+     * @throws Exception
+     * @return string
+     */
+    public static function url($routeName, $params = null, $fqdn = false)
+    {
+        if (!static::$router->hasName($routeName)) {
+            throw new Exception('Error: That route name does not exist.');
+        }
+
+        return static::$router->getUrl($routeName, $params, $fqdn);
     }
 
 }

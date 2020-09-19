@@ -232,6 +232,7 @@ class Application extends AbstractApplication implements \ArrayAccess
     public function registerRouter(Router\Router $router)
     {
         $this->router = $router;
+        Router\Route::setRouter($router);
         return $this;
     }
 

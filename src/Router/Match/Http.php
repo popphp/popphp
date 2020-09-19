@@ -304,4 +304,75 @@ class Http extends AbstractMatch
         }
     }
 
+    /**
+     * Get URL for the named route
+     *
+     * @param  string  $routeName
+     * @param  mixed   $params
+     * @param  boolean $fqdn
+     * @return string
+     */
+    public function getUrl($routeName, $params = null, $fqdn = false)
+    {
+        $url     = '';
+        $baseUrl = '';
+
+        if ($fqdn) {
+            $baseUrl .= (isset($_SERVER['SERVER_PORT']) && ($_SERVER['SERVER_PORT'] == 443)) ? 'https://' : 'http://';
+            if (isset($_SERVER['HTTP_HOST'])) {
+                $baseUrl .= $_SERVER['HTTP_HOST'];
+            }
+        }
+
+        $baseUrl .= $this->basePath;
+
+        if (isset($this->routeNames[$routeName]) && isset($this->routes[$this->routeNames[$routeName]])) {
+            $route         = $this->routeNames[$routeName];
+            $preparedRoute = null;
+
+            if (count($this->preparedRoutes) == 0) {
+                $this->prepare();
+            }
+
+            foreach ($this->preparedRoutes as $prepRoute) {
+                if ($prepRoute['route'] == $route) {
+                    $preparedRoute = $prepRoute;
+                    break;
+                }
+            }
+
+            if (!empty($params) && !empty($preparedRoute['params'])) {
+                foreach ($preparedRoute['params'] as $param) {
+                    $paramName    = $param['name'];
+                    $paramString  = null;
+                    $paramUrlName = null;
+
+                    if (is_object($params) && isset($params->{$paramName})) {
+                        if (is_array($params->{$paramName})) {
+                            $paramString  = implode('/', $params->{$paramName});
+                            $paramUrlName = $param['param'] . '*';
+                        } else {
+                            $paramString  = $params->{$paramName};
+                            $paramUrlName = $param['param'];
+                        }
+                    } else if (is_array($params) && isset($params[$paramName])) {
+                        if (is_array($params[$paramName])) {
+                            $paramString  = implode('/', $params[$paramName]);
+                            $paramUrlName = $param['param'] . '*';
+                        } else {
+                            $paramString  = $params[$paramName];
+                            $paramUrlName = $param['param'];
+                        }
+                    }
+
+                    $route = $baseUrl . str_replace($paramUrlName, '/' . $paramString, $route);
+                }
+            }
+
+            $url = $route;
+        }
+
+        return $url;
+    }
+
 }

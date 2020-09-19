@@ -93,6 +93,12 @@ abstract class AbstractMatch implements MatchInterface
     protected $routeParams = [];
 
     /**
+     * Route names
+     * @var array
+     */
+    protected $routeNames = [];
+
+    /**
      * Add a route
      *
      * @param  string $route
@@ -131,6 +137,10 @@ abstract class AbstractMatch implements MatchInterface
             }
         }
 
+        if (isset($controller['name'])) {
+            $this->name($controller['name']);
+        }
+
         if (isset($controller['params'])) {
             $this->addControllerParams($controller['controller'], $controller['params']);
         }
@@ -151,6 +161,34 @@ abstract class AbstractMatch implements MatchInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Add a route name
+     *
+     * @param  string $routeName
+     * @throws Exception
+     * @return AbstractMatch
+     */
+    public function name($routeName)
+    {
+        if (empty($this->routes)) {
+            throw new Exception('Error: No routes have been added to name.');
+        }
+
+        $this->routeNames[$routeName] = key(array_slice($this->routes, -1));
+        return $this;
+    }
+
+    /**
+     * Has a route name
+     *
+     * @param  string $routeName
+     * @return boolean
+     */
+    public function hasName($routeName)
+    {
+        return (isset($this->routeNames[$routeName]));
     }
 
     /**
