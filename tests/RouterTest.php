@@ -120,6 +120,10 @@ class RouterTest extends TestCase
 
     public function testGetRouteMatch()
     {
+        $_SERVER['argv'] = [
+            'myscript.php', 'edit', 1002
+        ];
+
         $router = new Router();
         $router->addRoute('help', [
             'controller' => function () {
