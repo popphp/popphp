@@ -123,6 +123,7 @@ class RouterTest extends TestCase
         $_SERVER['argv'] = [
             'myscript.php', 'edit', 1002
         ];
+
         $router = new Router();
         $router->addRoute('help', [
             'controller' => function () {
