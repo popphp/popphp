@@ -16,7 +16,7 @@ class ControllerTest extends TestCase
     public function testDispatch()
     {
         $controller = $this->getMockForAbstractClass(
-            '\Pop\Controller\AbstractController', [], '', false, false, false, ['error', 'login', 'user']
+            '\Pop\Controller\AbstractController', [], '', false, false, true, ['error', 'login', 'user']
         );
         $controller->expects($this->once())->method('error');
         $controller->expects($this->once())->method('login');

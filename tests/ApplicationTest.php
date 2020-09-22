@@ -532,10 +532,7 @@ class ApplicationTest extends TestCase
         $application->run(false);
         $result = ob_get_clean();
 
-        $this->assertContains('Command not found', $result);
-        $_SERVER['argv'] = [
-            'myscript.php', 'edit', 1002
-        ];
+        $this->assertContains('Command Not Found', $result);
     }
 
     public function testRunException()

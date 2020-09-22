@@ -169,6 +169,8 @@ class RouterHttpTest extends TestCase
     {
         $this->expectException('Pop\Router\Exception');
 
+        $_SERVER['REQUEST_URI']   = '/user';
+
         $router = new Router(null, new Http());
 
         Route::setRouter($router);
