@@ -204,13 +204,14 @@ class Cli extends AbstractMatch
      */
     public function noRouteFound($exit = true)
     {
-        if (stripos(PHP_OS, 'win') === false) {
+        if ((stripos(PHP_OS, 'darwin') === false) && (stripos(PHP_OS, 'win') !== false)) {
+            $string = 'Command Not Found.';
+        } else {
             $string  = "    \x1b[1;37m\x1b[41m                          \x1b[0m" . PHP_EOL;
             $string .= "    \x1b[1;37m\x1b[41m    Command Not Found.    \x1b[0m" . PHP_EOL;
             $string .= "    \x1b[1;37m\x1b[41m                          \x1b[0m";
-        } else {
-            $string = 'Command Not Found.';
         }
+
         echo PHP_EOL . $string . PHP_EOL . PHP_EOL;
 
         if ($exit) {
