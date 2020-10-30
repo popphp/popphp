@@ -115,17 +115,19 @@ abstract class AbstractMatch implements MatchInterface
                 $this->dynamicRoutePrefix = $controller['prefix'];
             }
         // Else, if wildcard route
-        } else if ($route == '*') {
+        } else if (($route == '*') || (substr($route, -2) == '/*')) {
+            $routeKey = (substr($route, -2) == '/*') ? substr($route, 0, -2) : $route;
             if (is_callable($controller)) {
                 $controller = ['controller' => $controller];
             }
-            $this->defaultRoute = $controller;
+            $this->defaultRoute[$routeKey] = $controller;
         // Else, regular route
         } else {
             $this->routeString = urldecode($this->routeString);
             if (is_array($controller) && !isset($controller['controller'])) {
                 foreach ($controller as $r => $c) {
-                    $this->addRoute($route . $r, $c);
+                    $fullRoute = ($r == '*') ? $route . '/*' : $route . $r;
+                    $this->addRoute($fullRoute, $c);
                 }
             } else {
                 if (is_callable($controller)) {
@@ -475,28 +477,37 @@ abstract class AbstractMatch implements MatchInterface
      */
     public function getController()
     {
-        $controller = null;
+        $routeController = null;
 
         if ((null !== $this->route) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['controller'])) {
-            $controller = $this->preparedRoutes[$this->route]['controller'];
+            $routeController = $this->preparedRoutes[$this->route]['controller'];
         } else {
-            if ((null === $controller) && (null !== $this->dynamicRoute) &&
+            if ((null === $routeController) && (null !== $this->dynamicRoute) &&
                 (null !== $this->dynamicRoutePrefix) && (count($this->segments) >= 1)) {
-                $controller = $this->dynamicRoutePrefix . ucfirst(strtolower($this->segments[0])) . 'Controller';
-                if (!class_exists($controller)) {
-                    $controller           = null;
+                $routeController = $this->dynamicRoutePrefix . ucfirst(strtolower($this->segments[0])) . 'Controller';
+                if (!class_exists($routeController)) {
+                    $routeController           = null;
                     $this->isDynamicRoute = false;
                 } else {
                     $this->isDynamicRoute = true;
                 }
             }
-            if ((null === $controller) && (null !== $this->defaultRoute) && isset($this->defaultRoute['controller'])) {
-                $controller = $this->defaultRoute['controller'];
+            if ((null === $routeController) && !empty($this->defaultRoute)) {
+                foreach ($this->defaultRoute as $routeKey => $controller) {
+                    if ($routeKey != '*') {
+                        if ((substr($this->routeString, 0, strlen($routeKey)) == $routeKey) && isset($controller['controller'])) {
+                            $routeController = $controller['controller'];
+                        }
+                    }
+                }
+                if ((null === $routeController) && isset($this->defaultRoute['*']) && isset($this->defaultRoute['*']['controller'])) {
+                    $routeController = $this->defaultRoute['*']['controller'];
+                }
             }
         }
 
-        return $controller;
+        return $routeController;
     }
 
     /**
@@ -514,8 +525,17 @@ abstract class AbstractMatch implements MatchInterface
         } else if ((null !== $this->dynamicRoute) && (null !== $this->getController()) &&
             (null !== $this->dynamicRoutePrefix) && (count($this->segments) >= 1)) {
             $result = class_exists($this->getController());
-        } else if ((null !== $this->defaultRoute) && isset($this->defaultRoute['controller'])) {
-            $result = true;
+        } else if (!empty($this->defaultRoute)) {
+            foreach ($this->defaultRoute as $routeKey => $controller) {
+                if ($routeKey != '*') {
+                    if ((substr($this->routeString, 0, strlen($routeKey)) == $routeKey) && isset($controller['controller'])) {
+                        $result = true;
+                    }
+                }
+            }
+            if ((!$result) && isset($this->defaultRoute['*']) && isset($this->defaultRoute['*']['controller'])) {
+                $result = true;
+            }
         }
 
         return $result;

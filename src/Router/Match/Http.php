@@ -196,7 +196,7 @@ class Http extends AbstractMatch
                     if (isset($controller['action'])) {
                         unset($controller['action']);
                     }
-                    $this->defaultRoute = $controller;
+                    $this->defaultRoute['*'] = $controller;
                 }
             }
         }

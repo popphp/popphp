@@ -22,7 +22,7 @@ class RouterTest extends TestCase
             }
         ]);
         $this->assertInstanceOf('Pop\Router\Router', $router);
-        $this->assertInstanceOf('Closure', $router->getRouteMatch()->getDefaultRoute()['controller']);
+        $this->assertInstanceOf('Closure', $router->getRouteMatch()->getDefaultRoute()['*']['controller']);
         $this->assertInstanceOf('Closure', $router->getRouteMatch()->getController());
         $this->assertTrue($router->getRouteMatch()->hasController());
         $this->assertTrue($router->getRouteMatch()->hasDefaultRoute());

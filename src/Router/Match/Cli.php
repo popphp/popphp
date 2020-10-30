@@ -240,7 +240,7 @@ class Cli extends AbstractMatch
             } else {
                 $routeRegex = $this->getRouteRegex($route);
                 if (isset($controller['default']) && ($controller['default'])) {
-                    $this->defaultRoute = $controller;
+                    $this->defaultRoute['*'] = $controller;
                 }
                 $this->preparedRoutes[$routeRegex['regex']] = array_merge($controller, [
                     'route' => $route
