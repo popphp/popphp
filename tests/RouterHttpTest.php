@@ -98,7 +98,7 @@ class RouterHttpTest extends TestCase
         $http->noRouteFound(false);
         $result = ob_get_clean();
 
-        $this->assertContains('Page Not Found', $result);
+        $this->assertStringContainsString('Page Not Found', $result);
     }
 
     public function testHttpDefaultRoute()

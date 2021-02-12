@@ -188,8 +188,8 @@ class RouterTest extends TestCase
         $this->assertTrue(is_array($router->getRouteMatch()->getRoutes()));
         $this->assertTrue($router->getRouteMatch()->hasAction());
         $this->assertEquals('help', $router->getRouteMatch()->getAction());
-        $this->assertContains('help', $router->getRouteMatch()->getRoute());
-        $this->assertContains('help', $router->getRouteMatch()->getOriginalRoute());
+        $this->assertStringContainsString('help', $router->getRouteMatch()->getRoute());
+        $this->assertStringContainsString('help', $router->getRouteMatch()->getOriginalRoute());
     }
 
     public function testControllerParams()

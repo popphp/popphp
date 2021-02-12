@@ -532,7 +532,7 @@ class ApplicationTest extends TestCase
         $application->run(false);
         $result = ob_get_clean();
 
-        $this->assertContains('Command Not Found', $result);
+        $this->assertStringContainsString('Command Not Found', $result);
     }
 
     public function testRunException()
