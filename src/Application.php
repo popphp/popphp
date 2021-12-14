@@ -499,7 +499,7 @@ class Application extends AbstractApplication implements \ArrayAccess
                     $controller = $this->router->getController();
                     if ($this->router->getControllerClass() == 'Closure') {
                         if ($this->router->hasRouteParams()) {
-                            call_user_func_array($controller, $this->router->getRouteParams());
+                            call_user_func_array($controller, array_values($this->router->getRouteParams()));
                         } else {
                             $controller();
                         }

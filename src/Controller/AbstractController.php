@@ -66,7 +66,7 @@ abstract class AbstractController implements ControllerInterface
     {
         if ((null !== $action) && method_exists($this, $action)) {
             if (null !== $params) {
-                call_user_func_array([$this, $action], $params);
+                call_user_func_array([$this, $action], array_values($params));
             } else {
                 $this->$action();
             }
