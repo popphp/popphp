@@ -14,6 +14,7 @@
 namespace Pop\Module;
 
 use Pop\Application;
+use ReturnTypeWillChange;
 
 /**
  * Pop module class
@@ -213,6 +214,7 @@ class Module extends AbstractModule implements \ArrayAccess
      * @param  mixed  $value
      * @return Module
      */
+    #[ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         return $this->__set($offset, $value);
@@ -224,6 +226,7 @@ class Module extends AbstractModule implements \ArrayAccess
      * @param  string $offset
      * @return mixed
      */
+    #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->__get($offset);
@@ -235,7 +238,7 @@ class Module extends AbstractModule implements \ArrayAccess
      * @param  string $offset
      * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->__isset($offset);
     }
@@ -246,6 +249,7 @@ class Module extends AbstractModule implements \ArrayAccess
      * @param  string $offset
      * @return Module
      */
+    #[ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         return $this->__unset($offset);

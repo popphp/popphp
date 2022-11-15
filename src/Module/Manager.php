@@ -13,6 +13,8 @@
  */
 namespace Pop\Module;
 
+use ReturnTypeWillChange;
+
 /**
  * Module manager class
  *
@@ -212,6 +214,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @throws Exception
      * @return Manager
      */
+    #[ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         return $this->__set($offset, $value);
@@ -223,6 +226,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $offset
      * @return Module
      */
+    #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->__get($offset);
@@ -234,7 +238,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $offset
      * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->__isset($offset);
     }
@@ -245,6 +249,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $offset
      * @return Manager
      */
+    #[ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         return $this->__unset($offset);
@@ -255,7 +260,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->modules);
     }
@@ -265,7 +270,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return \ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->modules);
     }

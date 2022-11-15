@@ -13,6 +13,8 @@
  */
 namespace Pop;
 
+use ReturnTypeWillChange;
+
 /**
  * Application class
  *
@@ -658,6 +660,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      * @throws Exception
      * @return Application
      */
+    #[ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         return $this->__set($offset, $value);
@@ -669,6 +672,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      * @param  string $offset
      * @return mixed
      */
+    #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->__get($offset);
@@ -680,7 +684,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      * @param  string $offset
      * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->__isset($offset);
     }
@@ -691,6 +695,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      * @param  string $offset
      * @return Application
      */
+    #[ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         return $this->__unset($offset);

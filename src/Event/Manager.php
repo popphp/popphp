@@ -14,6 +14,7 @@
 namespace Pop\Event;
 
 use Pop\Utils\CallableObject;
+use ReturnTypeWillChange;
 
 /**
  * Event manager class
@@ -262,6 +263,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  mixed  $value
      * @return Manager
      */
+    #[ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         return $this->on($offset, $value);
@@ -273,6 +275,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $offset
      * @return mixed
      */
+    #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->get($offset);
@@ -284,7 +287,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $offset
      * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }
@@ -295,6 +298,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $offset
      * @return Manager
      */
+    #[ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         if (isset($this->listeners[$offset])) {
@@ -308,7 +312,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->listeners);
     }
@@ -318,7 +322,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return \ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->listeners);
     }

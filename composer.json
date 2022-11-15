@@ -17,9 +17,9 @@
         }
     ],
     "require": {
-        "php": ">=7.3.0",
-        "popphp/pop-config" : "^3.4.0",
-        "popphp/pop-utils" : "^1.2.0"
+        "php": ">=7.4.0",
+        "popphp/pop-config" : "^3.4.1",
+        "popphp/pop-utils" : "^1.3.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0.0",

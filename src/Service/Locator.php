@@ -14,6 +14,7 @@
 namespace Pop\Service;
 
 use Pop\Utils\CallableObject;
+use ReturnTypeWillChange;
 
 /**
  * Service locator class
@@ -372,6 +373,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      * @throws Exception
      * @return Locator
      */
+    #[ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         return $this->set($offset, $value);
@@ -384,6 +386,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      * @throws Exception
      * @return mixed
      */
+    #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->get($offset);
@@ -395,7 +398,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $offset
      * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->services[$offset]);
     }
@@ -406,6 +409,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $offset
      * @return Locator
      */
+    #[ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         return $this->remove($offset);
@@ -416,7 +420,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->services);
     }
@@ -426,7 +430,7 @@ class Locator implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return \ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->services);
     }
