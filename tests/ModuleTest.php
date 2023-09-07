@@ -15,6 +15,7 @@ class ModuleTest extends TestCase
         $config = [
             'prefix'   => 'Test\\',
             'name'     => 'foo',
+            'version'  => '1.0.0',
             'src'      => __DIR__,
             'foo'      => 'bar',
             'routes'   => [
@@ -49,8 +50,33 @@ class ModuleTest extends TestCase
         $this->assertTrue($module->isRegistered());
         $this->assertTrue($application->isRegistered('foo'));
         $this->assertEquals('bar', $module->config()['foo']);
+        $this->assertEquals('1.0.0', $module->getVersion());
         $this->assertInstanceOf('Pop\Module\Module', $module);
         $this->assertInstanceOf('Pop\Application', $module->application());
+    }
+
+
+    public function testSetAndGet()
+    {
+        $config = [
+            'foo' => 'bar'
+        ];
+
+        $module = new Module();
+        $module->config = $config;
+
+        $this->assertEquals('bar', $module->config['foo']);
+        $this->assertFalse(isset($module->test));
+        $this->assertNull($module->test);
+
+        unset($module->config);
+        $this->assertFalse(isset($module->config));
+
+        $module['config'] = $config;
+        $this->assertEquals('bar', $module['config']['foo']);
+        unset($module['config']);
+        $this->assertFalse(isset($module['config']));
+
     }
 
     public function testPsr0()
@@ -123,6 +149,10 @@ class ModuleTest extends TestCase
         foreach ($manager as $name => $module) {
             $this->assertTrue($manager->isRegistered($name));
         }
+
+        $this->assertEquals('bar', $manager->getModuleName($manager['bar']));
+        $this->assertEquals(2, count($manager));
+        $this->assertEquals(2, $manager->count());
 
         unset($manager['bar']);
         $this->assertFalse($manager->isRegistered('bar'));

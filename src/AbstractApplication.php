@@ -27,10 +27,86 @@ abstract class AbstractApplication implements ApplicationInterface
 {
 
     /**
+     * Module name
+     * @var string
+     */
+    protected $name = null;
+
+    /**
+     * Module version
+     * @var string
+     */
+    protected $version = null;
+
+    /**
      * Application config
      * @var mixed
      */
     protected $config = null;
+
+    /**
+     * Set module name
+     *
+     * @param  string $name
+     * @return static
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * Get module name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Determine if module has name
+     *
+     * @return boolean
+     */
+    public function hasName()
+    {
+        return (null !== $this->name);
+    }
+
+    /**
+     * Set module version
+     *
+     * @param  string $version
+     * @return static
+     */
+    public function setVersion($version)
+    {
+        $this->version = $version;
+        return $this;
+    }
+
+    /**
+     * Get module version
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Determine if module has version
+     *
+     * @return boolean
+     */
+    public function hasVersion()
+    {
+        return (null !== $this->version);
+    }
 
     /**
      * Access application config

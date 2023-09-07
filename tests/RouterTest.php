@@ -192,6 +192,92 @@ class RouterTest extends TestCase
         $this->assertStringContainsString('help', $router->getRouteMatch()->getOriginalRoute());
     }
 
+    public function testGetPreparedRoutes()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help'
+        ]);
+
+        $router->route();
+        $preparedRoutes  = $router->getRouteMatch()->getPreparedRoutes();
+        $flattenedRoutes = $router->getRouteMatch()->getFlattenedRoutes();
+
+        $this->assertTrue(isset($preparedRoutes['/^help$(.*)$/']));
+        $this->assertTrue(is_array($preparedRoutes['/^help$(.*)$/']));
+        $this->assertEquals(3, count($preparedRoutes['/^help$(.*)$/']));
+        $this->assertTrue(isset($preparedRoutes['/^help$(.*)$/']['controller']));
+        $this->assertTrue(isset($preparedRoutes['/^help$(.*)$/']['action']));
+        $this->assertTrue(isset($preparedRoutes['/^help$(.*)$/']['route']));
+        $this->assertEquals('Pop\Test\TestAsset\TestController', $preparedRoutes['/^help$(.*)$/']['controller']);
+        $this->assertEquals('help', $preparedRoutes['/^help$(.*)$/']['action']);
+        $this->assertEquals('help', $preparedRoutes['/^help$(.*)$/']['route']);
+    }
+
+    public function testGetFlattenedRoutes()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help'
+        ]);
+
+        $router->route();
+        $flattenedRoutes = $router->getRouteMatch()->getFlattenedRoutes();
+
+        $this->assertTrue(isset($flattenedRoutes['help']));
+        $this->assertTrue(isset($flattenedRoutes['help']['controller']));
+        $this->assertTrue(isset($flattenedRoutes['help']['action']));
+        $this->assertEquals('Pop\Test\TestAsset\TestController', $flattenedRoutes['help']['controller']);
+        $this->assertEquals('help', $flattenedRoutes['help']['action']);
+    }
+
+    public function testHasRouteConfig()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help'
+        ]);
+
+
+        $this->assertFalse($router->getRouteMatch()->hasRouteConfig());
+        $router->route();
+        $this->assertTrue($router->getRouteMatch()->hasRouteConfig());
+    }
+
+    public function testGetRouteConfig()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help'
+        ]);
+
+
+        $this->assertNull($router->getRouteMatch()->getRouteConfig());
+        $router->route();
+        $this->assertTrue(is_array($router->getRouteMatch()->getRouteConfig()));
+        $this->assertEquals('help', $router->getRouteMatch()->getRouteConfig('action'));
+    }
+
     public function testControllerParams()
     {
         $_SERVER['argv'] = [

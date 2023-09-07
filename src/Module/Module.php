@@ -93,7 +93,12 @@ class Module extends AbstractModule implements \ArrayAccess
                 $this->setName($this->config['name']);
             }
 
-            // If the autoloader is set and the the module config has a
+            // Set the version, if available
+            if (!empty($this->config['version'])) {
+                $this->setVersion($this->config['version']);
+            }
+
+            // If the autoloader is set and the module config has a
             // defined prefix and src, register the module with the autoloader
             if ((null !== $this->application) && (null !== $this->application->autoloader()) &&
                 isset($this->config['prefix']) && isset($this->config['src']) && file_exists($this->config['src'])

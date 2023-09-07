@@ -29,50 +29,6 @@ interface ModuleInterface
 {
 
     /**
-     * Set module name
-     *
-     * @param  string $name
-     * @return ModuleInterface
-     */
-    public function setName($name);
-
-    /**
-     * Get module name
-     *
-     * @return string
-     */
-    public function getName();
-
-    /**
-     * Determine if module has name
-     *
-     * @return boolean
-     */
-    public function hasName();
-
-    /**
-     * Set module version
-     *
-     * @param  string $version
-     * @return ModuleInterface
-     */
-    public function setVersion($version);
-
-    /**
-     * Get module version
-     *
-     * @return string
-     */
-    public function getVersion();
-
-    /**
-     * Determine if module has version
-     *
-     * @return boolean
-     */
-    public function hasVersion();
-
-    /**
      * Get application
      *
      * @return Application

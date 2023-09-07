@@ -161,6 +161,8 @@ class ApplicationTest extends TestCase
     public function testRegisterConfig()
     {
         $config = [
+            'name'     => 'Test App',
+            'version'  => '1.0.0',
             'foo'      => 'bar',
             'routes'   => [
                 '/login[/]' => [
@@ -201,6 +203,10 @@ class ApplicationTest extends TestCase
             ]
         ]);
         $this->assertEquals($application->config()['foo'], 'bar');
+        $this->assertTrue($application->hasName());
+        $this->assertEquals($application->getName(), 'Test App');
+        $this->assertTrue($application->hasVersion());
+        $this->assertEquals($application->getVersion(), '1.0.0');
     }
 
     public function testRegisterConfig2()

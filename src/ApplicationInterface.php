@@ -27,6 +27,50 @@ interface ApplicationInterface
 {
 
     /**
+     * Set module name
+     *
+     * @param  string $name
+     * @return static
+     */
+    public function setName($name);
+
+    /**
+     * Get module name
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Determine if module has name
+     *
+     * @return boolean
+     */
+    public function hasName();
+
+    /**
+     * Set module version
+     *
+     * @param  string $version
+     * @return static
+     */
+    public function setVersion($version);
+
+    /**
+     * Get module version
+     *
+     * @return string
+     */
+    public function getVersion();
+
+    /**
+     * Determine if module has version
+     *
+     * @return boolean
+     */
+    public function hasVersion();
+
+    /**
      * Access application config
      *
      * @return ApplicationInterface

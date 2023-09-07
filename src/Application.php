@@ -125,7 +125,7 @@ class Application extends AbstractApplication implements \ArrayAccess
             $this->registerModules(new Module\Manager());
         }
 
-        // If the autoloader is set and the the application config has a
+        // If the autoloader is set and the application config has a
         // defined prefix and src, register with the autoloader
         if ((null !== $this->autoloader) && isset($this->config['prefix']) &&
             isset($this->config['src']) && file_exists($this->config['src'])) {
@@ -136,6 +136,16 @@ class Application extends AbstractApplication implements \ArrayAccess
             } else {
                 $this->autoloader->addPsr4($this->config['prefix'], $this->config['src']);
             }
+        }
+
+        // Set the app name
+        if (!empty($this->config['name'])) {
+            $this->setName($this->config['name']);
+        }
+
+        // Set the app version
+        if (!empty($this->config['version'])) {
+            $this->setVersion($this->config['version']);
         }
 
         // If routes are set in the app config, register them with the application
