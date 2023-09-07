@@ -78,6 +78,13 @@ interface ApplicationInterface
     public function config();
 
     /**
+     * Load application
+     *
+     * @return ApplicationInterface
+     */
+    public function load();
+
+    /**
      * Register a new configuration with the application
      *
      * @param  mixed $config

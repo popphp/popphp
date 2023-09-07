@@ -518,6 +518,24 @@ class ApplicationTest extends TestCase
         $this->assertEquals(1002, $application->router()->getController()->id);
     }
 
+    public function testLoad()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'bad'
+        ];
+
+        $config = [
+            'routes' => [
+                'bad' => [
+                    'controller' => 'Pop\Test\TestAsset\BadController',
+                    'action'     => 'bad'
+                ]
+            ]
+        ];
+        $application = new Application($config);
+        $this->assertInstanceOf('Pop\Application', $application->load());
+    }
+
     public function testNoRouteFound()
     {
         $_SERVER['argv'] = [

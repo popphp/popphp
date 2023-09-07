@@ -119,6 +119,16 @@ abstract class AbstractApplication implements ApplicationInterface
     }
 
     /**
+     * Optional method that can be used to load custom operations/configurations for an application to run
+     *
+     * @return AbstractApplication
+     */
+    public function load()
+    {
+        return $this;
+    }
+
+    /**
      * Register a new configuration with the application
      *
      * @param  mixed $config
