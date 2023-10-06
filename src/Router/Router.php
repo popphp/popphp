@@ -13,6 +13,7 @@
  */
 namespace Pop\Router;
 
+use Closure;
 use ReflectionException;
 
 /**
@@ -82,7 +83,7 @@ class Router
      * @param  mixed  $controller
      * @return static
      */
-    public function addRoute($route, $controller): static
+    public function addRoute(string $route, mixed $controller): static
     {
         $this->routeMatch->addRoute($route, $controller);
         return $this;
@@ -344,7 +345,7 @@ class Router
             if ($this->routeMatch->hasController()) {
                 $controller = $this->routeMatch->getController();
 
-                if ($controller instanceof \Closure) {
+                if ($controller instanceof Closure) {
                     $this->controllerClass = 'Closure';
                     $this->controller      = $controller;
                 } else if (class_exists($controller)) {

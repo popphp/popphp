@@ -115,8 +115,8 @@ abstract class AbstractMatch implements MatchInterface
                 $this->dynamicRoutePrefix = $controller['prefix'];
             }
         // Else, if wildcard route
-        } else if (($route == '*') || (substr($route, -2) == '/*')) {
-            $routeKey = (substr($route, -2) == '/*') ? substr($route, 0, -2) : $route;
+        } else if (($route == '*') || (str_ends_with($route, '/*'))) {
+            $routeKey = (str_ends_with($route, '/*')) ? substr($route, 0, -2) : $route;
             if (is_callable($controller)) {
                 $controller = ['controller' => $controller];
             }
@@ -222,11 +222,9 @@ abstract class AbstractMatch implements MatchInterface
         if (!is_array($params)) {
             $params = [$params];
         }
-        if (isset($this->controllerParams[$controller])) {
-            $this->controllerParams[$controller] = array_merge($this->controllerParams[$controller], $params);
-        } else {
-            $this->controllerParams[$controller] = $params;
-        }
+        $this->controllerParams[$controller] = (isset($this->controllerParams[$controller])) ?
+            array_merge($this->controllerParams[$controller], $params) : $params;
+
         return $this;
     }
 
@@ -304,8 +302,7 @@ abstract class AbstractMatch implements MatchInterface
      */
     public function getOriginalRoute(): ?string
     {
-        return (isset($this->preparedRoutes[$this->route]) && isset($this->preparedRoutes[$this->route]['route'])) ?
-            $this->preparedRoutes[$this->route]['route'] : null;
+        return $this->preparedRoutes[$this->route]['route'] ?? null;
     }
 
     /**
@@ -356,17 +353,16 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Get route config
      *
-     * @param  string $key
+     * @param  ?string $key
      * @return mixed
      */
-    public function getRouteConfig(string $key = null): mixed
+    public function getRouteConfig(?string $key = null): mixed
     {
         if (($this->route !== null) && isset($this->preparedRoutes[$this->route])) {
             if ($key === null) {
                 return $this->preparedRoutes[$this->route];
             } else {
-                return (isset($this->preparedRoutes[$this->route][$key])) ?
-                    $this->preparedRoutes[$this->route][$key] : null;
+                return $this->preparedRoutes[$this->route][$key] ?? null;
             }
         } else {
             return null;
@@ -381,7 +377,7 @@ abstract class AbstractMatch implements MatchInterface
     public function getFlattenedRoutes(): array
     {
         $routes = [];
-        foreach ($this->preparedRoutes as $key => $value) {
+        foreach ($this->preparedRoutes as $value) {
             if (isset($value['route'])) {
                 $routes[$value['route']] = $value;
                 unset($routes[$value['route']]['route']);
@@ -483,11 +479,10 @@ abstract class AbstractMatch implements MatchInterface
             isset($this->preparedRoutes[$this->route]['controller'])) {
             $routeController = $this->preparedRoutes[$this->route]['controller'];
         } else {
-            if (($routeController === null) && ($this->dynamicRoute !== null) &&
-                ($this->dynamicRoutePrefix !== null) && (count($this->segments) >= 1)) {
+            if (($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) && (count($this->segments) >= 1)) {
                 $routeController = $this->dynamicRoutePrefix . ucfirst(strtolower($this->segments[0])) . 'Controller';
                 if (!class_exists($routeController)) {
-                    $routeController           = null;
+                    $routeController      = null;
                     $this->isDynamicRoute = false;
                 } else {
                     $this->isDynamicRoute = true;
@@ -496,7 +491,7 @@ abstract class AbstractMatch implements MatchInterface
             if (($routeController === null) && !empty($this->defaultRoute)) {
                 foreach ($this->defaultRoute as $routeKey => $controller) {
                     if ($routeKey != '*') {
-                        if ((substr($this->routeString, 0, strlen($routeKey)) == $routeKey) && isset($controller['controller'])) {
+                        if (str_starts_with($this->routeString, $routeKey) && isset($controller['controller'])) {
                             $routeController = $controller['controller'];
                         }
                     }
@@ -527,10 +522,9 @@ abstract class AbstractMatch implements MatchInterface
             $result = class_exists($this->getController());
         } else if (!empty($this->defaultRoute)) {
             foreach ($this->defaultRoute as $routeKey => $controller) {
-                if ($routeKey != '*') {
-                    if ((substr($this->routeString, 0, strlen($routeKey)) == $routeKey) && isset($controller['controller'])) {
-                        $result = true;
-                    }
+                if (($routeKey != '*') && str_starts_with($this->routeString, $routeKey) && isset($controller['controller'])) {
+                    $result = true;
+                    break;
                 }
             }
             if ((!$result) && isset($this->defaultRoute['*']) && isset($this->defaultRoute['*']['controller'])) {
@@ -576,7 +570,7 @@ abstract class AbstractMatch implements MatchInterface
             isset($this->preparedRoutes[$this->route]['action'])) {
             $result = true;
         } else {
-            if (!($result) && ($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) &&
+            if (($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) &&
                 (count($this->segments) >= 2)) {
                 $result = method_exists($this->getController(), $this->getAction());
             }
