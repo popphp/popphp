@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -14,7 +14,10 @@
 namespace Pop\Event;
 
 use Pop\Utils\CallableObject;
-use ReturnTypeWillChange;
+use ArrayAccess;
+use ArrayIterator;
+use Countable;
+use IteratorAggregate;
 
 /**
  * Event manager class
@@ -22,11 +25,11 @@ use ReturnTypeWillChange;
  * @category   Pop
  * @package    Pop\Event
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
-class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
+class Manager implements ArrayAccess, Countable, IteratorAggregate
 {
 
     /**
@@ -45,32 +48,32 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Event listeners
      * @var array
      */
-    protected $listeners = [];
+    protected array $listeners = [];
 
     /**
      * Event results
      * @var array
      */
-    protected $results = [];
+    protected array $results = [];
 
     /**
      * Event 'alive' tracking flag
-     * @var boolean
+     * @var bool
      */
-    protected $alive = true;
+    protected bool $alive = true;
 
     /**
      * Constructor
      *
      * Instantiate the event manager object.
      *
-     * @param  string $name
-     * @param  mixed  $action
-     * @param  int    $priority
+     * @param  ?string $name
+     * @param  mixed   $action
+     * @param  int     $priority
      */
-    public function __construct($name = null, $action = null, $priority = 0)
+    public function __construct(?string $name = null, mixed $action = null, int $priority = 0)
     {
-        if ((null !== $name) && (null !== $action)) {
+        if (($name !== null) && ($action !== null)) {
             $this->on($name, $action, $priority);
         }
     }
@@ -91,7 +94,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  int    $priority
      * @return Manager
      */
-    public function on($name, $action, $priority = 0)
+    public function on(string $name, mixed $action, int $priority = 0): static
     {
         if (!isset($this->listeners[$name])) {
             $this->listeners[$name] = new \SplPriorityQueue();
@@ -108,7 +111,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  mixed  $action
      * @return Manager
      */
-    public function off($name, $action)
+    public function off(string $name, mixed $action): static
     {
         // If the event exists, loop through and remove the action if found.
         if (isset($this->listeners[$name])) {
@@ -136,7 +139,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $name
      * @return mixed
      */
-    public function get($name)
+    public function get(string $name): mixed
     {
         $listener = null;
         if (isset($this->listeners[$name])) {
@@ -150,9 +153,9 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Determine whether the event manage has an event registered with it
      *
      * @param  string $name
-     * @return boolean
+     * @return bool
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return (isset($this->listeners[$name]));
     }
@@ -163,17 +166,17 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $name
      * @return mixed
      */
-    public function getResults($name)
+    public function getResults(string $name): mixed
     {
-        return (isset($this->results[$name]) ? $this->results[$name] : null);
+        return $this->results[$name] ?? null;
     }
 
     /**
      * Determine if the project application is still alive or has been killed
      *
-     * @return boolean
+     * @return bool
      */
-    public function alive()
+    public function alive(): bool
     {
         return $this->alive;
     }
@@ -185,7 +188,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  array  $params
      * @return void
      */
-    public function trigger($name, array $params = [])
+    public function trigger(string $name, array $params = []): void
     {
         if (isset($this->listeners[$name])) {
             if (!isset($this->results[$name])) {
@@ -213,11 +216,11 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param  string $name
      * @param  mixed  $value
-     * @return Manager
+     * @return void
      */
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value): void
     {
-        return $this->on($name, $value);
+        $this->on($name, $value);
     }
 
     /**
@@ -226,7 +229,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $name
      * @return mixed
      */
-    public function __get($name)
+    public function __get(string $name): mixed
     {
         return $this->get($name);
     }
@@ -235,9 +238,9 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Determine if an event exists
      *
      * @param  string $name
-     * @return boolean
+     * @return bool
      */
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
         return $this->has($name);
     }
@@ -246,37 +249,34 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Unset an event
      *
      * @param  string $name
-     * @return Manager
+     * @return void
      */
-    public function __unset($name)
+    public function __unset(string $name): void
     {
         if (isset($this->listeners[$name])) {
             unset($this->listeners[$name]);
         }
-        return $this;
     }
 
     /**
      * Set an event
      *
-     * @param  string $offset
+     * @param  mixed $offset
      * @param  mixed  $value
-     * @return Manager
+     * @return void
      */
-    #[ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        return $this->on($offset, $value);
+        $this->on($offset, $value);
     }
 
     /**
      * Get an event
      *
-     * @param  string $offset
+     * @param  mixed $offset
      * @return mixed
      */
-    #[ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->get($offset);
     }
@@ -285,7 +285,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Determine if an event exists
      *
      * @param  string $offset
-     * @return boolean
+     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -295,16 +295,14 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Unset an event
      *
-     * @param  string $offset
-     * @return Manager
+     * @param  mixed $offset
+     * @return void
      */
-    #[ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         if (isset($this->listeners[$offset])) {
             unset($this->listeners[$offset]);
         }
-        return $this;
     }
 
     /**
@@ -320,11 +318,11 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Get iterator
      *
-     * @return \ArrayIterator
+     * @return ArrayIterator
      */
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): ArrayIterator
     {
-        return new \ArrayIterator($this->listeners);
+        return new ArrayIterator($this->listeners);
     }
 
 }

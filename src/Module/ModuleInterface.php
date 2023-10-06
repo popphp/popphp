@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -21,9 +21,9 @@ use Pop\Application;
  * @category   Pop
  * @package    Pop\Module
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 interface ModuleInterface
 {
@@ -33,14 +33,14 @@ interface ModuleInterface
      *
      * @return Application
      */
-    public function application();
+    public function application(): Application;
 
     /**
      * Determine if the module has been registered with an application object
      *
-     * @return boolean
+     * @return bool
      */
-    public function isRegistered();
+    public function isRegistered(): bool;
 
     /**
      * Register the module
@@ -48,6 +48,6 @@ interface ModuleInterface
      * @param  Application $application
      * @return ModuleInterface
      */
-    public function register(Application $application);
+    public function register(Application $application): ModuleInterface;
 
 }

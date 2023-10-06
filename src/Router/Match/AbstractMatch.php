@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,84 +19,84 @@ namespace Pop\Router\Match;
  * @category   Pop
  * @package    Pop\Router
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 abstract class AbstractMatch implements MatchInterface
 {
 
     /**
      * Route string
-     * @var string
+     * @var ?string
      */
-    protected $routeString = null;
+    protected ?string $routeString = null;
 
     /**
      * Segments of route string
      * @var array
      */
-    protected $segments = [];
+    protected array $segments = [];
 
     /**
      * Matched route
-     * @var string
+     * @var ?string
      */
-    protected $route = null;
+    protected ?string $route = null;
 
     /**
      * Default route
-     * @var array
+     * @var ?array
      */
-    protected $defaultRoute = null;
+    protected ?array $defaultRoute = null;
 
     /**
      * Dynamic route
-     * @var string
+     * @var mixed
      */
-    protected $dynamicRoute = null;
+    protected mixed $dynamicRoute = null;
 
     /**
      * Dynamic route prefix
-     * @var array
+     * @var mixed
      */
-    protected $dynamicRoutePrefix = null;
+    protected mixed $dynamicRoutePrefix = null;
 
     /**
      * Flag for dynamic route
-     * @var boolean
+     * @var bool
      */
-    protected $isDynamicRoute = false;
+    protected bool $isDynamicRoute = false;
 
     /**
      * Routes
      * @var array
      */
-    protected $routes = [];
+    protected array $routes = [];
 
     /**
      * Prepared routes
      * @var array
      */
-    protected $preparedRoutes = [];
+    protected array $preparedRoutes = [];
 
     /**
      * Controller parameters
      * @var array
      */
-    protected $controllerParams = [];
+    protected array $controllerParams = [];
 
     /**
      * Route parameters
      * @var array
      */
-    protected $routeParams = [];
+    protected array $routeParams = [];
 
     /**
      * Route names
      * @var array
      */
-    protected $routeNames = [];
+    protected array $routeNames = [];
 
     /**
      * Add a route
@@ -105,11 +105,11 @@ abstract class AbstractMatch implements MatchInterface
      * @param  mixed  $controller
      * @return AbstractMatch
      */
-    public function addRoute($route, $controller)
+    public function addRoute(string $route, mixed $controller): AbstractMatch
     {
         // If is dynamic route
-        if ((($this instanceof Http) && (strpos($route, ':controller') !== false)) ||
-            (($this instanceof Cli) && (strpos($route, '<controller') !== false))) {
+        if ((($this instanceof Http) && (str_contains($route, ':controller'))) ||
+            (($this instanceof Cli) && (str_contains($route, '<controller')))) {
             $this->dynamicRoute = $route;
             if (isset($controller['prefix'])) {
                 $this->dynamicRoutePrefix = $controller['prefix'];
@@ -156,7 +156,7 @@ abstract class AbstractMatch implements MatchInterface
      * @param  array $routes
      * @return AbstractMatch
      */
-    public function addRoutes(array $routes)
+    public function addRoutes(array $routes): AbstractMatch
     {
         foreach ($routes as $route => $controller) {
             $this->addRoute($route, $controller);
@@ -172,7 +172,7 @@ abstract class AbstractMatch implements MatchInterface
      * @throws Exception
      * @return AbstractMatch
      */
-    public function name($routeName)
+    public function name(string $routeName): AbstractMatch
     {
         if (empty($this->routes)) {
             throw new Exception('Error: No routes have been added to name.');
@@ -186,9 +186,9 @@ abstract class AbstractMatch implements MatchInterface
      * Has a route name
      *
      * @param  string $routeName
-     * @return boolean
+     * @return bool
      */
-    public function hasName($routeName)
+    public function hasName(string $routeName): bool
     {
         return (isset($this->routeNames[$routeName]));
     }
@@ -200,7 +200,7 @@ abstract class AbstractMatch implements MatchInterface
      * @param  mixed  $params
      * @return AbstractMatch
      */
-    public function addControllerParams($controller, $params)
+    public function addControllerParams(string $controller, mixed $params): AbstractMatch
     {
         if (!is_array($params)) {
             $params = [$params];
@@ -217,7 +217,7 @@ abstract class AbstractMatch implements MatchInterface
      * @param  mixed  $params
      * @return AbstractMatch
      */
-    public function appendControllerParams($controller, $params)
+    public function appendControllerParams(string $controller, mixed $params): AbstractMatch
     {
         if (!is_array($params)) {
             $params = [$params];
@@ -236,18 +236,18 @@ abstract class AbstractMatch implements MatchInterface
      * @param  string $controller
      * @return mixed
      */
-    public function getControllerParams($controller)
+    public function getControllerParams(string $controller): mixed
     {
-        return (isset($this->controllerParams[$controller])) ? $this->controllerParams[$controller] : null;
+        return $this->controllerParams[$controller] ?? null;
     }
 
     /**
      * Determine if the controller has params
      *
      * @param  string $controller
-     * @return boolean
+     * @return bool
      */
-    public function hasControllerParams($controller)
+    public function hasControllerParams(string $controller): bool
     {
         return (isset($this->controllerParams[$controller]));
     }
@@ -258,7 +258,7 @@ abstract class AbstractMatch implements MatchInterface
      * @param  string $controller
      * @return AbstractMatch
      */
-    public function removeControllerParams($controller)
+    public function removeControllerParams(string $controller): AbstractMatch
     {
         if (isset($this->controllerParams[$controller])) {
             unset($this->controllerParams[$controller]);
@@ -271,7 +271,7 @@ abstract class AbstractMatch implements MatchInterface
      *
      * @return string
      */
-    public function getRouteString()
+    public function getRouteString(): string
     {
         return $this->routeString;
     }
@@ -281,7 +281,7 @@ abstract class AbstractMatch implements MatchInterface
      *
      * @return array
      */
-    public function getSegments()
+    public function getSegments(): array
     {
         return $this->segments;
     }
@@ -290,19 +290,19 @@ abstract class AbstractMatch implements MatchInterface
      * Get a route string segment
      *
      * @param  int $i
-     * @return string
+     * @return ?string
      */
-    public function getSegment($i)
+    public function getSegment(int $i): ?string
     {
-        return (isset($this->segments[$i])) ? $this->segments[$i] : null;
+        return $this->segments[$i] ?? null;
     }
 
     /**
      * Get original route string
      *
-     * @return string
+     * @return ?string
      */
-    public function getOriginalRoute()
+    public function getOriginalRoute(): ?string
     {
         return (isset($this->preparedRoutes[$this->route]) && isset($this->preparedRoutes[$this->route]['route'])) ?
             $this->preparedRoutes[$this->route]['route'] : null;
@@ -313,7 +313,7 @@ abstract class AbstractMatch implements MatchInterface
      *
      * @return string
      */
-    public function getRoute()
+    public function getRoute(): string
     {
         return $this->route;
     }
@@ -323,7 +323,7 @@ abstract class AbstractMatch implements MatchInterface
      *
      * @return array
      */
-    public function getRoutes()
+    public function getRoutes(): array
     {
         return $this->routes;
     }
@@ -333,7 +333,7 @@ abstract class AbstractMatch implements MatchInterface
      *
      * @return array
      */
-    public function getPreparedRoutes()
+    public function getPreparedRoutes(): array
     {
         return $this->preparedRoutes;
     }
@@ -341,13 +341,13 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Has route config
      *
-     * @param  string $key
-     * @return boolean
+     * @param  ?string $key
+     * @return bool
      */
-    public function hasRouteConfig($key = null)
+    public function hasRouteConfig(?string $key = null): bool
     {
         if ((null !== $this->route) && isset($this->preparedRoutes[$this->route])) {
-            return (null !== $key) ? (isset($this->preparedRoutes[$this->route][$key])) : true;
+            return !((null !== $key) || isset($this->preparedRoutes[$this->route][$key]));
         } else {
             return false;
         }
@@ -359,10 +359,10 @@ abstract class AbstractMatch implements MatchInterface
      * @param  string $key
      * @return mixed
      */
-    public function getRouteConfig($key = null)
+    public function getRouteConfig(string $key = null): mixed
     {
-        if ((null !== $this->route) && isset($this->preparedRoutes[$this->route])) {
-            if (null === $key) {
+        if (($this->route !== null) && isset($this->preparedRoutes[$this->route])) {
+            if ($key === null) {
                 return $this->preparedRoutes[$this->route];
             } else {
                 return (isset($this->preparedRoutes[$this->route][$key])) ?
@@ -378,7 +378,7 @@ abstract class AbstractMatch implements MatchInterface
      *
      * @return array
      */
-    public function getFlattenedRoutes()
+    public function getFlattenedRoutes(): array
     {
         $routes = [];
         foreach ($this->preparedRoutes as $key => $value) {
@@ -395,7 +395,7 @@ abstract class AbstractMatch implements MatchInterface
      *
      * @return array
      */
-    public function getRouteParams()
+    public function getRouteParams(): array
     {
         return $this->routeParams;
     }
@@ -403,9 +403,9 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Determine if the route has params
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasRouteParams()
+    public function hasRouteParams(): bool
     {
         return (count($this->routeParams) > 0);
     }
@@ -415,7 +415,7 @@ abstract class AbstractMatch implements MatchInterface
      *
      * @return array
      */
-    public function getDefaultRoute()
+    public function getDefaultRoute(): array
     {
         return $this->defaultRoute;
     }
@@ -423,19 +423,19 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Determine if there is a default route
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasDefaultRoute()
+    public function hasDefaultRoute(): bool
     {
-        return (null !== $this->defaultRoute);
+        return ($this->defaultRoute !== null);
     }
 
     /**
      * Get the dynamic route
      *
-     * @return string
+     * @return mixed
      */
-    public function getDynamicRoute()
+    public function getDynamicRoute(): mixed
     {
         return $this->dynamicRoute;
     }
@@ -443,9 +443,9 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Get the dynamic route prefix
      *
-     * @return array
+     * @return mixed
      */
-    public function getDynamicRoutePrefix()
+    public function getDynamicRoutePrefix(): mixed
     {
         return $this->dynamicRoutePrefix;
     }
@@ -453,19 +453,19 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Determine if there is a dynamic route
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasDynamicRoute()
+    public function hasDynamicRoute(): bool
     {
-        return (null !== $this->dynamicRoute);
+        return ($this->dynamicRoute !== null);
     }
 
     /**
      * Determine if it is a dynamic route
      *
-     * @return boolean
+     * @return bool
      */
-    public function isDynamicRoute()
+    public function isDynamicRoute(): bool
     {
         return $this->isDynamicRoute;
     }
@@ -475,16 +475,16 @@ abstract class AbstractMatch implements MatchInterface
      *
      * @return mixed
      */
-    public function getController()
+    public function getController(): mixed
     {
         $routeController = null;
 
-        if ((null !== $this->route) && isset($this->preparedRoutes[$this->route]) &&
+        if (($this->route !== null) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['controller'])) {
             $routeController = $this->preparedRoutes[$this->route]['controller'];
         } else {
-            if ((null === $routeController) && (null !== $this->dynamicRoute) &&
-                (null !== $this->dynamicRoutePrefix) && (count($this->segments) >= 1)) {
+            if (($routeController === null) && ($this->dynamicRoute !== null) &&
+                ($this->dynamicRoutePrefix !== null) && (count($this->segments) >= 1)) {
                 $routeController = $this->dynamicRoutePrefix . ucfirst(strtolower($this->segments[0])) . 'Controller';
                 if (!class_exists($routeController)) {
                     $routeController           = null;
@@ -493,7 +493,7 @@ abstract class AbstractMatch implements MatchInterface
                     $this->isDynamicRoute = true;
                 }
             }
-            if ((null === $routeController) && !empty($this->defaultRoute)) {
+            if (($routeController === null) && !empty($this->defaultRoute)) {
                 foreach ($this->defaultRoute as $routeKey => $controller) {
                     if ($routeKey != '*') {
                         if ((substr($this->routeString, 0, strlen($routeKey)) == $routeKey) && isset($controller['controller'])) {
@@ -501,7 +501,7 @@ abstract class AbstractMatch implements MatchInterface
                         }
                     }
                 }
-                if ((null === $routeController) && isset($this->defaultRoute['*']) && isset($this->defaultRoute['*']['controller'])) {
+                if (($routeController === null) && isset($this->defaultRoute['*']) && isset($this->defaultRoute['*']['controller'])) {
                     $routeController = $this->defaultRoute['*']['controller'];
                 }
             }
@@ -513,17 +513,17 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Determine if there is a controller
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasController()
+    public function hasController(): bool
     {
         $result = false;
 
-        if ((null !== $this->route) && isset($this->preparedRoutes[$this->route]) &&
+        if (($this->route !== null) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['controller'])) {
             $result = true;
-        } else if ((null !== $this->dynamicRoute) && (null !== $this->getController()) &&
-            (null !== $this->dynamicRoutePrefix) && (count($this->segments) >= 1)) {
+        } else if (($this->dynamicRoute !== null) && ($this->getController() !== null) &&
+            ($this->dynamicRoutePrefix !== null) && (count($this->segments) >= 1)) {
             $result = class_exists($this->getController());
         } else if (!empty($this->defaultRoute)) {
             foreach ($this->defaultRoute as $routeKey => $controller) {
@@ -546,17 +546,17 @@ abstract class AbstractMatch implements MatchInterface
      *
      * @return mixed
      */
-    public function getAction()
+    public function getAction(): mixed
     {
         $action = null;
 
-        if ((null !== $this->route) && isset($this->preparedRoutes[$this->route]) &&
+        if (($this->route !== null) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['action'])) {
             $action = $this->preparedRoutes[$this->route]['action'];
-        } else if ((null !== $this->dynamicRoute) && (null !== $this->dynamicRoutePrefix) &&
+        } else if (($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) &&
             (count($this->segments) >= 1)) {
             $action = (isset($this->segments[1])) ? $this->segments[1] : null;
-        } else if ((null !== $this->defaultRoute) && isset($this->defaultRoute['action'])) {
+        } else if (($this->defaultRoute !== null) && isset($this->defaultRoute['action'])) {
             $action = $this->defaultRoute['action'];
         }
 
@@ -566,21 +566,21 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Determine if there is an action
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasAction()
+    public function hasAction(): bool
     {
         $result = false;
 
-        if ((null !== $this->route) && isset($this->preparedRoutes[$this->route]) &&
+        if (($this->route !== null) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['action'])) {
             $result = true;
         } else {
-            if (!($result) && (null !== $this->dynamicRoute) && (null !== $this->dynamicRoutePrefix) &&
+            if (!($result) && ($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) &&
                 (count($this->segments) >= 2)) {
                 $result = method_exists($this->getController(), $this->getAction());
             }
-            if (!($result) && (null !== $this->defaultRoute) && isset($this->defaultRoute['action'])) {
+            if (!($result) && ($this->defaultRoute !== null) && isset($this->defaultRoute['action'])) {
                 $result = true;
             }
         }
@@ -591,31 +591,31 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Determine if the route has been matched
      *
-     * @return boolean
+     * @return bool
      */
-    abstract public function hasRoute();
+    abstract public function hasRoute(): bool;
 
     /**
      * Prepare the routes
      *
      * @return AbstractMatch
      */
-    abstract public function prepare();
+    abstract public function prepare(): AbstractMatch;
 
     /**
      * Match the route
      *
-     * @param  string $forceRoute
-     * @return boolean
+     * @param  mixed $forceRoute
+     * @return bool
      */
-    abstract public function match($forceRoute = null);
+    abstract public function match(mixed $forceRoute = null): bool;
 
     /**
      * Method to process if a route was not found
      *
-     * @param  boolean $exit
+     * @param  bool $exit
      * @return void
      */
-    abstract public function noRouteFound($exit = true);
+    abstract public function noRouteFound(bool $exit = true): void;
 
 }

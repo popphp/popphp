@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -13,54 +13,56 @@
  */
 namespace Pop\Router;
 
+use ReflectionException;
+
 /**
  * Pop router class
  *
  * @category   Pop
  * @package    Pop\Router
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 class Router
 {
 
     /**
      * Route match object
-     * @var Match\MatchInterface
+     * @var ?Match\MatchInterface
      */
-    protected $routeMatch = null;
+    protected ?Match\MatchInterface $routeMatch = null;
 
     /**
      * Controller object
      * @var mixed
      */
-    protected $controller = null;
+    protected mixed $controller = null;
 
     /**
      * Action
      * @var mixed
      */
-    protected $action = null;
+    protected mixed $action = null;
 
     /**
      * Controller class
-     * @var string
+     * @var ?string
      */
-    protected $controllerClass = null;
+    protected ?string $controllerClass = null;
 
     /**
      * Constructor
      *
      * Instantiate the router object
      *
-     * @param  array               $routes
-     * @param  Match\AbstractMatch $match
+     * @param  ?array               $routes
+     * @param  ?Match\AbstractMatch $match
      */
-    public function __construct(array $routes = null, Match\AbstractMatch $match = null)
+    public function __construct(?array $routes = null, ?Match\AbstractMatch $match = null)
     {
-        if (null !== $match) {
+        if ($match !== null) {
             $this->routeMatch = $match;
         } else {
             $this->routeMatch = ((stripos(php_sapi_name(), 'cli') !== false) &&
@@ -68,7 +70,7 @@ class Router
                 new Match\Cli() : new Match\Http();
         }
 
-        if (null !== $routes) {
+        if ($routes !== null) {
             $this->addRoutes($routes);
         }
     }
@@ -78,9 +80,9 @@ class Router
      *
      * @param  string $route
      * @param  mixed  $controller
-     * @return Router
+     * @return static
      */
-    public function addRoute($route, $controller)
+    public function addRoute($route, $controller): static
     {
         $this->routeMatch->addRoute($route, $controller);
         return $this;
@@ -90,9 +92,9 @@ class Router
      * Add multiple controller routes
      *
      * @param  array $routes
-     * @return Router
+     * @return static
      */
-    public function addRoutes(array $routes)
+    public function addRoutes(array $routes): static
     {
         $this->routeMatch->addRoutes($routes);
         return $this;
@@ -104,7 +106,7 @@ class Router
      * @param  string $routeName
      * @return Router
      */
-    public function name($routeName)
+    public function name(string $routeName): static
     {
         $this->routeMatch->name($routeName);
         return $this;
@@ -114,9 +116,9 @@ class Router
      * Has a route name
      *
      * @param  string $routeName
-     * @return boolean
+     * @return bool
      */
-    public function hasName($routeName)
+    public function hasName(string $routeName): bool
     {
         return $this->routeMatch->hasName($routeName);
     }
@@ -124,13 +126,13 @@ class Router
     /**
      * Get URL for the named route
      *
-     * @param  string  $routeName
-     * @param  mixed   $params
-     * @param  boolean $fqdn
+     * @param  string $routeName
+     * @param  mixed  $params
+     * @param  bool   $fqdn
      * @throws Exception
      * @return string
      */
-    public function getUrl($routeName, $params = null, $fqdn = false)
+    public function getUrl(string $routeName, mixed $params = null, bool $fqdn = false): string
     {
         if (!$this->isHttp()) {
             throw new Exception('Error: The route is not HTTP.');
@@ -143,9 +145,9 @@ class Router
      *
      * @param  string $controller
      * @param  mixed  $params
-     * @return Router
+     * @return static
      */
-    public function addControllerParams($controller, $params)
+    public function addControllerParams(string $controller, mixed $params): static
     {
         $this->routeMatch->addControllerParams($controller, $params);
         return $this;
@@ -156,9 +158,9 @@ class Router
      *
      * @param  string $controller
      * @param  mixed  $params
-     * @return Router
+     * @return static
      */
-    public function appendControllerParams($controller, $params)
+    public function appendControllerParams(string $controller, mixed $params): static
     {
         $this->routeMatch->appendControllerParams($controller, $params);
         return $this;
@@ -170,7 +172,7 @@ class Router
      * @param  string $controller
      * @return mixed
      */
-    public function getControllerParams($controller)
+    public function getControllerParams(string $controller): mixed
     {
         return $this->routeMatch->getControllerParams($controller);
     }
@@ -179,9 +181,9 @@ class Router
      * Determine if the controller has params
      *
      * @param  string $controller
-     * @return boolean
+     * @return bool
      */
-    public function hasControllerParams($controller)
+    public function hasControllerParams(string $controller): bool
     {
         return $this->routeMatch->hasControllerParams($controller);
     }
@@ -190,9 +192,9 @@ class Router
      * Remove controller params
      *
      * @param  string $controller
-     * @return Router
+     * @return static
      */
-    public function removeControllerParams($controller)
+    public function removeControllerParams(string $controller): static
     {
         $this->routeMatch->removeControllerParams($controller);
         return $this;
@@ -203,7 +205,7 @@ class Router
      *
      * @return array
      */
-    public function getRoutes()
+    public function getRoutes(): array
     {
         return $this->routeMatch->getRoutes();
     }
@@ -213,7 +215,7 @@ class Router
      *
      * @return Match\MatchInterface
      */
-    public function getRouteMatch()
+    public function getRouteMatch(): Match\MatchInterface
     {
         return $this->routeMatch;
     }
@@ -221,9 +223,9 @@ class Router
     /**
      * Determine if there is a route match
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasRoute()
+    public function hasRoute(): bool
     {
         return $this->routeMatch->hasRoute();
     }
@@ -231,9 +233,9 @@ class Router
     /**
      * Get the params discovered from the route
      *
-     * @return mixed
+     * @return array
      */
-    public function getRouteParams()
+    public function getRouteParams(): array
     {
         return $this->routeMatch->getRouteParams();
     }
@@ -241,9 +243,9 @@ class Router
     /**
      * Determine if the route has params
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasRouteParams()
+    public function hasRouteParams(): bool
     {
         return $this->routeMatch->hasRouteParams();
     }
@@ -253,7 +255,7 @@ class Router
      *
      * @return mixed
      */
-    public function getController()
+    public function getController(): mixed
     {
         return $this->controller;
     }
@@ -261,11 +263,11 @@ class Router
     /**
      * Determine if the router has a controller
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasController()
+    public function hasController(): bool
     {
-        return (null !== $this->controller);
+        return ($this->controller !== null);
     }
 
     /**
@@ -273,7 +275,7 @@ class Router
      *
      * @return mixed
      */
-    public function getAction()
+    public function getAction(): mixed
     {
         return $this->action;
     }
@@ -281,11 +283,11 @@ class Router
     /**
      * Determine if the router has an action
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasAction()
+    public function hasAction(): bool
     {
-        return (null !== $this->action);
+        return ($this->action !== null);
     }
 
     /**
@@ -293,7 +295,7 @@ class Router
      *
      * @return string
      */
-    public function getControllerClass()
+    public function getControllerClass(): string
     {
         return $this->controllerClass;
     }
@@ -301,9 +303,9 @@ class Router
     /**
      * Determine if the route is CLI
      *
-     * @return boolean
+     * @return bool
      */
-    public function isCli()
+    public function isCli(): bool
     {
         return ($this->routeMatch instanceof Match\Cli);
     }
@@ -311,9 +313,9 @@ class Router
     /**
      * Determine if the route is HTTP
      *
-     * @return boolean
+     * @return bool
      */
-    public function isHttp()
+    public function isHttp(): bool
     {
         return ($this->routeMatch instanceof Match\Http);
     }
@@ -321,9 +323,9 @@ class Router
     /**
      * Prepare routes
      *
-     * @return Router
+     * @return static
      */
-    public function prepare()
+    public function prepare(): static
     {
         $this->routeMatch->prepare();
         return $this;
@@ -332,12 +334,11 @@ class Router
     /**
      * Route to the correct controller
      *
-     * @param  string $forceRoute
-     * @throws Exception
-     * @throws \ReflectionException
+     * @param  ?string $forceRoute
+     * @throws Exception|ReflectionException
      * @return void
      */
-    public function route($forceRoute = null)
+    public function route(?string $forceRoute = null): void
     {
         if ($this->routeMatch->match($forceRoute)) {
             if ($this->routeMatch->hasController()) {
@@ -356,7 +357,7 @@ class Router
                         $controllerParams = $this->routeMatch->getControllerParams('*');
                     }
 
-                    if (null !== $controllerParams) {
+                    if ($controllerParams !== null) {
                         $this->controller = (new \ReflectionClass($controller))->newInstanceArgs($controllerParams);
                     } else {
                         $this->controller = new $controller();
@@ -367,7 +368,7 @@ class Router
                     }
 
                     $action       = $this->routeMatch->getAction();
-                    $this->action = ((null === $action) && ($this->routeMatch->isDynamicRoute())) ? 'index' : $action;
+                    $this->action = (($action === null) && ($this->routeMatch->isDynamicRoute())) ? 'index' : $action;
                 }
             }
         }
@@ -376,10 +377,10 @@ class Router
     /**
      * Method to process if a route was not found
      *
-     * @param  boolean $exit
+     * @param  bool $exit
      * @return void
      */
-    public function noRouteFound($exit = true)
+    public function noRouteFound(bool $exit = true): void
     {
         $this->routeMatch->noRouteFound($exit);
     }

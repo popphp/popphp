@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\Router\Match;
  * @category   Pop
  * @package    Pop\Router
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 interface MatchInterface
 {
@@ -33,7 +33,7 @@ interface MatchInterface
      * @param  mixed  $controller
      * @return MatchInterface
      */
-    public function addRoute($route, $controller);
+    public function addRoute(string $route, mixed $controller): MatchInterface;
 
     /**
      * Add multiple controller routes
@@ -41,7 +41,7 @@ interface MatchInterface
      * @param  array $routes
      * @return MatchInterface
      */
-    public function addRoutes(array $routes);
+    public function addRoutes(array $routes): MatchInterface;
 
     /**
      * Add controller params to be passed into a new controller instance
@@ -50,7 +50,7 @@ interface MatchInterface
      * @param  mixed  $params
      * @return MatchInterface
      */
-    public function addControllerParams($controller, $params);
+    public function addControllerParams(string $controller, mixed $params): MatchInterface;
 
     /**
      * Append controller params to be passed into a new controller instance
@@ -59,7 +59,7 @@ interface MatchInterface
      * @param  mixed  $params
      * @return MatchInterface
      */
-    public function appendControllerParams($controller, $params);
+    public function appendControllerParams(string $controller, mixed $params): MatchInterface;
 
     /**
      * Get the params assigned to the controller
@@ -67,15 +67,15 @@ interface MatchInterface
      * @param  string $controller
      * @return mixed
      */
-    public function getControllerParams($controller);
+    public function getControllerParams(string $controller): mixed;
 
     /**
      * Determine if the controller has params
      *
      * @param  string $controller
-     * @return boolean
+     * @return bool
      */
-    public function hasControllerParams($controller);
+    public function hasControllerParams(string $controller): bool;
 
     /**
      * Remove controller params
@@ -83,177 +83,177 @@ interface MatchInterface
      * @param  string $controller
      * @return MatchInterface
      */
-    public function removeControllerParams($controller);
+    public function removeControllerParams(string $controller): MatchInterface;
 
     /**
      * Get the route string
      *
      * @return string
      */
-    public function getRouteString();
+    public function getRouteString(): string;
 
     /**
      * Get the route string segments
      *
      * @return array
      */
-    public function getSegments();
+    public function getSegments(): array;
 
     /**
      * Get a route string segment
      *
      * @param  int $i
-     * @return string
+     * @return ?string
      */
-    public function getSegment($i);
+    public function getSegment(int $i): ?string;
 
     /**
      * Get original route string
      *
-     * @return string
+     * @return ?string
      */
-    public function getOriginalRoute();
+    public function getOriginalRoute(): ?string;
 
     /**
      * Get route string
      *
      * @return string
      */
-    public function getRoute();
+    public function getRoute(): string;
 
     /**
      * Get routes
      *
      * @return array
      */
-    public function getRoutes();
+    public function getRoutes(): array;
 
     /**
      * Get prepared routes
      *
      * @return array
      */
-    public function getPreparedRoutes();
+    public function getPreparedRoutes(): array;
 
     /**
      * Get flattened routes
      *
      * @return array
      */
-    public function getFlattenedRoutes();
+    public function getFlattenedRoutes(): array;
 
     /**
      * Determine if there is a route match
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasRoute();
+    public function hasRoute(): bool;
 
     /**
      * Get the params discovered from the route
      *
      * @return array
      */
-    public function getRouteParams();
+    public function getRouteParams(): array;
 
     /**
      * Determine if the route has params
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasRouteParams();
+    public function hasRouteParams(): bool;
 
     /**
      * Get the default route
      *
      * @return array
      */
-    public function getDefaultRoute();
+    public function getDefaultRoute(): array;
 
     /**
      * Determine if there is a default route
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasDefaultRoute();
+    public function hasDefaultRoute(): bool;
 
     /**
      * Get the dynamic route
      *
-     * @return array
+     * @return mixed
      */
-    public function getDynamicRoute();
+    public function getDynamicRoute(): mixed;
 
     /**
      * Get the dynamic route prefix
      *
-     * @return array
+     * @return mixed
      */
-    public function getDynamicRoutePrefix();
+    public function getDynamicRoutePrefix(): mixed;
 
     /**
      * Determine if there is a dynamic route
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasDynamicRoute();
+    public function hasDynamicRoute(): bool;
 
     /**
      * Determine if it is a dynamic route
      *
-     * @return boolean
+     * @return bool
      */
-    public function isDynamicRoute();
+    public function isDynamicRoute(): bool;
 
     /**
      * Get the controller
      *
      * @return mixed
      */
-    public function getController();
+    public function getController(): mixed;
 
     /**
      * Determine if there is a controller
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasController();
+    public function hasController(): bool;
 
     /**
      * Get the action
      *
      * @return mixed
      */
-    public function getAction();
+    public function getAction(): mixed;
 
     /**
      * Determine if there is an action
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasAction();
+    public function hasAction(): bool;
 
     /**
      * Match the route
      *
      * @return MatchInterface
      */
-    public function prepare();
+    public function prepare(): MatchInterface;
 
     /**
      * Prepare the routes
      *
-     * @param  string $forceRoute
-     * @return boolean
+     * @param  mixed $forceRoute
+     * @return bool
      */
-    public function match($forceRoute = null);
+    public function match(mixed $forceRoute = null): bool;
 
     /**
      * Method to process if a route was not found
      *
-     * @param  boolean $exit
+     * @param  bool $exit
      * @return void
      */
-    public function noRouteFound($exit = true);
+    public function noRouteFound(bool $exit = true): void;
 
 }

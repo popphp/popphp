@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\Controller;
  * @category   Pop
  * @package    Pop\Controller
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 abstract class AbstractController implements ControllerInterface
 {
@@ -30,7 +30,7 @@ abstract class AbstractController implements ControllerInterface
      * Default action
      * @var string
      */
-    protected $defaultAction = 'error';
+    protected string $defaultAction = 'error';
 
     /**
      * Set the default action
@@ -38,7 +38,7 @@ abstract class AbstractController implements ControllerInterface
      * @param  string $default
      * @return AbstractController
      */
-    public function setDefaultAction($default)
+    public function setDefaultAction(string $default): AbstractController
     {
         $this->defaultAction = $default;
         return $this;
@@ -49,7 +49,7 @@ abstract class AbstractController implements ControllerInterface
      *
      * @return string
      */
-    public function getDefaultAction()
+    public function getDefaultAction(): string
     {
         return $this->defaultAction;
     }
@@ -57,20 +57,20 @@ abstract class AbstractController implements ControllerInterface
     /**
      * Dispatch the controller based on the action
      *
-     * @param  string $action
-     * @param  array  $params
+     * @param  ?string $action
+     * @param  ?array  $params
      * @throws Exception
      * @return void
      */
-    public function dispatch($action = null, array $params = null)
+    public function dispatch(?string $action = null, ?array $params = null): void
     {
-        if ((null !== $action) && method_exists($this, $action)) {
-            if (null !== $params) {
+        if (($action !== null) && method_exists($this, $action)) {
+            if ($params !== null) {
                 call_user_func_array([$this, $action], array_values($params));
             } else {
                 $this->$action();
             }
-        } else if ((null !== $this->defaultAction) && method_exists($this, $this->defaultAction)) {
+        } else if (($this->defaultAction !== null) && method_exists($this, $this->defaultAction)) {
             $action = $this->defaultAction;
             $this->$action();
         } else {

@@ -359,15 +359,7 @@ class ApplicationTest extends TestCase
     public function testRegisterModule()
     {
         $application = new Application();
-        $application->register('foo', ['bar' => 'baz']);
-        $this->assertNotNull($application->module('foo'));
-        $this->assertTrue($application->isRegistered('foo'));
-    }
-
-    public function testRegisterCustomModule()
-    {
-        $application = new Application();
-        $application->register('test', new TestAsset\TestModule());
+        $application->register(new TestAsset\TestModule(), 'test');
         $this->assertNotNull($application->module('test'));
         $this->assertTrue($application->isRegistered('test'));
     }
@@ -375,12 +367,12 @@ class ApplicationTest extends TestCase
     public function testUnregisterModule()
     {
         $application = new Application();
-        $application->register('foo', ['bar' => 'baz']);
-        $this->assertNotNull($application->module('foo'));
-        $this->assertTrue($application->isRegistered('foo'));
-        $application->unregister('foo');
-        $this->assertNull($application->module('foo'));
-        $this->assertFalse($application->isRegistered('foo'));
+        $application->register(new TestAsset\TestModule(), 'test');
+        $this->assertNotNull($application->module('test'));
+        $this->assertTrue($application->isRegistered('test'));
+        $application->unregister('test');
+        $this->assertNull($application->module('test'));
+        $this->assertFalse($application->isRegistered('test'));
     }
 
     public function testEventsOnRun()

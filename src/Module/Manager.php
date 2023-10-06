@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -13,7 +13,10 @@
  */
 namespace Pop\Module;
 
-use ReturnTypeWillChange;
+use ArrayAccess;
+use ArrayIterator;
+use Countable;
+use IteratorAggregate;
 
 /**
  * Module manager class
@@ -21,30 +24,30 @@ use ReturnTypeWillChange;
  * @category   Pop
  * @package    Pop\Module
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
-class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
+class Manager implements ArrayAccess, Countable, IteratorAggregate
 {
 
     /**
      * Modules
      * @var array
      */
-    protected $modules = [];
+    protected array $modules = [];
 
     /**
      * Constructor
      *
      * Instantiate the module manager object.
      *
-     * @param  array $modules
+     * @param  ?array $modules
      * @throws Exception
      */
-    public function __construct(array $modules = null)
+    public function __construct(?array $modules = null)
     {
-        if (null !== $modules) {
+        if ($modules !== null) {
             $this->registerModules($modules);
         }
     }
@@ -54,9 +57,9 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param  array $modules
      * @throws Exception
-     * @return Manager
+     * @return static
      */
-    public function registerModules(array $modules)
+    public function registerModules(array $modules): static
     {
         foreach ($modules as $module) {
             $this->register($module);
@@ -69,9 +72,9 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param  ModuleInterface $module
      * @throws Exception
-     * @return Manager
+     * @return static
      */
-    public function register(ModuleInterface $module)
+    public function register(ModuleInterface $module): static
     {
         if (!$module->hasName()) {
             throw new Exception('Error: The module does not have a name');
@@ -85,9 +88,9 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Determine if a module object is registered with the manager by $name
      *
      * @param  string $name
-     * @return boolean
+     * @return bool
      */
-    public function isRegistered($name)
+    public function isRegistered(string $name): bool
     {
         return isset($this->modules[$name]);
     }
@@ -96,9 +99,9 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Determine if a module object is registered with the manager by $module object comparison
      *
      * @param  ModuleInterface $module
-     * @return boolean
+     * @return bool
      */
-    public function hasModule(ModuleInterface $module)
+    public function hasModule(ModuleInterface $module): bool
     {
         $result = false;
 
@@ -118,7 +121,7 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  ModuleInterface $module
      * @return string
      */
-    public function getModuleName(ModuleInterface $module)
+    public function getModuleName(ModuleInterface $module): string
     {
         $moduleName = null;
 
@@ -138,18 +141,18 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $name
      * @return mixed
      */
-    public function get($name)
+    public function get(string $name): mixed
     {
-        return (isset($this->modules[$name])) ? $this->modules[$name] : null;
+        return $this->modules[$name] ?? null;
     }
 
     /**
      * Unregister a module
      *
      * @param  string $name
-     * @return Manager
+     * @return static
      */
-    public function unregister($name)
+    public function unregister(string $name): static
     {
         if (isset($this->modules[$name])) {
             unset($this->modules[$name]);
@@ -163,23 +166,23 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param  string $name
      * @param  mixed $value
      * @throws Exception
-     * @return Manager
+     * @return void
      */
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value): void
     {
         if ($value instanceof ModuleInterface) {
             $value->setName($name);
         }
-        return $this->register($value);
+        $this->register($value);
     }
 
     /**
      * Get a registered module
      *
      * @param  string $name
-     * @return Module
+     * @return mixed
      */
-    public function __get($name)
+    public function __get(string $name): mixed
     {
         return $this->get($name);
     }
@@ -188,9 +191,9 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Determine if a module is registered with the manager object
      *
      * @param  string $name
-     * @return boolean
+     * @return bool
      */
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
         return isset($this->modules[$name]);
     }
@@ -199,35 +202,33 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
      * Unregister a module with the manager
      *
      * @param  string $name
-     * @return Manager
+     * @return void
      */
-    public function __unset($name)
+    public function __unset(string $name): void
     {
-        return $this->unregister($name);
+        $this->unregister($name);
     }
 
     /**
      * Register a module with the manager
      *
-     * @param  string $offset
+     * @param  mixed $offset
      * @param  mixed $value
      * @throws Exception
-     * @return Manager
+     * @return void
      */
-    #[ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        return $this->__set($offset, $value);
+        $this->__set($offset, $value);
     }
 
     /**
      * Get a registered module
      *
-     * @param  string $offset
-     * @return Module
+     * @param  mixed $offset
+     * @return mixed
      */
-    #[ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->__get($offset);
     }
@@ -235,10 +236,10 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Determine if a module is registered with the manager object
      *
-     * @param  string $offset
-     * @return boolean
+     * @param  mixed $offset
+     * @return bool
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return $this->__isset($offset);
     }
@@ -246,13 +247,12 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Unregister a module with the manager
      *
-     * @param  string $offset
-     * @return Manager
+     * @param  mixed $offset
+     * @return void
      */
-    #[ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
-        return $this->__unset($offset);
+        $this->__unset($offset);
     }
 
     /**
@@ -268,11 +268,11 @@ class Manager implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Get iterator
      *
-     * @return \ArrayIterator
+     * @return ArrayIterator
      */
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): ArrayIterator
     {
-        return new \ArrayIterator($this->modules);
+        return new ArrayIterator($this->modules);
     }
 
 }

@@ -1,5 +1,8 @@
 composer.lock
 public
+script
 vendor
 kettle
+.phpunit.result.cache
+.phpunit.cache
 

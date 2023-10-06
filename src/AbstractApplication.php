@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -13,99 +13,102 @@
  */
 namespace Pop;
 
+use Pop\Config;
+use InvalidArgumentException;
+
 /**
  * Abstract application class
  *
  * @category   Pop
  * @package    Pop
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 abstract class AbstractApplication implements ApplicationInterface
 {
 
     /**
-     * Module name
-     * @var string
+     * Name
+     * @var ?string
      */
-    protected $name = null;
+    protected ?string $name = null;
 
     /**
-     * Module version
-     * @var string
+     * Version
+     * @var ?string
      */
-    protected $version = null;
+    protected ?string $version = null;
 
     /**
      * Application config
      * @var mixed
      */
-    protected $config = null;
+    protected mixed $config = null;
 
     /**
-     * Set module name
+     * Set name
      *
      * @param  string $name
      * @return static
      */
-    public function setName($name)
+    public function setName(string $name): static
     {
         $this->name = $name;
         return $this;
     }
 
     /**
-     * Get module name
+     * Get name
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
-     * Determine if module has name
+     * Determine if the name is set
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasName()
+    public function hasName(): bool
     {
-        return (null !== $this->name);
+        return ($this->name !== null);
     }
 
     /**
-     * Set module version
+     * Set version
      *
      * @param  string $version
      * @return static
      */
-    public function setVersion($version)
+    public function setVersion(string $version): static
     {
         $this->version = $version;
         return $this;
     }
 
     /**
-     * Get module version
+     * Get version
      *
      * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }
 
     /**
-     * Determine if module has version
+     * Determine if version has been set
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasVersion()
+    public function hasVersion(): bool
     {
-        return (null !== $this->version);
+        return ($this->version !== null);
     }
 
     /**
@@ -113,7 +116,7 @@ abstract class AbstractApplication implements ApplicationInterface
      *
      * @return mixed
      */
-    public function config()
+    public function config(): mixed
     {
         return $this->config;
     }
@@ -123,7 +126,7 @@ abstract class AbstractApplication implements ApplicationInterface
      *
      * @return AbstractApplication
      */
-    public function load()
+    public function load(): AbstractApplication
     {
         return $this;
     }
@@ -132,10 +135,10 @@ abstract class AbstractApplication implements ApplicationInterface
      * Register a new configuration with the application
      *
      * @param  mixed $config
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return AbstractApplication
      */
-    public function registerConfig($config)
+    public function registerConfig(mixed $config): AbstractApplication
     {
         if (!is_array($config) && !($config instanceof \ArrayAccess) && !($config instanceof \ArrayObject)) {
             throw new \InvalidArgumentException(
@@ -155,7 +158,7 @@ abstract class AbstractApplication implements ApplicationInterface
      * @param  string $value
      * @return AbstractApplication
      */
-    public function addConfigValue($name, $value)
+    public function addConfigValue(string $name, string $value): AbstractApplication
     {
         if (!isset($this->config[$name])) {
             $this->config[$name] = $value;
@@ -170,7 +173,7 @@ abstract class AbstractApplication implements ApplicationInterface
      * @param  string $value
      * @return AbstractApplication
      */
-    public function updateConfigValue($name, $value)
+    public function updateConfigValue(string $name, string $value): AbstractApplication
     {
         if (isset($this->config[$name])) {
             $this->config[$name] = $value;
@@ -184,7 +187,7 @@ abstract class AbstractApplication implements ApplicationInterface
      * @param  string $name
      * @return AbstractApplication
      */
-    public function deleteConfigValue($name)
+    public function deleteConfigValue(string $name): AbstractApplication
     {
         if (isset($this->config[$name])) {
             unset($this->config[$name]);
@@ -196,16 +199,16 @@ abstract class AbstractApplication implements ApplicationInterface
      * Merge new or altered config values with the existing config values
      *
      * @param  mixed $config
-     * @param  boolean $preserve
+     * @param  bool  $preserve
      * @throws Config\Exception
      * @return AbstractApplication
      */
-    public function mergeConfig($config, $preserve = false)
+    public function mergeConfig(mixed $config, bool $preserve = false): AbstractApplication
     {
-        if ($this->config instanceof \Pop\Config\Config) {
+        if ($this->config instanceof Config\Config) {
             $this->config->merge($config, $preserve);
         } else if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
-            if (null !== $this->config) {
+            if ($this->config !== null) {
                 $this->config = ($preserve) ? array_merge_recursive($this->config, $config) :
                     array_replace_recursive($this->config, $config);
             } else {

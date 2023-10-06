@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -13,85 +13,87 @@
  */
 namespace Pop;
 
+use InvalidArgumentException;
+
 /**
  * Application interface
  *
  * @category   Pop
  * @package    Pop
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 interface ApplicationInterface
 {
 
     /**
-     * Set module name
+     * Set name
      *
      * @param  string $name
      * @return static
      */
-    public function setName($name);
+    public function setName(string $name) : static;
 
     /**
-     * Get module name
+     * Get name
      *
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
-     * Determine if module has name
+     * Determine if name is set
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasName();
+    public function hasName(): bool;
 
     /**
-     * Set module version
+     * Set version
      *
      * @param  string $version
      * @return static
      */
-    public function setVersion($version);
+    public function setVersion(string $version): static;
 
     /**
-     * Get module version
+     * Get version
      *
      * @return string
      */
-    public function getVersion();
+    public function getVersion(): string;
 
     /**
-     * Determine if module has version
+     * Determine if version is set
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasVersion();
+    public function hasVersion(): bool;
 
     /**
      * Access application config
      *
-     * @return ApplicationInterface
+     * @return mixed
      */
-    public function config();
+    public function config(): mixed;
 
     /**
      * Load application
      *
      * @return ApplicationInterface
      */
-    public function load();
+    public function load(): ApplicationInterface;
 
     /**
      * Register a new configuration with the application
      *
      * @param  mixed $config
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return ApplicationInterface
      */
-    public function registerConfig($config);
+    public function registerConfig(mixed $config): ApplicationInterface;
 
     /**
      * Add new value to config
@@ -100,7 +102,7 @@ interface ApplicationInterface
      * @param  string $value
      * @return ApplicationInterface
      */
-    public function addConfigValue($name, $value);
+    public function addConfigValue(string $name, string $value): ApplicationInterface;
 
     /**
      * Update existing value in config
@@ -109,7 +111,7 @@ interface ApplicationInterface
      * @param  string $value
      * @return ApplicationInterface
      */
-    public function updateConfigValue($name, $value);
+    public function updateConfigValue(string $name, string $value): ApplicationInterface;
 
     /**
      * Replace existing value in config
@@ -117,15 +119,15 @@ interface ApplicationInterface
      * @param  string $name
      * @return ApplicationInterface
      */
-    public function deleteConfigValue($name);
+    public function deleteConfigValue(string $name): ApplicationInterface;
 
     /**
      * Merge new or altered config values with the existing config values
      *
-     * @param  mixed   $config
-     * @param  boolean $preserve
+     * @param  mixed $config
+     * @param  bool  $preserve
      * @return ApplicationInterface
      */
-    public function mergeConfig($config, $preserve = false);
+    public function mergeConfig(mixed $config, bool $preserve = false): ApplicationInterface;
 
 }

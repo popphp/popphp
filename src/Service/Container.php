@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\Service;
  * @category   Pop
  * @package    Pop\Service
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 class Container
 {
@@ -30,7 +30,7 @@ class Container
      * Array service locators
      * @var array
      */
-    private static $locators = ['default' => null];
+    private static array $locators = ['default' => null];
 
     /**
      * Set a service locator
@@ -39,7 +39,7 @@ class Container
      * @param  Locator $locator
      * @return void
      */
-    public static function set($name, Locator $locator)
+    public static function set(string $name, Locator $locator): void
     {
         self::$locators[$name] = $locator;
     }
@@ -47,25 +47,25 @@ class Container
     /**
      * Determine if a service locator has been set
      *
-     * @param  string  $name
-     * @return boolean
+     * @param  string $name
+     * @return bool
      */
-    public static function has($name)
+    public static function has(string $name): bool
     {
-        return (isset(self::$locators[$name]) && (null !== self::$locators[$name]) &&
+        return (isset(self::$locators[$name]) && (self::$locators[$name] !== null) &&
             (self::$locators[$name] instanceof Locator));
     }
 
     /**
      * Get a service locator
      *
-     * @param  string  $name
+     * @param  string $name
      * @throws Exception
      * @return Locator
      */
-    public static function get($name = 'default')
+    public static function get(string $name = 'default'): Locator
     {
-        if (!isset(self::$locators[$name]) || (isset(self::$locators[$name]) && (null === self::$locators[$name]))) {
+        if (!isset(self::$locators[$name]) || (isset(self::$locators[$name]) && (self::$locators[$name] === null))) {
             throw new Exception("Error: The service locator '" . $name . "' has not been added");
         }
         return self::$locators[$name];
@@ -74,10 +74,10 @@ class Container
     /**
      * Remove a service locator
      *
-     * @param  string  $name
+     * @param  string $name
      * @return void
      */
-    public static function remove($name)
+    public static function remove(string $name): void
     {
         if (isset(self::$locators[$name])) {
             unset(self::$locators[$name]);

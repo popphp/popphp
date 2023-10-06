@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,18 +19,18 @@ namespace Pop\Router\Match;
  * @category   Pop
  * @package    Pop\Router
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 class Http extends AbstractMatch
 {
 
     /**
      * Base path
-     * @var string
+     * @var ?string
      */
-    protected $basePath = null;
+    protected ?string $basePath = null;
 
     /**
      * Constructor
@@ -51,7 +51,7 @@ class Http extends AbstractMatch
         }
 
         // Trim trailing slash, if present
-        if (substr($path, -1) == '/') {
+        if (str_ends_with($path, '/')) {
             $path = substr($path, 0, -1);
             $trailingSlash = '/';
         } else {
@@ -72,7 +72,7 @@ class Http extends AbstractMatch
      *
      * @return string
      */
-    public function getBasePath()
+    public function getBasePath(): string
     {
         return $this->basePath;
     }
@@ -80,9 +80,9 @@ class Http extends AbstractMatch
     /**
      * Prepare the routes
      *
-     * @return Http
+     * @return static
      */
-    public function prepare()
+    public function prepare(): static
     {
         $this->flattenRoutes($this->routes);
         return $this;
@@ -91,16 +91,16 @@ class Http extends AbstractMatch
     /**
      * Match the route
      *
-     * @param  string $forceRoute
-     * @return boolean
+     * @param  mixed $forceRoute
+     * @return bool
      */
-    public function match($forceRoute = null)
+    public function match(mixed $forceRoute = null): bool
     {
         if (count($this->preparedRoutes) == 0) {
             $this->prepare();
         }
 
-        $routeToMatch = (null !== $forceRoute) ? $forceRoute : $this->routeString;
+        $routeToMatch = ($forceRoute !== null) ? $forceRoute : $this->routeString;
         $directMatch  = null;
 
         if (array_key_exists($routeToMatch, $this->routes)) {
@@ -111,7 +111,7 @@ class Http extends AbstractMatch
             $directMatch = $routeToMatch . '[/]';
         }
 
-        if (null !== $directMatch) {
+        if ($directMatch !== null) {
             foreach ($this->preparedRoutes as $regex => $controller) {
                 if ($directMatch == $controller['route']) {
                     $this->route = $regex;
@@ -135,20 +135,20 @@ class Http extends AbstractMatch
     /**
      * Determine if the route has been matched
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasRoute()
+    public function hasRoute(): bool
     {
-        return (null !== $this->route) || (null !== $this->dynamicRoute) || (null !== $this->defaultRoute);
+        return ($this->route !== null) || ($this->dynamicRoute !== null) || ($this->defaultRoute !== null);
     }
 
     /**
      * Method to process if a route was not found
      *
-     * @param  boolean $exit
+     * @param  bool $exit
      * @return void
      */
-    public function noRouteFound($exit = true)
+    public function noRouteFound(bool $exit = true): void
     {
         if (!headers_sent()) {
             header('HTTP/1.1 404 Not Found');
@@ -175,13 +175,13 @@ class Http extends AbstractMatch
      * @param  mixed        $controller
      * @return void
      */
-    protected function flattenRoutes($route, $controller = null)
+    protected function flattenRoutes(array|string $route, mixed $controller = null): void
     {
         if (is_array($route)) {
             foreach ($route as $r => $c) {
                 $this->flattenRoutes($r, $c);
             }
-        } else if (null !== $controller) {
+        } else if ($controller !== null) {
             if (!isset($controller['controller'])) {
                 foreach ($controller as $r => $c) {
                     $this->flattenRoutes($route . $r, $c);
@@ -208,7 +208,7 @@ class Http extends AbstractMatch
      * @param  string $route
      * @return array
      */
-    protected function getRouteRegex($route)
+    protected function getRouteRegex(string $route): array
     {
         $required   = [];
         $optional   = [];
@@ -273,7 +273,7 @@ class Http extends AbstractMatch
      *
      * @return void
      */
-    protected function parseRouteParams()
+    protected function parseRouteParams(): void
     {
         if (isset($this->preparedRoutes[$this->route]['params']) &&
             (count($this->preparedRoutes[$this->route]['params']) > 0)) {
@@ -284,10 +284,10 @@ class Http extends AbstractMatch
                     if ($value === false) {
                         $value = [];
                     } else {
-                        $value = (strpos($value, '/') !== false) ? explode('/', $value) : [$value];
+                        $value = (str_contains($value, '/')) ? explode('/', $value) : [$value];
                     }
                 } else {
-                    if (strpos($value, '/') !== false) {
+                    if (str_contains($value, '/')) {
                         $value = substr($value, 0, strpos($value, '/'));
                         $offset += strlen($value) - strlen($param['param']) + 1;
                     } else {
@@ -298,8 +298,8 @@ class Http extends AbstractMatch
                     $this->routeParams[$param['name']] = $value;
                 }
             }
-        } else if ((null !== $this->dynamicRoute) && (count($this->segments) >= 3)) {
-            $this->routeParams = (strpos($this->dynamicRoute, '/:param*') !==  false) ?
+        } else if (($this->dynamicRoute !== null) && (count($this->segments) >= 3)) {
+            $this->routeParams = (str_contains($this->dynamicRoute, '/:param*')) ?
                 [array_slice($this->segments, 2)] : array_slice($this->segments, 2);
         }
     }
@@ -307,12 +307,12 @@ class Http extends AbstractMatch
     /**
      * Get URL for the named route
      *
-     * @param  string  $routeName
-     * @param  mixed   $params
-     * @param  boolean $fqdn
+     * @param  string $routeName
+     * @param  mixed  $params
+     * @param  bool   $fqdn
      * @return string
      */
-    public function getUrl($routeName, $params = null, $fqdn = false)
+    public function getUrl(string $routeName, mixed $params = null, bool $fqdn = false): string
     {
         $url     = '';
         $baseUrl = '';

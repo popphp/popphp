@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -19,9 +19,9 @@ namespace Pop\Router\Match;
  * @category   Pop
  * @package    Pop\Router
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 class Cli extends AbstractMatch
 {
@@ -30,13 +30,13 @@ class Cli extends AbstractMatch
      * Route commands
      * @var array
      */
-    protected $commands = [];
+    protected array $commands = [];
 
     /**
      * Allowed route options
      * @var array
      */
-    protected $options = [
+    protected array $options = [
         'options' => [], // [-v|--verbose]
         'values'  => [], // [-n|--name=]
         'arrays'  => []  // [-i|--id=*]
@@ -46,13 +46,13 @@ class Cli extends AbstractMatch
      * Allowed route parameters
      * @var array
      */
-    protected $parameters = [];
+    protected array $parameters = [];
 
     /**
      * Flag for all required parameters
-     * @var boolean
+     * @var bool
      */
-    protected $hasAllRequired = true;
+    protected bool $hasAllRequired = true;
 
     /**
      * Constructor
@@ -75,9 +75,9 @@ class Cli extends AbstractMatch
     /**
      * Prepare the routes
      *
-     * @return Cli
+     * @return static
      */
-    public function prepare()
+    public function prepare(): static
     {
         $this->flattenRoutes($this->routes);
         return $this;
@@ -86,16 +86,16 @@ class Cli extends AbstractMatch
     /**
      * Match the route
      *
-     * @param  string $forceRoute
-     * @return boolean
+     * @param  mixed $forceRoute
+     * @return bool
      */
-    public function match($forceRoute = null)
+    public function match(mixed $forceRoute = null): bool
     {
         if (count($this->preparedRoutes) == 0) {
             $this->prepare();
         }
 
-        $routeToMatch = (null !== $forceRoute) ? $forceRoute : $this->routeString;
+        $routeToMatch = ($forceRoute !== null) ? $forceRoute : $this->routeString;
 
         foreach ($this->preparedRoutes as $regex => $controller) {
             if (preg_match($regex, $routeToMatch) != 0) {
@@ -104,7 +104,7 @@ class Cli extends AbstractMatch
             }
         }
 
-        if ((null !== $this->route) || (null !== $this->dynamicRoute)) {
+        if (($this->route !== null) || ($this->dynamicRoute !== null)) {
             $this->parseRouteParams();
         }
 
@@ -114,11 +114,11 @@ class Cli extends AbstractMatch
     /**
      * Determine if the route has been matched
      *
-     * @return boolean
+     * @return bool
      */
-    public function hasRoute()
+    public function hasRoute(): bool
     {
-        return (((null !== $this->route) && ($this->hasAllRequired)) || (null !== $this->dynamicRoute) || (null !== $this->defaultRoute));
+        return ((($this->route !== null) && ($this->hasAllRequired)) || ($this->dynamicRoute !== null) || ($this->defaultRoute !== null));
     }
 
     /**
@@ -126,7 +126,7 @@ class Cli extends AbstractMatch
      *
      * @return array
      */
-    public function getCommands()
+    public function getCommands(): array
     {
         return $this->commands;
     }
@@ -136,7 +136,7 @@ class Cli extends AbstractMatch
      *
      * @return array
      */
-    public function getCommandParameters()
+    public function getCommandParameters(): array
     {
         return $this->parameters;
     }
@@ -146,7 +146,7 @@ class Cli extends AbstractMatch
      *
      * @return array
      */
-    public function getCommandOptions()
+    public function getCommandOptions(): array
     {
         return $this->options;
     }
@@ -156,7 +156,7 @@ class Cli extends AbstractMatch
      *
      * @return array
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         $params = $this->routeParams;
         unset($params['options']);
@@ -169,9 +169,9 @@ class Cli extends AbstractMatch
      * @param  string $name
      * @return mixed
      */
-    public function getParameter($name)
+    public function getParameter(string $name): mixed
     {
-        return (isset($this->routeParams[$name])) ? $this->routeParams[$name] : null;
+        return $this->routeParams[$name] ?? null;
     }
 
     /**
@@ -179,9 +179,9 @@ class Cli extends AbstractMatch
      *
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
-        return (isset($this->routeParams['options'])) ? $this->routeParams['options'] : null;
+        return $this->routeParams['options'] ?? [];
     }
 
     /**
@@ -190,19 +190,18 @@ class Cli extends AbstractMatch
      * @param  string $name
      * @return mixed
      */
-    public function getOption($name)
+    public function getOption(string $name): mixed
     {
-        return (isset($this->routeParams['options']) && isset($this->routeParams['options'][$name])) ?
-            $this->routeParams['options'][$name] : null;
+        return $this->routeParams['options'][$name] ?? null;
     }
 
     /**
      * Method to process if a route was not found
      *
-     * @param  boolean $exit
+     * @param  bool $exit
      * @return void
      */
-    public function noRouteFound($exit = true)
+    public function noRouteFound(bool $exit = true): void
     {
         if ((stripos(PHP_OS, 'darwin') === false) && (stripos(PHP_OS, 'win') !== false)) {
             $string = 'Command Not Found.';
@@ -226,13 +225,13 @@ class Cli extends AbstractMatch
      * @param  mixed        $controller
      * @return void
      */
-    protected function flattenRoutes($route, $controller = null)
+    protected function flattenRoutes(array|string $route, mixed $controller = null): void
     {
         if (is_array($route)) {
             foreach ($route as $r => $c) {
                 $this->flattenRoutes($r, $c);
             }
-        } else if (null !== $controller) {
+        } else if ($controller !== null) {
             if (!isset($controller['controller'])) {
                 foreach ($controller as $r => $c) {
                     $this->flattenRoutes($route . $r, $c);
@@ -255,7 +254,7 @@ class Cli extends AbstractMatch
      * @param  string $route
      * @return array
      */
-    protected function getRouteRegex($route)
+    protected function getRouteRegex(string $route): array
     {
         $routeRegex         = '^';
         $commands           = [];
@@ -269,7 +268,7 @@ class Cli extends AbstractMatch
             $this->commands[$route] = [];
         }
 
-        if ((strpos($route, '<') !== false) || (strpos($route, '[') !== false)) {
+        if (str_contains($route, '<') || str_contains($route, '[')) {
             $regexCommands = [];
             preg_match_all('/[a-zA-Z0-9-_:|\p{L}]*(?=\s)/u', $route, $commands, PREG_OFFSET_CAPTURE);
             foreach ($commands[0] as $i => $command) {
@@ -295,12 +294,12 @@ class Cli extends AbstractMatch
         $routeRegex .= (isset($requiredParameters[0]) && isset($requiredParameters[0][0])) ? ' (.*)$' : '(.*)$';
 
         foreach ($options[0] as $option) {
-            if (strpos($option[0], '--') !== false) {
+            if (str_contains($option[0], '--')) {
                 $name = substr($option[0], (strpos($option[0], '--') + 2));
                 $name = substr($name, 0, strpos($name, ']'));
             } else {
                 $name = substr($option[0], (strpos($option[0], '-') + 1));
-                $name = (strpos($name, '|') !== false) ? substr($name, 0, strpos($name, '|')) : substr($name, 0, strpos($name, ']'));
+                $name = (str_contains($name, '|')) ? substr($name, 0, strpos($name, '|')) : substr($name, 0, strpos($name, ']'));
             }
             if (!isset($this->options['options'][$route])) {
                 $this->options['options'][$route] = [];
@@ -310,14 +309,14 @@ class Cli extends AbstractMatch
 
         foreach ($optionValues[0] as $option) {
             $opt = str_replace(['[', ']'], ['', ''], $option[0]);
-            if (strpos($option[0], '--') !== false) {
+            if (str_contains($option[0], '--')) {
                 $name = substr($option[0], (strpos($option[0], '--') + 2));
                 $name = substr($name, 0, strpos($name, '='));
             } else {
                 $name = substr($option[0], (strpos($option[0], '-') + 1));
                 $name = substr($name, 0, strpos($name, '='));
             }
-            if (strpos($opt, '|') !== false) {
+            if (str_contains($opt, '|')) {
                 [$opt1, $opt2] = explode('|', $opt);
                 $optionRegex   = '(' . $opt1 . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt1 . '"(.*)"|' . $opt2 .
                     '[a-zA-Z0-9-_:|.@,\/]+|' . $opt2 . '"(.*)")';
@@ -332,14 +331,14 @@ class Cli extends AbstractMatch
 
         foreach ($optionValueArray[0] as $option) {
             $opt = str_replace(['[', ']', '*'], ['', '', ''], $option[0]);
-            if (strpos($option[0], '--') !== false) {
+            if (str_contains($option[0], '--')) {
                 $name = substr($option[0], (strpos($option[0], '--') + 2));
                 $name = substr($name, 0, strpos($name, '='));
             } else {
                 $name = substr($option[0], (strpos($option[0], '-') + 1));
                 $name = substr($name, 0, strpos($name, '='));
             }
-            if (strpos($opt, '|') !== false) {
+            if (str_contains($opt, '|')) {
                 [$opt1, $opt2] = explode('|', $opt);
                 $optionRegex   = '(' . $opt1 . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt1 . '"(.*)"|' . $opt2 .
                     '[a-zA-Z0-9-_:|.@,\/]+|' . $opt2 . '"(.*)")';
@@ -384,10 +383,10 @@ class Cli extends AbstractMatch
      *
      * @return void
      */
-    protected function parseRouteParams()
+    protected function parseRouteParams(): void
     {
-        if ((null !== $this->dynamicRoute) && (count($this->segments) >= 3)) {
-            $this->routeParams = (strpos($this->dynamicRoute, 'param*') !==  false) ?
+        if (($this->dynamicRoute !== null) && (count($this->segments) >= 3)) {
+            $this->routeParams = (str_contains($this->dynamicRoute, 'param*')) ?
                 [array_slice($this->segments, 2)] : array_slice($this->segments, 2);
         } else {
             $options = [];
@@ -411,7 +410,7 @@ class Cli extends AbstractMatch
                     $match = [];
                     preg_match($regex, $this->routeString, $match);
                     if (isset($match[0]) && !empty($match[0])) {
-                        if (strpos($match[0], '=') !== false) {
+                        if (str_contains($match[0], '=')) {
                             $value = substr($match[0], (strpos($match[0], '=') + 1));
                         } else {
                             $value = substr($match[0], 2);
@@ -431,7 +430,7 @@ class Cli extends AbstractMatch
                     preg_match_all($regex, $this->routeString, $matches);
                     if (isset($matches[0]) && !empty($matches[0])) {
                         foreach ($matches[0] as $match) {
-                            if (strpos($match, '=') !== false) {
+                            if (str_contains($match, '=')) {
                                 $value = substr($match, (strpos($match, '=') + 1));
                             } else {
                                 $value = substr($match, 2);
@@ -450,6 +449,9 @@ class Cli extends AbstractMatch
 
             $i = (count($options) > 0) ? $start + 1 : $start + count($this->commands[$route]);
 
+            /**
+             * Need to review this
+             */
             if (isset($this->parameters[$route])) {
                 foreach ($this->parameters[$route] as $name => $parameter) {
                     if ($parameter['required']) {
@@ -463,7 +465,7 @@ class Cli extends AbstractMatch
                         $this->routeParams[$name] = null;
                     }
 
-                    if (($parameter['required']) && (null === $this->routeParams[$name])) {
+                    if (($parameter['required']) && ($this->routeParams[$name] === null)) {
                         $this->hasAllRequired = false;
                     }
                 }

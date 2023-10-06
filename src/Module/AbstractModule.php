@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -22,25 +22,25 @@ use Pop\AbstractApplication;
  * @category   Pop
  * @package    Pop
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  */
 abstract class AbstractModule extends AbstractApplication implements ModuleInterface
 {
 
     /**
      * Application
-     * @var Application
+     * @var ?Application
      */
-    protected $application = null;
+    protected ?Application $application = null;
 
     /**
      * Get application
      *
      * @return Application
      */
-    public function application()
+    public function application(): Application
     {
         return $this->application;
     }
@@ -48,12 +48,12 @@ abstract class AbstractModule extends AbstractApplication implements ModuleInter
     /**
      * Determine if the module has been registered with an application object
      *
-     * @return boolean
+     * @return bool
      */
-    public function isRegistered()
+    public function isRegistered(): bool
     {
-        return ((null !== $this->application) &&
-            (null !== $this->application->modules()) && ($this->application->modules()->hasModule($this)));
+        return (($this->application !== null) &&
+            ($this->application->modules() !== null) && ($this->application->modules()->hasModule($this)));
     }
 
     /**
@@ -62,6 +62,6 @@ abstract class AbstractModule extends AbstractApplication implements ModuleInter
      * @param  Application $application
      * @return AbstractModule
      */
-    abstract public function register(Application $application);
+    abstract public function register(Application $application): AbstractModule;
 
 }

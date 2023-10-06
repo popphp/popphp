@@ -2,8 +2,7 @@
 
 namespace Pop\Test;
 
-use Pop\Router\Router;
-use Pop\Router\Match;
+use Pop\Router;
 use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase
@@ -11,7 +10,7 @@ class RouterTest extends TestCase
 
     public function testConstructorRoutes()
     {
-        $router = new Router([
+        $router = new Router\Router([
             '/' => [
                 'controller' => function() {
                     echo 'index';
@@ -34,7 +33,7 @@ class RouterTest extends TestCase
 
     public function testAddRoute()
     {
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('/system/add', [
             'controller' => function() {
                 echo 'add';
@@ -46,7 +45,7 @@ class RouterTest extends TestCase
 
     public function testAddDynamicRoute()
     {
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('<controller> <action>', [
             'prefix' => 'MyApp\Controller\\'
         ]);
@@ -56,7 +55,7 @@ class RouterTest extends TestCase
 
     public function testAddControllerParams()
     {
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('/user', [
             'controller' => function($id) {
                 echo $id;
@@ -74,7 +73,7 @@ class RouterTest extends TestCase
 
     public function testAppendControllerParams()
     {
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('/user', [
             'controller' => function($id) {
                 echo $id;
@@ -87,7 +86,7 @@ class RouterTest extends TestCase
 
     public function testAddControllerParamsNoAppend()
     {
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('/user', [
             'controller' => function($id) {
                 echo $id;
@@ -100,7 +99,7 @@ class RouterTest extends TestCase
 
     public function testAddControllerParamsNull()
     {
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('/user', [
             'controller' => function($id) {
                 echo $id;
@@ -113,7 +112,7 @@ class RouterTest extends TestCase
 
     public function testIsCli()
     {
-        $router = new Router();
+        $router = new Router\Router();
         $this->assertTrue($router->isCli());
         $this->assertFalse($router->isHttp());
     }
@@ -124,7 +123,7 @@ class RouterTest extends TestCase
             'myscript.php', 'edit', 1002
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => function () {
                 echo 'help';
@@ -141,7 +140,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => function () {
                 echo 'help';
@@ -158,7 +157,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => 'Pop\Test\TestAsset\TestController',
             'action'     => 'help',
@@ -178,7 +177,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => 'Pop\Test\TestAsset\TestController',
             'action'     => 'help'
@@ -198,7 +197,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => 'Pop\Test\TestAsset\TestController',
             'action'     => 'help'
@@ -225,7 +224,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => 'Pop\Test\TestAsset\TestController',
             'action'     => 'help'
@@ -247,7 +246,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => 'Pop\Test\TestAsset\TestController',
             'action'     => 'help'
@@ -265,7 +264,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => 'Pop\Test\TestAsset\TestController',
             'action'     => 'help'
@@ -284,7 +283,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller'       => 'Pop\Test\TestAsset\TestController',
             'action'           => 'help',
@@ -302,7 +301,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller'  => 'Pop\Test\TestAsset\TestController',
             'action'      => 'help'
@@ -318,7 +317,7 @@ class RouterTest extends TestCase
         $_SERVER['argv'] = [
             'myscript.php', 'help'
         ];
-        $match = new Match\Cli();
+        $match = new Router\Match\Cli();
         $this->assertEquals('help', $match->getRouteString());
         $this->assertTrue(is_array($match->getCommandParameters()));
         $this->assertTrue(is_array($match->getCommandOptions()));
@@ -329,7 +328,7 @@ class RouterTest extends TestCase
         $_SERVER['argv'] = [
             'myscript.php', 'help'
         ];
-        $match = new Match\Cli();
+        $match = new Router\Match\Cli();
         $this->assertFalse($match->match(['foo' => ['controller' => function() {}]]));
         ob_start();
         $match->noRouteFound(false);
@@ -340,7 +339,7 @@ class RouterTest extends TestCase
     public function testHttpMatch()
     {
         $_SERVER['REQUEST_URI'] = '/system/?id=123';
-        $match = new Match\Http();
+        $match = new Router\Match\Http();
         $this->assertEquals('', $match->getBasePath());
         $this->assertContains('system', $match->getSegments());
         $this->assertEquals('/system/', $match->getRouteString());
@@ -350,7 +349,7 @@ class RouterTest extends TestCase
     {
         $_SERVER['REQUEST_URI'] = '/test/edit/1001';
 
-        $router = new Router(null, new Match\Http());
+        $router = new Router\Router(null, new Router\Match\Http());
         $router->addRoute('/:controller/:action/:param', [
             'prefix' => 'Pop\Test\TestAsset\\'
         ]);
@@ -366,7 +365,7 @@ class RouterTest extends TestCase
         $_SERVER['argv'] = [
             'myscript.php', 'foo', 'test', 'edit', '1001'
         ];
-        $router = new Router(null, new Match\Cli());
+        $router = new Router\Router(null, new Router\Match\Cli());
         $router->addRoute('<controller> <action> <param>', [
             'prefix' => 'Pop\Test\TestAsset\\'
         ]);
@@ -377,7 +376,7 @@ class RouterTest extends TestCase
     public function testHttpMatchIndex()
     {
         $_SERVER['REQUEST_URI'] = '';
-        $match = new Match\Http();
+        $match = new Router\Match\Http();
         $this->assertEquals('', $match->getBasePath());
         $this->assertEquals('/', $match->getRouteString());
     }
@@ -388,7 +387,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => 'Pop\Test\TestAsset\TestController',
             'action'     => 'help'
@@ -403,7 +402,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help', '-o1', '-o2'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help -o1 [-o2]', [
             'controller' => 'Pop\Test\TestAsset\TestController',
             'action'     => 'help'
@@ -419,7 +418,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help', 'test', 'test@test.com'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help <name> [<email>]', [
             'controller'  => 'Pop\Test\TestAsset\TestController',
             'action'      => 'help'
@@ -435,7 +434,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help', '--name=test', '--email=test@test.com'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help --name= [--email=]', [
             'controller'  => 'Pop\Test\TestAsset\TestController',
             'action'      => 'help'
@@ -451,7 +450,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help', '--options1', '-o3'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help [--o1|options1] [--o2|options2] [--o3|options3]', [
             'controller'  => 'Pop\Test\TestAsset\TestController',
             'action'      => 'help'
@@ -472,7 +471,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help', '--id=1', '--id=2'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help [-i|--id=*]', [
             'controller'  => function() {}
         ]);
@@ -489,7 +488,7 @@ class RouterTest extends TestCase
             'myscript.php', 'foo'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => 'Pop\Test\TestAsset\TestController',
             'action'     => 'help'
@@ -510,7 +509,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
 
-        $router = new Router();
+        $router = new Router\Router();
         $router->addRoute('help', [
             'controller' => 'Pop\Test\TestAsset\TestNotController',
             'action'     => 'help'

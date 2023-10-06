@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  */
 
@@ -13,7 +13,7 @@
  */
 namespace Pop;
 
-use ReturnTypeWillChange;
+use ReflectionException;
 
 /**
  * Application class
@@ -21,9 +21,9 @@ use ReturnTypeWillChange;
  * @category   Pop
  * @package    Pop
  * @author     Nick Sagona, III <dev@nolainteractive.com>
- * @copyright  Copyright (c) 2009-2023 NOLA Interactive, LLC. (http://www.nolainteractive.com)
+ * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    3.7.0
+ * @version    4.0.0
  * @property   $config mixed
  */
 class Application extends AbstractApplication implements \ArrayAccess
@@ -31,33 +31,33 @@ class Application extends AbstractApplication implements \ArrayAccess
 
     /**
      * Application router
-     * @var Router\Router
+     * @var ?Router\Router
      */
-    protected $router = null;
+    protected ?Router\Router $router = null;
 
     /**
      * Service locator
-     * @var Service\Locator
+     * @var ?Service\Locator
      */
-    protected $services = null;
+    protected ?Service\Locator$services = null;
 
     /**
      * Event manager
-     * @var Event\Manager
+     * @var ?Event\Manager
      */
-    protected $events = null;
+    protected ?Event\Manager$events = null;
 
     /**
      * Module manager
-     * @var Module\Manager
+     * @var ?Module\Manager
      */
-    protected $modules = null;
+    protected ?Module\Manager $modules = null;
 
     /**
      * Autoloader
      * @var mixed
      */
-    protected $autoloader = null;
+    protected mixed $autoloader = null;
 
     /**
      * Constructor
@@ -90,7 +90,7 @@ class Application extends AbstractApplication implements \ArrayAccess
             }
         }
 
-        if (null !== $config) {
+        if ($config !== null) {
             $this->registerConfig($config);
         }
 
@@ -102,32 +102,30 @@ class Application extends AbstractApplication implements \ArrayAccess
      * and registering with the autoloader, adding routes, services and events
      *
      * @param  mixed $autoloader
-     * @throws Exception
-     * @throws Module\Exception
-     * @throws Service\Exception
-     * @return Application
+     * @throws Exception|Module\Exception|Service\Exception
+     * @return static
      */
-    public function bootstrap($autoloader = null)
+    public function bootstrap(mixed $autoloader = null): static
     {
-        if (null !== $autoloader) {
+        if ($autoloader !== null) {
             $this->registerAutoloader($autoloader);
         }
-        if (null === $this->router) {
+        if ($this->router === null) {
             $this->registerRouter(new Router\Router());
         }
-        if (null === $this->services) {
+        if ($this->services === null) {
             $this->registerServices(new Service\Locator());
         }
-        if (null === $this->events) {
+        if ($this->events === null) {
             $this->registerEvents(new Event\Manager());
         }
-        if (null === $this->modules) {
+        if ($this->modules === null) {
             $this->registerModules(new Module\Manager());
         }
 
         // If the autoloader is set and the application config has a
         // defined prefix and src, register with the autoloader
-        if ((null !== $this->autoloader) && isset($this->config['prefix']) &&
+        if (($this->autoloader !== null) && isset($this->config['prefix']) &&
             isset($this->config['src']) && file_exists($this->config['src'])) {
             // Register as PSR-0
             if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
@@ -149,19 +147,19 @@ class Application extends AbstractApplication implements \ArrayAccess
         }
 
         // If routes are set in the app config, register them with the application
-        if (isset($this->config['routes']) && (null !== $this->router)) {
+        if (isset($this->config['routes']) && ($this->router !== null)) {
             $this->router->addRoutes($this->config['routes']);
         }
 
         // If services are set in the app config, register them with the application
-        if (isset($this->config['services']) && (null !== $this->services)) {
+        if (isset($this->config['services']) && ($this->services !== null)) {
             foreach ($this->config['services'] as $name => $service) {
                 $this->setService($name, $service);
             }
         }
 
         // If events are set in the app config, register them with the application
-        if (isset($this->config['events']) && (null !== $this->events)) {
+        if (isset($this->config['events']) && ($this->events !== null)) {
             foreach ($this->config['events'] as $event) {
                 if (isset($event['name']) && isset($event['action'])) {
                     $this->on($event['name'], $event['action'], ((isset($event['priority'])) ? $event['priority'] : 0));
@@ -175,11 +173,9 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Initialize the application
      *
-     * @throws Event\Exception
-     * @throws \ReflectionException
-     * @return Application
+     * @return static
      */
-    public function init()
+    public function init(): static
     {
         $this->trigger('app.init');
         return $this;
@@ -190,7 +186,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @return mixed
      */
-    public function autoloader()
+    public function autoloader(): mixed
     {
         return $this->autoloader;
     }
@@ -200,7 +196,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @return Router\Router
      */
-    public function router()
+    public function router(): Router\Router
     {
         return $this->router;
     }
@@ -210,7 +206,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @return Service\Locator
      */
-    public function services()
+    public function services(): Service\Locator
     {
         return $this->services;
     }
@@ -220,7 +216,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @return Event\Manager
      */
-    public function events()
+    public function events(): Event\Manager
     {
         return $this->events;
     }
@@ -230,7 +226,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @return Module\Manager
      */
-    public function modules()
+    public function modules(): Module\Manager
     {
         return $this->modules;
     }
@@ -239,9 +235,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Register a new router object with the application
      *
      * @param  Router\Router $router
-     * @return Application
+     * @return static
      */
-    public function registerRouter(Router\Router $router)
+    public function registerRouter(Router\Router $router): static
     {
         $this->router = $router;
         Router\Route::setRouter($router);
@@ -252,9 +248,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Register a new service locator object with the application
      *
      * @param  Service\Locator $services
-     * @return Application
+     * @return static
      */
-    public function registerServices(Service\Locator $services)
+    public function registerServices(Service\Locator $services): static
     {
         $this->services = $services;
         return $this;
@@ -264,9 +260,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Register a new event manager object with the application
      *
      * @param  Event\Manager $events
-     * @return Application
+     * @return static
      */
-    public function registerEvents(Event\Manager $events)
+    public function registerEvents(Event\Manager $events): static
     {
         $this->events = $events;
         return $this;
@@ -276,9 +272,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Register a new module manager object with the application
      *
      * @param  Module\Manager $modules
-     * @return Application
+     * @return static
      */
-    public function registerModules(Module\Manager $modules)
+    public function registerModules(Module\Manager $modules): static
     {
         $this->modules = $modules;
         return $this;
@@ -289,14 +285,14 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @param  mixed $autoloader
      * @throws Exception
-     * @return Application
+     * @return static
      */
-    public function registerAutoloader($autoloader)
+    public function registerAutoloader(mixed $autoloader): static
     {
         if (!method_exists($autoloader, 'add') || !method_exists($autoloader, 'addPsr4')) {
             throw new Exception(
                 'Error: The autoloader instance must contain the methods \'add\' and \'addPsr4\', ' .
-                'as with Composer\Autoload\ClassLoader or Pop\Loader\ClassLoader.'
+                'as with Composer\Autoload\ClassLoader.'
             );
         }
         $this->autoloader = $autoloader;
@@ -307,29 +303,28 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Access a module object
      *
      * @param  string $name
-     * @return Module\ModuleInterface
+     * @return ?Module\ModuleInterface
      */
-    public function module($name)
+    public function module(string $name): ?Module\ModuleInterface
     {
-        return (isset($this->modules[$name])) ? $this->modules[$name] : null;
+        return $this->modules[$name] ?? null;
     }
 
     /**
      * Register a module with the module manager object
      *
-     * @param  mixed $module
-     * @param  string $name
-     * @throws Module\Exception
-     * @throws Service\Exception
-     * @return Application
+     * @param  mixed   $module
+     * @param  ?string $name
+     * @throws Module\Exception|Service\Exception
+     * @return static
      */
-    public function register($module, $name = null)
+    public function register(mixed $module, ?string $name = null): static
     {
         if (!($module instanceof Module\ModuleInterface)) {
             $module = new Module\Module($module, $this);
         }
 
-        if (null !== $name) {
+        if ($name !== null) {
             $module->setName($name);
         }
 
@@ -344,9 +339,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Unregister a module with the module manager object
      *
      * @param  string $name
-     * @return Application
+     * @return static
      */
-    public function unregister($name)
+    public function unregister(string $name): static
     {
         unset($this->modules[$name]);
         return $this;
@@ -356,9 +351,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Determine whether a module is registered with the application object
      *
      * @param  string $name
-     * @return boolean
+     * @return bool
      */
-    public function isRegistered($name)
+    public function isRegistered(string $name): bool
     {
         return $this->modules->isRegistered($name);
     }
@@ -368,9 +363,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @param  string $route
      * @param  mixed  $controller
-     * @return Application
+     * @return static
      */
-    public function addRoute($route, $controller)
+    public function addRoute(string $route, mixed $controller): static
     {
         $this->router->addRoute($route, $controller);
         return $this;
@@ -380,9 +375,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Add routes
      *
      * @param  array $routes
-     * @return Application
+     * @return static
      */
-    public function addRoutes(array $routes)
+    public function addRoutes(array $routes): static
     {
         $this->router->addRoutes($routes);
         return $this;
@@ -392,11 +387,11 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Set a service
      *
      * @param  string $name
-     * @param  mixed $service
+     * @param  mixed  $service
      * @throws Service\Exception
-     * @return Application
+     * @return static
      */
-    public function setService($name, $service)
+    public function setService(string $name, mixed $service): static
     {
         $this->services->set($name, $service);
         return $this;
@@ -409,7 +404,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      * @throws Service\Exception
      * @return mixed
      */
-    public function getService($name)
+    public function getService(string $name): mixed
     {
         return $this->services->get($name);
     }
@@ -418,9 +413,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Remove a service
      *
      * @param  string $name
-     * @return Application
+     * @return static
      */
-    public function removeService($name)
+    public function removeService(string $name): static
     {
         $this->services->remove($name);
         return $this;
@@ -438,9 +433,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * @param  string $name
      * @param  mixed  $action
      * @param  int    $priority
-     * @return Application
+     * @return static
      */
-    public function on($name, $action, $priority = 0)
+    public function on(string $name, mixed $action, int $priority = 0): static
     {
         $this->events->on($name, $action, $priority);
         return $this;
@@ -457,9 +452,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @param  string $name
      * @param  mixed  $action
-     * @return Application
+     * @return static
      */
-    public function off($name, $action)
+    public function off(string $name, mixed $action): static
     {
         $this->events->off($name, $action);
         return $this;
@@ -470,9 +465,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @param  string $name
      * @param  array $args
-     * @return Application
+     * @return static
      */
-    public function trigger($name, array $args = [])
+    public function trigger(string $name, array $args = []): static
     {
         if (count($args) == 0) {
             $args = ['application' => $this];
@@ -484,16 +479,14 @@ class Application extends AbstractApplication implements \ArrayAccess
     }
 
     /**
-     * Run the application.
+     * Run the application
      *
-     * @param  boolean $exit
-     * @param  string  $forceRoute
-     * @throws Event\Exception
-     * @throws Router\Exception
-     * @throws \ReflectionException
+     * @param  bool    $exit
+     * @param  ?string $forceRoute
+     * @throws Event\Exception|Router\Exception|ReflectionException
      * @return void
      */
-    public function run($exit = true, $forceRoute = null)
+    public function run(bool $exit = true, ?string $forceRoute = null): void
     {
         try {
             $this->init();
@@ -501,7 +494,7 @@ class Application extends AbstractApplication implements \ArrayAccess
             // Trigger any app.route.pre events
             $this->trigger('app.route.pre');
 
-            if ((null !== $this->router)) {
+            if (($this->router !== null)) {
                 $this->router->route($forceRoute);
 
                 // Trigger any app.dispatch.post events
@@ -538,9 +531,9 @@ class Application extends AbstractApplication implements \ArrayAccess
      * @param  string $name
      * @param  mixed $value
      * @throws Exception
-     * @return Application
+     * @return void
      */
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value): void
     {
         switch ($name) {
             case 'config':
@@ -561,9 +554,7 @@ class Application extends AbstractApplication implements \ArrayAccess
             case 'autoloader':
                 $this->registerAutoloader($value);
                 break;
-
         }
-        return $this;
     }
 
     /**
@@ -572,71 +563,45 @@ class Application extends AbstractApplication implements \ArrayAccess
      * @param  string $name
      * @return mixed
      */
-    public function __get($name)
+    public function __get(string $name): mixed
     {
-        switch ($name) {
-            case 'config':
-                return $this->config;
-                break;
-            case 'router':
-                return $this->router;
-                break;
-            case 'services':
-                return $this->services;
-                break;
-            case 'events':
-                return $this->events;
-                break;
-            case 'modules':
-                return $this->modules;
-                break;
-            case 'autoloader':
-                return $this->autoloader;
-                break;
-            default:
-                return null;
-        }
+        return match ($name) {
+            'config'     => $this->config,
+            'router'     => $this->router,
+            'services'   => $this->services,
+            'events'     => $this->events,
+            'modules'    => $this->modules,
+            'autoloader' => $this->autoloader,
+            default      => null,
+        };
     }
 
     /**
      * Determine if a pre-designated value in the application object exists
      *
      * @param  string $name
-     * @return boolean
+     * @return bool
      */
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
-        switch ($name) {
-            case 'config':
-                return (null !== $this->config);
-                break;
-            case 'router':
-                return (null !== $this->router);
-                break;
-            case 'services':
-                return (null !== $this->services);
-                break;
-            case 'events':
-                return (null !== $this->events);
-                break;
-            case 'modules':
-                return (null !== $this->modules);
-                break;
-            case 'autoloader':
-                return (null !== $this->autoloader);
-                break;
-            default:
-                return false;
-        }
+        return match ($name) {
+            'config'     => ($this->config !== null),
+            'router'     => ($this->router !== null),
+            'services'   => ($this->services !== null),
+            'events'     => ($this->events !== null),
+            'modules'    => ($this->modules !== null),
+            'autoloader' => ($this->autoloader !== null),
+            default      => false,
+        };
     }
 
     /**
      * Unset a pre-designated value in the application object
      *
      * @param  string $name
-     * @return Application
+     * @return void
      */
-    public function __unset($name)
+    public function __unset(string $name): void
     {
         switch ($name) {
             case 'config':
@@ -658,32 +623,28 @@ class Application extends AbstractApplication implements \ArrayAccess
                 $this->autoloader = null;
                 break;
         }
-
-        return $this;
     }
 
     /**
      * Set a pre-designated value in the application object
      *
-     * @param  string $offset
+     * @param  mixed $offset
      * @param  mixed $value
      * @throws Exception
-     * @return Application
+     * @return void
      */
-    #[ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        return $this->__set($offset, $value);
+        $this->__set($offset, $value);
     }
 
     /**
      * Get a pre-designated value from the application object
      *
-     * @param  string $offset
+     * @param  mixed $offset
      * @return mixed
      */
-    #[ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->__get($offset);
     }
@@ -691,10 +652,10 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Determine if a pre-designated value in the application object exists
      *
-     * @param  string $offset
-     * @return boolean
+     * @param  mixed $offset
+     * @return bool
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return $this->__isset($offset);
     }
@@ -702,13 +663,12 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Unset a pre-designated value in the application object
      *
-     * @param  string $offset
-     * @return Application
+     * @param  mixed $offset
+     * @return void
      */
-    #[ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
-        return $this->__unset($offset);
+        $this->__unset($offset);
     }
 
 }
