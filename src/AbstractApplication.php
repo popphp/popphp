@@ -140,7 +140,7 @@ abstract class AbstractApplication implements ApplicationInterface
      */
     public function registerConfig(mixed $config): AbstractApplication
     {
-        if (!is_array($config) && !($config instanceof \ArrayAccess) && !($config instanceof \ArrayObject)) {
+        if (!is_array($config) && !($config instanceof \ArrayAccess)) {
             throw new \InvalidArgumentException(
                 'Error: The config must be either an array itself, implement ArrayAccess or extend ArrayObject'
             );

@@ -70,7 +70,7 @@ abstract class AbstractController implements ControllerInterface
             } else {
                 $this->$action();
             }
-        } else if (($this->defaultAction !== null) && method_exists($this, $this->defaultAction)) {
+        } else if (method_exists($this, $this->defaultAction)) {
             $action = $this->defaultAction;
             $this->$action();
         } else {

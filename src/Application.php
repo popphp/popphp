@@ -85,7 +85,7 @@ class Application extends AbstractApplication implements \ArrayAccess
                 $this->registerEvents($arg);
             } else if ($arg instanceof Module\Manager) {
                 $this->registerModules($arg);
-            } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)) {
+            } else if (is_array($arg) || ($arg instanceof \ArrayAccess)) {
                 $config = $arg;
             }
         }
@@ -162,7 +162,7 @@ class Application extends AbstractApplication implements \ArrayAccess
         if (isset($this->config['events']) && ($this->events !== null)) {
             foreach ($this->config['events'] as $event) {
                 if (isset($event['name']) && isset($event['action'])) {
-                    $this->on($event['name'], $event['action'], ((isset($event['priority'])) ? $event['priority'] : 0));
+                    $this->on($event['name'], $event['action'], ((int)$event['priority'] ?? 0));
                 }
             }
         }

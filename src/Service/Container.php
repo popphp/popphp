@@ -52,8 +52,7 @@ class Container
      */
     public static function has(string $name): bool
     {
-        return (isset(self::$locators[$name]) && (self::$locators[$name] !== null) &&
-            (self::$locators[$name] instanceof Locator));
+        return (!empty(self::$locators[$name]) && (self::$locators[$name] instanceof Locator));
     }
 
     /**
@@ -65,7 +64,7 @@ class Container
      */
     public static function get(string $name = 'default'): Locator
     {
-        if (!isset(self::$locators[$name]) || (isset(self::$locators[$name]) && (self::$locators[$name] === null))) {
+        if (empty(self::$locators[$name])) {
             throw new Exception("Error: The service locator '" . $name . "' has not been added");
         }
         return self::$locators[$name];

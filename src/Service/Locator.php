@@ -116,11 +116,10 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
             $params = null;
 
             if (!is_array($service)) {
-                $call   = $service;
-                $params = null;
+                $call = $service;
             } else if (isset($service['call'])) {
                 $call   = $service['call'];
-                $params = (isset($service['params'])) ? $service['params'] : null;
+                $params = $service['params'] ?? null;
             }
 
             if ($call === null) {
