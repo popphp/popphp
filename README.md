@@ -420,7 +420,7 @@ because, like the application object, they can take a configuration array that w
 settings specific to the module.
 
 Here's an example of a way to inject a module into an application. You'll want to register the autoloader
-with the application so that it can handle the appropriate loading of the module files and classes withing
+with the application so that it can handle the appropriate loading of the module files and classes within
 the application.
 
 ```php
@@ -500,6 +500,7 @@ class IndexController extends AbstractController
 {
     public function index()
     {
+        // 'default' is the default service container. Other service containers may be available.
         $foo = Container::get('default')->get('foo');
         // Do something with the 'foo' service
     }
