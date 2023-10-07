@@ -3,6 +3,7 @@
 namespace Pop\Test;
 
 use Pop\Application;
+use Pop\Config\Config;
 use Pop\Router\Router;
 use Pop\Service\Locator;
 use Pop\Event;
@@ -148,7 +149,7 @@ class ApplicationTest extends TestCase
         $this->assertFalse(isset($application['config']['baz']));
     }
 
-    public function testMergeConfig()
+    public function testMergeConfig1()
     {
         $application = new Application();
         $application->mergeConfig(['foo' => 'bar']);
@@ -156,6 +157,16 @@ class ApplicationTest extends TestCase
         $this->assertEquals($application->config()['baz'], 123);
         $application->mergeConfig(['foo' => 456]);
         $this->assertEquals($application->config()['foo'], 456);
+        $application->mergeConfig(new Config(['test' => 789]));
+        $this->assertEquals($application->config()['test'], 789);
+    }
+
+    public function testMergeConfig2()
+    {
+        $application = new Application(new Config(['test' => 123], true));
+        $application->mergeConfig(new Config(['foo' => 'bar'], true));
+        $this->assertEquals($application->config()['test'], 123);
+        $this->assertEquals($application->config()['foo'], 'bar');
     }
 
     public function testRegisterConfig()
@@ -356,10 +367,18 @@ class ApplicationTest extends TestCase
         $this->assertEquals($application->getService('foo'), 123);
     }
 
-    public function testRegisterModule()
+    public function testRegisterModule1()
     {
         $application = new Application();
         $application->register(new TestAsset\TestModule(), 'test');
+        $this->assertNotNull($application->module('test'));
+        $this->assertTrue($application->isRegistered('test'));
+    }
+
+    public function testRegisterModule2()
+    {
+        $application = new Application();
+        $application->register(['name' => 'test'], 'test');
         $this->assertNotNull($application->module('test'));
         $this->assertTrue($application->isRegistered('test'));
     }
@@ -553,23 +572,28 @@ class ApplicationTest extends TestCase
 
     public function testRunException()
     {
-        $this->expectException('Exception');
         $config = [
             'routes' => [
                 'bad' => [
-                    'controller' => function() {
-                        throw new \Exception('Whoops!');
+                    'controller' => function () {
+                        throw new \Pop\Exception('Whoops!');
                     }
                 ]
             ]
         ];
         $application = new Application($config);
-        $application->on('app.error', function(Application $application, \Exception $exception){
+        $application->on('app.error', function(\Pop\Exception $exception, Application $application) {
             file_put_contents(__DIR__ . '/tmp/error.log', $exception->getMessage());
         });
 
-        $application->run(false, 'bad');
-        $this->assertContains('Whoops!', file_get_contents(__DIR__ . '/tmp/error.log'));
+        $this->assertInstanceOf('Pop\Application', $application);
+
+        try {
+            $application->run(false, 'bad');
+        } catch (\Pop\Exception $e) {
+
+        }
+        $this->assertTrue(str_contains(file_get_contents(__DIR__ . '/tmp/error.log'), 'Whoops!'));
         unlink(__DIR__ . '/tmp/error.log');
     }
 

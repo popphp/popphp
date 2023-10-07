@@ -71,15 +71,10 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      * Register a module object
      *
      * @param  ModuleInterface $module
-     * @throws Exception
      * @return static
      */
     public function register(ModuleInterface $module): static
     {
-        if (!$module->hasName()) {
-            throw new Exception('Error: The module does not have a name');
-        }
-
         $this->modules[$module->getName()] = $module;
         return $this;
     }

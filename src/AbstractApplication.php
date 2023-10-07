@@ -208,6 +208,9 @@ abstract class AbstractApplication implements ApplicationInterface
         if ($this->config instanceof Config\Config) {
             $this->config->merge($config, $preserve);
         } else if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
+            if ($config instanceof Config\Config) {
+                $config = $config->toArray();
+            }
             if ($this->config !== null) {
                 $this->config = ($preserve) ? array_merge_recursive($this->config, $config) :
                     array_replace_recursive($this->config, $config);

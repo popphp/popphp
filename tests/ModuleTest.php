@@ -55,7 +55,6 @@ class ModuleTest extends TestCase
         $this->assertInstanceOf('Pop\Application', $module->application());
     }
 
-
     public function testSetAndGet()
     {
         $config = [

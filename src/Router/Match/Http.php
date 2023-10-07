@@ -40,7 +40,8 @@ class Http extends AbstractMatch
     public function __construct()
     {
         $basePath       = str_replace([realpath($_SERVER['DOCUMENT_ROOT']), '\\'], ['', '/'], realpath(getcwd()));
-        $this->basePath = (!empty($basePath) ? $basePath : '');
+        $this->basePath = !empty($basePath) ? $basePath : '';
+        $trailingSlash  = null;
 
         $path = ($this->basePath != '') ?
             substr($_SERVER['REQUEST_URI'], strlen($this->basePath)) : $_SERVER['REQUEST_URI'];
@@ -52,10 +53,8 @@ class Http extends AbstractMatch
 
         // Trim trailing slash, if present
         if (str_ends_with($path, '/')) {
-            $path = substr($path, 0, -1);
+            $path          = substr($path, 0, -1);
             $trailingSlash = '/';
-        } else {
-            $trailingSlash = null;
         }
 
         if ($path == '') {
@@ -100,7 +99,7 @@ class Http extends AbstractMatch
             $this->prepare();
         }
 
-        $routeToMatch = ($forceRoute !== null) ? $forceRoute : $this->routeString;
+        $routeToMatch = $forceRoute ?? $this->routeString;
         $directMatch  = null;
 
         if (array_key_exists($routeToMatch, $this->routes)) {
@@ -216,7 +215,7 @@ class Http extends AbstractMatch
         $offsets    = [];
         $paramArray = false;
 
-        if (strpos($route, '*') !== false) {
+        if (str_contains($route, '*')) {
             $paramArray = true;
             $route      = str_replace('*', '', $route);
         }
@@ -251,7 +250,7 @@ class Http extends AbstractMatch
         }
 
         $route = '^' . str_replace('/', '\/', $route) . '$';
-        if (substr($route, -5) == '[\/]$') {
+        if (str_ends_with($route, '[\/]$')) {
             $route = str_replace('[\/]$', '(|\/)$', $route);
         }
 
@@ -281,14 +280,14 @@ class Http extends AbstractMatch
             foreach ($this->preparedRoutes[$this->route]['params'] as $i => $param) {
                 $value = substr($this->routeString, ($param['offset'] + $offset + 1));
                 if ($param['array']) {
-                    if ($value === false) {
+                    if (!$value) {
                         $value = [];
                     } else {
                         $value = (str_contains($value, '/')) ? explode('/', $value) : [$value];
                     }
                 } else {
                     if (str_contains($value, '/')) {
-                        $value = substr($value, 0, strpos($value, '/'));
+                        $value   = substr($value, 0, strpos($value, '/'));
                         $offset += strlen($value) - strlen($param['param']) + 1;
                     } else {
                         $offset += strlen($value) - strlen($param['param']) + 1;

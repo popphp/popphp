@@ -451,7 +451,7 @@ class RouterTest extends TestCase
         ];
 
         $router = new Router\Router();
-        $router->addRoute('help [--o1|options1] [--o2|options2] [--o3|options3]', [
+        $router->addRoute('help [--o1|--options1] [--o2|--options2] [--o3|--options3]', [
             'controller'  => 'Pop\Test\TestAsset\TestController',
             'action'      => 'help'
         ]);
