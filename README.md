@@ -166,7 +166,7 @@ And here is a list of possible route syntax options for CLI applications:
 |foo [-o1\|--option1=]   |First command required, 1 option value                                |
 |foo [-o1\|--option1=*]  |First command required, 1 option value array                          |
 
-Parameter values are mapped directly 1:1 as named variables in the route parameters going into the
+Parameter values are directly mapped 1:1 as named variables in the route parameters going into the
 route method or function.
 
 ```bash
@@ -406,6 +406,9 @@ class User extends AbstractModel
 }
 ```
 
+**Note:** It is not required to use the abstract model class, and it merely exists as a convenience. The "models"
+of your application can be whatever is preferred or required for your use case.
+
 [Top](#basic-usage)
 
 ### The Module Manager
@@ -421,21 +424,13 @@ with the application so that it can register the modules with the application.
 
 ```php
 // Using Composer's autoloader
-$autoloader = require __DIR__  . APP_PATH . '/vendor/autoload.php';
+$autoloader = require __DIR__ . '/vendor/autoload.php';
 
 $app = new Pop\Application($autoloader, include __DIR__ . '/config/app.php');
 
 // $myModuleConfig contains the config settings for the
 // module, such as the autoload prefix and the routes
-$app->register('MyModule', $myModuleConfig);
-```
-
-The `$myModuleConfig` will be injected into a basic module object and registered with the application.
-If you wish to have your own module object with customized configuration and functionality, you can
-inject that directly:
-
-```php
-$app->register('MyModule', new MyModule\Module($app));
+$app->register(new MyModule($myModuleConfig));
 ```
 
 [Top](#basic-usage)
@@ -472,7 +467,7 @@ the application's life cycle.
 $app->setService('foo', 'MyApp\FooService');
 ```
 
-Inside of a controller object:
+From inside a controller object:
 
 ```php
 <?php
@@ -484,7 +479,27 @@ class IndexController extends AbstractController
 {
     public function index()
     {
-        $foo = $this->application->getService('foo');
+        $foo = $this->application->services['foo'];
+        // Do something with the 'foo' service
+    }
+}
+```
+
+If you don't have direct access to the application's service locator, you can use the
+global service container:
+
+```php
+<?php
+namespace MyApp\Controller;
+
+use Pop\Service\Container;
+use Pop\Controller\AbstractController;
+
+class IndexController extends AbstractController
+{
+    public function index()
+    {
+        $foo = Container::get('default')->get('foo');
         // Do something with the 'foo' service
     }
 }
