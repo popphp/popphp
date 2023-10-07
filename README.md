@@ -420,7 +420,8 @@ because, like the application object, they can take a configuration array that w
 settings specific to the module.
 
 Here's an example of a way to inject a module into an application. You'll want to register the autoloader
-with the application so that it can register the modules with the application.
+with the application so that it can handle the appropriate loading of the module files and classes withing
+the application.
 
 ```php
 // Using Composer's autoloader
