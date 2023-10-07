@@ -24,6 +24,7 @@ use Pop\Application;
  * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
  * @version    4.0.0
+ * @property   $config mixed
  */
 class Module extends AbstractModule implements \ArrayAccess
 {

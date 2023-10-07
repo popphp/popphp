@@ -354,7 +354,7 @@ class Cli extends AbstractMatch
                 $name = substr($name, 0, strpos($name, '='));
             } else {
                 $name = substr($option[0], (strpos($option[0], '-') + 1));
-                $name = substr($name, 0, strpos($name, '='));
+                $name = substr($name, 0, 1);
             }
             if (str_contains($opt, '|')) {
                 [$opt1, $opt2] = explode('|', $opt);
@@ -376,7 +376,7 @@ class Cli extends AbstractMatch
                 $name = substr($name, 0, strpos($name, '='));
             } else {
                 $name = substr($option[0], (strpos($option[0], '-') + 1));
-                $name = substr($name, 0, strpos($name, '='));
+                $name = substr($name, 0, 1);
             }
             if (str_contains($opt, '|')) {
                 [$opt1, $opt2] = explode('|', $opt);

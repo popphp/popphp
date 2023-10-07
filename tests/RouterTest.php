@@ -37,7 +37,22 @@ class RouterTest extends TestCase
         $router->addRoute('/system/add', [
             'controller' => function() {
                 echo 'add';
-            }
+            },
+            'name' => 'system'
+        ]);
+
+        $this->assertTrue(array_key_exists('/system/add', $router->getRoutes()));
+    }
+
+    public function testAddNestedRoute()
+    {
+        $router = new Router\Router();
+        $router->addRoute('/system', [
+            '/add' => [
+                'controller' => function() {
+                    echo 'add';
+                }
+            ]
         ]);
 
         $this->assertTrue(array_key_exists('/system/add', $router->getRoutes()));
@@ -45,12 +60,17 @@ class RouterTest extends TestCase
 
     public function testAddDynamicRoute()
     {
+        $_SERVER['argv'] = [
+            'myscript.php', 'users', 'edit', '1'
+        ];
+
         $router = new Router\Router();
         $router->addRoute('<controller> <action>', [
-            'prefix' => 'MyApp\Controller\\'
+            'prefix' => 'Pop\Test\TestAsset\\'
         ]);
 
         $this->assertTrue($router->getRouteMatch()->hasDynamicRoute());
+        $this->assertTrue($router->getRouteMatch()->hasAction());
     }
 
     public function testAddControllerParams()
@@ -134,7 +154,7 @@ class RouterTest extends TestCase
         $this->assertEquals('edit', $router->getRouteMatch()->getSegment(0));
     }
 
-    public function testHasRoute()
+    public function testHasRoute1()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'help'
@@ -149,6 +169,23 @@ class RouterTest extends TestCase
 
         $router->route();
         $this->assertTrue($router->hasRoute());
+    }
+
+    public function testHasRoute2()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'users', '-o'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('users <name>', [
+            'controller' => function ($name) {
+                echo 'users';
+            }
+        ]);
+
+        $router->route();
+        $this->assertFalse($router->hasRoute());
     }
 
     public function testGetControllerClass()
@@ -463,6 +500,23 @@ class RouterTest extends TestCase
         $this->assertEquals(0, count($router->getRouteMatch()->getParameters()));
         $this->assertNull($router->getRouteMatch()->getOption('foo'));
         $this->assertNull($router->getRouteMatch()->getParameter('foo'));
+    }
+
+    public function testCliOptionValues()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help', '-i1'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('help [-i|--id=]', [
+            'controller'  => function() {}
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals(1, count($router->getRouteMatch()->getOptions()));
+        $this->assertEquals("1", $router->getRouteMatch()->getOption('id'));
     }
 
     public function testCliArrays()

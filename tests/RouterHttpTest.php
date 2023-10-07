@@ -78,6 +78,40 @@ class RouterHttpTest extends TestCase
         $this->assertTrue($http->hasRoute());
     }
 
+    public function testHttpPreparedRouteWithOptions()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/foo/1/2';
+        $routes = [
+            '/foo/:id[/:uid]' => [
+                'controller' => function($id, $uid = null) {
+                    echo 'Foo';
+                }
+            ]
+        ];
+        $http = new Http();
+        $http->addRoutes($routes);
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+    }
+
+    public function testHttpPreparedRouteWithArray()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/foo/1/2/3';
+        $routes = [
+            '/foo/:id*' => [
+                'controller' => function(array $id) {
+                    echo 'Foo';
+                }
+            ]
+        ];
+        $http = new Http();
+        $http->addRoutes($routes);
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+    }
+
     public function testHttpNoRouteFound()
     {
         $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
@@ -165,7 +199,7 @@ class RouterHttpTest extends TestCase
         $this->assertEquals('http://www.domain.com/user/1', Route::url('user', ['id' => 1], true));
     }
 
-    public function testNamedRouteException()
+    public function testNamedRouteException1()
     {
         $this->expectException('Pop\Router\Exception');
 
@@ -178,6 +212,13 @@ class RouterHttpTest extends TestCase
         $this->assertTrue(Route::hasRouter());
         $this->assertInstanceOf('Pop\Router\Router', Route::getRouter());
         $this->assertEquals('/user/1', Route::url('user', ['id' => 1]));
+    }
+
+    public function testNamedRouteException2()
+    {
+        $this->expectException('Pop\Router\Match\Exception');
+        $router = new Router(null, new Http());
+        $router->name('user');
     }
 
     public function testNamedRouteNotHttpException()

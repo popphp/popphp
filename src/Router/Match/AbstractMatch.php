@@ -124,6 +124,7 @@ abstract class AbstractMatch implements MatchInterface
         // Else, regular route
         } else {
             $this->routeString = urldecode($this->routeString);
+            // Handle nested routes
             if (is_array($controller) && !isset($controller['controller'])) {
                 foreach ($controller as $r => $c) {
                     $fullRoute = ($r == '*') ? $route . '/*' : $route . $r;

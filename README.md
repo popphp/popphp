@@ -28,9 +28,11 @@ Install `popphp` using Composer.
 
     composer require popphp/popphp
 
-## DISCUSSION
+Or, require it in your composer.json file
 
-There is an IRC channel for Pop PHP over at irc://freenode/popphp.
+    "require": {
+        "popphp/popphp" : "4.0.*"
+    }
 
 ## BASIC USAGE
 
@@ -48,7 +50,7 @@ There is an IRC channel for Pop PHP over at irc://freenode/popphp.
 Here's a simple example of wiring a web application object with a
 configuration file that defines some basic routes:
 
-###### application.php
+###### app.php
 
 ```php
 <?php
@@ -80,7 +82,7 @@ The application object will parse the `routes` array and register those routes w
 ###### index.php
 
 ```php
-$app = new Pop\Application(include __DIR__ . '/config/application.php');
+$app = new Pop\Application(include __DIR__ . '/config/app.php');
 $app->run();
 ```
 
@@ -91,7 +93,7 @@ $app->run();
 The router object is one of the main components of a Pop application. It serves as the gatekeeper
 that routes requests to their proper controller.
 
-With the `application.php` config above, the actions listed  will be routed to methods within the
+With the `app.php` config above, the actions listed  will be routed to methods within the
 `MyApp\Controller\IndexController` object, `index()`, `users()`, `edit($id)` and `error()` respectively.
 
 The route '/users[/]' allows for an optional trailing slash. The route '/edit/:id' is expecting a value
@@ -102,31 +104,124 @@ If you don't want to be so strict about the parameters passed into a method or f
 the parameter optional like this: '/edit[/:id]'. The respective method would then look like this:
 `edit($id = null)`.
 
-Here is a list of possible route options for web applications:
+Here is a list of possible route syntax options for web applications:
 
-|Web Route                      |What's Expected                                                    |
-|-------------------------------|-------------------------------------------------------------------|
-|/foo/:bar/:baz                 |All 3 params are required                                          |
-|/foo[/:bar][/:baz]             |First param required, last two are optional                        |
-|/foo/:bar[/:baz]               |First two params required, last one is optional                    |
-|/foo/:bar/:baz[/:some][/:other]|Two required, two optional                                         |
-|/foo/:bar/:baz*                |One required param, one required param that is a collection (array)|
-|/foo/:bar[/:baz*]              |One required param, one optional param that is a collection (array)|
+|Web Route         |What's Expected                                                                |
+|------------------|-------------------------------------------------------------------------------|
+|/foo/:bar/:baz    |After segment `/foo`, the 2 params are required                                |
+|/foo[/:bar][/:baz]|After segment `/foo`, the 2 params are optional                                |
+|/foo/:bar[/:baz]  |After segment `/foo`, the 1st param is required, last one is optional          |
+|/foo/:bar/:baz*   |After segment `/foo`, the 1st param is required, 2nd param is a required array |
+|/foo/:bar[/:baz*] |After segment `/foo`, the 1st param is required, 2nd param is an optional array|
 
-And here is a list of possible route options for CLI applications:
+The last two examples use an array collection, which takes all the route segment values from that point on and
+maps them into an array. For example, creating a route like this:
 
-|CLI Route                          |What's Expected                                                     |
-|-----------------------------------|--------------------------------------------------------------------|
-|foo bar                            |All 2 params are required                                           |
-|foo [bar\|baz]                     |First param required, 2nd param has optional 2 values               |
-|foo -o1 [-o2]                      |First param required, 1st option required, 2nd option optional      |
-|foo --option1\|-o1 [--option2\|-o2]|First param required, 1st option required, 2nd option optional      |
-|foo \<name\> [\<email\>]           |First param required, 1st value required, 2nd value optional        |
-|foo --name= [--email=]             |First param required, 1st opt value required, 2nd opt value optional|
+```bash
+/foo/:bar*
+```
+
+and requesting this route:
+
+```bash
+/foo/1/2/3
+```
+
+will inject into the action a value of:
+
+```php
+$bar = [1, 2, 3];
+```
+
+The CLI router supports commands, parameter values and options. The options have the flexibility to act like
+simple option flags, option values or even option array values. Options also support short form (i.e., `-o`)
+and long form (i.e., `--option`).
+
+And here is a list of possible route syntax options for CLI applications:
+
+|CLI Route               |What's Expected                                                       |
+|------------------------|----------------------------------------------------------------------|
+|foo bar                 |Both commands are required                                            |
+|foo [bar\|baz]          |First command is required, 2nd command has optional 2 values          |
+|foo \<name\> [\<email\>]|First command required, 1st parameter required, 2nd parameter optional|
+|foo [-o1] [-o2]         |First command required, and there are 2 short options                 |
+|foo [-o1\|--option1]    |First command required, 1 option that supports both long and short    |
+|foo [-o1\|--option1=]   |First command required, 1 option value                                |
+|foo [-o1\|--option1=*]  |First command required, 1 option value array                          |
+
+Parameter values are mapped 1:1 directly as named variables in the route parameters going into the
+route method or function.
+
+```bash
+foo [-p] [-v|--verbose] <name> [<email>]
+```
+
+```bash
+foo John john@test.com
+```
+
+```php
+function($name, $email = null, array $options = []) { }
+```
+
+Options are passed as the last parameter injected into the route parameters of the route method or function.
+The `options` variable will be an array. When the options are simple flags, the values in the array are booleans:
+
+```bash
+foo -p --verbose John john@test.com
+```
+
+```php
+$options = [
+    'p'       => true,
+    'verbose' => true,
+];
+```
+
+Option values require a long form designator for variable naming purposes within PHP. The options array
+will contain those values. However, the value can be passed on the route in both long and short form:
+
+```bash
+foo [-n|--name=]
+```
+
+```bash
+foo -nJohn
+```
+
+```bash
+foo --name=John
+```
+
+Both examples above will populate the options array with:
+
+```php
+$options = ['name' => 'John'];
+```
+
+Option values arrays work similar to option values, but collect multiple values for the same option into an array.
+
+```bash
+foo [-n|--nums=*]
+```
+
+```bash
+foo -n1 --nums=2 --nums=3 -n4
+```
+
+Both examples above will populate the options array with:
+
+```php
+$options = [
+    'nums' => [1, 2, 3, 4]
+];
+```
+
+
 
 ##### Routing for a CLI application
 
-###### application.php
+###### app.php
 
 ```php
 <?php
@@ -147,11 +242,11 @@ return [
 ###### app.php
 
 ```php
-$app = new Pop\Application(include __DIR__ . '/config/application.php');
+$app = new Pop\Application(include __DIR__ . '/config/app.php');
 $app->run();
 ```
 
-As before, the actions listed in the `application.php` config above will be routed to methods within the
+As before, the actions listed in the `app.php` config above will be routed to methods within the
 `MyApp\Controller\IndexController` object, `help()` and `hello($name)` respectively.
 
 ##### Dynamic Routing
@@ -314,10 +409,10 @@ with the application so that it can register the modules with the application.
 // Using Composer's autoloader
 $autoloader = require __DIR__  . APP_PATH . '/vendor/autoload.php';
 
-$app = new Pop\Application($autoloader, include __DIR__ . '/config/application.php');
+$app = new Pop\Application($autoloader, include __DIR__ . '/config/app.php');
 
 // $myModuleConfig contains the config settings for the
-// module, such the autoload prefix and the routes
+// module, such as the autoload prefix and the routes
 $app->register('MyModule', $myModuleConfig);
 ```
 
