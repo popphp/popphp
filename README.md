@@ -45,7 +45,7 @@ Or, require it in your composer.json file
 
 ### The Application Object
 
-Here's a simple example of wiring a web application object with a
+Here's a simple example of how to wire up a web application object with a
 configuration file that defines some basic routes:
 
 ###### app.php
@@ -82,6 +82,23 @@ The application object will parse the `routes` array and register those routes w
 ```php
 $app = new Pop\Application(include __DIR__ . '/config/app.php');
 $app->run();
+```
+
+##### Flexible Constructor
+
+The application object has a flexible constructor that allows you to inject any of the following in
+any order:
+
+```php
+$app = new Pop\Application(
+    $config,     // Can be an array, an array-like object or an instance of Pop\Config\Config
+    $autoloader, // An object that is an instance of Composer\Autoload\ClassLoader
+    $router,     // An object that is an instance of Pop\Router\Router 
+    $services,   // An object that is an instance of Pop\Service\Locator
+    $events,     // An object that is an instance of Pop\Event\Manager
+    $modules,    // An object that is an instance of Pop\Module\Manager
+);
+
 ```
 
 [Top](#basic-usage)
@@ -477,10 +494,10 @@ class IndexController extends AbstractController
 
 ### Configuration Tips
 
-You've seen in the above examples that both the application and module config arrays can have
-a 'routes' key set that defines the routes of the application or module. Additionally, the keys
-'events' and 'services' are allowed as well, so you can wire up your application and module
-all from the configuration array:
+In the above examples, both the application and module config arrays can have a `routes` key
+set that defines the routes of the application or module. Additionally, the keys `events` and
+`services` are allowed as well, so an application or module can be wired up all from the
+configuration array:
 
 ```php
 <?php
@@ -518,14 +535,14 @@ return [
 ];
 ```
 
-The module config also supports the keys 'prefix', 'psr-0' and 'src' for autoloading purposes.
-The default is to autoload with PSR-4, unless the 'psr-0' key is set to `true`.
+The config also supports the keys `prefix`, `psr-0` and `src` for autoloading purposes.
+The default is to autoload with PSR-4, unless the `psr-0` key is set to `true`.
 
 ```php
 <?php
 return [
-    'prefix'     => 'MyModule\\',
-    'src'        => __DIR__ . '/../src',
+    'prefix' => 'MyModule\\',
+    'src'    => __DIR__ . '/../src',
 ];
 ```
 
