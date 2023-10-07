@@ -8,7 +8,7 @@ popphp
 
 OVERVIEW
 --------
-`popphp` is the main set of core components for the Pop PHP Framework.
+`popphp` is the main set of core components for the [Pop PHP Framework](http://www.popphp.org/).
 It provides the main Application object that can be configured to manage
 and interface with the underlying core components:
 
@@ -18,8 +18,6 @@ and interface with the underlying core components:
 * Module Manager
 * Event Manager
 * Service Locator
-
-`popphp` is the main core component of the [Pop PHP Framework](http://www.popphp.org/).
 
 INSTALL
 -------
@@ -96,26 +94,27 @@ that routes requests to their proper controller.
 With the `app.php` config above, the actions listed  will be routed to methods within the
 `MyApp\Controller\IndexController` object, `index()`, `users()`, `edit($id)` and `error()` respectively.
 
-The route '/users[/]' allows for an optional trailing slash. The route '/edit/:id' is expecting a value
-that will populate the variable $id that will be passed into the `edit($id)` method, such as '/edit/1001'.
-Failure to have the ID segment of the URL will result in an non-match, or invalid route.
+The route `/users[/]` allows for an optional trailing slash. The route `/edit/:id` is expecting a value
+that will populate the variable `$id` that will be passed into the `edit($id)` method, such as `/edit/1001`.
+Failure to have the ID segment of the URL will result in a non-match, or invalid route.
 
 If you don't want to be so strict about the parameters passed into a method or function, you can make
-the parameter optional like this: '/edit[/:id]'. The respective method would then look like this:
-`edit($id = null)`.
+the parameter optional like this: `/edit[/:id]`. The respective method signature would be `edit($id = null)`.
 
-Here is a list of possible route syntax options for web applications:
+##### HTTP
 
-|Web Route         |What's Expected                                                                |
+Here is a list of possible route syntax options for HTTP applications:
+
+|HTTP Route        |What's Expected                                                                |
 |------------------|-------------------------------------------------------------------------------|
-|/foo/:bar/:baz    |After segment `/foo`, the 2 params are required                                |
-|/foo[/:bar][/:baz]|After segment `/foo`, the 2 params are optional                                |
+|/foo/:bar/:baz    |After segment `/foo`, the 2 parameters are required                            |
+|/foo[/:bar][/:baz]|After segment `/foo`, the 2 parameters are optional                            |
 |/foo/:bar[/:baz]  |After segment `/foo`, the 1st param is required, last one is optional          |
 |/foo/:bar/:baz*   |After segment `/foo`, the 1st param is required, 2nd param is a required array |
 |/foo/:bar[/:baz*] |After segment `/foo`, the 1st param is required, 2nd param is an optional array|
 
-The last two examples use an array collection, which takes all the route segment values from that point on and
-maps them into an array. For example, creating a route like this:
+The last two examples use an array collection, which takes all the route segment values from that
+point on and maps them into an array. For example, creating a route like this:
 
 ```bash
 /foo/:bar*
@@ -127,11 +126,12 @@ and requesting this route:
 /foo/1/2/3
 ```
 
-will inject into the action a value of:
+will inject into the action method a value of:
 
 ```php
 $bar = [1, 2, 3];
 ```
+##### CLI
 
 The CLI router supports commands, parameter values and options. The options have the flexibility to act like
 simple option flags, option values or even option array values. Options also support short form (i.e., `-o`)
@@ -149,7 +149,7 @@ And here is a list of possible route syntax options for CLI applications:
 |foo [-o1\|--option1=]   |First command required, 1 option value                                |
 |foo [-o1\|--option1=*]  |First command required, 1 option value array                          |
 
-Parameter values are mapped 1:1 directly as named variables in the route parameters going into the
+Parameter values are mapped directly 1:1 as named variables in the route parameters going into the
 route method or function.
 
 ```bash
@@ -216,9 +216,6 @@ $options = [
     'nums' => [1, 2, 3, 4]
 ];
 ```
-
-
-
 ##### Routing for a CLI application
 
 ###### app.php
@@ -228,11 +225,11 @@ $options = [
 return [
     'routes' => [
         'help' => [
-            'controller' => 'MyApp\Controller\IndexController',
+            'controller' => 'MyApp\Controller\ConsoleController',
             'action'     => 'help'
         ],
         'hello <name>' => [
-            'controller' => 'MyApp\Controller\IndexController',
+            'controller' => 'MyApp\Controller\ConsoleController',
             'action'     => 'hello'
         ]
     ]
@@ -247,13 +244,13 @@ $app->run();
 ```
 
 As before, the actions listed in the `app.php` config above will be routed to methods within the
-`MyApp\Controller\IndexController` object, `help()` and `hello($name)` respectively.
+`MyApp\Controller\ConsoleController` object, `help()` and `hello($name)` respectively.
 
 ##### Dynamic Routing
 
-There is support for dynamic routing for both web and CLI applications. The reserved route keywords
+There is support for dynamic routing for both HTTP and CLI applications. The reserved route keywords
 `controller` and `action` are used to map the route to a matched controller class and respective
-action method within that class. You could define a dynamic web route like this:
+action method within that class. You could define a dynamic HTTP route like this:
 
 ```php
 <?php
