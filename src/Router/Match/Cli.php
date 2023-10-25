@@ -491,9 +491,13 @@ class Cli extends AbstractMatch
 
             if (isset($this->parameters[$route])) {
                 // Filter out commands and options from route segments, leaving only potential parameters
-                $paramSegments = [];
-                foreach ($this->commands as $command) {
-                    $paramSegments = array_merge($paramSegments, array_diff($this->segments, $command));
+                $paramSegments = $this->segments;
+                if (isset($this->commands[$route]) && is_array($this->commands[$route])) {
+                    foreach ($this->commands[$route] as $command) {
+                        if (in_array($command, $paramSegments)) {
+                            unset($paramSegments[array_search($command, $paramSegments)]);
+                        }
+                    }
                 }
                 $paramSegments = array_values(array_filter($paramSegments, function($value) {
                     return !str_starts_with($value, '-');
