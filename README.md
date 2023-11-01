@@ -4,9 +4,25 @@ popphp
 [![Build Status](https://github.com/popphp/popphp/workflows/phpunit/badge.svg)](https://github.com/popphp/popphp/actions)
 [![Coverage Status](http://cc.popphp.org/coverage.php?comp=popphp)](http://cc.popphp.org/popphp/)
 
-[![Join the chat at https://discord.gg/8DUdCr9x](https://www.popphp.org/assets/img/discord-chat.svg)](https://discord.gg/8DUdCr9x)
+[![Join the chat at https://popphp.slack.com](https://media.popphp.org/img/slack.svg)](https://popphp.slack.com)
+[![Join the chat at https://discord.gg/D9JBxPa5](https://media.popphp.org/img/discord.svg)](https://discord.gg/D9JBxPa5)
 
-OVERVIEW
+* [Overview](#overview)
+* [Install](#install)
+* [Quickstart](#quickstart)
+* [The Application Object](#the-application-object)
+* [The Router Object](#the-router-object)
+    - [HTTP Routes](#http-routes)
+    - [CLI Routes](#cli-routes)
+    - [Dynamic Routing](#dynamic-routing)
+* [The Controller Object](#the-controller-object)
+* [The Model Object](#the-model-object)
+* [The Module Manager](#the-module-manager)
+* [The Event Manager](#the-event-manager)
+* [The Service Locator](#the-service-locator)
+* [Configuration Tips](#configuration-tips)
+
+Overview
 --------
 `popphp` is the main set of core components for the [Pop PHP Framework](http://www.popphp.org/).
 It provides the main Application object that can be configured to manage
@@ -19,7 +35,9 @@ and interface with the underlying core components:
 * Event Manager
 * Service Locator
 
-INSTALL
+[Top](#popphp)
+
+Install
 -------
 
 Install `popphp` using Composer.
@@ -32,23 +50,57 @@ Or, require it in your composer.json file
         "popphp/popphp" : "^4.0.0"
     }
 
-## BASIC USAGE
+[Top](#popphp)
 
-* [The Application Object](#the-application-object)
-* [The Router Object](#the-router-object)
-* [The Controller Object](#the-controller-object)
-* [The Model Object](#the-model-object)
-* [The Module Manager](#the-module-manager)
-* [The Event Manager](#the-event-manager)
-* [The Service Locator](#the-service-locator)
-* [Configuration Tips](#configuration-tips)
+Quickstart
+----------
 
-### The Application Object
+Here's a config file for a basic HTTP web application with some routes in it:
 
-Here's a simple example of how to wire up a web application object with a
-configuration file that defines some basic routes:
+#### app.http.php
 
-###### app.php
+```php
+<?php
+return [
+    'routes' => [
+        '/' => [
+            'controller' => 'MyApp\Controller\IndexController',
+            'action'     => 'index'
+        ],
+        '*' => [
+            'controller' => 'MyApp\Controller\IndexController',
+            'action'     => 'error'
+        ]
+    ]
+];
+```
+
+And here's a basic `index.php` front controller that will drive the application:
+
+#### index.php
+
+```php
+$app = new Pop\Application(include __DIR__ . '/config/app.http.php');
+$app->run();
+```
+
+Any request that comes to that front controller will be routed accordingly. For example:
+
+```bash
+$ curl -i -X GET http://localhost/
+```
+
+The `/` request would route to and execute the `MyApp\Controller\IndexController->index` method.
+
+[Top](#popphp)
+
+The Application Object
+----------------------
+
+Here's an extended example of how to wire up a web application object with a configuration
+file that defines some basic routes:
+
+#### app.http.php
 
 ```php
 <?php
@@ -75,114 +127,86 @@ return [
 ```
 
 Then you can use `include` to push the configuration array into the application object.
-The application object will parse the `routes` array and register those routes with the application.
+The application object will parse the `routes` array and register those routes with
+the application.
 
-###### index.php
+#### index.php
 
 ```php
-$app = new Pop\Application(include __DIR__ . '/config/app.php');
+$app = new Pop\Application(include __DIR__ . '/config/app.http.php');
 $app->run();
 ```
 
-##### Flexible Constructor
+#### Flexible Constructor
 
 The application object has a flexible constructor that allows you to inject any of the following in
 any order:
 
 ```php
 $app = new Pop\Application(
-    $config,     // Can be an array, an array-like object or an instance of Pop\Config\Config
-    $autoloader, // An object that is an instance of Composer\Autoload\ClassLoader
-    $router,     // An object that is an instance of Pop\Router\Router 
-    $services,   // An object that is an instance of Pop\Service\Locator
-    $events,     // An object that is an instance of Pop\Event\Manager
-    $modules,    // An object that is an instance of Pop\Module\Manager
+    $config,     // An array, an array-like object or an instance of Pop\Config\Config
+    $autoloader, // An instance of Composer\Autoload\ClassLoader
+    $router,     // An instance of Pop\Router\Router
+    $services,   // An instance of Pop\Service\Locator
+    $events,     // An instance of Pop\Event\Manager
+    $modules,    // An instance of Pop\Module\Manager
 );
 
 ```
 
-[Top](#basic-usage)
+[Top](#popphp)
 
-### The Router Object
+The Router Object
+-----------------
 
 The router object is one of the main components of a Pop application. It serves as the gatekeeper
 that routes requests to their proper controller.
 
-With the `app.php` config above, the actions listed  will be routed to methods within the
+With the `app.http.php` config above, the actions listed  will be routed to methods within the
 `MyApp\Controller\IndexController` object, `index()`, `users()`, `edit($id)` and `error()` respectively.
 
 The route `/users[/]` allows for an optional trailing slash. The route `/edit/:id` is expecting a value
-that will populate the variable `$id` that will be passed into the `edit($id)` method, such as `/edit/1001`.
+that will populate the `$id` parameter that will be passed into the `edit($id)` method, such as `/edit/1001`.
 Failure to have the ID segment of the URL will result in a non-match, or invalid route.
 
 If you don't want to be so strict about the parameters passed into a method or function, you can make
 the parameter optional like this: `/edit[/:id]`. The respective method signature would be `edit($id = null)`.
 
-##### HTTP
+[Top](#popphp)
+
+### HTTP Routes
 
 Here is a list of possible route syntax options for HTTP applications:
 
-|HTTP Route        |What's Expected                                                                |
-|------------------|-------------------------------------------------------------------------------|
-|/foo/:bar/:baz    |After segment `/foo`, the 2 parameters are required                            |
-|/foo[/:bar][/:baz]|After segment `/foo`, the 2 parameters are optional                            |
-|/foo/:bar[/:baz]  |After segment `/foo`, the 1st param is required, last one is optional          |
-|/foo/:bar/:baz*   |After segment `/foo`, the 1st param is required, 2nd param is a required array |
-|/foo/:bar[/:baz*] |After segment `/foo`, the 1st param is required, 2nd param is an optional array|
+|HTTP Route        |What's Expected                                                     |
+|------------------|--------------------------------------------------------------------|
+|/foo/:bar/:baz    |The 2 params are required                                           |
+|/foo/:bar[/:baz]  |First param required, last one is optional                          |
+|/foo/:bar/:baz*   |One required param, one required param that is a collection (array) |
+|/foo/:bar[/:baz*] |One required param, one optional param that is a collection (array) |
 
-The last two examples use an array collection, which takes all the route segment values from that
-point on and maps them into an array. For example, creating a route like this:
 
-```bash
-/foo/:bar*
-```
+[Top](#popphp)
 
-and requesting this route:
+### CLI Routes
 
-```bash
-/foo/1/2/3
-```
+Here is a list of possible route syntax options for CLI applications:
 
-will inject into the action method a value of:
+|CLI Route                    |What's Expected                                           |
+|-----------------------------|----------------------------------------------------------|
+|foo bar                      |Two commands are required                                 |
+|foo bar\|baz                 |Two commands are required, the 2nd can accept 2 values    |
+|foo [bar\|baz]               |The second command is optional and can accept 2 values    |
+|foo \<name\> [\<email\>]     |First parameter required, 2nd parameter optional          |
+|foo --name=|-n [-e|--email=] |First option value required, 2nd option value is optional |
+|foo [--option|-o]            |Option with both long and short formats                   |
 
-```php
-$bar = [1, 2, 3];
-```
-##### CLI
-
-The CLI router supports commands, parameter values and options. The options have the flexibility to act like
-simple option flags, option values or even option array values. Options also support short form (i.e., `-o`)
-and long form (i.e., `--option`).
-
-And here is a list of possible route syntax options for CLI applications:
-
-|CLI Route               |What's Expected                                                       |
-|------------------------|----------------------------------------------------------------------|
-|foo bar                 |Both commands are required                                            |
-|foo [bar\|baz]          |First command is required, 2nd command has optional 2 values          |
-|foo \<name\> [\<email\>]|First command required, 1st parameter required, 2nd parameter optional|
-|foo [-o1] [-o2]         |First command required, and there are 2 short options                 |
-|foo [-o1\|--option1]    |First command required, 1 option that supports both long and short    |
-|foo [-o1\|--option1=]   |First command required, 1 option value                                |
-|foo [-o1\|--option1=*]  |First command required, 1 option value array                          |
-
-Parameter values are directly mapped 1:1 as named variables in the route parameters going into the
-route method or function.
-
-```bash
-foo [-p] [-v|--verbose] <name> [<email>]
-```
-
-```bash
-foo John john@test.com
-```
+Options are passed as the last parameter injected into the route parameters of the route method or function.
+The `$options` parameter will be an array. When the options are simple flags, the values in the array are booleans:
 
 ```php
 function($name, $email = null, array $options = []) { }
 ```
-
-Options are passed as the last parameter injected into the route parameters of the route method or function.
-The `options` variable will be an array. When the options are simple flags, the values in the array are booleans:
 
 ```bash
 foo -p --verbose John john@test.com
@@ -195,8 +219,8 @@ $options = [
 ];
 ```
 
-Option values require a long form designator for variable naming purposes within PHP. The options array
-will contain those values. However, the value can be passed on the route in both long and short form:
+Option values will populate the `$options` parameter like this:
+
 
 ```bash
 foo [-n|--name=]
@@ -210,32 +234,15 @@ foo -nJohn
 foo --name=John
 ```
 
-Both examples above will populate the options array with:
-
 ```php
 $options = ['name' => 'John'];
 ```
 
-Option values arrays work similar to option values, but collect multiple values for the same option into an array.
+[Top](#popphp)
 
-```bash
-foo [-n|--nums=*]
-```
+### Routing for a CLI application
 
-```bash
-foo -n1 --nums=2 --nums=3 -n4
-```
-
-Both examples above will populate the options array with:
-
-```php
-$options = [
-    'nums' => [1, 2, 3, 4]
-];
-```
-##### Routing for a CLI application
-
-###### app.php
+#### app.cli.php
 
 ```php
 <?php
@@ -253,17 +260,19 @@ return [
 ];
 ```
 
-###### app.php
+#### index.php
 
 ```php
-$app = new Pop\Application(include __DIR__ . '/config/app.php');
+$app = new Pop\Application(include __DIR__ . '/config/app.cli.php');
 $app->run();
 ```
 
-As before, the actions listed in the `app.php` config above will be routed to methods within the
+As before, the actions listed in the `app.cli.php` config above will be routed to methods within the
 `MyApp\Controller\ConsoleController` object, `help()` and `hello($name)` respectively.
 
-##### Dynamic Routing
+[Top](#popphp)
+
+### Dynamic Routing
 
 There is support for dynamic routing for both HTTP and CLI applications. The reserved route keywords
 `controller` and `action` are used to map the route to a matched controller class and respective
@@ -303,9 +312,10 @@ which will map a route like
     foo users edit 1001
     MyApp\Controller\UsersController->edit($id)
 
-[Top](#basic-usage)
+[Top](#popphp)
 
-### The Controller Object
+The Controller Object
+---------------------
 
 The controller object is the 'C' in the MVC design pattern and gives you the ability to encapsulate
 the behavior and functionality of how the routes behave and are handled. But it should be noted that
@@ -333,7 +343,7 @@ $app = new Application(new Router($routes));
 $app->run();
 ```
 
-But, for most larger applications, it would be best to use a full controller object to manage the
+But, for most large-scale applications, it would be best to use a full controller object to manage the
 overall behavior or what is to happen for specific routes. The base controller object is an abstract
 controller class `Pop\Controller\AbstractController`, which implements `Pop\Controller\ControllerInterface`.
 The base functionality is fairly simple and allows you to build and structure your controller as needed.
@@ -377,9 +387,10 @@ class IndexController extends AbstractController
 }
 ```
 
-[Top](#basic-usage)
+[Top](#popphp)
 
-### The Model Object
+The Model Object
+----------------
 
 The model object is the 'M' in the MVC design pattern and gives you the ability to map your data to
 an object that can be consumed and utilized by the other parts of you application. An abstract model
@@ -409,9 +420,10 @@ class User extends AbstractModel
 **Note:** It is not required to use the abstract model class, and it merely exists as a convenience. The "models"
 of your application can be whatever is preferred or required for your use case.
 
-[Top](#basic-usage)
+[Top](#popphp)
 
-### The Module Manager
+The Module Manager
+------------------
 
 The module manager provides a way to extend the core functionality of your application. The module manager
 object is really a collection object of actual module objects that serves as the bridge to integrate the
@@ -434,9 +446,10 @@ $app = new Pop\Application($autoloader, include __DIR__ . '/config/app.php');
 $app->register(new MyModule($myModuleConfig));
 ```
 
-[Top](#basic-usage)
+[Top](#popphp)
 
-### The Event Manager
+The Event Manager
+-----------------
 
 The event manager provides a way to hook specific events and functionality into certain points in the
 application's life cycle. The default hook points with the application object are:
@@ -456,9 +469,10 @@ $app->on('app.route.pre', function($application) {
 });
 ```
 
-[Top](#basic-usage)
+[Top](#popphp)
 
-### The Service Locator
+The Service Locator
+-------------------
 
 The service locator provides a way to make common services available throughout the application's
 life cycle. You can set them up at the beginning of the application and call them any time during
@@ -507,9 +521,10 @@ class IndexController extends AbstractController
 }
 ```
 
-[Top](#basic-usage)
+[Top](#popphp)
 
-### Configuration Tips
+Configuration Tips
+------------------
 
 In the above examples, both the application and module config arrays can have a `routes` key
 set that defines the routes of the application or module. Additionally, the keys `events` and
@@ -563,4 +578,4 @@ return [
 ];
 ```
 
-[Top](#basic-usage)
+[Top](#popphp)
