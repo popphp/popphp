@@ -204,7 +204,7 @@ An example of an invalid request would be:
 $ php app.php bad request
 ```
 
-##### Shortening the CLI script name
+#### Shortening the CLI script name
 
 Depending on your environment, a CLI front controller or script can be shortened to just a file basename
 (with the `.php` extension), for example:
