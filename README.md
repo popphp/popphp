@@ -243,7 +243,7 @@ and set to be executable:
 $ chmod 755 ./app
 ```
 
-Then the CLI application can be accessed in a shorted, more concise way, like:
+Then the CLI application can be accessed in a shortened, more concise way, like:
 
 ```bash
 $ ./app hello Nick
