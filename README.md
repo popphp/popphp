@@ -154,6 +154,8 @@ An example of an invalid request would be:
 $ curl -i -X GET http://localhost/bad-request
 ```
 
+[Top](#popphp)
+
 #### Setting up a CLI application
 
 Here's an example of how to wire up a CLI-based application object with a configuration
@@ -236,6 +238,8 @@ Then the CLI application can be accessed in a shorted, more concise way, like:
 ```bash
 $ ./app hello Nick
 ```
+
+[Top](#popphp)
 
 #### Flexible Constructor
 
