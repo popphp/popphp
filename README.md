@@ -93,6 +93,8 @@ $ curl -i -X GET http://localhost/
 
 would route to and execute the `MyApp\Controller\IndexController->index` method.
 
+Any invalid request would route to the `MyApp\Controller\IndexController->error` method. 
+
 [Top](#popphp)
 
 Applications
