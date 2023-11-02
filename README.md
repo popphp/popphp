@@ -260,6 +260,10 @@ return [
         'hello <name>' => [
             'controller' => 'MyApp\Controller\ConsoleController',
             'action'     => 'hello'
+        ],
+        '*' => [
+            'controller' => 'MyApp\Controller\ConsoleController',
+            'action'     => 'error'
         ]
     ]
 ];
@@ -273,7 +277,8 @@ $app->run();
 ```
 
 As before, the actions listed in the `app.cli.php` config above will be routed to methods within the
-`MyApp\Controller\ConsoleController` object, `help()` and `hello($name)` respectively.
+`MyApp\Controller\ConsoleController` object, `help()` and `hello($name)` respectively. And like HTTP,
+a default `error()` action can be defined to handle invalid CLI commands. 
 
 [Top](#popphp)
 
