@@ -203,8 +203,8 @@ Here is a list of possible route syntax options for CLI applications:
 |foo bar\|baz                 |Two commands are required, the 2nd can accept 2 values    |
 |foo [bar\|baz]               |The second command is optional and can accept 2 values    |
 |foo \<name\> [\<email\>]     |First parameter required, 2nd parameter optional          |
-|foo --name=|-n [-e|--email=] |First option value required, 2nd option value is optional |
-|foo [--option|-o]            |Option with both long and short formats                   |
+|foo --name=\|-n [-e\|--email=] |First option value required, 2nd option value is optional |
+|foo [--option\|-o]            |Option with both long and short formats                   |
 
 Options are passed as the last parameter injected into the route parameters of the route method or function.
 The `$options` parameter will be an array. When the options are simple flags, the values in the array are booleans:
