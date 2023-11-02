@@ -84,13 +84,14 @@ $app = new Pop\Application(include __DIR__ . '/config/app.http.php');
 $app->run();
 ```
 
-Any request that comes to that front controller will be routed accordingly. For example:
+Any request that comes to that front controller will be routed accordingly. For example,
+the request `/`:
 
 ```bash
 $ curl -i -X GET http://localhost/
 ```
 
-The `/` request would route to and execute the `MyApp\Controller\IndexController->index` method.
+would route to and execute the `MyApp\Controller\IndexController->index` method.
 
 [Top](#popphp)
 
@@ -160,7 +161,9 @@ Router
 ------
 
 The router object is one of the main components of a Pop application. It serves as the gatekeeper
-that routes requests to their proper controller.
+that routes requests to their proper controller. It works for both HTTP web applications and CLI-based
+applications. The router object will auto-detect the environment and use the correct router matching
+object for it.
 
 With the `app.http.php` config above, the actions listed  will be routed to methods within the
 `MyApp\Controller\IndexController` object, `index()`, `users()`, `edit($id)` and `error()` respectively.
