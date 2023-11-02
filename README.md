@@ -324,7 +324,7 @@ function($name, $email = null, array $options = []) { }
 ```
 
 ```bash
-foo -p --verbose John john@test.com
+./foo -p --verbose John john@test.com
 ```
 
 ```php
@@ -337,15 +337,15 @@ $options = [
 Option values will populate the `$options` parameter in key/value pairs, like this:
 
 ```bash
-foo [-n|--name=]
+./foo [-n|--name=]
 ```
 
 ```bash
-foo -nJohn
+./foo -nJohn
 ```
 
 ```bash
-foo --name=John
+./foo --name=John
 ```
 
 ```php
