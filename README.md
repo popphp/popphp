@@ -135,6 +135,8 @@ Then you can use `include` to push the configuration array into the application 
 The application object will parse the `routes` array and register those routes with
 the application.
 
+The `index.php` front controller for the web application would look like this:
+
 ##### index.php
 
 ```php
@@ -182,6 +184,8 @@ return [
     ]
 ];
 ```
+
+The `app.php` front controller (or main script) for the CLI application would look like this:
 
 ##### app.php
 
