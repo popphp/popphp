@@ -100,7 +100,7 @@ Any invalid request would route to the `MyApp\Controller\IndexController->error`
 Applications
 ------------
 
-#### Routing for an HTTP application
+#### Setting up an HTTP application
 
 Here's an extended example of how to wire up a web application object with a configuration
 file that defines some basic routes:
@@ -154,7 +154,7 @@ An example of an invalid request would be:
 $ curl -i -X GET http://localhost/bad-request
 ```
 
-#### Routing for a CLI application
+#### Setting up a CLI application
 
 Here's an example of how to wire up a CLI-based application object with a configuration
 file that defines some basic routes:
