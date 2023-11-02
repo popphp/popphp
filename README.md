@@ -13,7 +13,7 @@ popphp
 * [Applications](#applications)
   - [HTTP Applications](#setting-up-an-http-application)
   - [CLI Applications](#setting-up-a-cli-application)
-  - [Shortening the CLI](#shortening-the-cli-script-name)
+  - [CLI Shortcut](#cli-shortcut)
   - [Flexible Constructor](#flexible-constructor)
 * [Router](#router)
     - [HTTP Routes](#http-routes)
@@ -216,7 +216,7 @@ $ php app.php bad request
 
 [Top](#popphp)
 
-#### Shortening the CLI script name
+#### CLI Shortcut
 
 Depending on your environment, a CLI front controller or script can be shortened to just a file basename
 (with the `.php` extension), for example:
