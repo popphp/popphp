@@ -219,7 +219,7 @@ $ php app.php bad request
 #### CLI Shortcut
 
 Depending on your environment, a CLI front controller or script can be shortened to just a file basename
-(with the `.php` extension), for example:
+(without the `.php` extension), for example:
 
 ```bash
 $ ./app
