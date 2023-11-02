@@ -334,8 +334,7 @@ $options = [
 ];
 ```
 
-Option values will populate the `$options` parameter like this:
-
+Option values will populate the `$options` parameter in key/value pairs, like this:
 
 ```bash
 foo [-n|--name=]
