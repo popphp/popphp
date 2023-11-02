@@ -100,10 +100,12 @@ Any invalid request would route to the `MyApp\Controller\IndexController->error`
 Applications
 ------------
 
+#### Routing for an HTTP application
+
 Here's an extended example of how to wire up a web application object with a configuration
 file that defines some basic routes:
 
-#### app.http.php
+##### app.http.php
 
 ```php
 <?php
@@ -133,11 +135,106 @@ Then you can use `include` to push the configuration array into the application 
 The application object will parse the `routes` array and register those routes with
 the application.
 
-#### index.php
+##### index.php
 
 ```php
 $app = new Pop\Application(include __DIR__ . '/config/app.http.php');
 $app->run();
+```
+
+An example of a valid request to the above HTTP application would be:
+
+```bash
+$ curl -i -X GET http://localhost/edit/1001
+```
+
+An example of an invalid request would be:
+
+```bash
+$ curl -i -X GET http://localhost/bad-request
+```
+
+#### Routing for a CLI application
+
+Here's an example of how to wire up a CLI-based application object with a configuration
+file that defines some basic routes:
+
+##### app.cli.php
+
+```php
+<?php
+return [
+    'routes' => [
+        'help' => [
+            'controller' => 'MyApp\Controller\ConsoleController',
+            'action'     => 'help'
+        ],
+        'hello <name>' => [
+            'controller' => 'MyApp\Controller\ConsoleController',
+            'action'     => 'hello'
+        ],
+        '*' => [
+            'controller' => 'MyApp\Controller\ConsoleController',
+            'action'     => 'error'
+        ]
+    ]
+];
+```
+
+##### app.php
+
+```php
+$app = new Pop\Application(include __DIR__ . '/config/app.cli.php');
+$app->run();
+```
+
+As before, the actions listed in the `app.cli.php` config above will be routed to methods within the
+`MyApp\Controller\ConsoleController` object, `help()` and `hello($name)` respectively. And like HTTP,
+a default `error()` action can be defined to handle invalid CLI commands.
+
+An example of a valid request to the above CLI application would be:
+
+```bash
+$ php app.php hello Nick
+```
+
+An example of an invalid request would be:
+
+```bash
+$ php app.php bad request
+```
+
+##### Shortening the CLI script name
+
+Depending on your environment, a CLI front controller or script can be shortened to just a file basename
+(with the `.php` extension), for example:
+
+```bash
+$ ./app
+```
+
+But the script and its contents would have to be properly configured, for example:
+
+```php
+#!/usr/bin/php
+<?php
+
+/* include any autoloader or other content */
+
+$app = new Pop\Application(include __DIR__ . '/config/app.cli.php');
+$app->run();
+```
+
+and set to be executable:
+
+```bash
+$ chmod 755 ./app
+```
+
+Then the CLI application can be accessed in a shorted, more concise way, like:
+
+```bash
+$ ./app hello Nick
 ```
 
 #### Flexible Constructor
@@ -154,7 +251,6 @@ $app = new Pop\Application(
     $events,     // An instance of Pop\Event\Manager
     $modules,    // An instance of Pop\Module\Manager
 );
-
 ```
 
 [Top](#popphp)
@@ -242,43 +338,6 @@ foo --name=John
 ```php
 $options = ['name' => 'John'];
 ```
-
-[Top](#popphp)
-
-### Routing for a CLI application
-
-#### app.cli.php
-
-```php
-<?php
-return [
-    'routes' => [
-        'help' => [
-            'controller' => 'MyApp\Controller\ConsoleController',
-            'action'     => 'help'
-        ],
-        'hello <name>' => [
-            'controller' => 'MyApp\Controller\ConsoleController',
-            'action'     => 'hello'
-        ],
-        '*' => [
-            'controller' => 'MyApp\Controller\ConsoleController',
-            'action'     => 'error'
-        ]
-    ]
-];
-```
-
-#### index.php
-
-```php
-$app = new Pop\Application(include __DIR__ . '/config/app.cli.php');
-$app->run();
-```
-
-As before, the actions listed in the `app.cli.php` config above will be routed to methods within the
-`MyApp\Controller\ConsoleController` object, `help()` and `hello($name)` respectively. And like HTTP,
-a default `error()` action can be defined to handle invalid CLI commands. 
 
 [Top](#popphp)
 
