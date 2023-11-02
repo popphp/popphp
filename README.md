@@ -10,16 +10,16 @@ popphp
 * [Overview](#overview)
 * [Install](#install)
 * [Quickstart](#quickstart)
-* [The Application Object](#the-application-object)
-* [The Router Object](#the-router-object)
+* [Applications](#applications)
+* [Router](#router)
     - [HTTP Routes](#http-routes)
     - [CLI Routes](#cli-routes)
     - [Dynamic Routing](#dynamic-routing)
-* [The Controller Object](#the-controller-object)
-* [The Model Object](#the-model-object)
-* [The Module Manager](#the-module-manager)
-* [The Event Manager](#the-event-manager)
-* [The Service Locator](#the-service-locator)
+* [Controllers](#controller)
+* [Models](#models)
+* [Module Manager](#module-manager)
+* [Event Manager](#event-manager)
+* [Service Locator](#service-locator)
 * [Configuration Tips](#configuration-tips)
 
 Overview
@@ -94,8 +94,8 @@ The `/` request would route to and execute the `MyApp\Controller\IndexController
 
 [Top](#popphp)
 
-The Application Object
-----------------------
+Applications
+------------
 
 Here's an extended example of how to wire up a web application object with a configuration
 file that defines some basic routes:
@@ -156,8 +156,8 @@ $app = new Pop\Application(
 
 [Top](#popphp)
 
-The Router Object
------------------
+Router
+------
 
 The router object is one of the main components of a Pop application. It serves as the gatekeeper
 that routes requests to their proper controller.
@@ -314,8 +314,8 @@ which will map a route like
 
 [Top](#popphp)
 
-The Controller Object
----------------------
+Controllers
+-----------
 
 The controller object is the 'C' in the MVC design pattern and gives you the ability to encapsulate
 the behavior and functionality of how the routes behave and are handled. But it should be noted that
@@ -389,8 +389,8 @@ class IndexController extends AbstractController
 
 [Top](#popphp)
 
-The Model Object
-----------------
+Models
+------
 
 The model object is the 'M' in the MVC design pattern and gives you the ability to map your data to
 an object that can be consumed and utilized by the other parts of you application. An abstract model
@@ -422,8 +422,8 @@ of your application can be whatever is preferred or required for your use case.
 
 [Top](#popphp)
 
-The Module Manager
-------------------
+Module Manager
+--------------
 
 The module manager provides a way to extend the core functionality of your application. The module manager
 object is really a collection object of actual module objects that serves as the bridge to integrate the
@@ -448,8 +448,8 @@ $app->register(new MyModule($myModuleConfig));
 
 [Top](#popphp)
 
-The Event Manager
------------------
+Event Manager
+-------------
 
 The event manager provides a way to hook specific events and functionality into certain points in the
 application's life cycle. The default hook points with the application object are:
@@ -471,8 +471,8 @@ $app->on('app.route.pre', function($application) {
 
 [Top](#popphp)
 
-The Service Locator
--------------------
+Service Locator
+---------------
 
 The service locator provides a way to make common services available throughout the application's
 life cycle. You can set them up at the beginning of the application and call them any time during
