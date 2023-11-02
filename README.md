@@ -373,8 +373,11 @@ return [
 
 which will map a route like
 
-    /users/edit/1001
-    MyApp\Controller\UsersController->edit($id)
+```text
+/users/edit/1001
+MyApp\Controller\UsersController->edit($id)
+```
+
 
 A dynamic CLI route like would work in a similar fashion:
 
@@ -391,8 +394,10 @@ return [
 
 which will map a route like
 
-    foo users edit 1001
-    MyApp\Controller\UsersController->edit($id)
+```text
+./foo users edit 1001
+MyApp\Controller\UsersController->edit($id)
+```
 
 [Top](#popphp)
 
