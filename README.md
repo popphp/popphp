@@ -589,8 +589,8 @@ class IndexController extends AbstractController
 
 #### Service Container
 
-If you don't have direct access to the application's service locator, you can use the
-global service container:
+If you are in an area of the application where you don't have direct access to the
+application's service locator, you can use the globally available service container:
 
 ```php
 <?php
