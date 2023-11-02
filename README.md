@@ -11,6 +11,10 @@ popphp
 * [Install](#install)
 * [Quickstart](#quickstart)
 * [Applications](#applications)
+  - [HTTP Applications](#setting-up-an-http-application)
+  - [CLI Applications](#setting-up-a-cli-application)
+  - [Shortening the CLI](#shortening-the-cli-script-name)
+  - [Flexible Constructor](#flexible-constructor)
 * [Router](#router)
     - [HTTP Routes](#http-routes)
     - [CLI Routes](#cli-routes)
@@ -209,6 +213,8 @@ An example of an invalid request would be:
 ```bash
 $ php app.php bad request
 ```
+
+[Top](#popphp)
 
 #### Shortening the CLI script name
 
