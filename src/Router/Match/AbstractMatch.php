@@ -344,8 +344,8 @@ abstract class AbstractMatch implements MatchInterface
      */
     public function hasRouteConfig(?string $key = null): bool
     {
-        if ((null !== $this->route) && isset($this->preparedRoutes[$this->route])) {
-            return !((null !== $key) || isset($this->preparedRoutes[$this->route][$key]));
+        if (($this->route !== null) && isset($this->preparedRoutes[$this->route])) {
+            return ((($key !== null) && isset($this->preparedRoutes[$this->route][$key])) || (!empty($this->preparedRoutes[$this->route])));
         } else {
             return false;
         }
