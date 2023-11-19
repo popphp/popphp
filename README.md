@@ -22,7 +22,7 @@ popphp
 * [Controllers](#controllers)
 * [Models](#models)
 * [Modules](#modules)
-    - [Custom Modules](#custom-module)
+    - [Custom Modules](#custom-modules)
     - [Module Manager](#module-manager)
 * [Event Manager](#event-manager)
 * [Service Locator](#service-locator)
