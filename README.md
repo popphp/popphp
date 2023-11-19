@@ -19,9 +19,11 @@ popphp
     - [HTTP Routes](#http-routes)
     - [CLI Routes](#cli-routes)
     - [Dynamic Routing](#dynamic-routing)
-* [Controllers](#controller)
+* [Controllers](#controllers)
 * [Models](#models)
-* [Module Manager](#module-manager)
+* [Modules](#modules)
+    - [Custom Modules](#custom-module)
+    - [Module Manager](#module-manager)
 * [Event Manager](#event-manager)
 * [Service Locator](#service-locator)
 * [Configuration Tips](#configuration-tips)
@@ -35,7 +37,7 @@ and interface with the underlying core components:
 * Router
 * Controller
 * Model
-* Module Manager
+* Modules
 * Event Manager
 * Service Locator
 
@@ -509,8 +511,85 @@ of your application can be whatever is preferred or required for your use case.
 
 [Top](#popphp)
 
-Module Manager
---------------
+Modules
+-------
+
+Modules can be thought of as "mini-application objects" that allow you to extend the functionality
+of your application. Module objects accept similar configuration parameters as an application object,
+such as `routes`, `services` and `events`. Additionally, it accepts a `prefix` configuration
+value as well to allow the module to register itself with the application autoloader. Here's an example
+of what a module might look like and how you'd register it with an application:
+
+**Configuration Array**
+
+In the example below, the module configuration is passed into the application object. From there,
+an instance of the base module object is created and the configuration is passed into it. The newly
+created module object is then registered with the module manager within the application object.
+
+```php
+$application = new Pop\Application();
+
+$moduleConfig = [
+    'routes' => [
+        '/' => [
+            'controller' => 'MyModule\Controller\IndexController',
+            'action'     => 'index'
+        ]
+    ],
+    'prefix' => 'MyModule\\'
+];
+
+$application->register('my-module', $moduleConfig);
+```
+
+**Module Instance**
+
+In the example below, a module object is created and passed directly into the application object. The
+module object is then registered with the module manager within the application object.
+
+```php
+$application = new Pop\Application();
+
+$myModule = new Pop\Module\Module([
+    'name'   => 'my-module',
+    'routes' => [
+        '/' => [
+            'controller' => 'MyModule\Controller\IndexController',
+            'action'     => 'index'
+        ]
+    ],
+    'prefix' => 'MyModule\\'
+];
+
+$application->register($myModule);
+```
+
+### Custom Modules
+
+You can pass your own custom module objects into the application as well, as long as they implement
+the interface `Pop\Module\ModuleInterface` provided. As the example below shows, you can create a new instance of your
+custom module and pass that into the application. The benefit of
+doing this is to allow you to extend the base module class and methods and provide any additional
+functionality that may be needed. In doing it this way, however, you will have to register your module's
+namespace prefix with the application's autoloader prior to registering the module with the application
+so that the application can properly detect and load the module's source files.
+
+```php
+$application->autoloader->addPsr4('MyModule\\', __DIR__ . '/modules/mymodule/src');
+
+$myModule = new MyModule\Module([
+    'routes' => [
+        '/' => [
+            'controller' => 'MyModule\Controller\IndexController',
+            'action'     => 'index'
+        ]
+    ]
+]);
+
+$application->register('myModule', $myModule);
+```
+
+### Module Manager
 
 The module manager provides a way to extend the core functionality of your application. The module manager
 object is really a collection object of actual module objects that serves as the bridge to integrate the
