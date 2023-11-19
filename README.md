@@ -564,6 +564,8 @@ $myModule = new Pop\Module\Module([
 $application->register($myModule);
 ```
 
+[Top](#popphp)
+
 ### Custom Modules
 
 You can pass your own custom module objects into the application as well, as long as they implement
@@ -588,6 +590,8 @@ $myModule = new MyModule\Module([
 
 $application->register('myModule', $myModule);
 ```
+
+[Top](#popphp)
 
 ### Module Manager
 
