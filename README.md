@@ -284,7 +284,7 @@ an application object is created and bootstrapped, it is automatically registere
 ```php
 use Pop\App;
 
-$app = App::get(); // Returns an instance of Pop\Application
+$app = App::get(); // Returns the instance of the Pop\Application object
 ```
 
 At anytime in the application life cycle, you can use the API of the app helper class to access environmental
