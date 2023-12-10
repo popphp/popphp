@@ -277,9 +277,9 @@ $app = new Pop\Application(
 App Helper
 ----------
 
-There is an "app helper" class that manages any environmental variables set in the `.env` file as well as
-provides quick access to the current application object from anywhere in your application life cycle. When
-an application object is created and bootstrapped, it is automatically registered with this static class.
+There is an "app helper" class that provides access to any environmental variables set in the `.env` file
+as well as provides quick access to the current application object from anywhere in your application life cycle.
+When an application object is created and bootstrapped, it is automatically registered with this static class.
 
 ```php
 use Pop\App;
@@ -289,6 +289,14 @@ $app = App::get(); // Returns the instance of the Pop\Application object
 
 At anytime in the application life cycle, you can use the API of the app helper class to access environmental
 variables, like this:
+
+```php
+use Pop\App;
+
+if (App::env('SOME_VALUE') == 'foo') {
+    // Do something
+}
+```
 
 ```php
 use Pop\App;
