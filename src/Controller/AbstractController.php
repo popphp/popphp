@@ -102,8 +102,7 @@ abstract class AbstractController implements ControllerInterface
                 $this->$action();
             } else {
                 throw new Exception(
-                    "The application is currently in maintenance mode. The action '" .
-                    $action . "' is not defined in the controller."
+                    "The application is currently in maintenance mode. The maintenance action is not defined in the controller."
                 );
             }
         }
@@ -120,7 +119,7 @@ abstract class AbstractController implements ControllerInterface
             $action = $this->defaultAction;
             $this->$action();
         } else {
-            throw new Exception("The action '" . $action . "' is not defined in the controller.");
+            throw new Exception("The action to handle the route is not defined in the controller.");
         }
     }
 
