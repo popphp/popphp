@@ -298,6 +298,14 @@ if (App::env('SOME_VALUE') == 'foo') {
 }
 ```
 
+Supported values for the `APP_ENV` variable are:
+
+- `local`
+- `dev`
+- `testing`
+- `staging`
+- `production` (or just `prod`) 
+
 ```php
 use Pop\App;
 
@@ -315,6 +323,8 @@ if (App::isDown()) {
     // Handle the app in "maintenance mode"
 }
 ```
+
+The above example works off of the `MAINTENANCE_MODE` variable being set to either `true` or `false`. 
 
 The full API is:
 
