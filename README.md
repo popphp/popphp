@@ -298,7 +298,10 @@ if (App::env('SOME_VALUE') == 'foo') {
 }
 ```
 
-Supported values for the `APP_ENV` variable are:
+#### Application Environment
+
+The application environment variable sets what type of environment the current running app is in. Supported values
+for the `APP_ENV` variable are:
 
 - `local`
 - `dev`
@@ -315,6 +318,11 @@ if (App::isLocal()) {
     // Do something in the production environment
 }
 ```
+
+#### Maintenance Mode
+
+The `MAINTENANCE_MODE` variable can be set to either `true` or `false` to put the application into a controlled
+"down" state while upgrades and/or maintenance are being performed.
 
 ```php
 use Pop\App;
