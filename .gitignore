@@ -5,4 +5,4 @@ vendor
 kettle
 .phpunit.result.cache
 .phpunit.cache
-.env
+/.env
