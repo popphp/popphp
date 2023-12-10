@@ -58,6 +58,13 @@ interface ControllerInterface
     public function getMaintenanceAction(): string;
 
     /**
+     * Check the bypass maintenace check
+     *
+     * @return bool
+     */
+    public function bypassMaintenance(): bool;
+
+    /**
      * Dispatch the controller based on the action
      *
      * @param ?string $action

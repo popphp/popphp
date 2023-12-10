@@ -51,6 +51,7 @@ class ControllerTest extends TestCase
             '\Pop\Controller\AbstractController', [], '', false, false, true, ['maintenance', 'error', 'login', 'user']
         );
         $controller->expects($this->atMost(2))->method('maintenance');
+        $this->assertFalse($controller->bypassMaintenance());
         $controller->dispatch();
     }
 
