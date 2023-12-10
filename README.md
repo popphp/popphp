@@ -332,8 +332,6 @@ if (App::isDown()) {
 }
 ```
 
-The above example works off of the `MAINTENANCE_MODE` variable being set to either `true` or `false`. 
-
 The full API is:
 
 - `App::config(?string $key = null)`
@@ -548,6 +546,13 @@ use Pop\Controller\AbstractController;
 class IndexController extends AbstractController
 {
 
+    // This is the default value
+    protected string $defaultAction = 'error';
+
+    // This is the default value
+    protected string $maintenanceAction = 'maintenance';
+
+
     public function index()
     {
         // Do something for the index page
@@ -566,6 +571,11 @@ class IndexController extends AbstractController
     public function error()
     {
         // Handle a non-match route request
+    }
+
+    public function maintenance()
+    {
+        // Handle requests that come in while the application is in maintenance mode
     }
 
 }
