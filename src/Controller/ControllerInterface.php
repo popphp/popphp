@@ -41,6 +41,22 @@ interface ControllerInterface
      */
     public function getDefaultAction(): string;
 
+
+    /**
+     * Set the maintenance action
+     *
+     * @param  string $maintenance
+     * @return AbstractController
+     */
+    public function setMaintenanceAction(string $maintenance): ControllerInterface;
+
+    /**
+     * Get the maintenance action
+     *
+     * @return string
+     */
+    public function getMaintenanceAction(): string;
+
     /**
      * Dispatch the controller based on the action
      *

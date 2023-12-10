@@ -139,6 +139,8 @@ class Application extends AbstractApplication implements \ArrayAccess
         // Set the app name
         if (!empty($this->config['name'])) {
             $this->setName($this->config['name']);
+        } else if (!empty(App::name())) {
+            $this->setName(App::name());
         }
 
         // Set the app version
@@ -166,6 +168,9 @@ class Application extends AbstractApplication implements \ArrayAccess
                 }
             }
         }
+
+        // Register application object with App helper class
+        App::set($this);
 
         return $this;
     }
@@ -476,6 +481,119 @@ class Application extends AbstractApplication implements \ArrayAccess
         }
         $this->events->trigger($name, $args);
         return $this;
+    }
+
+    /**
+     * Get environment value
+     *
+     * @param  string $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function env(string $key, mixed $default = null): mixed
+    {
+        return App::env($key, $default);
+    }
+
+    /**
+     * Get application environment
+     *
+     * @param  mixed $env
+     * @return string|null|bool
+     */
+    public function environment(mixed $env = null): string|null|bool
+    {
+        return App::environment($env);
+    }
+
+    /**
+     * Get application name (alias method)
+     *
+     * @return ?string
+     */
+    public function name(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get application URL
+     *
+     * @return ?string
+     */
+    public function url(): ?string
+    {
+        return App::url();
+    }
+
+    /**
+     * Check if application environment is local
+     *
+     * @return bool
+     */
+    public function isLocal(): bool
+    {
+        return App::isLocal();
+    }
+
+    /**
+     * Check if application environment is dev
+     *
+     * @return bool
+     */
+    public function isDev(): bool
+    {
+        return App::isDev();
+    }
+
+    /**
+     * Check if application environment is testing
+     *
+     * @return bool
+     */
+    public function isTesting(): bool
+    {
+        return App::isTesting();
+    }
+
+    /**
+     * Check if application environment is staging
+     *
+     * @return bool
+     */
+    public function isStaging(): bool
+    {
+        return App::isStaging();
+    }
+
+    /**
+     * Check if application environment is production
+     *
+     * @return bool
+     */
+    public function isProduction(): bool
+    {
+        return App::isProduction();
+    }
+
+    /**
+     * Check if application is in maintenance mode
+     *
+     * @return bool
+     */
+    public function isDown(): bool
+    {
+        return App::isDown();
+    }
+
+    /**
+     * Check if application is in not maintenance mode
+     *
+     * @return bool
+     */
+    public function isUp(): bool
+    {
+        return App::isUp();
     }
 
     /**
