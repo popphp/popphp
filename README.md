@@ -15,6 +15,7 @@ popphp
   - [CLI Applications](#setting-up-a-cli-application)
   - [CLI Shortcut](#cli-shortcut)
   - [Flexible Constructor](#flexible-constructor)
+* [App Helper](#app-helper)
 * [Router](#router)
     - [HTTP Routes](#http-routes)
     - [CLI Routes](#cli-routes)
@@ -30,6 +31,7 @@ popphp
 
 Overview
 --------
+
 `popphp` is the main set of core components for the [Pop PHP Framework](http://www.popphp.org/).
 It provides the main Application object that can be configured to manage
 and interface with the underlying core components:
@@ -268,6 +270,73 @@ $app = new Pop\Application(
     $modules,    // An instance of Pop\Module\Manager
 );
 ```
+
+
+[Top](#popphp)
+
+App Helper
+----------
+
+There is an "app helper" class that manages any environmental variables set in the `.env` file as well as
+provides quick access to the current application object from anywhere in your application life cycle. When
+an application object is created and bootstrapped, it is automatically registered with this static class.
+
+```php
+use Pop\App;
+
+$app = App::get(); // Returns an instance of Pop\Application
+```
+
+At anytime in the application life cycle, you can use the API of the app helper class to access environmental
+variables, like this:
+
+```php
+use Pop\App;
+
+if (App::isLocal()) {
+    // Do something in the local environment
+} else if (App::isProduction()) {
+    // Do something in the production environment
+}
+```
+
+```php
+use Pop\App;
+
+if (App::isDown()) {
+    // Handle the app in "maintenance mode"
+}
+```
+
+The full API is:
+
+- `App::config(?string $key = null)`
+- `App::name()`
+- `App::url()`
+- `App::env(string $key, mixed $default = null)`
+- `App::environment(mixed $env = null)`
+- `App::isLocal()`
+- `App::isDev()`
+- `App::isTesting()`
+- `App::isStaging()`
+- `App::isProduction()`
+- `App::isDown()`
+- `App::isUp()`
+
+And the above static methods are also available on the application object instance as well:
+
+- `$app->name()`
+- `$app->url()`
+- `$app->env(string $key, mixed $default = null)`
+- `$app->environment(mixed $env = null)`
+- `$app->isLocal()`
+- `$app->isDev()`
+- `$app->isTesting()`
+- `$app->isStaging()`
+- `$app->isProduction()`
+- `$app->isDown()`
+- `$app->isUp()`
+
 
 [Top](#popphp)
 
