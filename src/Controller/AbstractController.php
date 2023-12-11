@@ -121,10 +121,8 @@ abstract class AbstractController implements ControllerInterface
                     "The application is currently in maintenance mode. The maintenance action is not defined in the controller."
                 );
             }
-        }
-
         // Else, dispatch route action
-        if (($action !== null) && method_exists($this, $action)) {
+        } else if (($action !== null) && method_exists($this, $action)) {
             if ($params !== null) {
                 call_user_func_array([$this, $action], array_values($params));
             } else {
