@@ -13,6 +13,8 @@
  */
 namespace Pop;
 
+use Pop\Cookie\Cookie;
+
 /**
  * Application helper class
  *
@@ -222,6 +224,25 @@ class App
     public static function isUp(): bool
     {
         return (self::env('MAINTENANCE_MODE') === false);
+    }
+
+    /**
+     * Check if application is in not maintenance mode
+     *
+     * @return bool
+     */
+    public static function isSecretRequest(): bool
+    {
+        if (isset($_GET['secret'])) {
+            $secret = $_GET['secret'];
+            $cookie = Cookie::getInstance();
+            $cookie->set('pop_mm_secret', $_GET['secret']);
+        } else {
+            $cookie = Cookie::getInstance();
+            $secret = $cookie['pop_mm_secret'];
+        }
+
+        return (!empty($secret) && ($secret == App::env('MAINTENANCE_MODE_SECRET')));
     }
 
 }

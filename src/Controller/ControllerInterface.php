@@ -58,6 +58,14 @@ interface ControllerInterface
     public function getMaintenanceAction(): string;
 
     /**
+     * Set bypass maintenance flag
+     *
+     * @param  bool $bypass
+     * @return static
+     */
+    public function setBypassMaintenance(bool $bypass = true): static;
+
+    /**
      * Check the bypass maintenace check
      *
      * @return bool

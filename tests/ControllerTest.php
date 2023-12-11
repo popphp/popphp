@@ -7,6 +7,12 @@ use PHPUnit\Framework\TestCase;
 class ControllerTest extends TestCase
 {
 
+    public function setUp(): void
+    {
+        $_SERVER['HTTP_HOST']   = 'localhost';
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+    }
+
     public function testSetAndGetDefaultAction()
     {
         $controller = $this->getMockForAbstractClass('\Pop\Controller\AbstractController');
@@ -42,7 +48,7 @@ class ControllerTest extends TestCase
         $controller->dispatch('foo');
     }
 
-    public function testMaintenance()
+    public function testMaintenance1()
     {
         $dotEnv = Dotenv::createImmutable(__DIR__ . '/tmp');
         $dotEnv->load();
@@ -52,6 +58,21 @@ class ControllerTest extends TestCase
         );
         $controller->expects($this->atMost(2))->method('maintenance');
         $this->assertFalse($controller->bypassMaintenance());
+        $controller->dispatch();
+    }
+
+    public function testMaintenance2()
+    {
+        $dotEnv = Dotenv::createImmutable(__DIR__ . '/tmp');
+        $dotEnv->load();
+
+        $controller = $this->getMockForAbstractClass(
+            '\Pop\Controller\AbstractController', [], '', false, false, true, ['maintenance', 'error', 'login', 'user']
+        );
+        $controller->expects($this->atMost(2))->method('maintenance');
+        $this->assertFalse($controller->bypassMaintenance());
+        $controller->setBypassMaintenance(true);
+        $this->assertTrue($controller->bypassMaintenance());
         $controller->dispatch();
     }
 

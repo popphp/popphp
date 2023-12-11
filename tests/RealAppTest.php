@@ -14,6 +14,9 @@ class RealAppTest extends TestCase
 
     public function setUp(): void
     {
+        $_SERVER['HTTP_HOST']   = 'localhost';
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
         $dotEnv = Dotenv::createImmutable(__DIR__);
         $dotEnv->load();
 
@@ -105,6 +108,12 @@ class RealAppTest extends TestCase
     public function testDefault()
     {
         $this->assertEquals(123, App::env('NO_VALUE', 123));
+    }
+
+    public function testIsSecretRequest()
+    {
+        $_GET['secret'] = '123456';
+        $this->assertFalse(App::isSecretRequest());
     }
 
 }

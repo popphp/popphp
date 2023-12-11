@@ -94,6 +94,18 @@ abstract class AbstractController implements ControllerInterface
     /**
      * Check the bypass maintenace check
      *
+     * @param  bool $bypass
+     * @return static
+     */
+    public function setBypassMaintenance(bool $bypass = true): static
+    {
+        $this->bypassMaintenance = $bypass;
+        return $this;
+    }
+
+    /**
+     * Check the bypass maintenace check
+     *
      * @return bool
      */
     public function bypassMaintenance(): bool
@@ -112,7 +124,7 @@ abstract class AbstractController implements ControllerInterface
     public function dispatch(?string $action = null, ?array $params = null): void
     {
         // Handle maintenance mode
-        if ((App::isDown()) && (!$this->bypassMaintenance)) {
+        if ((App::isDown()) && (!App::isSecretRequest()) && (!$this->bypassMaintenance)) {
             if (method_exists($this, $this->maintenanceAction)) {
                 $action = $this->maintenanceAction;
                 $this->$action();
