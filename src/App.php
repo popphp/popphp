@@ -203,7 +203,7 @@ class App
      */
     public static function isProduction(): bool
     {
-        return str_starts_with(self::env('APP_ENV'), 'prod');
+        return !empty(self::env('APP_ENV')) && str_starts_with(self::env('APP_ENV'), 'prod');
     }
 
     /**
