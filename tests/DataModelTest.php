@@ -19,8 +19,7 @@ class DataModelTest extends TestCase
 
     public function testCreate()
     {
-        $userModel = new User();
-        $user      = $userModel->create([
+        $user      = User::createNew([
             'username' => 'testuser1',
             'email'    => 'testuser1@test.com'
         ]);
@@ -41,24 +40,34 @@ class DataModelTest extends TestCase
 
     public function testGetAll()
     {
-        $userModel = new User();
-        $users     = $userModel->getAll();
+        $users = User::fetchAll();
 
         $this->assertEquals('testuser1', $users[0]['username']);
         $this->assertEquals('testuser1@test.com', $users[0]['email']);
         $this->assertEquals(1, $users[0]['id']);
-        $this->assertEquals(1, $userModel->count());
+        $this->assertEquals(1, (new User())->count());
 
         Record::db()->disconnect();
     }
 
-    public function testCountAndFilters()
+    public function testCountAndFilters1()
     {
         $userModel = new User();
         $count     = $userModel->filter('username LIKE testuser1%', ['id', 'username'])->count();
         $users     = $userModel->getAll();
 
         $this->assertEquals(1, $count);
+        $this->assertEquals('testuser1', $users[0]['username']);
+        $this->assertFalse(isset($users[0]['email']));
+        $this->assertEquals(1, $users[0]['id']);
+
+        Record::db()->disconnect();
+    }
+
+    public function testCountAndFilters2()
+    {
+        $users = User::filterBy('username LIKE testuser1%', ['id', 'username'])->getAll();
+
         $this->assertEquals('testuser1', $users[0]['username']);
         $this->assertFalse(isset($users[0]['email']));
         $this->assertEquals(1, $users[0]['id']);
@@ -82,8 +91,7 @@ class DataModelTest extends TestCase
 
     public function testGetById()
     {
-        $userModel = new User();
-        $user      = $userModel->getById(1);
+        $user = User::fetch(1);
 
         $this->assertEquals('testuser1', $user['username']);
         $this->assertEquals('testuser1@test.com', $user['email']);

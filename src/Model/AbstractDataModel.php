@@ -55,6 +55,59 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     protected array $privateColumns = [];
 
     /**
+     * Fetch all
+     *
+     * @param  ?string $sort
+     * @param  mixed $limit
+     * @param  mixed $page
+     * @param  bool $asArray
+     * @throws Exception
+     * @return array|Collection
+     */
+    public static function fetchAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection
+    {
+        return (new static())->getAll($sort, $limit, $page, $asArray);
+    }
+
+    /**
+     * Fetch by ID
+     *
+     * @param  mixed $id
+     * @param  bool $asArray
+     * @throws Exception
+     * @return array|Record
+     */
+    public static function fetch(mixed $id, bool $asArray = true): array|Record
+    {
+        return (new static())->getById($id, $asArray);
+    }
+
+    /**
+     * Create new
+     *
+     * @param  array $data
+     * @param  bool  $asArray
+     * @throws Exception
+     * @return array|Record
+     */
+    public static function createNew(array $data, bool $asArray = true): array|Record
+    {
+        return (new static())->create($data, $asArray);
+    }
+
+    /**
+     * Filter by
+     *
+     * @param  mixed $filters
+     * @param  mixed $select
+     * @return static
+     */
+    public static function filterBy(mixed $filters = null, mixed $select = null): static
+    {
+        return (new static())->filter($filters, $select);
+    }
+
+    /**
      * Get all
      *
      * @param  ?string $sort
@@ -98,7 +151,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     public function getById(mixed $id, bool $asArray = true): array|Record
     {
         $table   = $this->getTableClass();
-        $options = (!empty($this->selectColumns)) ? ['select' => $this->selectColumns] : null;
+        $options = ['select' => $this->describe($this->selectColumns)];
         return $table::findById($id, $options, $asArray);
     }
 

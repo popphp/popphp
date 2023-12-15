@@ -22,6 +22,7 @@ popphp
     - [Dynamic Routing](#dynamic-routing)
 * [Controllers](#controllers)
 * [Models](#models)
+    - [Data Models](#data-models)
 * [Modules](#modules)
     - [Custom Modules](#custom-modules)
     - [Module Manager](#module-manager)
@@ -593,6 +594,28 @@ less like any array or value object. It has a single property `data`, implements
 `Countable` and `IteratorAggregate`. Once you extend the abstract model class, you build in the logic
 needed to handle the business logic in your application.
 
+### Data Models
+
+Going one level further, the abstract class `Pop\Model\AbstractDataModel` is also available, which provides
+a tightly integrated API which some common interactions with a database and its records. The basic requirements
+are that there is a model class that extends the abstract data model and a subsequent related table class
+(see the `pop-db` [documentation](https://github.com/popphp/pop-db#table-class) for more info.) In the examples
+below, the classes `MyApp\Model\User` and `MyApp\Table\Users` are created. And by that naming convention, they
+are linked together. 
+
+```php
+<?php
+
+namespace MyApp\Table;
+
+use Pop\Db\Record;
+
+class Users extends Record
+{
+
+}
+```
+
 ```php
 <?php
 
@@ -600,19 +623,33 @@ namespace MyApp\Model;
 
 use Pop\Model\AbstractModel;
 
-class User extends AbstractModel
+class User extends AbstractDataModel
 {
-
-    public function getById($id)
-    {
-        // Perform the logic to get a user by $id
-    }
 
 }
 ```
 
-**Note:** It is not required to use the abstract model class, and it merely exists as a convenience. The "models"
-of your application can be whatever is preferred or required for your use case.
+The available API in the data model object is:
+
+- `getAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection`
+- `getById(mixed $id, bool $asArray = true): array|Record`
+- `create(array $data, bool $asArray = true): array|Record`
+- `update(mixed $id, array $data, bool $asArray = true): array|Record`
+- `replace(mixed $id, array $data, bool $asArray = true): array|Record`
+- `delete(mixed $id): int`
+- `remove(array $ids): int`
+- `count(): int`
+- `describe(mixed $columns = null): array`
+- `filter(mixed $filters = null, mixed $select = null): AbstractDataModel`
+- `select(mixed $select = null): AbstractDataModel`
+
+```php
+use MyApp\Model\User;
+
+$userModel = new User();
+$
+
+```
 
 [Top](#popphp)
 
