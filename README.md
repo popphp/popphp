@@ -631,6 +631,10 @@ class User extends AbstractDataModel
 
 The available API in the data model object is:
 
+- `static function fetchAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection`
+- `static function fetch(mixed $id, bool $asArray = true): array|Record`
+- `static function createNew(array $data, bool $asArray = true): array|Record`
+- `static function filterBy(mixed $filters = null, mixed $select = null): static`
 - `getAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection`
 - `getById(mixed $id, bool $asArray = true): array|Record`
 - `create(array $data, bool $asArray = true): array|Record`
@@ -643,13 +647,54 @@ The available API in the data model object is:
 - `filter(mixed $filters = null, mixed $select = null): AbstractDataModel`
 - `select(mixed $select = null): AbstractDataModel`
 
+**Create new**
+
+```php
+use MyApp\Model\User;
+
+$user = User::createNew($userData);
+```
+
+**Update**
+
 ```php
 use MyApp\Model\User;
 
 $userModel = new User();
-$
-
+$user = $userModel->update(1, $userData);
 ```
+
+The `update()` method acts like a `PATCH` call and `replace()` acts like a `PUT` call and will replace and reset all model data.
+
+**Delete**
+
+```php
+use MyApp\Model\User;
+
+$userModel = new User();
+$userModel->delete(1);
+$userModel->remove([2, 3, 4]);
+```
+
+**Fetch**
+
+```php
+use MyApp\Model\User;
+
+$users = User::fetchAll();
+$user  = User::fetch(1);
+```
+
+**Filter and sort**
+
+```php
+use MyApp\Model\User;
+
+$users = User::filter('username LIKE myuser%')->getAll('-id', '10', 2);
+```
+
+The above call filters the search by the filter string and sorts by `ID DESC` (`-id`). Also, it sets the limit to `10`
+and starts the page offset on the second page.
 
 [Top](#popphp)
 
