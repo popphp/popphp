@@ -631,10 +631,15 @@ class User extends AbstractDataModel
 
 The available API in the data model object is:
 
-- `static function fetchAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection`
-- `static function fetch(mixed $id, bool $asArray = true): array|Record`
-- `static function createNew(array $data, bool $asArray = true): array|Record`
-- `static function filterBy(mixed $filters = null, mixed $select = null): static`
+**Static Methods**
+
+- `fetchAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection`
+- `fetch(mixed $id, bool $asArray = true): array|Record`
+- `createNew(array $data, bool $asArray = true): array|Record`
+- `filterBy(mixed $filters = null, mixed $select = null): static`
+
+**Instance Methods**
+
 - `getAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection`
 - `getById(mixed $id, bool $asArray = true): array|Record`
 - `create(array $data, bool $asArray = true): array|Record`
