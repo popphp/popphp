@@ -599,8 +599,8 @@ needed to handle the business logic in your application.
 Going one level further, the abstract class `Pop\Model\AbstractDataModel` is also available, which provides
 a tightly integrated API which some common interactions with a database and its records. The basic requirements
 are that there is a model class that extends the abstract data model and a subsequent related table class
-(see the `pop-db` [documentation](https://github.com/popphp/pop-db#table-class) for more info.) In the examples
-below, the classes `MyApp\Model\User` and `MyApp\Table\Users` are created. And by that naming convention, they
+(see the `pop-db` [documentation](https://github.com/popphp/pop-db#table-class) for more info.) In the example
+below, the classes `MyApp\Model\User` and `MyApp\Table\Users` are created, and by that naming convention, they
 are linked together. 
 
 ```php
