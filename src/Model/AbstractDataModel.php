@@ -43,6 +43,12 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     protected array $filters = [];
 
     /**
+     * Requirements
+     * @var array
+     */
+    protected array $requirements = [];
+
+    /**
      * Select columns
      * @var ?array
      */
@@ -165,9 +171,48 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      */
     public function create(array $data, bool $asArray = true): array|Record
     {
+        if ($this->hasRequirements()) {
+            $results = $this->validate($data);
+            if (is_array($results)) {
+                return $results;
+            }
+        }
+
         $table = $this->getTableClass();
         $record = new $table($data);
         $record->save();
+
+        return ($asArray) ? $record->toArray() : $record;
+    }
+
+    /**
+     * Replace
+     *
+     * @param  mixed $id
+     * @param  array $data
+     * @param  bool  $asArray
+     * @throws Exception
+     * @return array|Record
+     */
+    public function replace(mixed $id, array $data, bool $asArray = true): array|Record
+    {
+        if ($this->hasRequirements()) {
+            $results = $this->validate($data);
+            if (is_array($results)) {
+                return $results;
+            }
+        }
+
+        $table      = $this->getTableClass();
+        $record     = $table::findById($id);
+        $recordData = $record->toArray();
+
+        if (isset($record->id)) {
+            foreach ($recordData as $key => $value) {
+                $record->{$key} = $data[$key] ?? null;
+            }
+            $record->save();
+        }
 
         return ($asArray) ? $record->toArray() : $record;
     }
@@ -189,31 +234,6 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         if (isset($record->id)) {
             foreach ($data as $key => $value) {
                 $record->{$key} = $value ?? $record->{$key};
-            }
-            $record->save();
-        }
-
-        return ($asArray) ? $record->toArray() : $record;
-    }
-
-    /**
-     * Replace
-     *
-     * @param  mixed $id
-     * @param  array $data
-     * @param  bool  $asArray
-     * @throws Exception
-     * @return array|Record
-     */
-    public function replace(mixed $id, array $data, bool $asArray = true): array|Record
-    {
-        $table      = $this->getTableClass();
-        $record     = $table::findById($id);
-        $recordData = $record->toArray();
-
-        if (isset($record->id)) {
-            foreach ($recordData as $key => $value) {
-                $record->{$key} = $data[$key] ?? null;
             }
             $record->save();
         }
@@ -297,6 +317,35 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
 
         return (!empty($columns)) ?
             array_values(array_diff($tableColumns, array_diff($tableColumns, $columns))) : $tableColumns;
+    }
+
+    /**
+     * Method to check if model has requirements
+     *
+     * @return bool
+     */
+    public function hasRequirements(): bool
+    {
+        return !empty($this->requirements);
+    }
+
+    /**
+     * Method to validate model data
+     *
+     * @param  array $data
+     * @return bool|array
+     */
+    public function validate(array $data): bool|array
+    {
+        $errors = [];
+
+        foreach ($this->requirements as $column) {
+            if (!array_key_exists($column, $data)) {
+                $errors[$column] = "The column '" . $column . "' is required.";
+            }
+        }
+
+        return (!empty($errors)) ? ['errors' => $errors] : true;
     }
 
     /**

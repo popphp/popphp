@@ -60,15 +60,6 @@ interface DataModelInterface
     public function create(array $data): mixed;
 
     /**
-     * Update
-     *
-     * @param  mixed $id
-     * @param  array $data
-     * @return mixed
-     */
-    public function update(mixed $id, array $data): mixed;
-
-    /**
      * Replace
      *
      * @param  mixed $id
@@ -76,6 +67,15 @@ interface DataModelInterface
      * @return mixed
      */
     public function replace(mixed $id, array $data): mixed;
+
+    /**
+     * Update
+     *
+     * @param  mixed $id
+     * @param  array $data
+     * @return mixed
+     */
+    public function update(mixed $id, array $data): mixed;
 
     /**
      * Delete
@@ -111,6 +111,21 @@ interface DataModelInterface
      * @return array
      */
     public function describe(mixed $columns = null): array;
+
+    /**
+     * Method to check if model has requirements or validations
+     *
+     * @return bool
+     */
+    public function hasRequirements(): bool;
+
+    /**
+     * Method to validate model data
+     *
+     * @param  array $data
+     * @return bool|array
+     */
+    public function validate(array $data): bool|array;
 
     /**
      * Set filters

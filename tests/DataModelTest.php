@@ -17,9 +17,29 @@ class DataModelTest extends TestCase
         ]));
     }
 
+    public function testRequirements()
+    {
+        $userModel = new User();
+        $this->assertTrue($userModel->hasRequirements());
+    }
+
+    public function testCreateBad()
+    {
+        $userModel = new User();
+        $results   = $userModel->create([
+            'email' => 'testuser1@test.com'
+        ]);
+
+        $this->assertTrue(isset($results['errors']));
+        $this->assertTrue(isset($results['errors']['username']));
+        $this->assertEquals("The column 'username' is required.", $results['errors']['username']);
+
+        Record::db()->disconnect();
+    }
+
     public function testCreate()
     {
-        $user      = User::createNew([
+        $user = User::createNew([
             'username' => 'testuser1',
             'email'    => 'testuser1@test.com'
         ]);
@@ -111,6 +131,20 @@ class DataModelTest extends TestCase
         $this->assertEquals('testuser2', $user['username']);
         $this->assertEquals('testuser2@test.com', $user['email']);
         $this->assertEquals(1, $user['id']);
+
+        Record::db()->disconnect();
+    }
+
+    public function testReplaceBad()
+    {
+        $userModel = new User();
+        $results   = $userModel->replace(1, [
+            'email' => 'testuser1@test.com'
+        ]);
+
+        $this->assertTrue(isset($results['errors']));
+        $this->assertTrue(isset($results['errors']['username']));
+        $this->assertEquals("The column 'username' is required.", $results['errors']['username']);
 
         Record::db()->disconnect();
     }
