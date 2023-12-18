@@ -313,10 +313,27 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
             throw new Exception('Error: The table info parameter is not in the correct format');
         }
 
-        $tableColumns = array_diff(array_keys($tableInfo['columns']), $this->privateColumns);
+        // Get table columns
+        $tableColumns = array_keys($tableInfo['columns']);
 
-        return (!empty($columns)) ?
-            array_values(array_diff($tableColumns, array_diff($tableColumns, $columns))) : $tableColumns;
+        // Get any possible foreign columns
+        $foreignColumns = array_diff($columns, $tableColumns);
+
+        // Remove any private columns
+        $tableColumns   = array_diff($tableColumns, $this->privateColumns);
+        $foreignColumns = array_diff($foreignColumns, $this->privateColumns);
+
+        if (!empty($columns)) {
+            $cols = [];
+            foreach ($columns as $column) {
+                if (in_array($column, $tableColumns) || in_array($column, $foreignColumns)) {
+                    $cols[] = $column;
+                }
+            }
+            return $cols;
+        } else {
+            return $tableColumns;
+        }
     }
 
     /**
