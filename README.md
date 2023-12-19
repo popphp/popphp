@@ -648,7 +648,9 @@ The available API in the data model object is:
 - `delete(mixed $id): int`
 - `remove(array $ids): int`
 - `count(): int`
-- `describe(mixed $columns = null): array`
+- `describe(bool $native = false, bool $full = false): array`
+- `hasRequirements(): bool`
+- `validate(array $data): bool|array`
 - `filter(mixed $filters = null, mixed $select = null): AbstractDataModel`
 - `select(mixed $select = null): AbstractDataModel`
 
