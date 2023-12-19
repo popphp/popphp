@@ -21,7 +21,7 @@ namespace Pop\Service;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    4.0.0
+ * @version    4.2.0
  */
 class Container
 {

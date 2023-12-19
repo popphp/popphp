@@ -24,7 +24,7 @@ use Pop\Db\Record\Collection;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    4.0.0
+ * @version    4.2.0
  */
 interface DataModelInterface
 {
@@ -106,11 +106,12 @@ interface DataModelInterface
     /**
      * Method to describe columns in the database table
      *
-     * @param  mixed $columns
+     * @param  bool $native     Show the native columns in the table
+     * @param  bool $full       Used with the native flag, returns array of "column" => "type"
      * @throws Exception
      * @return array
      */
-    public function describe(mixed $columns = null): array;
+    public function describe(bool $native = false, bool $full = false): array;
 
     /**
      * Method to check if model has requirements or validations

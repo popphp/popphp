@@ -25,7 +25,7 @@ use Pop\Db\Sql\Parser;
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2024 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
- * @version    4.0.0
+ * @version    4.2.0
  */
 abstract class AbstractDataModel extends AbstractModel implements DataModelInterface
 {
@@ -50,15 +50,36 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
 
     /**
      * Select columns
-     * @var ?array
+     *  - Columns to show for general select queries. Can include foreign columns
+     *    if the $foreignTables property is properly configured
+     * @var array
      */
-    protected ?array $selectColumns = null;
+    protected array $selectColumns = [];
 
     /**
      * Private columns
+     *  - Columns of sensitive data to hide from general select queries (i.e. passwords, etc.)
      * @var array
      */
     protected array $privateColumns = [];
+
+    /**
+     * Foreign tables
+     *  - List of foreign tables and columns to use in general select queries as JOINS
+     *      [
+     *          'table'   => 'foreign_table',
+     *          'columns' => ['foreign_table.id' => 'table.foreign_id']
+     *      ]
+     * @var array
+     */
+    protected array $foreignTables = [];
+
+    /**
+     * Original select columns
+     *  - Property to track original select columns
+     * @var array
+     */
+    private array $origSelectColumns = [];
 
     /**
      * Fetch all
@@ -127,22 +148,25 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     {
         $table          = $this->getTableClass();
         $offsetAndLimit = $this->getOffsetAndLimit($page, $limit);
+        $options        = [
+            'offset' => $offsetAndLimit['offset'],
+            'limit'  => $offsetAndLimit['limit'],
+            'order'  => $this->getOrderBy($sort)
+        ];
+
+        if ($asArray) {
+            $options['select'] = $this->describe();
+            if (!empty($this->foreignTables)) {
+                $options['join'] = $this->foreignTables;
+            }
+        } else {
+            $options = ['select' => $this->describe(true)];
+        }
 
         if (!empty($this->filters)) {
-            $columns = $this->parseFilter($this->filters);
-            return $table::findBy($columns, [
-                'select' => $this->describe($this->selectColumns),
-                'offset' => $offsetAndLimit['offset'],
-                'limit'  => $offsetAndLimit['limit'],
-                'order'  => $this->getOrderBy($sort)
-            ], $asArray);
+            return $table::findBy($this->parseFilter($this->filters), $options, $asArray);
         } else {
-            return $table::findAll([
-                'select' => $this->describe($this->selectColumns),
-                'offset' => $offsetAndLimit['offset'],
-                'limit'  => $offsetAndLimit['limit'],
-                'order'  => $this->getOrderBy($sort)
-            ], $asArray);
+            return $table::findAll($options, $asArray);
         }
     }
 
@@ -156,8 +180,17 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      */
     public function getById(mixed $id, bool $asArray = true): array|Record
     {
-        $table   = $this->getTableClass();
-        $options = ['select' => $this->describe($this->selectColumns)];
+        $table = $this->getTableClass();
+
+        if ($asArray) {
+            $options = ['select' => $this->describe()];
+            if (!empty($this->foreignTables)) {
+                $options['join'] = $this->foreignTables;
+            }
+        } else {
+            $options = ['select' => $this->describe(true)];
+        }
+
         return $table::findById($id, $options, $asArray);
     }
 
@@ -286,8 +319,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     {
         $table = $this->getTableClass();
         if (!empty($this->filters)) {
-            $columns = $this->parseFilter($this->filters);
-            return $table::getTotal($columns);
+            return $table::getTotal($this->parseFilter($this->filters));
         } else {
             return $table::getTotal();
         }
@@ -296,43 +328,41 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     /**
      * Method to describe columns in the database table
      *
-     * @param  mixed $columns
-     * @throws Exception
+     * @param  bool $native     Show only the native columns in the table
+     * @param  bool $full       Used with the native flag, returns a full descriptive array of table info
      * @return array
+     *@throws Exception
      */
-    public function describe(mixed $columns = null): array
+    public function describe(bool $native = false, bool $full = false): array
     {
-        if (!empty($columns) && !is_array($columns)) {
-            $columns = array_map('trim', ((str_contains($columns, ',')) ? explode(',', $columns) : [$columns]));
-        }
-
-        $table     = $this->getTableClass();
-        $tableInfo = $table::getTableInfo();
+        $table        = $this->getTableClass();
+        $tableInfo    = $table::getTableInfo();
+        $tableColumns = array_keys($tableInfo['columns']);
 
         if (!isset($tableInfo['tableName']) || !isset($tableInfo['columns'])) {
             throw new Exception('Error: The table info parameter is not in the correct format');
         }
 
-        // Get table columns
-        $tableColumns = array_keys($tableInfo['columns']);
+        $tableColumns = array_diff($tableColumns, $this->privateColumns);
 
-        // Get any possible foreign columns
-        $foreignColumns = array_diff($columns, $tableColumns);
+        if ($native) {
+            return ($full) ? $tableInfo : $tableColumns;
+        } else{
+            // Get any possible foreign columns
+            $foreignColumns = array_diff(array_diff($this->selectColumns, $tableColumns), $this->privateColumns);
 
-        // Remove any private columns
-        $tableColumns   = array_diff($tableColumns, $this->privateColumns);
-        $foreignColumns = array_diff($foreignColumns, $this->privateColumns);
-
-        if (!empty($columns)) {
-            $cols = [];
-            foreach ($columns as $column) {
-                if (in_array($column, $tableColumns) || in_array($column, $foreignColumns)) {
-                    $cols[] = $column;
+            // Assemble and return allowed filtered columns
+            if (!empty($this->selectColumns)) {
+                $cols = [];
+                foreach ($this->selectColumns as $key => $column) {
+                    if (in_array($column, $tableColumns) || in_array($column, $foreignColumns)) {
+                        $cols[$key] = $column;
+                    }
                 }
+                return $cols;
+            } else {
+                return $tableColumns;
             }
-            return $cols;
-        } else {
-            return $tableColumns;
         }
     }
 
@@ -386,7 +416,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     }
 
     /**
-     * Set select columns
+     * Set (override) select columns
      *
      * @param  mixed $select
      * @return AbstractDataModel
@@ -394,9 +424,12 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     public function select(mixed $select = null): AbstractDataModel
     {
         if (!empty($select)) {
+            if (empty($this->origSelectColumns)) {
+                $this->origSelectColumns = $this->selectColumns;
+            }
             $this->selectColumns = (!is_array($select)) ? [$select] : $select;
-        } else {
-            $this->selectColumns = null;
+        } else if (!empty($this->origSelectColumns)) {
+            $this->selectColumns = $this->origSelectColumns;
         }
 
         return $this;

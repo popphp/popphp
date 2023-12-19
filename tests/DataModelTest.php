@@ -55,7 +55,6 @@ class DataModelTest extends TestCase
     {
         $userModel = new User();
         $this->assertCount(3, $userModel->describe());
-        $this->assertCount(2, $userModel->describe('id, username'));
     }
 
     public function testGetAll()
