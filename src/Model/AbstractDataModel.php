@@ -43,6 +43,12 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     protected array $filters = [];
 
     /**
+     * Options
+     * @var array
+     */
+    protected array $options = [];
+
+    /**
      * Requirements
      * @var array
      */
@@ -148,25 +154,35 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     {
         $table          = $this->getTableClass();
         $offsetAndLimit = $this->getOffsetAndLimit($page, $limit);
-        $options        = [
-            'offset' => $offsetAndLimit['offset'],
-            'limit'  => $offsetAndLimit['limit'],
-            'order'  => $this->getOrderBy($sort)
-        ];
 
-        if ($asArray) {
-            $options['select'] = $this->describe();
-            if (!empty($this->foreignTables)) {
-                $options['join'] = $this->foreignTables;
-            }
+        if (!empty($this->options)) {
+            $this->options['offset'] = $offsetAndLimit['offset'];
+            $this->options['limit']  = $offsetAndLimit['limit'];
+            $this->options['order']  = $this->getOrderBy($sort);
         } else {
-            $options = ['select' => $this->describe(true)];
+            $this->options = [
+                'offset' => $offsetAndLimit['offset'],
+                'limit'  => $offsetAndLimit['limit'],
+                'order'  => $this->getOrderBy($sort)
+            ];
+        }
+
+        if (!isset($this->options['select'])) {
+            if ($asArray) {
+                $this->options['select'] = $this->describe();
+            } else {
+                $this->options = ['select' => $this->describe(true)];
+            }
+        }
+
+        if (!empty($this->foreignTables) && !isset($this->options['join'])) {
+            $this->options['join'] = $this->foreignTables;
         }
 
         if (!empty($this->filters)) {
-            return $table::findBy($this->parseFilter($this->filters), $options, $asArray);
+            return $table::findBy($this->parseFilter($this->filters), $this->options, $asArray);
         } else {
-            return $table::findAll($options, $asArray);
+            return $table::findAll($this->options, $asArray);
         }
     }
 
@@ -182,16 +198,19 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     {
         $table = $this->getTableClass();
 
-        if ($asArray) {
-            $options = ['select' => $this->describe()];
-            if (!empty($this->foreignTables)) {
-                $options['join'] = $this->foreignTables;
+        if (!isset($this->options['select'])) {
+            if ($asArray) {
+                $this->options['select'] = $this->describe();
+            } else {
+                $this->options = ['select' => $this->describe(true)];
             }
-        } else {
-            $options = ['select' => $this->describe(true)];
         }
 
-        return $table::findById($id, $options, $asArray);
+        if (!empty($this->foreignTables) && !isset($this->options['join'])) {
+            $this->options['join'] = $this->foreignTables;
+        }
+
+        return $table::findById($id, $this->options, $asArray);
     }
 
     /**
@@ -398,11 +417,12 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     /**
      * Set filters
      *
-     * @param  mixed $filters
-     * @param  mixed $select
+     * @param  mixed  $filters
+     * @param  mixed  $select
+     * @param  ?array $options
      * @return AbstractDataModel
      */
-    public function filter(mixed $filters = null, mixed $select = null): AbstractDataModel
+    public function filter(mixed $filters = null, mixed $select = null, ?array $options = null): AbstractDataModel
     {
         if (!empty($filters)) {
             $this->filters = (!is_array($filters)) ? [$filters] : $filters;
@@ -410,7 +430,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
             $this->filters = [];
         }
 
-        $this->select($select);
+        $this->select($select, $options);
 
         return $this;
     }
@@ -418,10 +438,11 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     /**
      * Set (override) select columns
      *
-     * @param  mixed $select
+     * @param  mixed  $select
+     * @param  ?array $options
      * @return AbstractDataModel
      */
-    public function select(mixed $select = null): AbstractDataModel
+    public function select(mixed $select = null, ?array $options = null): AbstractDataModel
     {
         if (!empty($select)) {
             if (empty($this->origSelectColumns)) {
@@ -431,6 +452,8 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         } else if (!empty($this->origSelectColumns)) {
             $this->selectColumns = $this->origSelectColumns;
         }
+
+        $this->options = (!empty($options)) ? $options : [];
 
         return $this;
     }
