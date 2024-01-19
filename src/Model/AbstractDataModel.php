@@ -380,7 +380,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
                 }
                 return $cols;
             } else {
-                return $tableColumns;
+                return array_values($tableColumns);
             }
         }
     }
