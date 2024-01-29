@@ -210,7 +210,19 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
             $this->options['join'] = $this->foreignTables;
         }
 
-        return $table::findById($id, $this->options, $asArray);
+        if (!empty($this->filters)) {
+            $primaryKeys = (new $table())->getPrimaryKeys();
+            foreach ($primaryKeys as $i => $primaryKey) {
+                if (is_array($id) && isset($id[$i])) {
+                    $this->filters[] = $primaryKey . ' = ' . $id[$i];
+                } else if (!is_array($id)) {
+                    $this->filters[] = $primaryKey . ' = ' . $id;
+                }
+            }
+            return $table::findOne($this->parseFilter($this->filters), $this->options, $asArray);
+        } else {
+            return $table::findById($id, $this->options, $asArray);
+        }
     }
 
     /**
