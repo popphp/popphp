@@ -458,6 +458,9 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     public function select(mixed $select = null, ?array $options = null): AbstractDataModel
     {
         if (!empty($select)) {
+            if (is_string($select) && str_contains($select, ',')) {
+                $select = array_map('trim', explode(',', $select));
+            }
             if (empty($this->origSelectColumns)) {
                 $this->origSelectColumns = $this->selectColumns;
             }
