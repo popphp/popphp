@@ -212,11 +212,12 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
 
         if (!empty($this->filters)) {
             $primaryKeys = (new $table())->getPrimaryKeys();
+            $tableClass  = $table::table();
             foreach ($primaryKeys as $i => $primaryKey) {
                 if (is_array($id) && isset($id[$i])) {
-                    $this->filters[] = $primaryKey . ' = ' . $id[$i];
+                    $this->filters[] = $tableClass . '.' . $primaryKey . ' = ' . $id[$i];
                 } else if (!is_array($id)) {
-                    $this->filters[] = $primaryKey . ' = ' . $id;
+                    $this->filters[] = $tableClass . '.' . $primaryKey . ' = ' . $id;
                 }
             }
             return $table::findOne($this->parseFilter($this->filters), $this->options, $asArray);
