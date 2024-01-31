@@ -464,7 +464,18 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
             if (empty($this->origSelectColumns)) {
                 $this->origSelectColumns = $this->selectColumns;
             }
-            $this->selectColumns = (!is_array($select)) ? [$select] : $select;
+            $select        = (!is_array($select)) ? [$select] : $select;
+            $selectColumns = [];
+
+            foreach ($select as $selectColumn) {
+                if (in_array($selectColumn, $this->selectColumns)) {
+                    $selectColumns[array_search($selectColumn, $this->selectColumns)] = $selectColumn;
+                } else {
+                    $selectColumns[] = $selectColumn;
+                }
+            }
+
+            $this->selectColumns = $selectColumns;
         } else if (!empty($this->origSelectColumns)) {
             $this->selectColumns = $this->origSelectColumns;
         }
