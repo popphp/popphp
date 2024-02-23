@@ -134,6 +134,18 @@ class DataModelTest extends TestCase
         Record::db()->disconnect();
     }
 
+    public function testCopy()
+    {
+        $userModel = new User();
+        $user      = $userModel->copy(1);
+
+        $this->assertEquals('testuser2', $user['username']);
+        $this->assertEquals('testuser2@test.com', $user['email']);
+        $this->assertEquals(2, $user['id']);
+
+        Record::db()->disconnect();
+    }
+
     public function testReplaceBad()
     {
         $userModel = new User();

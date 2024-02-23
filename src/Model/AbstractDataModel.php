@@ -251,6 +251,27 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     }
 
     /**
+     * Copy
+     *
+     * @param  mixed $id
+     * @param  array $replace
+     * @param  bool  $asArray
+     * @throws Exception
+     * @return array|Record
+     */
+    public function copy(mixed $id, array $replace = [], bool $asArray = true): array|Record
+    {
+        $table  = $this->getTableClass();
+        $record = $table::findById($id);
+
+        if (isset($record->id)) {
+            $record = $record->copy($replace);
+        }
+
+        return ($asArray) ? $record->toArray() : $record;
+    }
+
+    /**
      * Replace
      *
      * @param  mixed $id
