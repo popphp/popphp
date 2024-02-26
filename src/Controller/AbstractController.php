@@ -92,7 +92,7 @@ abstract class AbstractController implements ControllerInterface
     }
 
     /**
-     * Check the bypass maintenace check
+     * Check the bypass maintenance check
      *
      * @param  bool $bypass
      * @return static
@@ -104,7 +104,7 @@ abstract class AbstractController implements ControllerInterface
     }
 
     /**
-     * Check the bypass maintenace check
+     * Check the bypass maintenance check
      *
      * @return bool
      */
