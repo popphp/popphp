@@ -370,6 +370,10 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      */
     public function count(): int
     {
+        if (!empty($this->foreignTables) && !isset($this->options['join'])) {
+            $this->options['join'] = $this->foreignTables;
+        }
+
         $table = $this->getTableClass();
         if (!empty($this->filters)) {
             return $table::getTotal($this->parseFilter($this->filters), $this->options);
