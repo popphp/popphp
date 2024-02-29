@@ -372,9 +372,9 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     {
         $table = $this->getTableClass();
         if (!empty($this->filters)) {
-            return $table::getTotal($this->parseFilter($this->filters));
+            return $table::getTotal($this->parseFilter($this->filters), $this->options);
         } else {
-            return $table::getTotal();
+            return $table::getTotal(null, $this->options);
         }
     }
 
