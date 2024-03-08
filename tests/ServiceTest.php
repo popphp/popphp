@@ -248,6 +248,23 @@ class ServiceTest extends TestCase
         $this->assertFalse($services->isLoaded('foo'));
     }
 
+    public function testReload()
+    {
+        $services = new Locator([
+            'foo' => [
+                'call'   => function(){
+                    return 123;
+                }
+            ]
+        ]);
+        $result = $services['foo'];
+        $this->assertTrue($services->isLoaded('foo'));
+        $this->assertEquals(123, $result);
+        $services->reload('foo');
+        $this->assertTrue($services->isLoaded('foo'));
+        $this->assertEquals(123, $result);
+    }
+
     public function testMagicMethods()
     {
         $services = new Locator();

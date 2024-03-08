@@ -304,6 +304,21 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
+     * Re-load a service object
+     *
+     * @param  string $name
+     * @return
+     */
+    public function reload(string $name): mixed
+    {
+        if (isset($this->loaded[$name])) {
+            unset($this->loaded[$name]);
+        }
+
+        return $this->get($name);
+    }
+
+    /**
      * Remove a service
      *
      * @param  string $name
