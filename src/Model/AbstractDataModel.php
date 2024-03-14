@@ -261,10 +261,11 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      */
     public function copy(mixed $id, array $replace = [], bool $asArray = true): array|Record
     {
-        $table  = $this->getTableClass();
-        $record = $table::findById($id);
+        $table      = $this->getTableClass();
+        $record     = $table::findById($id);
+        $primaryKey = $this->getPrimaryId();
 
-        if (isset($record->id)) {
+        if (isset($record->{$primaryKey})) {
             $record = $record->copy($replace);
         }
 
@@ -292,8 +293,9 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         $table      = $this->getTableClass();
         $record     = $table::findById($id);
         $recordData = $record->toArray();
+        $primaryKey = $this->getPrimaryId();
 
-        if (isset($record->id)) {
+        if (isset($record->{$primaryKey})) {
             foreach ($recordData as $key => $value) {
                 $record->{$key} = $data[$key] ?? null;
             }
@@ -314,10 +316,11 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      */
     public function update(mixed $id, array $data, bool $asArray = true): array|Record
     {
-        $table  = $this->getTableClass();
-        $record = $table::findById($id);
+        $table      = $this->getTableClass();
+        $record     = $table::findById($id);
+        $primaryKey = $this->getPrimaryId();
 
-        if (isset($record->id)) {
+        if (isset($record->{$primaryKey})) {
             foreach ($data as $key => $value) {
                 $record->{$key} = $value ?? $record->{$key};
             }
@@ -336,9 +339,11 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      */
     public function delete(mixed $id): int
     {
-        $table  = $this->getTableClass();
-        $record = $table::findById($id);
-        if (isset($record->id)) {
+        $table      = $this->getTableClass();
+        $record     = $table::findById($id);
+        $primaryKey = $this->getPrimaryId();
+
+        if (isset($record->{$primaryKey})) {
             $record->delete();
             return 1;
         } else {
@@ -531,6 +536,19 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         }
 
         return $table;
+    }
+
+    /**
+     * Get table primary ID
+     *
+     * @return string
+     */
+    public function getPrimaryId(): string
+    {
+        $table       = $this->getTableClass();
+        $primaryKeys = (new $table())->getPrimaryKeys();
+
+        return $primaryKeys[0] ?? 'id';
     }
 
     /**

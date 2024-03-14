@@ -153,6 +153,13 @@ interface DataModelInterface
     public function getTableClass(): string;
 
     /**
+     * Get table primary ID
+     *
+     * @return string
+     */
+    public function getPrimaryId(): string;
+
+    /**
      * Get offset and limit
      *
      * @param  mixed $page
