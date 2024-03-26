@@ -322,7 +322,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
 
         if (isset($record->{$primaryKey})) {
             foreach ($data as $key => $value) {
-                $record->{$key} = $value ?? $record->{$key};
+                $record->{$key} = $value;
             }
             $record->save();
         }
