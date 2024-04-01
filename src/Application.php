@@ -13,6 +13,7 @@
  */
 namespace Pop;
 
+use Pop\Utils\Helper;
 use ReflectionException;
 
 /**
@@ -146,6 +147,11 @@ class Application extends AbstractApplication implements \ArrayAccess
         // Set the app version
         if (!empty($this->config['version'])) {
             $this->setVersion($this->config['version']);
+        }
+
+        // Load helper functions
+        if ((!isset($this->config['helper_functions']) || ($this->config['helper_functions'] === true)) && (!Helper::isLoaded())) {
+            Helper::loadFunctions();
         }
 
         // If routes are set in the app config, register them with the application

@@ -944,4 +944,16 @@ return [
 ];
 ```
 
+#### Helper Functions
+
+The helper functions available from the `pop-utils` component are automatically loaded within
+the application object's `boostrap` call. If this is not desired, a configuration setting called
+`helper_functions` (set to `false`) can be passed to prevent them from loading:
+
+```php
+$app = new Pop\Application([
+    'helper_functions' => false
+]);
+```
+
 [Top](#popphp)

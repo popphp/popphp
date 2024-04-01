@@ -14,6 +14,7 @@
 namespace Pop\Module;
 
 use Pop\Application;
+use Pop\Utils\Helper;
 
 /**
  * Pop module class

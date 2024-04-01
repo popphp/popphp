@@ -20,8 +20,8 @@
         "php": ">=8.1.0",
         "popphp/pop-config" : "^4.0.0",
         "popphp/pop-cookie" : "^4.0.1",
-        "popphp/pop-db" : "^6.5.0",
-        "popphp/pop-utils" : "^2.0.0",
+        "popphp/pop-db" : "^6.5.6",
+        "popphp/pop-utils" : "^2.1.0",
         "vlucas/phpdotenv": "^5.6.0"
     },
     "require-dev": {
