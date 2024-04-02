@@ -307,7 +307,7 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      * Re-load a service object
      *
      * @param  string $name
-     * @return
+     * @return mixed
      */
     public function reload(string $name): mixed
     {
