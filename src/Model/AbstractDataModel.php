@@ -90,42 +90,42 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     /**
      * Fetch all
      *
-     * @param  ?string $sort
-     * @param  mixed $limit
-     * @param  mixed $page
-     * @param  bool $asArray
+     * @param  ?string    $sort
+     * @param  mixed      $limit
+     * @param  mixed      $page
+     * @param  bool|array $toArray
      * @throws Exception
      * @return array|Collection
      */
-    public static function fetchAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection
+    public static function fetchAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool|array $toArray = false): array|Collection
     {
-        return (new static())->getAll($sort, $limit, $page, $asArray);
+        return (new static())->getAll($sort, $limit, $page, $toArray);
     }
 
     /**
      * Fetch by ID
      *
      * @param  mixed $id
-     * @param  bool $asArray
+     * @param  bool $toArray
      * @throws Exception
      * @return array|Record
      */
-    public static function fetch(mixed $id, bool $asArray = true): array|Record
+    public static function fetch(mixed $id, bool $toArray = false): array|Record
     {
-        return (new static())->getById($id, $asArray);
+        return (new static())->getById($id, $toArray);
     }
 
     /**
      * Create new
      *
      * @param  array $data
-     * @param  bool  $asArray
+     * @param  bool  $toArray
      * @throws Exception
      * @return array|Record
      */
-    public static function createNew(array $data, bool $asArray = true): array|Record
+    public static function createNew(array $data, bool $toArray = false): array|Record
     {
-        return (new static())->create($data, $asArray);
+        return (new static())->create($data, $toArray);
     }
 
     /**
@@ -143,14 +143,14 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     /**
      * Get all
      *
-     * @param  ?string $sort
-     * @param  mixed   $limit
-     * @param  mixed   $page
-     * @param  bool    $asArray
+     * @param  ?string    $sort
+     * @param  mixed      $limit
+     * @param  mixed      $page
+     * @param  bool|array $toArray
      * @throws Exception
      * @return array|Collection
      */
-    public function getAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection
+    public function getAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool|array $toArray = false): array|Collection
     {
         $table          = $this->getTableClass();
         $offsetAndLimit = $this->getOffsetAndLimit($page, $limit);
@@ -168,7 +168,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         }
 
         if (!isset($this->options['select'])) {
-            if ($asArray) {
+            if ($toArray) {
                 $this->options['select'] = $this->describe();
             } else {
                 $this->options = ['select' => $this->describe(true)];
@@ -180,9 +180,9 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         }
 
         if (!empty($this->filters)) {
-            return $table::findBy($this->parseFilter($this->filters), $this->options, $asArray);
+            return $table::findBy($this->parseFilter($this->filters), $this->options, $toArray);
         } else {
-            return $table::findAll($this->options, $asArray);
+            return $table::findAll($this->options, $toArray);
         }
     }
 
@@ -190,16 +190,16 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      * Get by ID
      *
      * @param  mixed $id
-     * @param  bool  $asArray
+     * @param  bool  $toArray
      * @throws Exception
      * @return array|Record
      */
-    public function getById(mixed $id, bool $asArray = true): array|Record
+    public function getById(mixed $id, bool $toArray = false): array|Record
     {
         $table = $this->getTableClass();
 
         if (!isset($this->options['select'])) {
-            if ($asArray) {
+            if ($toArray) {
                 $this->options['select'] = $this->describe();
             } else {
                 $this->options = ['select' => $this->describe(true)];
@@ -220,9 +220,9 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
                     $this->filters[] = $tableClass . '.' . $primaryKey . ' = ' . $id;
                 }
             }
-            return $table::findOne($this->parseFilter($this->filters), $this->options, $asArray);
+            return $table::findOne($this->parseFilter($this->filters), $this->options, $toArray);
         } else {
-            return $table::findById($id, $this->options, $asArray);
+            return $table::findById($id, $this->options, $toArray);
         }
     }
 
@@ -230,11 +230,11 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      * Create
      *
      * @param  array $data
-     * @param  bool  $asArray
+     * @param  bool  $toArray
      * @throws Exception
      * @return array|Record
      */
-    public function create(array $data, bool $asArray = true): array|Record
+    public function create(array $data, bool $toArray = false): array|Record
     {
         if ($this->hasRequirements()) {
             $results = $this->validate($data);
@@ -247,7 +247,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         $record = new $table($data);
         $record->save();
 
-        return ($asArray) ? $record->toArray() : $record;
+        return ($toArray) ? $record->toArray() : $record;
     }
 
     /**
@@ -255,11 +255,11 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      *
      * @param  mixed $id
      * @param  array $replace
-     * @param  bool  $asArray
+     * @param  bool  $toArray
      * @throws Exception
      * @return array|Record
      */
-    public function copy(mixed $id, array $replace = [], bool $asArray = true): array|Record
+    public function copy(mixed $id, array $replace = [], bool $toArray = false): array|Record
     {
         $table      = $this->getTableClass();
         $record     = $table::findById($id);
@@ -269,7 +269,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
             $record = $record->copy($replace);
         }
 
-        return ($asArray) ? $record->toArray() : $record;
+        return ($toArray) ? $record->toArray() : $record;
     }
 
     /**
@@ -277,11 +277,11 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      *
      * @param  mixed $id
      * @param  array $data
-     * @param  bool  $asArray
+     * @param  bool  $toArray
      * @throws Exception
      * @return array|Record
      */
-    public function replace(mixed $id, array $data, bool $asArray = true): array|Record
+    public function replace(mixed $id, array $data, bool $toArray = false): array|Record
     {
         if ($this->hasRequirements()) {
             $results = $this->validate($data);
@@ -302,7 +302,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
             $record->save();
         }
 
-        return ($asArray) ? $record->toArray() : $record;
+        return ($toArray) ? $record->toArray() : $record;
     }
 
     /**
@@ -310,11 +310,11 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      *
      * @param  mixed $id
      * @param  array $data
-     * @param  bool  $asArray
+     * @param  bool  $toArray
      * @throws Exception
-     * @return Record
+     * @return array|Record
      */
-    public function update(mixed $id, array $data, bool $asArray = true): array|Record
+    public function update(mixed $id, array $data, bool $toArray = false): array|Record
     {
         $table      = $this->getTableClass();
         $record     = $table::findById($id);
@@ -327,7 +327,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
             $record->save();
         }
 
-        return ($asArray) ? $record->toArray() : $record;
+        return ($toArray) ? $record->toArray() : $record;
     }
 
     /**
@@ -589,10 +589,10 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      * Get order by
      *
      * @param  mixed $sort
-     * @param  bool  $asArray
+     * @param  bool  $toArray
      * @return string|array|null
      */
-    public function getOrderBy(mixed $sort = null, bool $asArray = false): string|array|null
+    public function getOrderBy(mixed $sort = null, bool $toArray = false): string|array|null
     {
         $orderBy        = null;
         $orderByStrings = [];
@@ -624,7 +624,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
             $orderBy = implode(', ', $orderByStrings);
         }
 
-        return ($asArray) ? $orderByAry : $orderBy;
+        return ($toArray) ? $orderByAry : $orderBy;
     }
 
     /**

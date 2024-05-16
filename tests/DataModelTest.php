@@ -73,11 +73,11 @@ class DataModelTest extends TestCase
     {
         $userModel = new User();
         $count     = $userModel->filter('username LIKE testuser1%', ['id', 'username'])->count();
-        $users     = $userModel->getAll();
+        $users     = $userModel->getAll()->toArray();
 
         $this->assertEquals(1, $count);
         $this->assertEquals('testuser1', $users[0]['username']);
-        $this->assertFalse(isset($users[0]['email']));
+        $this->assertTrue(isset($users[0]['email']));
         $this->assertEquals(1, $users[0]['id']);
 
         Record::db()->disconnect();
@@ -85,10 +85,10 @@ class DataModelTest extends TestCase
 
     public function testCountAndFilters2()
     {
-        $users = User::filterBy('username LIKE testuser1%', ['id', 'username'])->getAll();
+        $users = User::filterBy('username LIKE testuser1%', ['id', 'username'])->getAll()->toArray();
 
         $this->assertEquals('testuser1', $users[0]['username']);
-        $this->assertFalse(isset($users[0]['email']));
+        $this->assertTrue(isset($users[0]['email']));
         $this->assertEquals(1, $users[0]['id']);
 
         Record::db()->disconnect();

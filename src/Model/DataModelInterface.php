@@ -32,24 +32,24 @@ interface DataModelInterface
     /**
      * Get all
      *
-     * @param  ?string $sort
-     * @param  mixed   $limit
-     * @param  mixed   $page
-     * @param  bool    $asArray
+     * @param  ?string    $sort
+     * @param  mixed      $limit
+     * @param  mixed      $page
+     * @param  bool|array $toArray
      * @throws Exception
      * @return array|Collection
      */
-    public function getAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection;
+    public function getAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool|array $toArray = false): array|Collection;
 
     /**
      * Get by ID
      *
      * @param  mixed $id
-     * @param  bool  $asArray
+     * @param  bool  $toArray
      * @throws Exception
      * @return array|Record
      */
-    public function getById(mixed $id, bool $asArray = true): array|Record;
+    public function getById(mixed $id, bool $toArray = false): array|Record;
 
     /**
      * Create
@@ -172,10 +172,10 @@ interface DataModelInterface
      * Get order by
      *
      * @param  mixed $sort
-     * @param  bool  $asArray
+     * @param  bool  $toArray
      * @return string|array|null
      */
-    public function getOrderBy(mixed $sort = null, bool $asArray = false): string|array|null;
+    public function getOrderBy(mixed $sort = null, bool $toArray = false): string|array|null;
 
     /**
      * Method to parse filter for select predicates
