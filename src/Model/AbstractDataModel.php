@@ -402,6 +402,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         $table        = $this->getTableClass();
         $tableInfo    = $table::getTableInfo();
         $tableColumns = array_keys($tableInfo['columns']);
+        $tableName    = $tableInfo['tableName'];
 
         if (!isset($tableInfo['tableName']) || !isset($tableInfo['columns'])) {
             throw new Exception('Error: The table info parameter is not in the correct format');
@@ -410,8 +411,10 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         $tableColumns = array_diff($tableColumns, $this->privateColumns);
 
         if ($native) {
-            return ($full) ? $tableInfo : $tableColumns;
-        } else{
+            return ($full) ? $tableInfo : array_map(function($value) use ($tableName) {
+                return $tableName . '.' . $value;
+            }, $tableColumns);
+        } else {
             // Get any possible foreign columns
             $foreignColumns = array_diff(array_diff($this->selectColumns, $tableColumns), $this->privateColumns);
 
