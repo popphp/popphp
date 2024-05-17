@@ -168,11 +168,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         }
 
         if (!isset($this->options['select'])) {
-            if ($toArray) {
-                $this->options['select'] = $this->describe();
-            } else {
-                $this->options = ['select' => $this->describe(true)];
-            }
+            $this->options['select'] = $this->describe(($toArray !== false));
         }
 
         if (!empty($this->foreignTables) && !isset($this->options['join'])) {
