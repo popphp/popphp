@@ -77,7 +77,7 @@ class DataModelTest extends TestCase
 
         $this->assertEquals(1, $count);
         $this->assertEquals('testuser1', $users[0]['username']);
-        $this->assertTrue(isset($users[0]['email']));
+        $this->assertFalse(isset($users[0]['email']));
         $this->assertEquals(1, $users[0]['id']);
 
         Record::db()->disconnect();
@@ -88,7 +88,7 @@ class DataModelTest extends TestCase
         $users = User::filterBy('username LIKE testuser1%', ['id', 'username'])->getAll()->toArray();
 
         $this->assertEquals('testuser1', $users[0]['username']);
-        $this->assertTrue(isset($users[0]['email']));
+        $this->assertFalse(isset($users[0]['email']));
         $this->assertEquals(1, $users[0]['id']);
 
         Record::db()->disconnect();
