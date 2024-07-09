@@ -40,13 +40,13 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Service locator
      * @var ?Service\Locator
      */
-    protected ?Service\Locator$services = null;
+    protected ?Service\Locator $services = null;
 
     /**
      * Event manager
      * @var ?Event\Manager
      */
-    protected ?Event\Manager$events = null;
+    protected ?Event\Manager $events = null;
 
     /**
      * Module manager
