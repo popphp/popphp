@@ -4,7 +4,6 @@ popphp
 [![Build Status](https://github.com/popphp/popphp/workflows/phpunit/badge.svg)](https://github.com/popphp/popphp/actions)
 [![Coverage Status](http://cc.popphp.org/coverage.php?comp=popphp)](http://cc.popphp.org/popphp/)
 
-[![Join the chat at https://popphp.slack.com](https://media.popphp.org/img/slack.svg)](https://popphp.slack.com)
 [![Join the chat at https://discord.gg/TZjgT74U7E](https://media.popphp.org/img/discord.svg)](https://discord.gg/TZjgT74U7E)
 
 * [Overview](#overview)
@@ -33,7 +32,7 @@ popphp
 Overview
 --------
 
-`popphp` is the main set of core components for the [Pop PHP Framework](http://www.popphp.org/).
+`popphp` is the main set of core components for the [Pop PHP Framework](https://www.popphp.org/).
 It provides the main Application object that can be configured to manage
 and interface with the underlying core components:
 
@@ -56,7 +55,7 @@ Install `popphp` using Composer.
 Or, require it in your composer.json file
 
     "require": {
-        "popphp/popphp" : "^4.0.0"
+        "popphp/popphp" : "^4.3.5"
     }
 
 [Top](#popphp)
