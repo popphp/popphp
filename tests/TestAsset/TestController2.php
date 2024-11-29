@@ -4,7 +4,7 @@ namespace Pop\Test\TestAsset;
 
 use Pop\Controller\AbstractController;
 
-class TestController extends AbstractController
+class TestController2 extends AbstractController
 {
 
     public $foo = null;
@@ -31,11 +31,6 @@ class TestController extends AbstractController
     }
 
     public function error()
-    {
-        $this->id = 0;
-    }
-
-    public function maintenance()
     {
         $this->id = 0;
     }

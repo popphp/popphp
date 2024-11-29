@@ -3,6 +3,7 @@
 namespace Pop\Test;
 use Dotenv\Dotenv;
 use PHPUnit\Framework\TestCase;
+use Pop\Test\TestAsset\TestController;
 
 class ControllerTest extends TestCase
 {
@@ -15,35 +16,32 @@ class ControllerTest extends TestCase
 
     public function testSetAndGetDefaultAction()
     {
-        $controller = $this->getMockForAbstractClass('\Pop\Controller\AbstractController');
+        $controller = new TestController();
         $controller->setDefaultAction('default');
         $this->assertEquals('default', $controller->getDefaultAction());
     }
 
     public function testSetAndGetMaintenanceAction()
     {
-        $controller = $this->getMockForAbstractClass('\Pop\Controller\AbstractController');
+        $controller = new TestController();
         $controller->setMaintenanceAction('mt');
         $this->assertEquals('mt', $controller->getMaintenanceAction());
     }
 
     public function testDispatch()
     {
-        $controller = $this->getMockForAbstractClass(
-            '\Pop\Controller\AbstractController', [], '', false, false, true, ['error', 'login', 'user']
-        );
-        $controller->expects($this->once())->method('error');
-        $controller->expects($this->once())->method('login');
-        $controller->expects($this->once())->method('user');
-        $controller->dispatch('login');
-        $controller->dispatch('user', [1001]);
+        $controller = new TestController();
+        $controller->dispatch('delete');
+        $controller->dispatch('edit', [1001]);
+        $this->assertEquals(1001, $controller->getId());
         $controller->dispatch();
+        $this->assertEquals(0, $controller->getId());
     }
 
     public function testDispatchException()
     {
         $this->expectException('Pop\Controller\Exception');
-        $controller = $this->getMockForAbstractClass('\Pop\Controller\AbstractController');
+        $controller = new TestController();
         $controller->setDefaultAction('foo');
         $controller->dispatch('foo');
     }
@@ -53,10 +51,7 @@ class ControllerTest extends TestCase
         $dotEnv = Dotenv::createImmutable(__DIR__ . '/tmp');
         $dotEnv->load();
 
-        $controller = $this->getMockForAbstractClass(
-            '\Pop\Controller\AbstractController', [], '', false, false, true, ['maintenance', 'error', 'login', 'user']
-        );
-        $controller->expects($this->atMost(2))->method('maintenance');
+        $controller = new TestController();
         $this->assertFalse($controller->bypassMaintenance());
         $controller->dispatch();
     }
@@ -66,10 +61,8 @@ class ControllerTest extends TestCase
         $dotEnv = Dotenv::createImmutable(__DIR__ . '/tmp');
         $dotEnv->load();
 
-        $controller = $this->getMockForAbstractClass(
-            '\Pop\Controller\AbstractController', [], '', false, false, true, ['maintenance', 'error', 'login', 'user']
-        );
-        $controller->expects($this->atMost(2))->method('maintenance');
+        $controller = new TestController();
+
         $this->assertFalse($controller->bypassMaintenance());
         $controller->setBypassMaintenance(true);
         $this->assertTrue($controller->bypassMaintenance());
@@ -81,8 +74,8 @@ class ControllerTest extends TestCase
         $dotEnv = Dotenv::createImmutable(__DIR__ . '/tmp');
         $dotEnv->load();
 
-        $this->expectException('Pop\Controller\Exception');
-        $controller = $this->getMockForAbstractClass('\Pop\Controller\AbstractController');
+        $this->expectException('Error');
+        $controller = new TestController2();
         $controller->dispatch();
     }
 
