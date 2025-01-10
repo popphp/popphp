@@ -511,6 +511,11 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
             }
 
             $this->selectColumns = $selectColumns;
+            if (!empty($options)) {
+                $options['select'] = $selectColumns;
+            } else {
+                $options = ['select' => $selectColumns];
+            }
         } else if (!empty($this->origSelectColumns)) {
             $this->selectColumns = $this->origSelectColumns;
         }
