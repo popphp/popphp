@@ -16,6 +16,7 @@ jobs:
     strategy:
       matrix:
         php-versions: [ '8.2', '8.3' ]
+        phpunit-versions: ['11.5.0']
 
     steps:
       - uses: actions/checkout@v3
@@ -24,6 +25,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
+          tools: phpunit:${{ matrix.phpunit-versions }}
 
       #- name: Validate composer.json and composer.lock
       #  run: composer validate
