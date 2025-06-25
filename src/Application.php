@@ -205,9 +205,9 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Access the application router
      *
-     * @return Router\Router
+     * @return ?Router\Router
      */
-    public function router(): Router\Router
+    public function router(): ?Router\Router
     {
         return $this->router;
     }
@@ -215,9 +215,9 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Get the service locator
      *
-     * @return Service\Locator
+     * @return ?Service\Locator
      */
-    public function services(): Service\Locator
+    public function services(): ?Service\Locator
     {
         return $this->services;
     }
@@ -225,9 +225,9 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Get the event manager
      *
-     * @return Event\Manager
+     * @return ?Event\Manager
      */
-    public function events(): Event\Manager
+    public function events(): ?Event\Manager
     {
         return $this->events;
     }
@@ -235,9 +235,9 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Access all application module configs
      *
-     * @return Module\Manager
+     * @return ?Module\Manager
      */
-    public function modules(): Module\Manager
+    public function modules(): ?Module\Manager
     {
         return $this->modules;
     }

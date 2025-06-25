@@ -14,6 +14,7 @@
 namespace Pop;
 
 use Pop\Cookie\Cookie;
+use Pop\Router\Router;
 
 /**
  * Application helper class
@@ -78,6 +79,71 @@ class App
         } else {
             return null;
         }
+    }
+
+    /**
+     * Get router
+     *
+     * @return ?Router
+     */
+    public static function router(): ?Router
+    {
+        return (self::$application !== null) ? self::$application->router() : null;
+    }
+
+    /**
+     * Get service locator
+     *
+     * @param  ?string $key
+     * @return mixed
+     */
+    public static function services(?string $key = null): mixed
+    {
+        if (self::$application !== null) {
+            return ($key !== null) ? self::$application->services[$key] : self::$application->services();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get event manager
+     *
+     * @param  ?string $key
+     * @return mixed
+     */
+    public static function events(?string $key = null): mixed
+    {
+        if (self::$application !== null) {
+            return ($key !== null) ? self::$application->events[$key] : self::$application->events();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get module manager
+     *
+     * @param  ?string $key
+     * @return mixed
+     */
+    public static function modules(?string $key = null): mixed
+    {
+        if (self::$application !== null) {
+            return ($key !== null) ? self::$application->modules[$key] : self::$application->modules();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get autoloader
+     *
+     * @return mixed
+     */
+    public static function autoloader(): mixed
+    {
+        return (self::$application !== null) ? self::$application->autoloader() : null;
     }
 
     /**
