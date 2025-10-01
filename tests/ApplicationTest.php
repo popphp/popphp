@@ -539,7 +539,8 @@ class ApplicationTest extends TestCase
             'routes' => [
                 'help' => [
                     'controller' => 'Pop\Test\TestAsset\TestController',
-                    'action'     => 'help'
+                    'action'     => 'help',
+                    'middleware' => 'Pop\Test\TestAsset\TestMiddleware'
                 ]
             ]
         ];
@@ -547,7 +548,7 @@ class ApplicationTest extends TestCase
         ob_start();
         $application->run();
         $result = ob_get_clean();
-        $this->assertEquals('help', $result);
+        $this->assertStringContainsString('help', $result);
     }
 
     public function testRunClassControllerWithParam()
