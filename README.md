@@ -841,8 +841,8 @@ Middleware Manager
 The middleware manager provides a way to hook specific functionality in and around the `dispatch` action
 in an application object. Middleware themselves are classes that would implement the following interfaces:
 
-* `Pop\Middleware\MiddlewareInterface` - required, defines the `handle` that will be called to execute the middleware
-* `Pop\Middleware\TerminableInterface` - optional, defines the `terminate` method that can be called to execute any post-dispatch code
+* `Pop\Middleware\MiddlewareInterface` - required, defines the `handle()` method that will be called to execute the middleware
+* `Pop\Middleware\TerminableInterface` - optional, defines the `terminate()` method that can be called to execute any post-dispatch code
 
 Example middleware class:
 
@@ -860,7 +860,11 @@ class TestMiddleware implements MiddlewareInterface, TerminableInterface
 
     public function terminate(mixed $request = null, mixed $response = null): void
     {
-        file_put_contents(__DIR__ . '/logs/mw.log', 'Executing terminate method for test middleware.' . PHP_EOL, FILE_APPEND);
+        file_put_contents(
+            __DIR__ . '/logs/mw.log',
+            'Executing terminate method for test middleware.' . PHP_EOL,
+            FILE_APPEND
+        );
     }
 }
 ```
@@ -892,6 +896,12 @@ When making the request to the above application (e.g., `http://localhost:8000/`
 Entering Test Middleware.
 Index page!
 Exiting Test Middleware.
+```
+
+Furthermore, the `terminate()` method will have been executed post-dispatch and added the entry to the log file.
+
+```text
+Executing terminate method for test middleware.
 ```
 
 Middleware can be applied globally or on a specific route-level. Middleware assigned to a specific route
