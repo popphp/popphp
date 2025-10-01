@@ -881,8 +881,9 @@ $config = [
     'middleware' => ['TestMiddleware'],
     'routes'     => [
         '/' => [
-            'controller' => 'MyController',
-            'action'     => 'index'
+            'controller' => function() {
+                echo 'Index Page.<br />';
+            }
         ],
     ]
 ]
@@ -894,11 +895,12 @@ When making the request to the above application (e.g., `http://localhost:8000/`
 
 ```text
 Entering Test Middleware.
-Index page!
+Index page.
 Exiting Test Middleware.
 ```
 
-Furthermore, the `terminate()` method will have been executed post-dispatch and added the entry to the log file.
+Furthermore, the `terminate()` method will have been executed post-dispatch and added the following entry
+to the `logs/mw.log` log file:
 
 ```text
 Executing terminate method for test middleware.
@@ -912,13 +914,15 @@ $config = [
     'middleware' => ['TestMiddleware'],
     'routes'     => [
         '/' => [
-            'controller' => 'MyController',
-            'action'     => 'index'
+            'controller' => function() {
+                echo 'Index Page.<br />';
+            }
         ],
         '/admin[/]' => [
-            'controller' => 'MyController',
-            'action'     => 'admin',
-            'middleware' => 'AdminMiddleware'
+            'middleware' => 'AdminMiddleware',
+            'controller' => function() {
+                echo 'Admin Page.<br />';
+            }
         ],
     ]
 ]
