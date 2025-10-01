@@ -673,7 +673,6 @@ class Application extends AbstractApplication implements \ArrayAccess
                 if ($this->router->hasController()) {
                     $controller = $this->router->getController();
 
-
                     // Process middleware
                     if (($this->middleware !== null) && ($this->middleware->hasHandlers())) {
                         $request        = null;

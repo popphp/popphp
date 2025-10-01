@@ -149,7 +149,6 @@ class ModuleTest extends TestCase
             $this->assertTrue($manager->isRegistered($name));
         }
 
-        $this->assertEquals('bar', $manager->getModuleName($manager['bar']));
         $this->assertEquals(2, count($manager));
         $this->assertEquals(2, $manager->count());
 

@@ -198,7 +198,7 @@ class Locator extends AbstractManager
      * @param  mixed  $call
      * @return static
      */
-    public function setCallables(string $name, mixed $call): static
+    public function setCallable(string $name, mixed $call): static
     {
         if (isset($this->items[$name])) {
             $this->items[$name]->setCallable($call);

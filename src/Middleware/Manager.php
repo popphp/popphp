@@ -87,11 +87,11 @@ class Manager extends AbstractManager
     public static function handle(mixed $request, \Closure $dispatch, mixed $dispatchParams = null): mixed
     {
         $next = array_shift(self::$handlers);
-        if (is_string($next) && class_exists($next)) {
-            $next = new $next();
-        }
+
         if ($next === null) {
             return (null !== $dispatchParams) ? call_user_func_array($dispatch, $dispatchParams) : $dispatch();
+        } else if (is_string($next) && class_exists($next)) {
+            $next = new $next();
         }
 
         return $next->handle($request, function ($req) use ($dispatch, $dispatchParams) {

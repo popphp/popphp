@@ -83,8 +83,8 @@ class ServiceTest extends TestCase
                 'call' => 'Foo'
             ]
         ]);
-        $services->setCall('foo', 'Bar');
-        $this->assertEquals('Bar', $services->getCall('foo'));
+        $services->setCallable('foo', 'Bar');
+        $this->assertEquals('Bar', $services->getCallable('foo'));
     }
 
     public function testSetParams1()
@@ -94,8 +94,8 @@ class ServiceTest extends TestCase
                 'call'   => 'Foo'
             ]
         ]);
-        $services->setParams('foo', 456);
-        $this->assertEquals(456, $services->getParams('foo')[0]);
+        $services->setParameters('foo', 456);
+        $this->assertEquals(456, $services->getParameters('foo')[0]);
     }
 
     public function testSetParams2()
@@ -105,9 +105,9 @@ class ServiceTest extends TestCase
                 'call'   => 'Foo'
             ]
         ]);
-        $services->setParams('foo', [123, 456]);
-        $this->assertEquals(123, $services->getParams('foo')[0]);
-        $this->assertEquals(456, $services->getParams('foo')[1]);
+        $services->setParameters('foo', [123, 456]);
+        $this->assertEquals(123, $services->getParameters('foo')[0]);
+        $this->assertEquals(456, $services->getParameters('foo')[1]);
     }
 
     public function testSetAndGetParam()
@@ -118,8 +118,8 @@ class ServiceTest extends TestCase
                 'params' => 123
             ]
         ]);
-        $services->addParam('foo', 456);
-        $this->assertEquals(456, $services->getParams('foo')[1]);
+        $services->addParameter('foo', 456);
+        $this->assertEquals(456, $services->getParameters('foo')[1]);
     }
 
     public function testAddParam1()
@@ -130,8 +130,8 @@ class ServiceTest extends TestCase
                 'params' => 123
             ]
         ]);
-        $services->addParam('foo', 456);
-        $this->assertTrue(is_array($services->getParams('foo')));
+        $services->addParameter('foo', 456);
+        $this->assertTrue(is_array($services->getParameters('foo')));
     }
 
     public function testAddParam2()
@@ -142,9 +142,9 @@ class ServiceTest extends TestCase
                 'params' => [123]
             ]
         ]);
-        $services->addParam('foo', 456, 'test');
-        $this->assertTrue(is_array($services->getParams('foo')));
-        $this->assertEquals(456, $services->getParams('foo')['test']);
+        $services->addParameter('foo', 456, 'test');
+        $this->assertTrue(is_array($services->getParameters('foo')));
+        $this->assertEquals(456, $services->getParameters('foo')['test']);
     }
 
     public function testAddParam3()
@@ -154,8 +154,8 @@ class ServiceTest extends TestCase
                 'call' => 'Foo'
             ]
         ]);
-        $services->addParam('foo', 456);
-        $this->assertEquals(456, $services->getParams('foo')[0]);
+        $services->addParameter('foo', 456);
+        $this->assertEquals(456, $services->getParameters('foo')[0]);
     }
 
     public function testAddParam4()
@@ -165,9 +165,9 @@ class ServiceTest extends TestCase
                 'call' => 'Foo'
             ]
         ]);
-        $services->addParam('foo', 456, 'test');
-        $this->assertTrue(is_array($services->getParams('foo')));
-        $this->assertEquals(456, $services->getParams('foo')['test']);
+        $services->addParameter('foo', 456, 'test');
+        $this->assertTrue(is_array($services->getParameters('foo')));
+        $this->assertEquals(456, $services->getParameters('foo')['test']);
     }
 
     public function testRemoveParam1()
@@ -178,8 +178,8 @@ class ServiceTest extends TestCase
                 'params' => 123
             ]
         ]);
-        $services->removeParam('foo', 123);
-        $this->assertFalse($services->hasParams('foo'));
+        $services->removeParameters('foo', 123);
+        $this->assertFalse($services->hasParameter('foo'));
     }
 
     public function testRemoveParam2()
@@ -190,8 +190,8 @@ class ServiceTest extends TestCase
                 'params' => [123]
             ]
         ]);
-        $services->removeParam('foo', 123, 0);
-        $this->assertFalse($services->hasParams('foo'));
+        $services->removeParameters('foo', 123, 0);
+        $this->assertFalse($services->hasParameter('foo'));
     }
 
     public function testRemoveParam3()
@@ -202,8 +202,8 @@ class ServiceTest extends TestCase
                 'params' => [123]
             ]
         ]);
-        $services->removeParam('foo', 123);
-        $this->assertFalse($services->hasParams('foo'));
+        $services->removeParameters('foo', 123);
+        $this->assertFalse($services->hasParameter('foo'));
     }
 
     public function testRemoveParam4()
@@ -216,8 +216,8 @@ class ServiceTest extends TestCase
                 ]
             ]
         ]);
-        $services->removeParam('foo', 123, 'test');
-        $this->assertFalse($services->hasParams('foo'));
+        $services->removeParameters('foo', 123, 'test');
+        $this->assertFalse($services->hasParameter('foo'));
     }
 
     public function testIsAvailable()
