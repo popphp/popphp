@@ -15,6 +15,8 @@ namespace Pop\Router;
 
 use Closure;
 use ReflectionException;
+use Pop\App;
+use Pop\Utils\Arr;
 
 /**
  * Pop router class
@@ -343,7 +345,14 @@ class Router
     {
         if ($this->routeMatch->match($forceRoute)) {
             if ($this->routeMatch->hasController()) {
-                $controller = $this->routeMatch->getController();
+                $controller         = $this->routeMatch->getController();
+                $application        = App::get();
+                $middlewareDisabled = $application->env('MIDDLEWARE_DISABLED');
+
+                $routeConfig = $this->routeMatch->getRouteConfig();
+                if (!empty($routeConfig['middleware']) && ($middlewareDisabled != 'route') && ($middlewareDisabled != 'all')) {
+                    $application->middleware->addItems(Arr::make($routeConfig['middleware']));
+                }
 
                 if ($controller instanceof Closure) {
                     $this->controllerClass = 'Closure';
@@ -361,7 +370,9 @@ class Router
                     if ($controllerParams !== null) {
                         $this->controller = (new \ReflectionClass($controller))->newInstanceArgs($controllerParams);
                     } else {
-                        $this->controller = new $controller();
+                        $this->controller = (class_uses($controller, 'Pop\Controller\HttpControllerTrait') ||
+                            class_uses($controller, 'Pop\Controller\ConsoleControllerTrait')) ?
+                            new $controller($application) : new $controller();
                     }
 
                     if (!($this->controller instanceof \Pop\Controller\ControllerInterface)) {

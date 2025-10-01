@@ -13,6 +13,10 @@
  */
 namespace Pop;
 
+use Pop\Console\Console;
+use Pop\Http\Server\Request;
+use Pop\Http\Uri;
+use Pop\Utils\Arr;
 use Pop\Utils\Helper;
 use ReflectionException;
 
@@ -184,6 +188,14 @@ class Application extends AbstractApplication implements \ArrayAccess
                     $this->on($event['name'], $event['action'], ((int)$event['priority'] ?? 0));
                 }
             }
+        }
+
+        $middlewareDisabled = $this->env('MIDDLEWARE_DISABLED');
+
+        // If middleware is defined in the app config, register them with the application
+        if (isset($this->config['middleware']) && ($this->middleware !== null) &&
+            (empty($middlewareDisabled) || ($middlewareDisabled == 'route'))) {
+            $this->middleware->addItems(Arr::make($this->config['middleware']));
         }
 
         // Register application object with App helper class
@@ -640,7 +652,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @param  bool    $exit
      * @param  ?string $forceRoute
-     * @throws Event\Exception|Router\Exception|ReflectionException
+     * @throws Event\Exception|Router\Exception|ReflectionException|Exception
      * @return void
      */
     public function run(bool $exit = true, ?string $forceRoute = null): void
@@ -657,18 +669,55 @@ class Application extends AbstractApplication implements \ArrayAccess
                 // Trigger any app.dispatch.post events
                 $this->trigger('app.dispatch.pre');
 
+                // Dispatch
                 if ($this->router->hasController()) {
                     $controller = $this->router->getController();
-                    if ($this->router->getControllerClass() == 'Closure') {
-                        if ($this->router->hasRouteParams()) {
-                            call_user_func_array($controller, array_values($this->router->getRouteParams()));
+
+
+                    // Process middleware
+                    if (($this->middleware !== null) && ($this->middleware->hasHandlers())) {
+                        $request        = null;
+                        $dispatchParams = null;
+                        if ($this->router->getControllerClass() == 'Closure') {
+                            $dispatch       = $controller;
+                            $dispatchParams = ($this->router->hasRouteParams()) ? array_values($this->router->getRouteParams()) : null;
                         } else {
-                            $controller();
+                            $params   = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
+                            $dispatch = function() use ($controller, $params) {
+                                $controller->dispatch($this->router->getAction(), $params);
+                            };
                         }
+
+                        // Retrieve request object, or create one
+                        if (class_uses($controller, 'Pop\Controller\HttpControllerTrait')) {
+                            $request = $controller->request();
+                        } else if (class_uses($controller, 'Pop\Controller\ConsoleControllerTrait')) {
+                            $request = $controller->console();
+                        } else if ($this->router->isHttp()) {
+                            $request = new Request(new Uri());
+                        } else if ($this->router->isCli()) {
+                            $request = new Console(120);
+                        }
+
+                        if ($request === null) {
+                            throw new Exception('Error: Unable to retrieve the request object for the middleware.');
+                        }
+
+                        $this->middleware->process($request, $dispatch, $dispatchParams);
+                    // Skip middleware or process as normal
                     } else {
-                        $params = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-                        $controller->dispatch($this->router->getAction(), $params);
+                        if ($this->router->getControllerClass() == 'Closure') {
+                            if ($this->router->hasRouteParams()) {
+                                call_user_func_array($controller, array_values($this->router->getRouteParams()));
+                            } else {
+                                $controller();
+                            }
+                        } else {
+                            $params = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
+                            $controller->dispatch($this->router->getAction(), $params);
+                        }
                     }
+                // Else, no route found
                 } else {
                     $this->router->noRouteFound($exit);
                 }

@@ -73,7 +73,7 @@ abstract class AbstractManager implements ManagerInterface, ArrayAccess, Countab
      */
     public function addItem(mixed $item, mixed $name = null): static
     {
-        if ($name !== null) {
+        if (($name !== null) && !is_numeric($name)) {
             $this->items[$name] = $item;
         } else {
             $this->items[] = $item;
@@ -117,6 +117,16 @@ abstract class AbstractManager implements ManagerInterface, ArrayAccess, Countab
     public function hasItem(string $name): bool
     {
         return (isset($this->items[$name]));
+    }
+
+    /**
+     * Determine whether the manager has items
+     *
+     * @return bool
+     */
+    public function hasItems(): bool
+    {
+        return (!empty($this->items));
     }
 
     /**
