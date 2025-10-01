@@ -7,6 +7,7 @@ use Pop\Config\Config;
 use Pop\Router\Router;
 use Pop\Service\Locator;
 use Pop\Event;
+use Pop\Middleware;
 use Pop\Module;
 use PHPUnit\Framework\TestCase;
 
@@ -19,6 +20,7 @@ class ApplicationTest extends TestCase
             new Router(),
             new Locator(),
             new Event\Manager(),
+            new Middleware\Manager(),
             new Module\Manager(),
             include __DIR__ . '/../vendor/autoload.php',
             ['foo' => 'bar']
@@ -28,6 +30,7 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('Pop\Router\Router', $application->router());
         $this->assertInstanceOf('Pop\Service\Locator', $application->services());
         $this->assertInstanceOf('Pop\Event\Manager', $application->events());
+        $this->assertInstanceOf('Pop\Middleware\Manager', $application->middleware());
         $this->assertInstanceOf('Pop\Module\Manager', $application->modules());
         $this->assertInstanceOf('Composer\Autoload\ClassLoader', $application->autoloader());
         $this->assertEquals($application->config()['foo'], 'bar');
@@ -35,6 +38,7 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('Pop\Router\Router', $application['router']);
         $this->assertInstanceOf('Pop\Service\Locator', $application['services']);
         $this->assertInstanceOf('Pop\Event\Manager', $application['events']);
+        $this->assertInstanceOf('Pop\Middleware\Manager', $application['middleware']);
         $this->assertInstanceOf('Pop\Module\Manager', $application['modules']);
         $this->assertInstanceOf('Composer\Autoload\ClassLoader', $application['autoloader']);
         $this->assertEquals($application['config']['foo'], 'bar');
@@ -42,6 +46,7 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('Pop\Router\Router', $application->router);
         $this->assertInstanceOf('Pop\Service\Locator', $application->services);
         $this->assertInstanceOf('Pop\Event\Manager', $application->events);
+        $this->assertInstanceOf('Pop\Middleware\Manager', $application->middleware);
         $this->assertInstanceOf('Pop\Module\Manager', $application->modules);
         $this->assertInstanceOf('Composer\Autoload\ClassLoader', $application->autoloader);
         $this->assertNull($application->foo);
@@ -55,6 +60,7 @@ class ApplicationTest extends TestCase
         $application->router     = new Router();
         $application->services   = new Locator();
         $application->events     = new Event\Manager();
+        $application->middleware = new Middleware\Manager();
         $application->modules    = new Module\Manager();
         $application->autoloader = include __DIR__ . '/../vendor/autoload.php';
         $application->config     = ['foo' => 'bar'];
@@ -62,6 +68,7 @@ class ApplicationTest extends TestCase
         $this->assertTrue(isset($application->router));
         $this->assertTrue(isset($application->services));
         $this->assertTrue(isset($application->events));
+        $this->assertTrue(isset($application->middleware));
         $this->assertTrue(isset($application->modules));
         $this->assertTrue(isset($application->autoloader));
         $this->assertTrue(isset($application->config));
@@ -69,6 +76,7 @@ class ApplicationTest extends TestCase
         unset($application->router);
         unset($application->services);
         unset($application->events);
+        unset($application->middleware);
         unset($application->modules);
         unset($application->autoloader);
         unset($application->config);
@@ -76,6 +84,7 @@ class ApplicationTest extends TestCase
         $this->assertFalse(isset($application->router));
         $this->assertFalse(isset($application->services));
         $this->assertFalse(isset($application->events));
+        $this->assertFalse(isset($application->middleware));
         $this->assertFalse(isset($application->modules));
         $this->assertFalse(isset($application->autoloader));
         $this->assertFalse(isset($application->config));
@@ -89,6 +98,7 @@ class ApplicationTest extends TestCase
         $application['router']     = new Router();
         $application['services']   = new Locator();
         $application['events']     = new Event\Manager();
+        $application['middleware'] = new Middleware\Manager();
         $application['modules']    = new Module\Manager();
         $application['autoloader'] = include __DIR__ . '/../vendor/autoload.php';
         $application['config']     = ['foo' => 'bar'];
@@ -96,6 +106,7 @@ class ApplicationTest extends TestCase
         $this->assertTrue(isset($application['router']));
         $this->assertTrue(isset($application['services']));
         $this->assertTrue(isset($application['events']));
+        $this->assertTrue(isset($application['middleware']));
         $this->assertTrue(isset($application['modules']));
         $this->assertTrue(isset($application['autoloader']));
         $this->assertTrue(isset($application['config']));
@@ -103,6 +114,7 @@ class ApplicationTest extends TestCase
         unset($application['router']);
         unset($application['services']);
         unset($application['events']);
+        unset($application['middleware']);
         unset($application['modules']);
         unset($application['autoloader']);
         unset($application['config']);
@@ -110,6 +122,7 @@ class ApplicationTest extends TestCase
         $this->assertFalse(isset($application['router']));
         $this->assertFalse(isset($application['services']));
         $this->assertFalse(isset($application['events']));
+        $this->assertFalse(isset($application['middleware']));
         $this->assertFalse(isset($application['modules']));
         $this->assertFalse(isset($application['autoloader']));
         $this->assertFalse(isset($application['config']));
@@ -123,6 +136,7 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('Pop\Router\Router', $application->router());
         $this->assertInstanceOf('Pop\Service\Locator', $application->services());
         $this->assertInstanceOf('Pop\Event\Manager', $application->events());
+        $this->assertInstanceOf('Pop\Middleware\Manager', $application->middleware());
         $this->assertInstanceOf('Pop\Module\Manager', $application->modules());
         $this->assertInstanceOf('Composer\Autoload\ClassLoader', $application->autoloader());
     }
@@ -199,8 +213,9 @@ class ApplicationTest extends TestCase
                     'priority' => 1000
                 ]
             ],
-            'prefix' => 'TestAsset\\',
-            'src'    => __DIR__ . '/TestAsset'
+            'middleware' => ['TestMiddleware'],
+            'prefix'     => 'TestAsset\\',
+            'src'        => __DIR__ . '/TestAsset'
         ];
         $application = new Application($config, include __DIR__ . '/../vendor/autoload.php');
         $application->addRoute('/logout', [
@@ -443,6 +458,31 @@ class ApplicationTest extends TestCase
         $this->assertContains('app.route.pre', $application->events()->getResults('app.route.pre'));
         $this->assertContains('app.dispatch.pre', $application->events()->getResults('app.dispatch.pre'));
         $this->assertContains('app.dispatch.post', $application->events()->getResults('app.dispatch.post'));
+    }
+
+
+
+    public function testMiddlewareOnRun()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+        $config = [
+            'foo'      => 'bar',
+            'routes'   => [
+                'help' => function() {
+                    return 'help';
+                }
+            ],
+            'middleware' => 'Pop\Test\TestAsset\TestMiddleware'
+        ];
+        $application = new Application($config);
+        ob_start();
+        $application->run();
+        $result = ob_get_clean();
+        $this->assertStringContainsString('Entering Test Middleware.', $result);
+        $this->assertStringContainsString('Exiting Test Middleware.', $result);
+        $this->assertStringContainsString('Executing terminate method for test middleware.', $result);
     }
 
     public function testRunClosureController()

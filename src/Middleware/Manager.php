@@ -88,9 +88,19 @@ class Manager extends AbstractManager
      * @param  mixed $name
      * @return mixed
      */
-    public function getItem(mixed $name): mixed
+    public function getHandler(mixed $name): mixed
     {
         return parent::getItem($name);
+    }
+
+    /**
+     * Get handlers
+     *
+     * @return array
+     */
+    public function getHandlers(): array
+    {
+        return parent::getItems();
     }
 
     /**

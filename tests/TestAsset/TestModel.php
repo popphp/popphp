@@ -2,6 +2,7 @@
 
 namespace Pop\Test\TestAsset;
 
-class TestModel extends \Pop\Model\AbstractModel {
+class TestModel extends \Pop\Model\AbstractModel
+{
 
 }

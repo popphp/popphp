@@ -41,7 +41,8 @@ class ModuleTest extends TestCase
                     },
                     'priority' => 1000
                 ]
-            ]
+            ],
+            'middleware' => 'TestMiddleware'
         ];
 
         $application = new Application(include __DIR__ . '/../vendor/autoload.php');
@@ -144,6 +145,7 @@ class ModuleTest extends TestCase
         $manager['bar'] = new Module(['baz' => 123]);
 
         $this->assertInstanceOf('Pop\Module\Manager', $manager);
+        $this->assertInstanceOf('Pop\Module\Module', $manager->get('bar'));
 
         foreach ($manager as $name => $module) {
             $this->assertTrue($manager->isRegistered($name));
@@ -153,6 +155,30 @@ class ModuleTest extends TestCase
         $this->assertEquals(2, $manager->count());
 
         unset($manager['bar']);
+        $this->assertFalse($manager->isRegistered('bar'));
+    }
+
+    public function testManagerSet()
+    {
+        $manager = new Manager([new Module(['foo' => 'bar'], 'foo')]);
+        $manager->bar = new Module(['baz' => 123]);
+
+        $this->assertInstanceOf('Pop\Module\Module', $manager['bar']);
+    }
+
+    public function testManagerSetException()
+    {
+        $this->expectException('InvalidArgumentException');
+        $manager = new Manager([new Module(['foo' => 'bar'], 'foo')]);
+        $manager->bar = 'BadModule';
+    }
+
+    public function testManagerUnregister()
+    {
+        $manager = new Manager([new Module(['foo' => 'bar'], 'foo')]);
+        $manager['bar'] = new Module(['baz' => 123]);
+
+        $manager->unregister('bar');
         $this->assertFalse($manager->isRegistered('bar'));
     }
 

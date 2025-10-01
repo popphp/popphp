@@ -2,7 +2,8 @@
 
 namespace Pop\Test\TestAsset;
 
-class TestEvent {
+class TestEvent
+{
 
     public function __construct()
     {

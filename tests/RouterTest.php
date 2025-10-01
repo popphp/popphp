@@ -140,14 +140,15 @@ class RouterTest extends TestCase
     public function testGetRouteMatch()
     {
         $_SERVER['argv'] = [
-            'myscript.php', 'edit', 1002
+            'myscript.php', 'edit'
         ];
 
         $router = new Router\Router();
-        $router->addRoute('help', [
+        $router->addRoute('edit', [
             'controller' => function () {
-                echo 'help';
-            }
+                echo 'edit';
+            },
+            'middleware' => 'Pop\Test\TestAsset\TestMiddleware'
         ]);
         $router->route();
         $this->assertInstanceOf('Pop\Router\Match\AbstractMatch', $router->getRouteMatch());

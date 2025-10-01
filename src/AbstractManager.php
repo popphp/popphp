@@ -109,6 +109,16 @@ abstract class AbstractManager implements ManagerInterface, ArrayAccess, Countab
     }
 
     /**
+     * Get items
+     *
+     * @return array
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    /**
      * Determine whether the manager has an item
      *
      * @param  string $name

@@ -1,9 +1,14 @@
 <?php
 
 namespace Pop\Test;
+
 use Dotenv\Dotenv;
 use PHPUnit\Framework\TestCase;
+use Pop\Application;
 use Pop\Test\TestAsset\TestController;
+use Pop\Test\TestAsset\TestController2;
+use Pop\Test\TestAsset\TestHttpController;
+use Pop\Test\TestAsset\TestConsoleController;
 
 class ControllerTest extends TestCase
 {
@@ -74,9 +79,24 @@ class ControllerTest extends TestCase
         $dotEnv = Dotenv::createImmutable(__DIR__ . '/tmp');
         $dotEnv->load();
 
-        $this->expectException('Error');
+        $this->expectException('Pop\Controller\Exception');
         $controller = new TestController2();
         $controller->dispatch();
+    }
+
+    public function testHttpControllerTrait()
+    {
+        $httpController = new TestHttpController(new Application());
+        $this->assertInstanceOf('Pop\Application', $httpController->application());
+        $this->assertInstanceOf('Pop\Http\Server\Request', $httpController->request());
+        $this->assertInstanceOf('Pop\Http\Server\Response', $httpController->response());
+    }
+
+    public function testConsoleControllerTrait()
+    {
+        $consoleController = new TestConsoleController(new Application());
+        $this->assertInstanceOf('Pop\Application', $consoleController->application());
+        $this->assertInstanceOf('Pop\Console\Console', $consoleController->console());
     }
 
 }

@@ -2,7 +2,8 @@
 
 namespace Pop\Test\TestAsset;
 
-class TestService {
+class TestService
+{
 
     public $foo = null;
 
