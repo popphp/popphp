@@ -13,10 +13,8 @@
  */
 namespace Pop\Module;
 
-use ArrayAccess;
-use ArrayIterator;
-use Countable;
-use IteratorAggregate;
+use InvalidArgumentException;
+use Pop\AbstractManager;
 
 /**
  * Module manager class
@@ -28,14 +26,8 @@ use IteratorAggregate;
  * @license    https://www.popphp.org/license     New BSD License
  * @version    4.3.8
  */
-class Manager implements ArrayAccess, Countable, IteratorAggregate
+class Manager extends AbstractManager
 {
-
-    /**
-     * Modules
-     * @var array
-     */
-    protected array $modules = [];
 
     /**
      * Constructor
@@ -43,7 +35,6 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      * Instantiate the module manager object.
      *
      * @param  ?array $modules
-     * @throws Exception
      */
     public function __construct(?array $modules = null)
     {
@@ -56,7 +47,6 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      * Register module objects
      *
      * @param  array $modules
-     * @throws Exception
      * @return static
      */
     public function registerModules(array $modules): static
@@ -75,8 +65,7 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      */
     public function register(ModuleInterface $module): static
     {
-        $this->modules[$module->getName()] = $module;
-        return $this;
+        return $this->addItem($module, $module->getName());
     }
 
     /**
@@ -87,7 +76,7 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      */
     public function isRegistered(string $name): bool
     {
-        return isset($this->modules[$name]);
+        return $this->hasItem($name);
     }
 
     /**
@@ -100,7 +89,7 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
     {
         $result = false;
 
-        foreach ($this->modules as $name => $mod) {
+        foreach ($this->items as $name => $mod) {
             if ($mod === $module) {
                 $result = true;
                 break;
@@ -111,26 +100,6 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * Get a module object's registered name
-     *
-     * @param  ModuleInterface $module
-     * @return string
-     */
-    public function getModuleName(ModuleInterface $module): string
-    {
-        $moduleName = null;
-
-        foreach ($this->modules as $name => $mod) {
-            if ($mod === $module) {
-                $moduleName = $name;
-                break;
-            }
-        }
-
-        return $moduleName;
-    }
-
-    /**
      * Get a module
      *
      * @param  string $name
@@ -138,7 +107,7 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      */
     public function get(string $name): mixed
     {
-        return $this->modules[$name] ?? null;
+        return $this->getItem($name);
     }
 
     /**
@@ -149,10 +118,7 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      */
     public function unregister(string $name): static
     {
-        if (isset($this->modules[$name])) {
-            unset($this->modules[$name]);
-        }
-        return $this;
+        return $this->removeItem($name);
     }
 
     /**
@@ -160,114 +126,15 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      *
      * @param  string $name
      * @param  mixed $value
-     * @throws Exception
      * @return void
      */
     public function __set(string $name, mixed $value): void
     {
-        if ($value instanceof ModuleInterface) {
-            $value->setName($name);
+        if (!($value instanceof ModuleInterface)) {
+            throw new InvalidArgumentException('Error: The value passed must be instance of ModuleInterface');
         }
+        $value->setName($name);
         $this->register($value);
-    }
-
-    /**
-     * Get a registered module
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public function __get(string $name): mixed
-    {
-        return $this->get($name);
-    }
-
-    /**
-     * Determine if a module is registered with the manager object
-     *
-     * @param  string $name
-     * @return bool
-     */
-    public function __isset(string $name): bool
-    {
-        return isset($this->modules[$name]);
-    }
-
-    /**
-     * Unregister a module with the manager
-     *
-     * @param  string $name
-     * @return void
-     */
-    public function __unset(string $name): void
-    {
-        $this->unregister($name);
-    }
-
-    /**
-     * Register a module with the manager
-     *
-     * @param  mixed $offset
-     * @param  mixed $value
-     * @throws Exception
-     * @return void
-     */
-    public function offsetSet(mixed $offset, mixed $value): void
-    {
-        $this->__set($offset, $value);
-    }
-
-    /**
-     * Get a registered module
-     *
-     * @param  mixed $offset
-     * @return mixed
-     */
-    public function offsetGet(mixed $offset): mixed
-    {
-        return $this->__get($offset);
-    }
-
-    /**
-     * Determine if a module is registered with the manager object
-     *
-     * @param  mixed $offset
-     * @return bool
-     */
-    public function offsetExists(mixed $offset): bool
-    {
-        return $this->__isset($offset);
-    }
-
-    /**
-     * Unregister a module with the manager
-     *
-     * @param  mixed $offset
-     * @return void
-     */
-    public function offsetUnset(mixed $offset): void
-    {
-        $this->__unset($offset);
-    }
-
-    /**
-     * Return count
-     *
-     * @return int
-     */
-    public function count(): int
-    {
-        return count($this->modules);
-    }
-
-    /**
-     * Get iterator
-     *
-     * @return ArrayIterator
-     */
-    public function getIterator(): ArrayIterator
-    {
-        return new ArrayIterator($this->modules);
     }
 
 }

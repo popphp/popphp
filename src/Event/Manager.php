@@ -13,11 +13,8 @@
  */
 namespace Pop\Event;
 
+use Pop\AbstractManager;
 use Pop\Utils\CallableObject;
-use ArrayAccess;
-use ArrayIterator;
-use Countable;
-use IteratorAggregate;
 
 /**
  * Event manager class
@@ -29,7 +26,7 @@ use IteratorAggregate;
  * @license    https://www.popphp.org/license     New BSD License
  * @version    4.3.8
  */
-class Manager implements ArrayAccess, Countable, IteratorAggregate
+class Manager extends AbstractManager
 {
 
     /**
@@ -43,12 +40,6 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      * @var string
      */
     const KILL = 'Pop\Event\Manager::KILL';
-
-    /**
-     * Event listeners
-     * @var array
-     */
-    protected array $listeners = [];
 
     /**
      * Event results
@@ -96,10 +87,13 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      */
     public function on(string $name, mixed $action, int $priority = 0): static
     {
-        if (!isset($this->listeners[$name])) {
-            $this->listeners[$name] = new \SplPriorityQueue();
+        if (!isset($this->items[$name])) {
+            $this->items[$name] = new \SplPriorityQueue();
         }
-        $this->listeners[$name]->insert(new CallableObject($action), (int)$priority);
+        if (!($action instanceof CallableObject)) {
+            $action = new CallableObject($action);
+        }
+        $this->items[$name]->insert($action, $priority);
 
         return $this;
     }
@@ -114,10 +108,10 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
     public function off(string $name, mixed $action): static
     {
         // If the event exists, loop through and remove the action if found.
-        if (isset($this->listeners[$name])) {
+        if (isset($this->items[$name])) {
             $newListeners = new \SplPriorityQueue();
 
-            $listeners = clone $this->listeners[$name];
+            $listeners = clone $this->items[$name];
             $listeners->setExtractFlags(\SplPriorityQueue::EXTR_BOTH);
 
             foreach ($listeners as $value) {
@@ -127,7 +121,7 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
                 }
             }
 
-            $this->listeners[$name] = $newListeners;
+            $this->items[$name] = $newListeners;
         }
 
         return $this;
@@ -141,23 +135,18 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      */
     public function get(string $name): mixed
     {
-        $listener = null;
-        if (isset($this->listeners[$name])) {
-            $listener = $this->listeners[$name];
-        }
-
-        return $listener;
+        return $this->getItem($name);
     }
 
     /**
-     * Determine whether the event manage has an event registered with it
+     * Determine whether the event manager has an event registered with it
      *
      * @param  string $name
      * @return bool
      */
     public function has(string $name): bool
     {
-        return (isset($this->listeners[$name]));
+        return $this->hasItem($name);
     }
 
     /**
@@ -182,7 +171,7 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * Trigger an event listener priority
+     * Trigger an event listener
      *
      * @param  string $name
      * @param  array  $params
@@ -190,12 +179,12 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
      */
     public function trigger(string $name, array $params = []): void
     {
-        if (isset($this->listeners[$name])) {
+        if (isset($this->items[$name])) {
             if (!isset($this->results[$name])) {
                 $this->results[$name] = [];
             }
 
-            foreach ($this->listeners[$name] as $action) {
+            foreach ($this->items[$name] as $action) {
                 if (end($this->results[$name]) == self::STOP) {
                     return;
                 }
@@ -224,41 +213,6 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * Get an event
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public function __get(string $name): mixed
-    {
-        return $this->get($name);
-    }
-
-    /**
-     * Determine if an event exists
-     *
-     * @param  string $name
-     * @return bool
-     */
-    public function __isset(string $name): bool
-    {
-        return $this->has($name);
-    }
-
-    /**
-     * Unset an event
-     *
-     * @param  string $name
-     * @return void
-     */
-    public function __unset(string $name): void
-    {
-        if (isset($this->listeners[$name])) {
-            unset($this->listeners[$name]);
-        }
-    }
-
-    /**
      * Set an event
      *
      * @param  mixed $offset
@@ -268,61 +222,6 @@ class Manager implements ArrayAccess, Countable, IteratorAggregate
     public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->on($offset, $value);
-    }
-
-    /**
-     * Get an event
-     *
-     * @param  mixed $offset
-     * @return mixed
-     */
-    public function offsetGet(mixed $offset): mixed
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * Determine if an event exists
-     *
-     * @param  string $offset
-     * @return bool
-     */
-    public function offsetExists($offset): bool
-    {
-        return $this->has($offset);
-    }
-
-    /**
-     * Unset an event
-     *
-     * @param  mixed $offset
-     * @return void
-     */
-    public function offsetUnset(mixed $offset): void
-    {
-        if (isset($this->listeners[$offset])) {
-            unset($this->listeners[$offset]);
-        }
-    }
-
-    /**
-     * Return count
-     *
-     * @return int
-     */
-    public function count(): int
-    {
-        return count($this->listeners);
-    }
-
-    /**
-     * Get iterator
-     *
-     * @return ArrayIterator
-     */
-    public function getIterator(): ArrayIterator
-    {
-        return new ArrayIterator($this->listeners);
     }
 
 }

@@ -13,11 +13,8 @@
  */
 namespace Pop\Service;
 
+use Pop\AbstractManager;
 use Pop\Utils\CallableObject;
-use ArrayAccess;
-use ArrayIterator;
-use Countable;
-use IteratorAggregate;
 
 /**
  * Service locator class
@@ -29,7 +26,7 @@ use IteratorAggregate;
  * @license    https://www.popphp.org/license     New BSD License
  * @version    4.3.8
  */
-class Locator implements ArrayAccess, Countable, IteratorAggregate
+class Locator extends AbstractManager
 {
 
     /**
@@ -43,12 +40,6 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      * @var array
      */
     private static array $called = [];
-
-    /**
-     * Services
-     * @var array
-     */
-    protected array $services = [];
 
     /**
      * Services that are loaded/instantiated
@@ -126,9 +117,9 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
                 throw new Exception('Error: A callable service was not passed');
             }
 
-            $this->services[$name] = new CallableObject($call, $params);
+            $this->items[$name] = new CallableObject($call, $params);
         } else {
-            $this->services[$name] = $service;
+            $this->items[$name] = $service;
         }
 
         return $this;
@@ -143,7 +134,7 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      */
     public function get(string $name): mixed
     {
-        if (!isset($this->services[$name])) {
+        if (!isset($this->items[$name])) {
             throw new Exception("Error: The service '" . $name . "' has not been added to the service locator");
         }
         if (!isset($this->loaded[$name])) {
@@ -160,7 +151,7 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
                 self::$called[] = $name;
             }
 
-            $this->loaded[$name] = $this->services[$name]->call();
+            $this->loaded[$name] = $this->items[$name]->call();
             self::$depth--;
         }
 
@@ -173,9 +164,9 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      * @param  string $name
      * @return mixed
      */
-    public function getCall(string $name): mixed
+    public function getCallable(string $name): mixed
     {
-        return $this->services[$name]?->getCallable();
+        return $this->items[$name]?->getCallable();
     }
 
     /**
@@ -184,9 +175,9 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      * @param  string $name
      * @return bool
      */
-    public function hasParams(string $name): bool
+    public function hasParameter(string $name): bool
     {
-        return (isset($this->services[$name]) && $this->services[$name]->hasParameters());
+        return (isset($this->items[$name]) && $this->items[$name]->hasParameters());
     }
 
     /**
@@ -195,9 +186,9 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      * @param  string $name
      * @return mixed
      */
-    public function getParams(string $name): mixed
+    public function getParameters(string $name): mixed
     {
-        return $this->services[$name]?->getParameters();
+        return $this->items[$name]?->getParameters();
     }
 
     /**
@@ -207,10 +198,10 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      * @param  mixed  $call
      * @return static
      */
-    public function setCall(string $name, mixed $call): static
+    public function setCallables(string $name, mixed $call): static
     {
-        if (isset($this->services[$name])) {
-            $this->services[$name]->setCallable($call);
+        if (isset($this->items[$name])) {
+            $this->items[$name]->setCallable($call);
         }
         return $this;
     }
@@ -222,13 +213,13 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      * @param  mixed  $params
      * @return static
      */
-    public function setParams(string $name, mixed $params): static
+    public function setParameters(string $name, mixed $params): static
     {
-        if (isset($this->services[$name])) {
+        if (isset($this->items[$name])) {
             if (is_array($params)) {
-                $this->services[$name]->setParameters($params);
+                $this->items[$name]->setParameters($params);
             } else {
-                $this->services[$name]->setParameters([$params]);
+                $this->items[$name]->setParameters([$params]);
             }
         }
         return $this;
@@ -242,13 +233,13 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      * @param  mixed  $key
      * @return static
      */
-    public function addParam(string $name, mixed $param, mixed $key = null): static
+    public function addParameter(string $name, mixed $param, mixed $key = null): static
     {
-        if (isset($this->services[$name])) {
+        if (isset($this->items[$name])) {
             if ($key !== null) {
-                $this->services[$name]->addNamedParameter($key, $param);
+                $this->items[$name]->addNamedParameter($key, $param);
             } else {
-                $this->services[$name]->addParameter($param);
+                $this->items[$name]->addParameter($param);
             }
         }
 
@@ -263,15 +254,15 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      * @param  mixed  $key
      * @return static
      */
-    public function removeParam(string $name, mixed $param, mixed $key = null): static
+    public function removeParameters(string $name, mixed $param, mixed $key = null): static
     {
-        if ($this->hasParams($name)) {
+        if ($this->hasParameter($name)) {
             if ($key !== null) {
-                $this->services[$name]->removeParameter($key);
+                $this->items[$name]->removeParameter($key);
             } else {
-                foreach ($this->services[$name]->getParameters() as $key => $value) {
+                foreach ($this->items[$name]->getParameters() as $key => $value) {
                     if ($value == $param) {
-                        $this->services[$name]->removeParameter($key);
+                        $this->items[$name]->removeParameter($key);
                         break;
                     }
                 }
@@ -289,7 +280,7 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      */
     public function isAvailable(string $name): bool
     {
-        return isset($this->services[$name]);
+        return isset($this->items[$name]);
     }
 
     /**
@@ -326,8 +317,8 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      */
     public function remove(string $name): static
     {
-        if (isset($this->services[$name])) {
-            unset($this->services[$name]);
+        if (isset($this->items[$name])) {
+            unset($this->items[$name]);
         }
         if (isset($this->loaded[$name])) {
             unset($this->loaded[$name]);
@@ -368,7 +359,7 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      */
     public function __isset(string $name): bool
     {
-        return isset($this->services[$name]);
+        return isset($this->items[$name]);
     }
 
     /**
@@ -415,7 +406,7 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
      */
     public function offsetExists(mixed$offset): bool
     {
-        return isset($this->services[$offset]);
+        return isset($this->items[$offset]);
     }
 
     /**
@@ -427,26 +418,6 @@ class Locator implements ArrayAccess, Countable, IteratorAggregate
     public function offsetUnset(mixed $offset): void
     {
         $this->remove($offset);
-    }
-
-    /**
-     * Return count
-     *
-     * @return int
-     */
-    public function count(): int
-    {
-        return count($this->services);
-    }
-
-    /**
-     * Get iterator
-     *
-     * @return ArrayIterator
-     */
-    public function getIterator(): ArrayIterator
-    {
-        return new ArrayIterator($this->services);
     }
 
 }

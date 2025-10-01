@@ -49,6 +49,12 @@ class Application extends AbstractApplication implements \ArrayAccess
     protected ?Event\Manager $events = null;
 
     /**
+     * Middleware manager
+     * @var ?Middleware\Manager
+     */
+    protected ?Middleware\Manager $middleware = null;
+
+    /**
      * Module manager
      * @var ?Module\Manager
      */
@@ -84,6 +90,8 @@ class Application extends AbstractApplication implements \ArrayAccess
                 $this->registerServices($arg);
             } else if ($arg instanceof Event\Manager) {
                 $this->registerEvents($arg);
+            } else if ($arg instanceof Middleware\Manager) {
+                $this->registerMiddleware($arg);
             } else if ($arg instanceof Module\Manager) {
                 $this->registerModules($arg);
             } else if (is_array($arg) || ($arg instanceof \ArrayAccess)) {
@@ -119,6 +127,9 @@ class Application extends AbstractApplication implements \ArrayAccess
         }
         if ($this->events === null) {
             $this->registerEvents(new Event\Manager());
+        }
+        if ($this->middleware === null) {
+            $this->registerMiddleware(new Middleware\Manager());
         }
         if ($this->modules === null) {
             $this->registerModules(new Module\Manager());
@@ -233,6 +244,16 @@ class Application extends AbstractApplication implements \ArrayAccess
     }
 
     /**
+     * Get the middleware manager
+     *
+     * @return ?Middleware\Manager
+     */
+    public function middleware(): ?Middleware\Manager
+    {
+        return $this->middleware;
+    }
+
+    /**
      * Access all application module configs
      *
      * @return ?Module\Manager
@@ -276,6 +297,18 @@ class Application extends AbstractApplication implements \ArrayAccess
     public function registerEvents(Event\Manager $events): static
     {
         $this->events = $events;
+        return $this;
+    }
+
+    /**
+     * Register a new middleware manager object with the application
+     *
+     * @param  Middleware\Manager $middleware
+     * @return static
+     */
+    public function registerMiddleware(Middleware\Manager $middleware): static
+    {
+        $this->middleware = $middleware;
         return $this;
     }
 
@@ -672,6 +705,9 @@ class Application extends AbstractApplication implements \ArrayAccess
             case 'events':
                 $this->registerEvents($value);
                 break;
+            case 'middleware':
+                $this->registerMiddleware($value);
+                break;
             case 'modules':
                 $this->registerModules($value);
                 break;
@@ -694,6 +730,7 @@ class Application extends AbstractApplication implements \ArrayAccess
             'router'     => $this->router,
             'services'   => $this->services,
             'events'     => $this->events,
+            'middleware' => $this->middleware,
             'modules'    => $this->modules,
             'autoloader' => $this->autoloader,
             default      => null,
@@ -713,6 +750,7 @@ class Application extends AbstractApplication implements \ArrayAccess
             'router'     => ($this->router !== null),
             'services'   => ($this->services !== null),
             'events'     => ($this->events !== null),
+            'middleware' => ($this->middleware !== null),
             'modules'    => ($this->modules !== null),
             'autoloader' => ($this->autoloader !== null),
             default      => false,
@@ -739,6 +777,9 @@ class Application extends AbstractApplication implements \ArrayAccess
                 break;
             case 'events':
                 $this->events = null;
+                break;
+            case 'middleware':
+                $this->middleware = null;
                 break;
             case 'modules':
                 $this->modules = null;

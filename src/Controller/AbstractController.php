@@ -34,7 +34,6 @@ abstract class AbstractController implements ControllerInterface
      */
     protected string $defaultAction = 'error';
 
-
     /**
      * Maintenance action
      * @var string
