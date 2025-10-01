@@ -66,7 +66,7 @@ interface ControllerInterface
     public function setBypassMaintenance(bool $bypass = true): static;
 
     /**
-     * Check the bypass maintenace check
+     * Check the bypass maintenance check
      *
      * @return bool
      */
@@ -80,6 +80,6 @@ interface ControllerInterface
      * @throws Exception
      * @return void
      */
-    public function dispatch(string $action = null, ?array $params = null): void;
+    public function dispatch(?string $action = null, ?array $params = null): void;
 
 }
