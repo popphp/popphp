@@ -26,6 +26,7 @@ popphp
     - [Custom Modules](#custom-modules)
     - [Module Manager](#module-manager)
 * [Event Manager](#event-manager)
+* [Middleware Manager](#middleware-manager)
 * [Service Locator](#service-locator)
 * [Configuration Tips](#configuration-tips)
 
@@ -830,6 +831,89 @@ in the application's life cycle:
 $app->on('app.route.pre', function($application) {
     // Do some pre-route stuff
 });
+```
+
+[Top](#popphp)
+
+Middleware Manager
+------------------
+
+The middleware manager provides a way to hook specific functionality in and around the `dispatch` action
+in an application object. Middleware themselves are classes that would implement the following interfaces:
+
+* `Pop\Middleware\MiddlewareInterface` - required, defines the `handle` that will be called to execute the middleware
+* `Pop\Middleware\TerminableInterface` - optional, defines the `terminate` method that can be called to execute any post-dispatch code
+
+Example middleware class:
+
+```php
+class TestMiddleware implements MiddlewareInterface, TerminableInterface
+{
+
+    public function handle(mixed $request, \Closure $next): mixed
+    {
+        echo 'Entering Test Middleware.<br />';
+        $response = $next($request);
+        echo 'Exiting Test Middleware.<br />';
+        return $response;
+    }
+
+    public function terminate(mixed $request = null, mixed $response = null): void
+    {
+        file_put_contents(__DIR__ . '/logs/mw.log', 'Executing terminate method for test middleware.' . PHP_EOL, FILE_APPEND);
+    }
+}
+```
+
+Middleware can be added directly to the application object, or via the application config:
+
+```php
+$app = new Pop\Application();
+$app->middleware->addHandler('TestMiddleware');
+```
+
+```php
+$config = [
+    'middleware' => ['TestMiddleware'],
+    'routes'     => [
+        '/' => [
+            'controller' => 'MyController',
+            'action'     => 'index'
+        ],
+    ]
+]
+$app = new Pop\Application($config);
+$app->run();
+```
+
+When making the request to the above application (e.g., `http://localhost:8000/`), the response will be:
+
+```text
+Entering Test Middleware.
+Index page!
+Exiting Test Middleware.
+```
+
+Middleware can be applied globally or on a specific route-level. Middleware assigned to a specific route
+will only execute on that route.
+
+```php
+$config = [
+    'middleware' => ['TestMiddleware'],
+    'routes'     => [
+        '/' => [
+            'controller' => 'MyController',
+            'action'     => 'index'
+        ],
+        '/admin[/]' => [
+            'controller' => 'MyController',
+            'action'     => 'admin',
+            'middleware' => 'AdminMiddleware'
+        ],
+    ]
+]
+$app = new Pop\Application($config);
+$app->run();
 ```
 
 [Top](#popphp)

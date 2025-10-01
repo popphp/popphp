@@ -39,13 +39,69 @@ class Manager extends AbstractManager
      *
      * Instantiate the middleware manager object.
      *
-     * @param ?array $middlewares
+     * @param ?array $handlers
      */
-    public function __construct(?array $middlewares = null)
+    public function __construct(?array $handlers = null)
     {
-        if (!empty($middlewares)) {
-            $this->addItems($middlewares);
+        if (!empty($handlers)) {
+            parent::addItems($handlers);
         }
+    }
+
+    /**
+     * Add handlers
+     *
+     * @param  array $handlers
+     * @return static
+     */
+    public function addHandlers(array $handlers): static
+    {
+        return parent::addItems($handlers);
+    }
+
+    /**
+     * Add a handler
+     *
+     * @param  mixed $handler
+     * @param  mixed $name
+     * @return static
+     */
+    public function addHandler(mixed $handler, mixed $name = null): static
+    {
+        return parent::addItem($handler, $name);
+    }
+
+    /**
+     * Remove a handler
+     *
+     * @param  mixed $name
+     * @return static
+     */
+    public function removeHandler(mixed $name): static
+    {
+        return parent::removeItem($name);
+    }
+
+    /**
+     * Get a handler
+     *
+     * @param  mixed $name
+     * @return mixed
+     */
+    public function getItem(mixed $name): mixed
+    {
+        return parent::getItem($name);
+    }
+
+    /**
+     * Determine whether the manager has a handler
+     *
+     * @param  string $name
+     * @return bool
+     */
+    public function hasHandler(string $name): bool
+    {
+        return parent::hasItem($name);
     }
 
     /**
@@ -55,7 +111,7 @@ class Manager extends AbstractManager
      */
     public function hasHandlers(): bool
     {
-        return $this->hasItems();
+        return parent::hasItems();
     }
 
     /**

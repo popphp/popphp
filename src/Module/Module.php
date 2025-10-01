@@ -13,7 +13,9 @@
  */
 namespace Pop\Module;
 
+use Pop\App;
 use Pop\Application;
+use Pop\Utils\Arr;
 use Pop\Utils\Helper;
 
 /**
@@ -124,7 +126,7 @@ class Module extends AbstractModule implements \ArrayAccess
                 }
             }
 
-            // If events are set in the app config, register them with the application
+            // If events are set in the module config, register them with the application
             if (isset($this->config['events']) && ($this->application !== null) && ($this->application->events() !== null)) {
                 foreach ($this->config['events'] as $event) {
                     if (isset($event['name']) && isset($event['action'])) {
@@ -135,6 +137,14 @@ class Module extends AbstractModule implements \ArrayAccess
                         );
                     }
                 }
+            }
+
+            $middlewareDisabled = App::env('MIDDLEWARE_DISABLED');
+
+            // If middleware is defined in the module  config, register them with the application
+            if (isset($this->config['middleware']) && ($this->application->middleware() !== null) &&
+                (empty($middlewareDisabled) || ($middlewareDisabled == 'route'))) {
+                $this->application->middleware()->addItems(Arr::make($this->config['middleware']));
             }
         }
 
