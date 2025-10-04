@@ -2,9 +2,9 @@ name: phpunit
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dev ]
 
 env:
   XDEBUG_MODE: debug,coverage
@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: [ '8.2', '8.3' ]
-        phpunit-versions: ['11.5.0']
+        php-versions: [ '8.3', '8.4' ]
+        phpunit-versions: ['12.0.0']
 
     steps:
       - uses: actions/checkout@v3
