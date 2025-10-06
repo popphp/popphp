@@ -75,11 +75,11 @@ interface ControllerInterface
     /**
      * Dispatch the controller based on the action
      *
-     * @param ?string $action
-     * @param ?array  $params
+     * @param  ?string $action
+     * @param  ?array  $params
      * @throws Exception
      * @return void
      */
-    public function dispatch(string $action = null, ?array $params = null): void;
+    public function dispatch(?string $action = null, ?array $params = null): void;
 
 }
