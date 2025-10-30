@@ -23,7 +23,7 @@ use ArrayIterator;
  * @author     Nick Sagona, III <dev@noladev.com>
  * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    4.3.8
+ * @version    4.4.0
  */
 interface ManagerInterface
 {
