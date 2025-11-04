@@ -1054,4 +1054,3 @@ $app = new Pop\Application([
 ```
 
 [Top](#popphp)
-
