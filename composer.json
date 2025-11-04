@@ -21,7 +21,7 @@
         "popphp/pop-config" : "^4.0.4",
         "popphp/pop-console" : "^4.2.6",
         "popphp/pop-cookie" : "^4.0.4",
-        "popphp/pop-db" : "^6.6.5",
+        "popphp/pop-db" : "^6.7.0",
         "popphp/pop-http" : "^5.3.8",
         "popphp/pop-utils" : "^2.3.0",
         "vlucas/phpdotenv": "^5.6.1"
