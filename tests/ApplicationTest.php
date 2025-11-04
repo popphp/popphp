@@ -460,8 +460,6 @@ class ApplicationTest extends TestCase
         $this->assertContains('app.dispatch.post', $application->events()->getResults('app.dispatch.post'));
     }
 
-
-
     public function testMiddlewareOnRun()
     {
         $_SERVER['argv'] = [
@@ -483,6 +481,26 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Entering Test Middleware.', $result);
         $this->assertStringContainsString('Exiting Test Middleware.', $result);
         $this->assertStringContainsString('Executing terminate method for test middleware.', $result);
+    }
+
+    public function testAddMiddleware()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+        $config = [
+            'foo'      => 'bar',
+            'routes'   => [
+                'help' => function() {
+                    return 'help';
+                }
+            ]
+        ];
+        $application = new Application($config);
+        $application->addMiddleware('Pop\Test\TestAsset\TestMiddleware', 'test');
+        $this->assertEquals('Pop\Test\TestAsset\TestMiddleware', $application->getMiddleware('test'));
+        $application->removeMiddleware('test');
+        $this->assertNotEquals('Pop\Test\TestAsset\TestMiddleware', $application->getMiddleware('test'));
     }
 
     public function testRunClosureController()

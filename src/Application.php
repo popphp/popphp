@@ -535,6 +535,42 @@ class Application extends AbstractApplication implements \ArrayAccess
     }
 
     /**
+     * Add a middleware handler
+     *
+     * @param  mixed $handler
+     * @param  mixed $name
+     * @return static
+     */
+    public function addMiddleware(mixed $handler, mixed $name = null): static
+    {
+        $this->middleware->addHandler($handler, $name);
+        return $this;
+    }
+
+    /**
+     * Get middleware
+     *
+     * @param  mixed $name
+     * @return mixed
+     */
+    public function getMiddleware(mixed $name): mixed
+    {
+        return $this->middleware->getHandler($name);
+    }
+
+    /**
+     * Remove middleware
+     *
+     * @param  mixed $name
+     * @return static
+     */
+    public function removeMiddleware(mixed $name): static
+    {
+        $this->middleware->removeHandler($name);
+        return $this;
+    }
+
+    /**
      * Get environment value
      *
      * @param  string $key
