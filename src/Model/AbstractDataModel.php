@@ -219,6 +219,33 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
     }
 
     /**
+     * Get one
+     *
+     * @param  array $columns
+     * @param  bool  $toArray
+     * @throws Exception
+     * @return array|Record
+     */
+    public function getOne(array $columns, bool $toArray = false): array|Record
+    {
+        $table = $this->getTableClass();
+
+        if (!isset($this->options['select'])) {
+            $this->options['select'] = $this->describe(($toArray !== false));
+        }
+
+        if (!empty($this->foreignTables) && !isset($this->options['join'])) {
+            $this->options['join'] = $this->foreignTables;
+        }
+
+        if (!empty($this->filters)) {
+            $columns = array_merge($columns, $this->parseFilter($this->filters));
+        }
+
+        return $table::findOne($columns, $this->options, $toArray);
+    }
+
+    /**
      * Create
      *
      * @param  array $data
