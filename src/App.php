@@ -75,7 +75,11 @@ class App
     public static function config(?string $key = null): mixed
     {
         if (self::$application !== null) {
-            return ($key !== null) ? self::$application->config[$key] : self::$application->config();
+            if ($key !== null) {
+                return (isset(self::$application->config[$key])) ? self::$application->config[$key] : null;
+            } else {
+                return self::$application->config();
+            }
         } else {
             return null;
         }
@@ -100,7 +104,11 @@ class App
     public static function services(?string $key = null): mixed
     {
         if (self::$application !== null) {
-            return ($key !== null) ? self::$application->services[$key] : self::$application->services();
+            if ($key !== null) {
+                return (isset(self::$application->services[$key])) ? self::$application->services[$key] : null;
+            } else {
+                return self::$application->services();
+            }
         } else {
             return null;
         }
@@ -115,7 +123,11 @@ class App
     public static function events(?string $key = null): mixed
     {
         if (self::$application !== null) {
-            return ($key !== null) ? self::$application->events[$key] : self::$application->events();
+            if ($key !== null) {
+                return (isset(self::$application->events[$key])) ? self::$application->events[$key] : null;
+            } else {
+                return self::$application->events();
+            }
         } else {
             return null;
         }
@@ -130,7 +142,11 @@ class App
     public static function modules(?string $key = null): mixed
     {
         if (self::$application !== null) {
-            return ($key !== null) ? self::$application->modules[$key] : self::$application->modules();
+            if ($key !== null) {
+                return (isset(self::$application->modules[$key])) ? self::$application->modules[$key] : null;
+            } else {
+                return self::$application->modules();
+            }
         } else {
             return null;
         }
