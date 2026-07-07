@@ -421,10 +421,11 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
      *
      * @param  bool $native     Show only the native columns in the table
      * @param  bool $full       Used with the native flag, returns a full descriptive array of table info
+     * @param  bool $withAlias  Preserves any column aliases
      * @return array
      *@throws Exception
      */
-    public function describe(bool $native = false, bool $full = false): array
+    public function describe(bool $native = false, bool $full = false, bool $withAlias = false): array
     {
         $table        = $this->getTableClass();
         $tableInfo    = $table::getTableInfo();
@@ -453,7 +454,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
                         $cols[$key] = $column;
                     }
                 }
-                return $cols;
+                return ($withAlias) ? $cols : array_values($cols);
             } else {
                 return array_values($tableColumns);
             }
