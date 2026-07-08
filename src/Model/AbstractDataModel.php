@@ -168,7 +168,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         }
 
         if (!isset($this->options['select'])) {
-            $this->options['select'] = $this->describe(($toArray !== false));
+            $this->options['select'] = $this->describe(($toArray !== false), false, true);
         }
 
         if (!empty($this->foreignTables) && !isset($this->options['join'])) {
@@ -195,7 +195,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         $table = $this->getTableClass();
 
         if (!isset($this->options['select'])) {
-            $this->options['select'] = $this->describe(($toArray !== false));
+            $this->options['select'] = $this->describe(($toArray !== false), false, true);
         }
 
         if (!empty($this->foreignTables) && !isset($this->options['join'])) {
@@ -231,7 +231,7 @@ abstract class AbstractDataModel extends AbstractModel implements DataModelInter
         $table = $this->getTableClass();
 
         if (!isset($this->options['select'])) {
-            $this->options['select'] = $this->describe(($toArray !== false));
+            $this->options['select'] = $this->describe(($toArray !== false), false, true);
         }
 
         if (!empty($this->foreignTables) && !isset($this->options['join'])) {
