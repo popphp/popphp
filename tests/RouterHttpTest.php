@@ -135,6 +135,34 @@ class RouterHttpTest extends TestCase
         $this->assertStringContainsString('Page Not Found', $result);
     }
 
+    public function testHttpNoRouteFoundDoesNotEmitNullOffsetDeprecation()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/foo';
+        $routes = [
+            '/bar' => [
+                'controller' => function() {
+                    echo 'Foo';
+                }
+            ]
+        ];
+
+        $deprecations = [];
+        set_error_handler(function ($errno, $errstr) use (&$deprecations) {
+            $deprecations[] = $errstr;
+            return true;
+        }, E_DEPRECATED);
+
+        $http = new Http();
+        $http->addRoutes($routes);
+        $http->match();
+
+        restore_error_handler();
+
+        $this->assertFalse($http->hasRoute());
+        $this->assertSame([], $deprecations);
+    }
+
     public function testHttpDefaultRoute()
     {
         $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());

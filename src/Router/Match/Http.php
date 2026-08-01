@@ -274,7 +274,7 @@ class Http extends AbstractMatch
      */
     protected function parseRouteParams(): void
     {
-        if (isset($this->preparedRoutes[$this->route]['params']) &&
+        if (($this->route !== null) && isset($this->preparedRoutes[$this->route]['params']) &&
             (count($this->preparedRoutes[$this->route]['params']) > 0)) {
             $offset = 0;
             foreach ($this->preparedRoutes[$this->route]['params'] as $i => $param) {
