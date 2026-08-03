@@ -3,12 +3,53 @@
 namespace Pop\Test;
 
 use Pop\Service\Container;
+use Pop\Service\Exception;
 use Pop\Service\Locator;
+use Pop\Service\NotFoundException;
 use PHPUnit\Framework\TestCase;
 use Pop\Utils\CallableObject;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class ServiceTest extends TestCase
 {
+
+    public function testImplementsPsrContainerInterface()
+    {
+        $services = new Locator();
+        $this->assertInstanceOf(ContainerInterface::class, $services);
+    }
+
+    public function testHasMirrorsIsAvailable()
+    {
+        $services = new Locator([
+            'foo' => 'Pop\Test\TestAsset\TestService'
+        ]);
+        $this->assertTrue($services->has('foo'));
+        $this->assertFalse($services->has('bar'));
+    }
+
+    public function testGetMissingServiceThrowsPsrNotFoundException()
+    {
+        $services = new Locator();
+
+        try {
+            $services->get('missing');
+            $this->fail('Expected NotFoundException was not thrown');
+        } catch (NotFoundException $exception) {
+            $this->assertInstanceOf(NotFoundExceptionInterface::class, $exception);
+            // NotFoundExceptionInterface extends ContainerExceptionInterface, per PSR-11
+            $this->assertInstanceOf(ContainerExceptionInterface::class, $exception);
+            // Still catchable as the pre-existing, non-PSR exception type - not a BC break
+            $this->assertInstanceOf(Exception::class, $exception);
+        }
+    }
+
+    public function testServiceExceptionImplementsPsrContainerExceptionInterface()
+    {
+        $this->assertInstanceOf(ContainerExceptionInterface::class, new Exception('test'));
+    }
 
     public function testConstructor()
     {
@@ -399,6 +440,56 @@ class ServiceTest extends TestCase
         ]);
 
         $result = $services->get('service1');
+    }
+
+    protected function getRecursionState(): array
+    {
+        $reflection   = new \ReflectionClass(Locator::class);
+        $depthProp    = $reflection->getProperty('depth');
+        $calledProp   = $reflection->getProperty('called');
+        $depthProp->setAccessible(true);
+        $calledProp->setAccessible(true);
+
+        return [$depthProp->getValue(), $calledProp->getValue()];
+    }
+
+    public function testCalledStackDoesNotLeakAfterSuccess()
+    {
+        $services = new Locator();
+        $services->set('service1', function() {
+            return 1;
+        });
+
+        $services->get('service1');
+
+        [$depth, $called] = $this->getRecursionState();
+        $this->assertEquals(0, $depth);
+        $this->assertEquals([], $called);
+    }
+
+    public function testDepthAndCalledResetAfterFactoryThrows()
+    {
+        $services = new Locator();
+        $services->set('willThrow', function() {
+            throw new \RuntimeException('Boom');
+        });
+
+        try {
+            $services->get('willThrow');
+            $this->fail('Expected exception was not thrown');
+        } catch (\RuntimeException $exception) {
+            $this->assertEquals('Boom', $exception->getMessage());
+        }
+
+        [$depth, $called] = $this->getRecursionState();
+        $this->assertEquals(0, $depth, 'depth must be restored even when the factory throws');
+        $this->assertEquals([], $called, 'called stack must be restored even when the factory throws');
+
+        // A prior failure must not corrupt the recursion guard for later, unrelated calls
+        $services->set('service1', function() {
+            return 1;
+        });
+        $this->assertEquals(1, $services->get('service1'));
     }
 
 }

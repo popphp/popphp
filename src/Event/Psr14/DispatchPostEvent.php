@@ -11,18 +11,16 @@
 /**
  * @namespace
  */
-namespace Pop\Service;
-
-use Psr\Container\ContainerExceptionInterface;
+namespace Pop\Event\Psr14;
 
 /**
- * Service locator exception class
+ * PSR-14 dispatch post event class
  *
  * @category   Pop
- * @package    Pop\Service
+ * @package    Pop\Event
  * @author     Nick Sagona, III <dev@noladev.com>
  * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  * @version    4.4.0
  */
-class Exception extends \Exception implements ContainerExceptionInterface {}
+class DispatchPostEvent extends AbstractApplicationEvent {}

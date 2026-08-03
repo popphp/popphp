@@ -155,9 +155,9 @@ class App
     /**
      * Get autoloader
      *
-     * @return mixed
+     * @return ?\Composer\Autoload\ClassLoader
      */
-    public static function autoloader(): mixed
+    public static function autoloader(): ?\Composer\Autoload\ClassLoader
     {
         return (self::$application !== null) ? self::$application->autoloader() : null;
     }

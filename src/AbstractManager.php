@@ -252,4 +252,5 @@ abstract class AbstractManager implements ManagerInterface, ArrayAccess, Countab
     {
         return new ArrayIterator($this->items);
     }
+
 }

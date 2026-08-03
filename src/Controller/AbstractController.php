@@ -13,7 +13,7 @@
  */
 namespace Pop\Controller;
 
-use Pop\App;
+use Pop\Dispatch;
 
 /**
  * Pop abstract controller class
@@ -25,127 +25,12 @@ use Pop\App;
  * @license    https://www.popphp.org/license     New BSD License
  * @version    4.4.0
  */
-abstract class AbstractController implements ControllerInterface
+abstract class AbstractController extends Dispatch\AbstractDispatcher implements Dispatch\DispatchableInterface, Dispatch\MaintenanceInterface
 {
 
     /**
-     * Default action
-     * @var string
+     * Traits
      */
-    protected string $defaultAction = 'error';
-
-    /**
-     * Maintenance action
-     * @var string
-     */
-    protected string $maintenanceAction = 'maintenance';
-
-    /**
-     * Bypass maintenance false
-     * @var bool
-     */
-    protected bool $bypassMaintenance = false;
-
-    /**
-     * Set the default action
-     *
-     * @param  string $default
-     * @return AbstractController
-     */
-    public function setDefaultAction(string $default): AbstractController
-    {
-        $this->defaultAction = $default;
-        return $this;
-    }
-
-    /**
-     * Get the default action
-     *
-     * @return string
-     */
-    public function getDefaultAction(): string
-    {
-        return $this->defaultAction;
-    }
-
-    /**
-     * Set the maintenance action
-     *
-     * @param  string $maintenance
-     * @return AbstractController
-     */
-    public function setMaintenanceAction(string $maintenance): AbstractController
-    {
-        $this->maintenanceAction = $maintenance;
-        return $this;
-    }
-
-    /**
-     * Get the maintenance action
-     *
-     * @return string
-     */
-    public function getMaintenanceAction(): string
-    {
-        return $this->maintenanceAction;
-    }
-
-    /**
-     * Check the bypass maintenance check
-     *
-     * @param  bool $bypass
-     * @return static
-     */
-    public function setBypassMaintenance(bool $bypass = true): static
-    {
-        $this->bypassMaintenance = $bypass;
-        return $this;
-    }
-
-    /**
-     * Check the bypass maintenance check
-     *
-     * @return bool
-     */
-    public function bypassMaintenance(): bool
-    {
-        return $this->bypassMaintenance;
-    }
-
-    /**
-     * Dispatch the controller based on the action
-     *
-     * @param  ?string $action
-     * @param  ?array  $params
-     * @throws Exception
-     * @return void
-     */
-    public function dispatch(?string $action = null, ?array $params = null): void
-    {
-        // Handle maintenance mode
-        if ((App::isDown()) && (!App::isSecretRequest()) && (!$this->bypassMaintenance)) {
-            if (method_exists($this, $this->maintenanceAction)) {
-                $action = $this->maintenanceAction;
-                $this->$action();
-            } else {
-                throw new Exception(
-                    "The application is currently in maintenance mode. The maintenance action is not defined in the controller."
-                );
-            }
-        // Else, dispatch route action
-        } else if (($action !== null) && method_exists($this, $action)) {
-            if ($params !== null) {
-                call_user_func_array([$this, $action], array_values($params));
-            } else {
-                $this->$action();
-            }
-        // Else, fallback to default route action
-        } else if (method_exists($this, $this->defaultAction)) {
-            $action = $this->defaultAction;
-            $this->$action();
-        } else {
-            throw new Exception("The action to handle the route is not defined in the controller.");
-        }
-    }
+    use Dispatch\MaintenanceTrait;
 
 }

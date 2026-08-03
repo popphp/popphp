@@ -2,7 +2,6 @@
 
 namespace Pop\Test;
 
-use Dotenv\Dotenv;
 use PHPUnit\Framework\TestCase;
 use Pop\Application;
 use Pop\Test\TestAsset\TestController;
@@ -45,43 +44,45 @@ class ControllerTest extends TestCase
 
     public function testDispatchException()
     {
-        $this->expectException('Pop\Controller\Exception');
+        // dispatch()'s body now lives in Dispatch\AbstractDispatcher, so a bare
+        // "not defined" throw resolves to Pop\Dispatch\Exception, not
+        // Pop\Controller\Exception - a deliberate, accepted narrow BC break.
+        $this->expectException('Pop\Dispatch\Exception');
         $controller = new TestController();
         $controller->setDefaultAction('foo');
         $controller->dispatch('foo');
     }
 
-    public function testMaintenance1()
+    public function testBypassMaintenanceDefaultsFalseAndCanBeSet()
     {
-        $dotEnv = Dotenv::createImmutable(__DIR__ . '/tmp');
-        $dotEnv->load();
-
+        // Maintenance-mode enforcement itself is exercised at the Application
+        // level now (Application::run() consults this via Dispatch\MaintenanceInterface),
+        // so this is just the getter/setter contract - no MAINTENANCE_MODE env
+        // involvement needed, unlike the two tests this replaced.
         $controller = new TestController();
         $this->assertFalse($controller->bypassMaintenance());
-        $controller->dispatch();
-    }
 
-    public function testMaintenance2()
-    {
-        $dotEnv = Dotenv::createImmutable(__DIR__ . '/tmp');
-        $dotEnv->load();
-
-        $controller = new TestController();
-
-        $this->assertFalse($controller->bypassMaintenance());
         $controller->setBypassMaintenance(true);
         $this->assertTrue($controller->bypassMaintenance());
-        $controller->dispatch();
     }
 
-    public function testMaintenanceException()
+    public function testDispatchMaintenanceRunsMaintenanceAction()
     {
-        $dotEnv = Dotenv::createImmutable(__DIR__ . '/tmp');
-        $dotEnv->load();
+        $controller = new TestController();
+        $controller->dispatchMaintenance();
+        $this->assertEquals(0, $controller->getId());
+    }
 
-        $this->expectException('Pop\Controller\Exception');
+    public function testDispatchMaintenanceExceptionWhenActionNotDefined()
+    {
+        // Maintenance-mode enforcement now lives in Application::run() (calling
+        // dispatchMaintenance() directly), not in AbstractController::dispatch()
+        // itself - so this exercises Dispatch\MaintenanceTrait's own throw path,
+        // and the exception is now Pop\Dispatch\Exception (this logic's new,
+        // shared home), not Pop\Controller\Exception.
+        $this->expectException('Pop\Dispatch\Exception');
         $controller = new TestController2();
-        $controller->dispatch();
+        $controller->dispatchMaintenance();
     }
 
     public function testHttpControllerTrait()

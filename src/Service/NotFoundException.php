@@ -13,10 +13,10 @@
  */
 namespace Pop\Service;
 
-use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Service locator exception class
+ * Service locator not found exception class
  *
  * @category   Pop
  * @package    Pop\Service
@@ -25,4 +25,4 @@ use Psr\Container\ContainerExceptionInterface;
  * @license    https://www.popphp.org/license     New BSD License
  * @version    4.4.0
  */
-class Exception extends \Exception implements ContainerExceptionInterface {}
+class NotFoundException extends Exception implements NotFoundExceptionInterface {}

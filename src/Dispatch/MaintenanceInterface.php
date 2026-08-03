@@ -11,44 +11,28 @@
 /**
  * @namespace
  */
-namespace Pop\Controller;
+namespace Pop\Dispatch;
 
 /**
- * Pop controller interface
+ * Dispatch maintenance interface
  *
  * @category   Pop
- * @package    Pop\Controller
+ * @package    Pop
  * @author     Nick Sagona, III <dev@noladev.com>
  * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  * @version    4.4.0
  */
-interface ControllerInterface
+interface MaintenanceInterface
 {
-
-    /**
-     * Set the default action
-     *
-     * @param  string $default
-     * @return ControllerInterface
-     */
-    public function setDefaultAction(string $default): ControllerInterface;
-
-    /**
-     * Get the default action
-     *
-     * @return string
-     */
-    public function getDefaultAction(): string;
-
 
     /**
      * Set the maintenance action
      *
      * @param  string $maintenance
-     * @return AbstractController
+     * @return static
      */
-    public function setMaintenanceAction(string $maintenance): ControllerInterface;
+    public function setMaintenanceAction(string $maintenance): static;
 
     /**
      * Get the maintenance action
@@ -58,7 +42,7 @@ interface ControllerInterface
     public function getMaintenanceAction(): string;
 
     /**
-     * Set bypass maintenance flag
+     * Check the bypass maintenance check
      *
      * @param  bool $bypass
      * @return static
@@ -73,13 +57,11 @@ interface ControllerInterface
     public function bypassMaintenance(): bool;
 
     /**
-     * Dispatch the controller based on the action
+     * Dispatch the maintenance action
      *
-     * @param  ?string $action
-     * @param  ?array  $params
-     * @throws Exception
+     * @throws \Pop\Dispatch\Exception
      * @return void
      */
-    public function dispatch(?string $action = null, ?array $params = null): void;
+    public function dispatchMaintenance(): void;
 
 }

@@ -10,4 +10,9 @@ class TestHttpController extends AbstractController
 
     use HttpControllerTrait;
 
+    public function help()
+    {
+        echo 'help';
+    }
+
 }

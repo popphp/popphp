@@ -55,6 +55,12 @@ class Cli extends AbstractMatch
     protected bool $hasAllRequired = true;
 
     /**
+     * Specificity score per prepared route, keyed the same as preparedRoutes
+     * @var array
+     */
+    protected array $routeSpecificity = [];
+
+    /**
      * Constructor
      *
      *   cmd              required command
@@ -93,6 +99,13 @@ class Cli extends AbstractMatch
     public function prepare(): static
     {
         $this->flattenRoutes($this->routes);
+
+        uksort($this->preparedRoutes, function($keyA, $keyB) {
+            $scoreA = $this->routeSpecificity[$keyA] ?? 0;
+            $scoreB = $this->routeSpecificity[$keyB] ?? 0;
+            return $scoreB <=> $scoreA;
+        });
+
         return $this;
     }
 
@@ -255,6 +268,14 @@ class Cli extends AbstractMatch
                 }
             } else {
                 $routeRegex = $this->getRouteRegex($route);
+
+                $requiredCount = 0;
+                $optionalCount = 0;
+                foreach ($this->parameters[$route] ?? [] as $parameter) {
+                    $parameter['required'] ? $requiredCount++ : $optionalCount++;
+                }
+                $this->routeSpecificity[$routeRegex['regex']] = 1000 - ($requiredCount * 5) - ($optionalCount * 10);
+
                 if (isset($controller['default']) && ($controller['default'])) {
                     $this->defaultRoute['*'] = $controller;
                 }

@@ -324,6 +324,231 @@ class Router
     }
 
     /**
+     * Get the active HTTP match object, guarding that the router is in HTTP mode
+     *
+     * @throws Exception
+     * @return Match\Http
+     */
+    protected function httpMatch(): Match\Http
+    {
+        if (!$this->isHttp()) {
+            throw new Exception('Error: The route is not HTTP.');
+        }
+        return $this->routeMatch;
+    }
+
+    /**
+     * Add a GET route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function get(string $route, mixed $controller): static
+    {
+        $this->httpMatch()->get($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a HEAD route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function head(string $route, mixed $controller): static
+    {
+        $this->httpMatch()->head($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a POST route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function post(string $route, mixed $controller): static
+    {
+        $this->httpMatch()->post($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a PUT route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function put(string $route, mixed $controller): static
+    {
+        $this->httpMatch()->put($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a DELETE route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function delete(string $route, mixed $controller): static
+    {
+        $this->httpMatch()->delete($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a TRACE route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function trace(string $route, mixed $controller): static
+    {
+        $this->httpMatch()->trace($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add an OPTIONS route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function options(string $route, mixed $controller): static
+    {
+        $this->httpMatch()->options($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a CONNECT route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function connect(string $route, mixed $controller): static
+    {
+        $this->httpMatch()->connect($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a PATCH route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function patch(string $route, mixed $controller): static
+    {
+        $this->httpMatch()->patch($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a custom HTTP method to the whitelist
+     *
+     * @param  string $method
+     * @throws Exception
+     * @return static
+     */
+    public function addCustomMethod(string $method): static
+    {
+        $this->httpMatch()->addCustomMethod($method);
+        return $this;
+    }
+
+    /**
+     * Add multiple custom HTTP methods to the whitelist
+     *
+     * @param  array $methods
+     * @throws Exception
+     * @return static
+     */
+    public function addCustomMethods(array $methods): static
+    {
+        $this->httpMatch()->addCustomMethods($methods);
+        return $this;
+    }
+
+    /**
+     * Determine if a custom HTTP method has been whitelisted
+     *
+     * @param  string $method
+     * @throws Exception
+     * @return bool
+     */
+    public function hasCustomMethod(string $method): bool
+    {
+        return $this->httpMatch()->hasCustomMethod($method);
+    }
+
+    /**
+     * Determine if the last route() call matched a path whose method was rejected
+     *
+     * @return bool
+     */
+    public function hasMethodMismatch(): bool
+    {
+        return $this->isHttp() && $this->routeMatch->hasMethodMismatch();
+    }
+
+    /**
+     * Get the methods accepted by at least one path-matching route from the last route() call
+     *
+     * @return array
+     */
+    public function getAllowedMethods(): array
+    {
+        return ($this->isHttp()) ? $this->routeMatch->getAllowedMethods() : [];
+    }
+
+    /**
+     * Send a 405 Method Not Allowed response
+     *
+     * @param  array $allowedMethods
+     * @param  bool  $exit
+     * @throws Exception
+     * @return void
+     */
+    public function methodNotAllowed(array $allowedMethods, bool $exit = true): void
+    {
+        $this->httpMatch()->methodNotAllowed($allowedMethods, $exit);
+    }
+
+    /**
+     * Magic method to register a route for a whitelisted custom HTTP method
+     *
+     * @param  string $name
+     * @param  array  $arguments
+     * @throws Exception
+     * @return static
+     */
+    public function __call(string $name, array $arguments): static
+    {
+        $this->httpMatch()->{$name}(...$arguments);
+        return $this;
+    }
+
+    /**
      * Prepare routes
      *
      * @return static
@@ -347,15 +572,19 @@ class Router
             if ($this->routeMatch->hasController()) {
                 $controller         = $this->routeMatch->getController();
                 $application        = App::get();
-                $middlewareDisabled = $application->env('MIDDLEWARE_DISABLED');
+                $middlewareDisabled = App::env('MIDDLEWARE_DISABLED');
 
                 $routeConfig = $this->routeMatch->getRouteConfig();
-                if (!empty($routeConfig['middleware']) && ($middlewareDisabled != 'route') && ($middlewareDisabled != 'all')) {
+                if (!empty($routeConfig['middleware']) && ($middlewareDisabled != 'route') && ($middlewareDisabled != 'all') &&
+                    ($application !== null)) {
                     $application->middleware->addItems(Arr::make($routeConfig['middleware']));
                 }
 
                 if ($controller instanceof Closure) {
                     $this->controllerClass = 'Closure';
+                    $this->controller      = $controller;
+                } else if (is_string($controller) && !is_subclass_of($controller, 'Pop\Controller\AbstractController', true)) {
+                    $this->controllerClass = 'Pop\Utils\CallableObject';
                     $this->controller      = $controller;
                 } else if (class_exists($controller)) {
                     $this->controllerClass = $controller;
@@ -370,12 +599,13 @@ class Router
                     if ($controllerParams !== null) {
                         $this->controller = (new \ReflectionClass($controller))->newInstanceArgs($controllerParams);
                     } else {
-                        $this->controller = (class_uses($controller, 'Pop\Controller\HttpControllerTrait') ||
-                            class_uses($controller, 'Pop\Controller\ConsoleControllerTrait')) ?
+                        $controllerTraits = class_uses($controller);
+                        $this->controller = (in_array('Pop\Controller\HttpControllerTrait', $controllerTraits) ||
+                            in_array('Pop\Controller\ConsoleControllerTrait', $controllerTraits)) ?
                             new $controller($application) : new $controller();
                     }
 
-                    if (!($this->controller instanceof \Pop\Controller\ControllerInterface)) {
+                    if (!($this->controller instanceof \Pop\Dispatch\DispatchableInterface)) {
                         throw new Exception('Error: The controller must be an instance of Pop\Controller\Interface');
                     }
 

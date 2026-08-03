@@ -396,6 +396,77 @@ Here is a list of possible route syntax options for HTTP applications:
 |/foo/:bar/:baz*   |One required param, one required param that is a collection (array) |
 |/foo/:bar[/:baz*] |One required param, one optional param that is a collection (array) |
 
+#### HTTP Method Constraints
+
+An HTTP route's controller config can include an optional `method` key to constrain it to one or more HTTP
+methods. It accepts a single method string, a comma-separated string, or an array of methods. A route with no
+`method` key matches any HTTP method, exactly as before.
+
+```php
+'routes' => [
+    '/users' => [
+        'controller' => 'MyApp\Controller\UsersController',
+        'action'     => 'index',
+        'method'     => 'get',
+    ],
+],
+```
+
+The same path can be registered multiple times with different `method` constraints and different
+controllers/actions - the standard REST pattern of `GET /users` listing and `POST /users` creating both
+resolve correctly and independently.
+
+A fluent verb API is also available directly on the application, the router, or an `Http` match instance,
+matching the array-config `method` key equivalently:
+
+```php
+$app->get('/users', 'MyApp\Controller\UsersController')
+    ->post('/users', 'MyApp\Controller\UsersController');
+```
+
+`head`, `put`, `delete`, `trace`, `options`, `connect`, and `patch` are all available the same way. These verb
+methods are HTTP-only - calling them on an application or router that isn't routed for HTTP throws an
+exception, since the application object itself remains HTTP/CLI-agnostic.
+
+**Custom HTTP methods** (e.g. WebDAV verbs) can be registered via `addCustomMethod()`/`addCustomMethods()`
+before being used as a fluent method call:
+
+```php
+$app->addCustomMethod('propfind');
+$app->propfind('/dav', 'MyApp\Controller\DavController');
+```
+
+**404 vs. 405** - if no registered route's path matches the request URI at all, the response is a standard
+404 Not Found. If a route's path matches but none of its `method` constraints accept the request's HTTP
+method (and no wildcard/dynamic fallback is available), the response is `405 Method Not Allowed` with an
+`Allow` header listing the methods that do match that path.
+
+**Route matching order** - when more than one registered route could match a given request, the most specific
+one wins, regardless of the order routes were declared in. A fully literal route (no parameters) is more
+specific than one with required parameters, which is more specific than one with optional parameters, which
+is more specific than one with an array/wildcard parameter (`:param*`). Declaration order is only used as a
+tiebreaker between routes of equal specificity.
+
+**Popcorn-style method-grouped routes** are also supported, for apps migrating a `popphp/popcorn`-style routes
+config: a top-level key that's a bare, comma-separated list of HTTP methods (never a real route path, which
+always starts with `/`, is `*`, or contains `:controller`) wraps a nested array of routes, applying that
+method list to every route inside it:
+
+```php
+'routes' => [
+    'options,get' => [
+        '/users' => ['controller' => 'MyApp\Controller\UsersController', 'action' => 'index'],
+        '/roles' => ['controller' => 'MyApp\Controller\RolesController', 'action' => 'index'],
+    ],
+    'options,post' => [
+        '/users/create' => ['controller' => 'MyApp\Controller\UsersController', 'action' => 'create'],
+    ],
+],
+```
+
+This is equivalent to (and expands internally into) giving each nested route its own `method` key directly -
+if a nested route also sets its own `method` key, the group's method list wins. Both forms can be mixed freely
+in the same routes config.
 
 [Top](#popphp)
 
@@ -411,6 +482,9 @@ Here is a list of possible route syntax options for CLI applications:
 |foo \<name\> [\<email\>]     |First parameter required, 2nd parameter optional          |
 |foo --name=\|-n [-e\|--email=] |First option value required, 2nd option value is optional |
 |foo [--option\|-o]            |Option with both long and short formats                   |
+
+When more than one registered CLI route could match a given command, the most specific one wins regardless of
+declaration order, same as the HTTP route matching order described above.
 
 Options are passed as the last parameter injected into the route parameters of the route method or function.
 The `$options` parameter will be an array. When the options are simple flags, the values in the array are booleans:
@@ -528,11 +602,21 @@ $app->run();
 
 But, for most large-scale applications, it would be best to use a full controller object to manage the
 overall behavior or what is to happen for specific routes. The base controller object is an abstract
-controller class `Pop\Controller\AbstractController`, which implements `Pop\Controller\ControllerInterface`.
-The base functionality is fairly simple and allows you to build and structure your controller as needed.
-The only base functionality wired in is a `dispatch` method that handles the actual dispatching of
-the appropriate method and also the default action methods to set up what happens with a route/method
-isn't matched (typically used for error handling.)
+controller class `Pop\Controller\AbstractController`, which extends `Pop\Dispatch\AbstractDispatcher` and
+implements `Pop\Dispatch\DispatchableInterface`/`Pop\Dispatch\MaintenanceInterface` (the shared `Pop\Dispatch`
+namespace that backs any dispatchable, maintenance-aware object, not just controllers). The base functionality
+is fairly simple and allows you to build and structure your controller as needed. The only base functionality
+wired in is a `dispatch` method that handles the actual dispatching of the appropriate method and also the
+default action methods to set up what happens with a route/method isn't matched (typically used for error
+handling.)
+
+Maintenance mode (see [Maintenance Mode](#application-configuration) above) is handled automatically by
+`Application::run()` - as soon as `MAINTENANCE_MODE` is on, every matched route is redirected to the
+maintenance response, with no extra setup required. For a controller-based route, that means your own
+`maintenance()` action (below) runs instead of the normal action; closure and callable routes get a generic
+"Service Unavailable" response instead, since they have no action of their own to redirect to. Call
+`$controller->setBypassMaintenance(true)` (typically in your controller's constructor) to exempt a specific
+controller from maintenance mode entirely.
 
 Let's take a look at what the `MyApp\Controller\IndexController` class from the above web example
 might look like:
@@ -631,28 +715,37 @@ class User extends AbstractDataModel
 
 The available API in the data model object is:
 
+Each method that reads or writes a record takes a `$toArray` parameter (`bool|array`, default `false`). Leave it
+`false` to get back `Record`/`Collection` objects (from `pop-db`); pass `true` to get plain arrays instead, or
+pass an array of column names to get plain arrays limited to just those columns.
+
 **Static Methods**
 
-- `fetchAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection`
-- `fetch(mixed $id, bool $asArray = true): array|Record`
-- `createNew(array $data, bool $asArray = true): array|Record`
+- `fetchAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool|array $toArray = false): array|Collection`
+- `fetch(mixed $id, bool $toArray = false): array|Record`
+- `createNew(array $data, bool $toArray = false): array|Record`
 - `filterBy(mixed $filters = null, mixed $select = null): static`
 
 **Instance Methods**
 
-- `getAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection`
-- `getById(mixed $id, bool $asArray = true): array|Record`
-- `create(array $data, bool $asArray = true): array|Record`
-- `update(mixed $id, array $data, bool $asArray = true): array|Record`
-- `replace(mixed $id, array $data, bool $asArray = true): array|Record`
+- `getAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool|array $toArray = false): array|Collection`
+- `getById(mixed $id, bool $toArray = false): array|Record`
+- `getOne(array $columns, bool $toArray = false): array|Record`
+- `create(array $data, bool $toArray = false): array|Record`
+- `copy(mixed $id, array $replace = [], bool $toArray = false): array|Record`
+- `update(mixed $id, array $data, bool $toArray = false): array|Record`
+- `replace(mixed $id, array $data, bool $toArray = false): array|Record`
 - `delete(mixed $id): int`
 - `remove(array $ids): int`
 - `count(): int`
-- `describe(bool $native = false, bool $full = false): array`
+- `describe(bool $native = false, bool $full = false, bool $withAlias = false): array`
 - `hasRequirements(): bool`
 - `validate(array $data): bool|array`
-- `filter(mixed $filters = null, mixed $select = null): AbstractDataModel`
-- `select(mixed $select = null): AbstractDataModel`
+- `filter(mixed $filters = null, mixed $select = null, ?array $options = null): AbstractDataModel`
+- `select(mixed $select = null, ?array $options = null): AbstractDataModel`
+
+`getOne()` fetches a single record by an arbitrary column/value array (rather than by primary key), and `copy()`
+duplicates an existing record by ID, optionally overriding some columns via `$replace`.
 
 **Create new**
 
@@ -833,6 +926,26 @@ $app->on('app.route.pre', function($application) {
 });
 ```
 
+#### PSR-14 Compatibility
+
+In addition to the event manager above, `Pop\Application` exposes a genuine, spec-compliant
+[PSR-14](https://www.php-fig.org/psr/psr-14/) `Psr\EventDispatcher\EventDispatcherInterface` via
+`$app->dispatcher()`, firing alongside (not instead of) the event manager's `app.*` hook points. This is purely
+additive - the `on()`/`trigger()` API above is completely unaffected, and nothing is required to touch the
+PSR-14 side to keep using it exactly as documented above.
+
+```php
+use Pop\Event\Psr14\RoutePreEvent;
+
+$app->dispatcher()->listeners()->listen(RoutePreEvent::class, function(RoutePreEvent $event) {
+    // Do some pre-route stuff - $event->application() is the Pop\Application instance
+});
+```
+
+There is one dispatchable event class per existing `app.*` hook point (`InitEvent`, `RoutePreEvent`,
+`DispatchPreEvent`, `DispatchPostEvent`, `ErrorEvent` - the last of which also exposes `exception()`), all
+under `Pop\Event\Psr14\`. Listener resolution is by exact event class only.
+
 [Top](#popphp)
 
 Middleware Manager
@@ -930,6 +1043,27 @@ $app = new Pop\Application($config);
 $app->run();
 ```
 
+#### PSR-15 Compatibility
+
+`Pop\Middleware\Psr15\MiddlewareAdapter` lets a real [PSR-15](https://www.php-fig.org/psr/psr-15/)
+`Psr\Http\Server\MiddlewareInterface` handler run inside the native middleware queue above, alongside ordinary
+Pop middleware:
+
+```php
+use Pop\Middleware\Psr15\MiddlewareAdapter;
+
+$app->middleware->addHandler(new MiddlewareAdapter(new SomeThirdPartyPsr15Middleware()));
+```
+
+**This does not mean HTTP requests handled by `Application::run()` are PSR-7 objects.** PSR-15 requires
+`Psr\Http\Message\ServerRequestInterface`/`ResponseInterface` (PSR-7) objects; `Pop\Http\Server\Request`/
+`Response` do not implement PSR-7 today. A PSR-15 middleware registered this way only receives a genuine
+`ServerRequestInterface` if *your application* supplies one - e.g. by constructing `Middleware\Manager::process()`'s
+call yourself with a PSR-7 request from a library like `nyholm/psr7`, rather than relying on `Application::run()`'s
+own (non-PSR-7) HTTP request construction. `Pop\Middleware\Psr15\RequestHandler` is the companion PSR-15
+`RequestHandlerInterface` implementation the adapter uses internally to expose Pop's own `$next` continuation
+to the wrapped PSR-15 middleware.
+
 [Top](#popphp)
 
 Service Locator
@@ -983,6 +1117,15 @@ class IndexController extends AbstractController
     }
 }
 ```
+
+#### PSR-11 Compatibility
+
+`Pop\Service\Locator` implements [PSR-11](https://www.php-fig.org/psr/psr-11/)'s `Psr\Container\ContainerInterface`,
+so it can be type-hinted and passed anywhere a PSR-11 container is expected. `get()` throws
+`Pop\Service\NotFoundException` (which implements `Psr\Container\NotFoundExceptionInterface`) for an
+unregistered service name, and `Pop\Service\Exception` (which implements `Psr\Container\ContainerExceptionInterface`)
+for other retrieval errors - both are still catchable as their existing, non-PSR types, so this is not a
+breaking change.
 
 [Top](#popphp)
 

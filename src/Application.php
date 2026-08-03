@@ -53,6 +53,12 @@ class Application extends AbstractApplication implements \ArrayAccess
     protected ?Event\Manager $events = null;
 
     /**
+     * PSR-14 event dispatcher (additive - does not replace the event manager above)
+     * @var ?Event\Psr14\Dispatcher
+     */
+    protected ?Event\Psr14\Dispatcher $psr14Dispatcher = null;
+
+    /**
      * Middleware manager
      * @var ?Middleware\Manager
      */
@@ -66,9 +72,9 @@ class Application extends AbstractApplication implements \ArrayAccess
 
     /**
      * Autoloader
-     * @var mixed
+     * @var ?\Composer\Autoload\ClassLoader
      */
-    protected mixed $autoloader = null;
+    protected ?\Composer\Autoload\ClassLoader $autoloader = null;
 
     /**
      * Constructor
@@ -85,8 +91,7 @@ class Application extends AbstractApplication implements \ArrayAccess
         $config     = null;
 
         foreach ($args as $arg) {
-            $class = (is_object($arg)) ? get_class($arg) : '';
-            if ((stripos($class, 'classload') !== false) || (stripos($class, 'autoload') !== false)) {
+            if ($arg instanceof \Composer\Autoload\ClassLoader) {
                 $autoloader = $arg;
             } else if ($arg instanceof Router\Router) {
                 $this->registerRouter($arg);
@@ -114,11 +119,11 @@ class Application extends AbstractApplication implements \ArrayAccess
      * Bootstrap the application, creating the required objects if they haven't been created yet
      * and registering with the autoloader, adding routes, services and events
      *
-     * @param  mixed $autoloader
+     * @param  ?\Composer\Autoload\ClassLoader $autoloader
      * @throws Exception|Module\Exception|Service\Exception
      * @return static
      */
-    public function bootstrap(mixed $autoloader = null): static
+    public function bootstrap(?\Composer\Autoload\ClassLoader $autoloader = null): static
     {
         if ($autoloader !== null) {
             $this->registerAutoloader($autoloader);
@@ -131,6 +136,9 @@ class Application extends AbstractApplication implements \ArrayAccess
         }
         if ($this->events === null) {
             $this->registerEvents(new Event\Manager());
+        }
+        if ($this->psr14Dispatcher === null) {
+            $this->psr14Dispatcher = new Event\Psr14\Dispatcher(new Event\Psr14\ListenerProvider());
         }
         if ($this->middleware === null) {
             $this->registerMiddleware(new Middleware\Manager());
@@ -212,15 +220,16 @@ class Application extends AbstractApplication implements \ArrayAccess
     public function init(): static
     {
         $this->trigger('app.init');
+        $this->psr14Dispatcher?->dispatch(new Event\Psr14\InitEvent($this));
         return $this;
     }
 
     /**
      * Get the autoloader object
      *
-     * @return mixed
+     * @return ?\Composer\Autoload\ClassLoader
      */
-    public function autoloader(): mixed
+    public function autoloader(): ?\Composer\Autoload\ClassLoader
     {
         return $this->autoloader;
     }
@@ -253,6 +262,16 @@ class Application extends AbstractApplication implements \ArrayAccess
     public function events(): ?Event\Manager
     {
         return $this->events;
+    }
+
+    /**
+     * Get the PSR-14 event dispatcher (additive - does not replace the event manager)
+     *
+     * @return ?Event\Psr14\Dispatcher
+     */
+    public function dispatcher(): ?Event\Psr14\Dispatcher
+    {
+        return $this->psr14Dispatcher;
     }
 
     /**
@@ -339,18 +358,11 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Register the autoloader object with the application
      *
-     * @param  mixed $autoloader
-     * @throws Exception
+     * @param  \Composer\Autoload\ClassLoader $autoloader
      * @return static
      */
-    public function registerAutoloader(mixed $autoloader): static
+    public function registerAutoloader(\Composer\Autoload\ClassLoader $autoloader): static
     {
-        if (!method_exists($autoloader, 'add') || !method_exists($autoloader, 'addPsr4')) {
-            throw new Exception(
-                'Error: The autoloader instance must contain the methods \'add\' and \'addPsr4\', ' .
-                'as with Composer\Autoload\ClassLoader.'
-            );
-        }
         $this->autoloader = $autoloader;
         return $this;
     }
@@ -436,6 +448,198 @@ class Application extends AbstractApplication implements \ArrayAccess
     public function addRoutes(array $routes): static
     {
         $this->router->addRoutes($routes);
+        return $this;
+    }
+
+    /**
+     * Get the active HTTP router, guarding that the application is routed for HTTP
+     *
+     * @throws Exception
+     * @return Router\Router
+     */
+    protected function httpRouter(): Router\Router
+    {
+        if (($this->router === null) || (!$this->router->isHttp())) {
+            throw new Exception('Error: The application is not routed for HTTP.');
+        }
+        return $this->router;
+    }
+
+    /**
+     * Add a GET route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function get(string $route, mixed $controller): static
+    {
+        $this->httpRouter()->get($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a HEAD route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function head(string $route, mixed $controller): static
+    {
+        $this->httpRouter()->head($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a POST route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function post(string $route, mixed $controller): static
+    {
+        $this->httpRouter()->post($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a PUT route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function put(string $route, mixed $controller): static
+    {
+        $this->httpRouter()->put($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a DELETE route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function delete(string $route, mixed $controller): static
+    {
+        $this->httpRouter()->delete($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a TRACE route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function trace(string $route, mixed $controller): static
+    {
+        $this->httpRouter()->trace($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add an OPTIONS route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function options(string $route, mixed $controller): static
+    {
+        $this->httpRouter()->options($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a CONNECT route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function connect(string $route, mixed $controller): static
+    {
+        $this->httpRouter()->connect($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a PATCH route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @throws Exception
+     * @return static
+     */
+    public function patch(string $route, mixed $controller): static
+    {
+        $this->httpRouter()->patch($route, $controller);
+        return $this;
+    }
+
+    /**
+     * Add a custom HTTP method to the whitelist
+     *
+     * @param  string $method
+     * @throws Exception
+     * @return static
+     */
+    public function addCustomMethod(string $method): static
+    {
+        $this->httpRouter()->addCustomMethod($method);
+        return $this;
+    }
+
+    /**
+     * Add multiple custom HTTP methods to the whitelist
+     *
+     * @param  array $methods
+     * @throws Exception
+     * @return static
+     */
+    public function addCustomMethods(array $methods): static
+    {
+        $this->httpRouter()->addCustomMethods($methods);
+        return $this;
+    }
+
+    /**
+     * Determine if a custom HTTP method has been whitelisted
+     *
+     * @param  string $method
+     * @throws Exception
+     * @return bool
+     */
+    public function hasCustomMethod(string $method): bool
+    {
+        return $this->httpRouter()->hasCustomMethod($method);
+    }
+
+    /**
+     * Magic method to register a route for a whitelisted custom HTTP method
+     *
+     * @param  string $name
+     * @param  array  $arguments
+     * @throws Exception
+     * @return static
+     */
+    public function __call(string $name, array $arguments): static
+    {
+        $this->httpRouter()->{$name}(...$arguments);
         return $this;
     }
 
@@ -688,7 +892,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      *
      * @param  bool    $exit
      * @param  ?string $forceRoute
-     * @throws Event\Exception|Router\Exception|ReflectionException|Exception
+     * @throws \Throwable
      * @return void
      */
     public function run(bool $exit = true, ?string $forceRoute = null): void
@@ -698,24 +902,40 @@ class Application extends AbstractApplication implements \ArrayAccess
 
             // Trigger any app.route.pre events
             $this->trigger('app.route.pre');
+            $this->psr14Dispatcher?->dispatch(new Event\Psr14\RoutePreEvent($this));
 
             if (($this->router !== null)) {
                 $this->router->route($forceRoute);
 
                 // Trigger any app.dispatch.post events
                 $this->trigger('app.dispatch.pre');
+                $this->psr14Dispatcher?->dispatch(new Event\Psr14\DispatchPreEvent($this));
 
                 // Dispatch
                 if ($this->router->hasController()) {
                     $controller = $this->router->getController();
 
+                    // Handle maintenance mode uniformly, regardless of route target shape
+                    if (App::isDown() && !App::isSecretRequest() &&
+                        !(($controller instanceof Dispatch\MaintenanceInterface) && $controller->bypassMaintenance())) {
+                        if ($controller instanceof Dispatch\MaintenanceInterface) {
+                            $controller->dispatchMaintenance();
+                        } else {
+                            $this->renderMaintenanceResponse($exit);
+                        }
                     // Process middleware
-                    if (($this->middleware !== null) && ($this->middleware->hasHandlers())) {
+                    } else if (($this->middleware !== null) && ($this->middleware->hasHandlers())) {
                         $request        = null;
                         $dispatchParams = null;
                         if ($this->router->getControllerClass() == 'Closure') {
                             $dispatch       = $controller;
                             $dispatchParams = ($this->router->hasRouteParams()) ? array_values($this->router->getRouteParams()) : null;
+                        } else if ($this->router->getControllerClass() == 'Pop\Utils\CallableObject') {
+                            $params   = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
+                            $dispatch = function() use ($controller, $params) {
+                                $callableObject = new \Pop\Utils\CallableObject($controller, $params);
+                                $callableObject->call();
+                            };
                         } else {
                             $params   = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
                             $dispatch = function() use ($controller, $params) {
@@ -724,9 +944,9 @@ class Application extends AbstractApplication implements \ArrayAccess
                         }
 
                         // Retrieve request object, or create one
-                        if (class_uses($controller, 'Pop\Controller\HttpControllerTrait')) {
+                        if (is_object($controller) && in_array('Pop\Controller\HttpControllerTrait', class_uses($controller))) {
                             $request = $controller->request();
-                        } else if (class_uses($controller, 'Pop\Controller\ConsoleControllerTrait')) {
+                        } else if (is_object($controller) && in_array('Pop\Controller\ConsoleControllerTrait', class_uses($controller))) {
                             $request = $controller->console();
                         } else if ($this->router->isHttp()) {
                             $request = new Request(new Uri());
@@ -747,6 +967,10 @@ class Application extends AbstractApplication implements \ArrayAccess
                             } else {
                                 $controller();
                             }
+                        } else if ($this->router->getControllerClass() == 'Pop\Utils\CallableObject') {
+                            $params         = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
+                            $callableObject = new \Pop\Utils\CallableObject($controller, $params);
+                            $callableObject->call();
                         } else {
                             $params = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
                             $controller->dispatch($this->router->getAction(), $params);
@@ -754,15 +978,53 @@ class Application extends AbstractApplication implements \ArrayAccess
                     }
                 // Else, no route found
                 } else {
-                    $this->router->noRouteFound($exit);
+                    if ($this->router->isHttp() && $this->router->hasMethodMismatch()) {
+                        $this->router->methodNotAllowed($this->router->getAllowedMethods(), $exit);
+                    } else {
+                        $this->router->noRouteFound($exit);
+                    }
                 }
 
                 // Trigger any app.dispatch.post events
                 $this->trigger('app.dispatch.post');
+                $this->psr14Dispatcher?->dispatch(new Event\Psr14\DispatchPostEvent($this));
             }
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             // Trigger any app.error events
             $this->trigger('app.error', ['exception' => $exception]);
+            $this->psr14Dispatcher?->dispatch(new Event\Psr14\ErrorEvent($this, $exception));
+        }
+    }
+
+    /**
+     * Render a default maintenance-mode response for route targets that
+     * aren't a Dispatch\MaintenanceInterface (closures, callables) and so
+     * have no custom maintenance action of their own to run
+     *
+     * @param  bool $exit
+     * @return void
+     */
+    protected function renderMaintenanceResponse(bool $exit): void
+    {
+        if ($this->router->isHttp()) {
+            if (!headers_sent()) {
+                header('HTTP/1.1 503 Service Unavailable');
+            }
+            echo '<!DOCTYPE html>' . PHP_EOL;
+            echo '<html>' . PHP_EOL;
+            echo '    <head>' . PHP_EOL;
+            echo '        <title>Service Unavailable</title>' . PHP_EOL;
+            echo '    </head>' . PHP_EOL;
+            echo '<body>' . PHP_EOL;
+            echo '    <h1>Service Unavailable</h1>' . PHP_EOL;
+            echo '</body>' . PHP_EOL;
+            echo '</html>' . PHP_EOL;
+        } else {
+            echo PHP_EOL . 'Service Unavailable.' . PHP_EOL . PHP_EOL;
+        }
+
+        if ($exit) {
+            exit();
         }
     }
 

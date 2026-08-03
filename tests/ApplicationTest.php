@@ -14,6 +14,14 @@ use PHPUnit\Framework\TestCase;
 class ApplicationTest extends TestCase
 {
 
+    public function tearDown(): void
+    {
+        // Always reset - maintenance-mode tests below set this directly on
+        // $_ENV (App::env() reads $_ENV directly), and it must never leak
+        // into unrelated tests elsewhere in the suite that call run().
+        unset($_ENV['MAINTENANCE_MODE']);
+    }
+
     public function testConstructor()
     {
         $application = new Application(
@@ -343,11 +351,25 @@ class ApplicationTest extends TestCase
         $application->registerConfig('bad');
     }
 
-    public function testRegisterAutoloaderException()
+    public function testRegisterAutoloaderTypeError()
     {
-        $this->expectException('Pop\Exception');
+        $this->expectException(\TypeError::class);
         $application = new Application();
         $application->registerAutoloader(new \StdClass());
+    }
+
+    public function testConstructorIgnoresNonClassLoaderAutoloaderLookalike()
+    {
+        // FakeAutoloader has 'Autoload' in its class name and duck-types
+        // add()/addPsr4(), which used to be enough to get mistaken for the
+        // autoloader by the old class-name-substring heuristic. Confirms the
+        // constructor now detects it by instanceof Composer\Autoload\ClassLoader
+        // instead, so this decoy is correctly ignored rather than being (wrongly)
+        // registered as the application's autoloader.
+        $application = new Application(new TestAsset\FakeAutoloader(), ['foo' => 'bar']);
+
+        $this->assertNull($application->autoloader());
+        $this->assertEquals('bar', $application->config()['foo']);
     }
 
     public function testGetService()
@@ -503,6 +525,68 @@ class ApplicationTest extends TestCase
         $this->assertNotEquals('Pop\Test\TestAsset\TestMiddleware', $application->getMiddleware('test'));
     }
 
+    public function testMiddlewareManagerProcessIsReentrantSafe()
+    {
+        $log = new \ArrayObject();
+
+        // Triggers a *nested* process() call on a separate Manager instance
+        // from mid-chain, before continuing the outer chain below it - the
+        // pre-fix implementation shared a single class-wide static handler
+        // queue across every Manager instance, so this alone was enough to
+        // wipe out the outer chain's remaining queue and silently skip
+        // whatever came after this handler.
+        $reentrant = new class($log) implements Middleware\MiddlewareInterface {
+            public function __construct(protected \ArrayObject $log)
+            {
+            }
+
+            public function handle(mixed $request, \Closure $next): mixed
+            {
+                $this->log[] = 'outer-a';
+
+                $inner = new Middleware\Manager();
+                $inner->addHandler(new class($this->log) implements Middleware\MiddlewareInterface {
+                    public function __construct(protected \ArrayObject $log)
+                    {
+                    }
+
+                    public function handle(mixed $request, \Closure $next): mixed
+                    {
+                        $this->log[] = 'inner';
+                        return $next($request);
+                    }
+                });
+                $inner->process('inner-request', function () {
+                    return 'inner-response';
+                });
+
+                return $next($request);
+            }
+        };
+
+        $second = new class($log) implements Middleware\MiddlewareInterface {
+            public function __construct(protected \ArrayObject $log)
+            {
+            }
+
+            public function handle(mixed $request, \Closure $next): mixed
+            {
+                $this->log[] = 'outer-b';
+                return $next($request);
+            }
+        };
+
+        $manager = new Middleware\Manager();
+        $manager->addHandler($reentrant);
+        $manager->addHandler($second);
+
+        $manager->process('outer-request', function () {
+            return 'outer-response';
+        });
+
+        $this->assertEquals(['outer-a', 'inner', 'outer-b'], $log->getArrayCopy());
+    }
+
     public function testRunClosureController()
     {
         $_SERVER['argv'] = [
@@ -609,14 +693,14 @@ class ApplicationTest extends TestCase
     public function testNoRouteFound()
     {
         $_SERVER['argv'] = [
-            'myscript.php', 'bad'
+            'myscript.php', 'unknown'
         ];
 
         $config = [
             'routes' => [
                 'bad' => [
-                    'controller' => 'Pop\Test\TestAsset\BadController',
-                    'action'     => 'bad'
+                    'controller' => 'Pop\Test\TestAsset\TestController',
+                    'action'     => 'help'
                 ]
             ]
         ];
@@ -654,6 +738,380 @@ class ApplicationTest extends TestCase
         }
         $this->assertTrue(str_contains(file_get_contents(__DIR__ . '/tmp/error.log'), 'Whoops!'));
         unlink(__DIR__ . '/tmp/error.log');
+    }
+
+    public function testApplicationVerbProxiesChain()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/b';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/a', function() { echo 'A'; })
+            ->post('/b', function() { echo 'B'; });
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertTrue($app->router()->hasRoute());
+    }
+
+    public function testApplicationVerbProxyThrowsWhenNotHttp()
+    {
+        $this->expectException('Pop\Exception');
+
+        $_SERVER['argv'] = ['myscript.php', 'help'];
+
+        $app = new Application();
+        $app->get('/a', function() {});
+    }
+
+    public function testApplicationRemainingVerbProxiesRegisterAndMatch()
+    {
+        foreach (['head', 'put', 'delete', 'trace', 'options', 'connect', 'patch'] as $verb) {
+            $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+            $_SERVER['REQUEST_URI']    = '/resource';
+            $_SERVER['REQUEST_METHOD'] = strtoupper($verb);
+
+            $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+            $app->$verb('/resource', function() {});
+
+            ob_start();
+            $app->run(false);
+            ob_get_clean();
+
+            $this->assertTrue($app->router()->hasRoute(), "Failed to match verb: $verb");
+        }
+    }
+
+    public function testApplicationCustomMethodProxies()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/dav';
+        $_SERVER['REQUEST_METHOD'] = 'PROPFIND';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->addCustomMethod('propfind');
+        $app->addCustomMethods(['proppatch']);
+
+        $this->assertTrue($app->hasCustomMethod('propfind'));
+        $this->assertTrue($app->hasCustomMethod('proppatch'));
+
+        $app->propfind('/dav', function() { echo 'Dav'; });
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertTrue($app->router()->hasRoute());
+    }
+
+    public function testApplicationMethodNotAllowedResponse()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/users';
+        $_SERVER['REQUEST_METHOD'] = 'DELETE';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/users', function() {});
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('Method Not Allowed', $result);
+    }
+
+    public function testApplicationNoRouteFoundStaysNotFound()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/does-not-exist';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/users', function() {});
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('Page Not Found', $result);
+    }
+
+    public function testPsr14DispatcherFiresAlongsideLegacyEventsOnRun()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $calls = [];
+        $app   = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/', function() { echo 'Index'; });
+
+        $app->dispatcher()->listeners()->listen(
+            \Pop\Event\Psr14\RoutePreEvent::class,
+            function($event) use (&$calls, $app) {
+                $calls[] = ($event->application() === $app);
+            }
+        );
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertEquals([true], $calls);
+    }
+
+    public function testPsr14ErrorEventCarriesTheThrownException()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/', function() {
+            throw new \Pop\Exception('boom');
+        });
+
+        $caught = null;
+        $app->dispatcher()->listeners()->listen(
+            \Pop\Event\Psr14\ErrorEvent::class,
+            function($event) use (&$caught) { $caught = $event->exception(); }
+        );
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertInstanceOf('Pop\Exception', $caught);
+        $this->assertEquals('boom', $caught->getMessage());
+    }
+
+    public function testMaintenanceModeRunsControllersOwnMaintenanceAction()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->router()->addRoute('/', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help',
+        ]);
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        // TestController::help() echoes 'help'; TestController::maintenance()
+        // echoes nothing - proving the real action did NOT run.
+        $this->assertStringNotContainsString('help', $result);
+    }
+
+    public function testMaintenanceModeBypassStillRunsTheRealAction()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->router()->addRoute('/', [
+            'controller' => 'Pop\Test\TestAsset\TestBypassMaintenanceController',
+            'action'     => 'help',
+        ]);
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('help', $result);
+    }
+
+    public function testMaintenanceModeRendersDefaultResponseForClosureRoutes()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $closureCalled = false;
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/', function() use (&$closureCalled) {
+            $closureCalled = true;
+            echo 'Index';
+        });
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertFalse($closureCalled);
+        $this->assertStringContainsString('Service Unavailable', $result);
+    }
+
+    public function testMaintenanceModeExceptionSurfacesViaAppError()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->router()->addRoute('/', [
+            'controller' => 'Pop\Test\TestAsset\TestController2',
+            'action'     => 'help',
+        ]);
+
+        $caught = null;
+        $app->on('app.error', function($exception) use (&$caught) {
+            $caught = $exception;
+        });
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertInstanceOf('Pop\Dispatch\Exception', $caught);
+    }
+
+    public function testCallableObjectRouteWithMiddleware()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $config = [
+            'routes' => [
+                '/' => [
+                    'controller' => 'Pop\Test\TestAsset\TestService::baz',
+                    'middleware' => 'Pop\Test\TestAsset\TestMiddleware',
+                ],
+            ],
+        ];
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()), $config);
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('Entering Test Middleware', $result);
+    }
+
+    public function testCallableObjectRouteWithoutMiddleware()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->router()->addRoute('/', [
+            'controller' => 'Pop\Test\TestAsset\TestService::baz',
+        ]);
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertTrue($app->router()->hasRoute());
+    }
+
+    public function testHttpControllerTraitRequestRetrievalWithMiddleware()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $config = [
+            'routes' => [
+                '/' => [
+                    'controller' => 'Pop\Test\TestAsset\TestHttpController',
+                    'action'     => 'help',
+                    'middleware' => 'Pop\Test\TestAsset\TestMiddleware',
+                ],
+            ],
+        ];
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()), $config);
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('help', $result);
+    }
+
+    public function testConsoleControllerTraitRequestRetrievalWithMiddleware()
+    {
+        $_SERVER['argv'] = ['myscript.php', 'help'];
+
+        $config = [
+            'routes' => [
+                'help' => [
+                    'controller' => 'Pop\Test\TestAsset\TestConsoleController',
+                    'action'     => 'help',
+                    'middleware' => 'Pop\Test\TestAsset\TestMiddleware',
+                ],
+            ],
+        ];
+        $app = new Application($config);
+
+        ob_start();
+        $app->run();
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('help', $result);
+    }
+
+    public function testMaintenanceModeRendersDefaultResponseForClosureRoutesInCliMode()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+        $_SERVER['argv']          = ['myscript.php', 'help'];
+
+        $closureCalled = false;
+        $app = new Application();
+        $app->router()->addRoute('help', function() use (&$closureCalled) {
+            $closureCalled = true;
+        });
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertFalse($closureCalled);
+        $this->assertStringContainsString('Service Unavailable', $result);
+    }
+
+    public function testPopcornStyleMethodGroupConfig()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/users';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $config = [
+            'routes' => [
+                'options,get' => [
+                    '/users' => ['controller' => function() { echo 'Users List'; }],
+                    '/roles' => ['controller' => function() { echo 'Roles List'; }],
+                ],
+                'options,post' => [
+                    '/users/create' => ['controller' => function() { echo 'Create User'; }],
+                ],
+            ],
+        ];
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()), $config);
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertTrue($app->router()->hasRoute());
+        $this->assertStringContainsString('Users List', $result);
     }
 
 }

@@ -29,12 +29,6 @@ class Manager extends AbstractManager
 {
 
     /**
-     * Handlers
-     * @var array
-     */
-    protected static array $handlers = [];
-
-    /**
      * Constructor
      *
      * Instantiate the middleware manager object.
@@ -134,8 +128,7 @@ class Manager extends AbstractManager
      */
     public function process(mixed $request, \Closure $dispatch, mixed $dispatchParams = null): static
     {
-        self::$handlers = $this->items;
-        $response = self::handle($request, $dispatch, $dispatchParams);
+        $response = $this->handle($request, $this->items, $dispatch, $dispatchParams);
 
         self::terminate($this->items, $request, $response);
 
@@ -145,14 +138,22 @@ class Manager extends AbstractManager
     /**
      * Recursive method to execute all middleware handlers
      *
+     * The remaining handler queue is threaded through as a plain local
+     * parameter (captured by value in the continuation closure below)
+     * rather than shared instance/class state - so a middleware that itself
+     * triggers a nested process() call (its own, or on a different Manager
+     * entirely) can never corrupt this call's remaining queue, since there
+     * is no shared mutable slot for it to clobber.
+     *
      * @param  mixed    $request
+     * @param  array    $handlers
      * @param  \Closure $dispatch
      * @param  mixed    $dispatchParams
      * @return mixed
      */
-    public static function handle(mixed $request, \Closure $dispatch, mixed $dispatchParams = null): mixed
+    protected function handle(mixed $request, array $handlers, \Closure $dispatch, mixed $dispatchParams = null): mixed
     {
-        $next = array_shift(self::$handlers);
+        $next = array_shift($handlers);
 
         if ($next === null) {
             return (null !== $dispatchParams) ? call_user_func_array($dispatch, $dispatchParams) : $dispatch();
@@ -160,8 +161,8 @@ class Manager extends AbstractManager
             $next = new $next();
         }
 
-        return $next->handle($request, function ($req) use ($dispatch, $dispatchParams) {
-            return self::handle($req, $dispatch, $dispatchParams);
+        return $next->handle($request, function ($req) use ($handlers, $dispatch, $dispatchParams) {
+            return $this->handle($req, $handlers, $dispatch, $dispatchParams);
         });
     }
 

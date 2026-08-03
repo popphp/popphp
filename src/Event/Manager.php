@@ -180,12 +180,17 @@ class Manager extends AbstractManager
     public function trigger(string $name, array $params = []): void
     {
         if (isset($this->items[$name])) {
-            if (!isset($this->results[$name])) {
-                $this->results[$name] = [];
-            }
+            $this->results[$name] = [];
 
-            foreach ($this->items[$name] as $action) {
-                if (end($this->results[$name]) == self::STOP) {
+            // Iterate a clone, not $this->items[$name] itself - SplPriorityQueue
+            // iteration destructively dequeues, and an early return on STOP
+            // would otherwise leave undequeued listeners stuck in the original
+            // queue, permanently missing from every future trigger() call for
+            // this name (same technique off() already uses above).
+            $listeners = clone $this->items[$name];
+
+            foreach ($listeners as $action) {
+                if (end($this->results[$name]) === self::STOP) {
                     return;
                 }
 
@@ -193,7 +198,7 @@ class Manager extends AbstractManager
                 $result                 = $action->call($params);
                 $this->results[$name][] = $result;
 
-                if ($result == self::KILL) {
+                if ($result === self::KILL) {
                     $this->alive = false;
                 }
             }

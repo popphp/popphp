@@ -15,6 +15,7 @@ namespace Pop\Service;
 
 use Pop\AbstractManager;
 use Pop\Utils\CallableObject;
+use Psr\Container\ContainerInterface;
 
 /**
  * Service locator class
@@ -26,7 +27,7 @@ use Pop\Utils\CallableObject;
  * @license    https://www.popphp.org/license     New BSD License
  * @version    4.4.0
  */
-class Locator extends AbstractManager
+class Locator extends AbstractManager implements ContainerInterface
 {
 
     /**
@@ -129,13 +130,13 @@ class Locator extends AbstractManager
      * Get/load a service
      *
      * @param  string $name
-     * @throws Exception
+     * @throws NotFoundException|Exception
      * @return mixed
      */
     public function get(string $name): mixed
     {
         if (!isset($this->items[$name])) {
-            throw new Exception("Error: The service '" . $name . "' has not been added to the service locator");
+            throw new NotFoundException("Error: The service '" . $name . "' has not been added to the service locator");
         }
         if (!isset($this->loaded[$name])) {
             if (self::$depth > 40) {
@@ -147,12 +148,14 @@ class Locator extends AbstractManager
 
             // Keep track of the called services
             self::$depth++;
-            if (!in_array($name, self::$called)) {
-                self::$called[] = $name;
-            }
+            self::$called[] = $name;
 
-            $this->loaded[$name] = $this->items[$name]->call();
-            self::$depth--;
+            try {
+                $this->loaded[$name] = $this->items[$name]->call();
+            } finally {
+                array_pop(self::$called);
+                self::$depth--;
+            }
         }
 
         return $this->loaded[$name];
@@ -281,6 +284,17 @@ class Locator extends AbstractManager
     public function isAvailable(string $name): bool
     {
         return isset($this->items[$name]);
+    }
+
+    /**
+     * Determine if a service is available (PSR-11 ContainerInterface)
+     *
+     * @param  string $id
+     * @return bool
+     */
+    public function has(string $id): bool
+    {
+        return $this->isAvailable($id);
     }
 
     /**
