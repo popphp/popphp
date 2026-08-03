@@ -56,7 +56,7 @@ Install `popphp` using Composer.
 Or, require it in your composer.json file
 
     "require": {
-        "popphp/popphp" : "^4.4.0"
+        "popphp/popphp" : "^5.0.0"
     }
 
 [Top](#popphp)
