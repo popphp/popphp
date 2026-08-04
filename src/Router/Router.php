@@ -580,13 +580,16 @@ class Router
                     $application->middleware->addItems(Arr::make($routeConfig['middleware']));
                 }
 
+                // If controller is a plain closure
                 if ($controller instanceof Closure) {
                     $this->controllerClass = 'Closure';
                     $this->controller      = $controller;
-                } else if (is_string($controller) && !is_subclass_of($controller, 'Pop\Controller\AbstractController', true)) {
+                // Else, if a controller is a plain callable object
+                } else if (is_string($controller) && !is_subclass_of($controller, 'Pop\Dispatch\AbstractDispatcher', true)) {
                     $this->controllerClass = 'Pop\Utils\CallableObject';
                     $this->controller      = $controller;
-                } else if (class_exists($controller)) {
+                // Else, if the controller is a dispatchable controller
+                } else if (class_exists($controller) && is_subclass_of($controller, 'Pop\Dispatch\AbstractDispatcher', true)) {
                     $this->controllerClass = $controller;
                     $controllerParams      = null;
 
