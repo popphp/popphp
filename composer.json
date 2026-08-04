@@ -19,7 +19,7 @@
     "require": {
         "php": ">=8.4.0",
         "popphp/pop-config" : "^4.0.4",
-        "popphp/pop-console" : "^5.0.0-beta.2",
+        "popphp/pop-console" : "^5.0.0-beta.3",
         "popphp/pop-cookie" : "^4.0.4",
         "popphp/pop-db" : "^6.8.14",
         "popphp/pop-http" : "^5.3.8",
