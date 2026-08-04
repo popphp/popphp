@@ -51,6 +51,28 @@ interface ApplicationInterface
     public function hasName(): bool;
 
     /**
+     * Set full name
+     *
+     * @param  string $fullName
+     * @return static
+     */
+    public function setFullName(string $fullName) : static;
+
+    /**
+     * Get full name
+     *
+     * @return string
+     */
+    public function getFullName(): string;
+
+    /**
+     * Determine if full name is set
+     *
+     * @return bool
+     */
+    public function hasFullName(): bool;
+
+    /**
      * Set version
      *
      * @param  string $version

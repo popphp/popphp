@@ -61,6 +61,17 @@ class ApplicationTest extends TestCase
         $this->assertEquals($application->config['foo'], 'bar');
     }
 
+    public function testFullName()
+    {
+        $application = new Application();
+
+        $this->assertFalse($application->hasFullName());
+
+        $this->assertInstanceOf('Pop\Application', $application->setFullName('My Application'));
+        $this->assertTrue($application->hasFullName());
+        $this->assertEquals('My Application', $application->getFullName());
+    }
+
     public function testMagicMethods()
     {
         $application = new Application();

@@ -30,10 +30,16 @@ abstract class AbstractApplication implements ApplicationInterface
 {
 
     /**
-     * Name
+     * Name (Slug, e.g. "my-app")
      * @var ?string
      */
     protected ?string $name = null;
+
+    /**
+     * Full Name (Human-readable, e.g., "My Application")
+     * @var ?string
+     */
+    protected ?string $fullName = null;
 
     /**
      * Version
@@ -77,6 +83,38 @@ abstract class AbstractApplication implements ApplicationInterface
     public function hasName(): bool
     {
         return ($this->name !== null);
+    }
+
+    /**
+     * Set full name
+     *
+     * @param  string $fullName
+     * @return static
+     */
+    public function setFullName(string $fullName): static
+    {
+        $this->fullName = $fullName;
+        return $this;
+    }
+
+    /**
+     * Get full name
+     *
+     * @return string
+     */
+    public function getFullName(): string
+    {
+        return $this->fullName;
+    }
+
+    /**
+     * Determine if the full name is set
+     *
+     * @return bool
+     */
+    public function hasFullName(): bool
+    {
+        return ($this->fullName !== null);
     }
 
     /**
