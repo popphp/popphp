@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: [ '8.4' ]
+        php-versions: [ '8.4', '8.5' ]
         phpunit-versions: ['12.5.0']
 
     steps:

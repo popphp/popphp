@@ -21,14 +21,14 @@
         "popphp/pop-config" : "^4.0.4",
         "popphp/pop-console" : "^4.2.6",
         "popphp/pop-cookie" : "^4.0.4",
-        "popphp/pop-db" : "^6.7.0",
+        "popphp/pop-db" : "^6.8.14",
         "popphp/pop-http" : "^5.3.8",
-        "popphp/pop-utils" : "^2.3.0",
-        "vlucas/phpdotenv": "^5.6.1",
-        "psr/container": "^2.0",
-        "psr/event-dispatcher": "^1.0",
+        "popphp/pop-utils" : "^2.4.1",
+        "vlucas/phpdotenv": "^5.6.4",
+        "psr/container": "^2.0.2",
+        "psr/event-dispatcher": "^1.0.0",
         "psr/http-message": "^2.0",
-        "psr/http-server-middleware": "^1.0"
+        "psr/http-server-middleware": "^1.0.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5.0"
