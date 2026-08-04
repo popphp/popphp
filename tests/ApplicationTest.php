@@ -731,13 +731,15 @@ class ApplicationTest extends TestCase
 
         $this->assertInstanceOf('Pop\Application', $application);
 
+        $this->expectException(\Pop\Exception::class);
+        $this->expectExceptionMessage('Whoops!');
+
         try {
             $application->run(false, 'bad');
-        } catch (\Pop\Exception $e) {
-
+        } finally {
+            $this->assertTrue(str_contains(file_get_contents(__DIR__ . '/tmp/error.log'), 'Whoops!'));
+            unlink(__DIR__ . '/tmp/error.log');
         }
-        $this->assertTrue(str_contains(file_get_contents(__DIR__ . '/tmp/error.log'), 'Whoops!'));
-        unlink(__DIR__ . '/tmp/error.log');
     }
 
     public function testApplicationVerbProxiesChain()
@@ -880,12 +882,17 @@ class ApplicationTest extends TestCase
             function($event) use (&$caught) { $caught = $event->exception(); }
         );
 
-        ob_start();
-        $app->run(false);
-        ob_get_clean();
+        $this->expectException(\Pop\Exception::class);
+        $this->expectExceptionMessage('boom');
 
-        $this->assertInstanceOf('Pop\Exception', $caught);
-        $this->assertEquals('boom', $caught->getMessage());
+        ob_start();
+        try {
+            $app->run(false);
+        } finally {
+            ob_get_clean();
+            $this->assertInstanceOf('Pop\Exception', $caught);
+            $this->assertEquals('boom', $caught->getMessage());
+        }
     }
 
     public function testMaintenanceModeRunsControllersOwnMaintenanceAction()
@@ -974,11 +981,15 @@ class ApplicationTest extends TestCase
             $caught = $exception;
         });
 
-        ob_start();
-        $app->run(false);
-        ob_get_clean();
+        $this->expectException(\Pop\Dispatch\Exception::class);
 
-        $this->assertInstanceOf('Pop\Dispatch\Exception', $caught);
+        ob_start();
+        try {
+            $app->run(false);
+        } finally {
+            ob_get_clean();
+            $this->assertInstanceOf('Pop\Dispatch\Exception', $caught);
+        }
     }
 
     public function testCallableObjectRouteWithMiddleware()

@@ -993,6 +993,7 @@ class Application extends AbstractApplication implements \ArrayAccess
             // Trigger any app.error events
             $this->trigger('app.error', ['exception' => $exception]);
             $this->psr14Dispatcher?->dispatch(new Event\Psr14\ErrorEvent($this, $exception));
+            throw $exception;
         }
     }
 
