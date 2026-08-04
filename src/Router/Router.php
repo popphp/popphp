@@ -603,6 +603,13 @@ class Router
                         $this->controller = (new \ReflectionClass($controller))->newInstanceArgs($controllerParams);
                     } else {
                         $controllerTraits = class_uses($controller);
+                        $parentClass      = get_parent_class($controller);
+
+                        while ($parentClass !== false) {
+                            $controllerTraits = array_merge($controllerTraits, class_uses($parentClass));
+                            $parentClass      = get_parent_class($parentClass);
+                        }
+
                         $this->controller = (in_array('Pop\Controller\HttpControllerTrait', $controllerTraits) ||
                             in_array('Pop\Controller\ConsoleControllerTrait', $controllerTraits)) ?
                             new $controller($application) : new $controller();
