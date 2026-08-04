@@ -23,7 +23,7 @@
         "popphp/pop-cookie" : "^4.0.4",
         "popphp/pop-db" : "^6.8.14",
         "popphp/pop-http" : "^5.3.8",
-        "popphp/pop-utils" : "^2.4.1",
+        "popphp/pop-utils" : "^2.4.2",
         "vlucas/phpdotenv": "^5.6.4",
         "psr/container": "^2.0.2",
         "psr/event-dispatcher": "^1.0.0",
