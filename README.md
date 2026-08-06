@@ -272,6 +272,36 @@ $app = new Pop\Application(
 );
 ```
 
+#### Application Identity
+
+The application object can carry a name, a human-readable full name and a version, each with the usual
+`set`/`get`/`has` trio:
+
+```php
+$app->setName('my-app')                  // A short, slug-like identifier, e.g. for logging or CLI output
+    ->setFullName('My Application')      // A human-readable display name, e.g. for a CLI banner or UI header
+    ->setVersion('1.2.0');
+
+$app->hasName();      // true
+$app->getName();      // 'my-app'
+$app->hasFullName();  // true
+$app->getFullName();  // 'My Application'
+$app->hasVersion();   // true
+$app->getVersion();   // '1.2.0'
+```
+
+`name` and `version` can also be set via the application config, and are picked up automatically during
+bootstrap:
+
+```php
+$config = [
+    'name'    => 'my-app',
+    'version' => '1.2.0',
+];
+```
+
+If `name` isn't set in the config, it falls back to the `APP_NAME` environment variable (`App::name()`). There
+is no config key for `fullName` - it must be set explicitly with `setFullName()`.
 
 [Top](#popphp)
 
@@ -666,6 +696,66 @@ class IndexController extends AbstractController
 }
 ```
 
+#### Getting the Application, Request/Response or Console in a Controller
+
+`AbstractController` on its own takes no constructor arguments. To have the application object (and, for
+HTTP, the request/response objects; for CLI, the console object) automatically injected into your controller,
+use the matching trait:
+
+```php
+<?php
+
+namespace MyApp\Controller;
+
+use Pop\Controller\AbstractController;
+use Pop\Controller\HttpControllerTrait;
+
+class IndexController extends AbstractController
+{
+    use HttpControllerTrait;
+
+    public function index()
+    {
+        $name = $this->application()->getName();
+        $uri  = $this->request()->getUriString();
+        $this->response()->setBody('Hello from ' . $name . ' at ' . $uri);
+    }
+}
+```
+
+`Pop\Controller\ConsoleControllerTrait` is the CLI equivalent - it injects `$application` and a `Console`
+object instead, accessible via `$this->application()` and `$this->console()`.
+
+The router detects these traits automatically - it walks up the controller's entire parent class chain
+looking for `HttpControllerTrait`/`ConsoleControllerTrait`, so a shared base controller can declare the trait
+once and every subclass picks it up. If neither trait is found anywhere in the hierarchy, the controller is
+instantiated with no constructor arguments at all.
+
+If a controller needs custom constructor arguments instead (for either a dependency that isn't the
+application/request/response/console, or a controller that doesn't use either trait), bypass the trait
+detection entirely with the route's `params` key:
+
+```php
+'routes' => [
+    '/users' => [
+        'controller' => 'MyApp\Controller\UsersController',
+        'action'     => 'index',
+        'params'     => [$userService, $logger],
+    ],
+],
+```
+
+or via `addControllerParams()` directly on the router:
+
+```php
+$app->router()->addControllerParams('MyApp\Controller\UsersController', [$userService, $logger]);
+```
+
+`addControllerParams('*', [...])` registers a default parameter set that applies to any controller that
+doesn't have its own explicit entry - it's only settable this way, not via the route array's `params` key.
+When explicit params (or the `'*'` default) are present for a controller, they always take priority over
+trait-based injection.
+
 [Top](#popphp)
 
 Models
@@ -924,6 +1014,25 @@ in the application's life cycle:
 $app->on('app.route.pre', function($application) {
     // Do some pre-route stuff
 });
+```
+
+**`app.error` does not suppress the exception.** If anything throws during routing or dispatch,
+`Application::run()` catches it, fires `app.error` (and the PSR-14 `ErrorEvent` below) with the exception
+available to your listeners, and then rethrows the same exception - it does not swallow it. `app.error` is a
+place to react (log it, send a notification, etc.), not a place to handle it and move on. Wrap your own
+`$app->run()` call in a `try`/`catch` if you want the exception to stop there instead of propagating to your
+calling script:
+
+```php
+$app->on('app.error', function($exception, $application) {
+    // Log it, notify someone, etc. - the exception still propagates after this runs.
+});
+
+try {
+    $app->run();
+} catch (\Throwable $exception) {
+    // Handle it here if you don't want it to escape further.
+}
 ```
 
 #### PSR-14 Compatibility
