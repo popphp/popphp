@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 env:
-  XDEBUG_MODE: debug,coverage
+  XDEBUG_MODE: debug
 
 jobs:
   build:
