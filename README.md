@@ -42,6 +42,7 @@ and interface with the underlying core components:
 * Model
 * Modules
 * Event Manager
+* Middleware Manager
 * Service Locator
 
 [Top](#popphp)
@@ -363,6 +364,18 @@ if (App::isDown()) {
 }
 ```
 
+To let specific requests through while `MAINTENANCE_MODE` is on, set a `MAINTENANCE_MODE_SECRET` env value.
+Appending `?secret=<value>` to a request (once) sets a cookie with that value, and `App::isSecretRequest()`
+returns `true` for any subsequent request - from that client - whose secret (query param or cookie) matches:
+
+```php
+use Pop\App;
+
+if (App::isDown() && !App::isSecretRequest()) {
+    // Show the maintenance response
+}
+```
+
 The full API is:
 
 - `App::config(?string $key = null)`
@@ -377,8 +390,10 @@ The full API is:
 - `App::isProduction()`
 - `App::isDown()`
 - `App::isUp()`
+- `App::isSecretRequest()`
 
-And the above static methods are also available on the application object instance as well:
+And all of the above except `App::isSecretRequest()` are also available on the application object instance
+as well:
 
 - `$app->name()`
 - `$app->url()`
@@ -640,7 +655,7 @@ wired in is a `dispatch` method that handles the actual dispatching of the appro
 default action methods to set up what happens with a route/method isn't matched (typically used for error
 handling.)
 
-Maintenance mode (see [Maintenance Mode](#application-configuration) above) is handled automatically by
+Maintenance mode (see [Maintenance Mode](#maintenance-mode) above) is handled automatically by
 `Application::run()` - as soon as `MAINTENANCE_MODE` is on, every matched route is redirected to the
 maintenance response, with no extra setup required. For a controller-based route, that means your own
 `maintenance()` action (below) runs instead of the normal action; closure and callable routes get a generic
@@ -795,7 +810,7 @@ class Users extends Record
 
 namespace MyApp\Model;
 
-use Pop\Model\AbstractModel;
+use Pop\Model\AbstractDataModel;
 
 class User extends AbstractDataModel
 {
@@ -916,7 +931,7 @@ $moduleConfig = [
     'prefix' => 'MyModule\\'
 ];
 
-$application->register('my-module', $moduleConfig);
+$application->register($moduleConfig, 'my-module');
 ```
 
 **Module Instance**
@@ -936,7 +951,7 @@ $myModule = new Pop\Module\Module([
         ]
     ],
     'prefix' => 'MyModule\\'
-];
+]);
 
 $application->register($myModule);
 ```
@@ -965,7 +980,7 @@ $myModule = new MyModule\Module([
     ]
 ]);
 
-$application->register('myModule', $myModule);
+$application->register($myModule, 'myModule');
 ```
 
 [Top](#popphp)
@@ -1193,12 +1208,15 @@ From inside a controller object:
 namespace MyApp\Controller;
 
 use Pop\Controller\AbstractController;
+use Pop\Controller\HttpControllerTrait;
 
 class IndexController extends AbstractController
 {
+    use HttpControllerTrait;
+
     public function index()
     {
-        $foo = $this->application->services['foo'];
+        $foo = $this->application()->getService('foo');
         // Do something with the 'foo' service
     }
 }
