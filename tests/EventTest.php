@@ -72,6 +72,28 @@ class EventTest extends TestCase
         $this->assertFalse($events->alive());
     }
 
+    public function testBooleanTrueDoesNotFalselyTriggerKillOrStop()
+    {
+        // STOP/KILL are non-empty strings; loose == comparison casts a bool
+        // to true against any non-empty string, so a listener returning
+        // plain `true` (an extremely ordinary "handled successfully" return
+        // value) used to be indistinguishable from an explicit KILL/STOP
+        // signal. Strict === comparison fixes this without changing what a
+        // listener that deliberately returns Manager::STOP/KILL does.
+        $events = new Manager();
+        $events->on('foo', function() {
+            return true;
+        }, 2);
+        $events->on('foo', function() {
+            return 456;
+        }, 1);
+
+        $events->trigger('foo');
+
+        $this->assertTrue($events->alive());
+        $this->assertEquals([true, 456], $events->getResults('foo'));
+    }
+
     public function testCallable()
     {
         $events = new Manager();
@@ -114,6 +136,55 @@ class EventTest extends TestCase
         $results = $events->getResults('foo');
         $this->assertEquals(2, count($results));
         $this->assertFalse(in_array(456, $results));
+    }
+
+    public function testStopDoesNotPermanentlyDisableLaterTriggers()
+    {
+        // Returns STOP only on the first call, so the two trigger() calls
+        // below can distinguish "a stale STOP leaked forward and disabled
+        // this event name" from "a listener that always returns STOP
+        // correctly halts every call" (which would still be correct
+        // behavior, not a bug, and isn't what this test is checking).
+        $callCount = 0;
+        $events    = new Manager();
+        $events->on('foo', function() use (&$callCount) {
+            $callCount++;
+            return ($callCount === 1) ? Manager::STOP : 'not-stop';
+        }, 2);
+        $events->on('foo', function() {
+            return 456;
+        }, 1);
+
+        // First call: STOP halts the second listener.
+        $events->trigger('foo');
+        $this->assertEquals([Manager::STOP], $events->getResults('foo'));
+
+        // Second call, same event name, same instance: the first listener no
+        // longer returns STOP, so the chain must run fully - proving the
+        // previous call's STOP result doesn't leak forward and permanently
+        // disable this event name.
+        $events->trigger('foo');
+        $this->assertEquals(['not-stop', 456], $events->getResults('foo'));
+    }
+
+    public function testResultChainingDoesNotLeakAcrossSeparateTriggers()
+    {
+        $events = new Manager();
+        $seenResults = [];
+
+        $events->on('foo', function($result = null) use (&$seenResults) {
+            $seenResults[] = $result;
+            return 'first-call-result';
+        }, 1);
+
+        $events->trigger('foo');
+        $this->assertEquals([null], $seenResults);
+
+        // A second, separate trigger() call for the same name must present
+        // the listener with a fresh chain (no prior result) rather than the
+        // previous call's leftover last result.
+        $events->trigger('foo');
+        $this->assertEquals([null, null], $seenResults);
     }
 
 }

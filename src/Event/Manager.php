@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
@@ -22,9 +22,9 @@ use Pop\Utils\CallableObject;
  * @category   Pop
  * @package    Pop\Event
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    4.4.0
+ * @version    5.0.0
  */
 class Manager extends AbstractManager
 {
@@ -180,12 +180,17 @@ class Manager extends AbstractManager
     public function trigger(string $name, array $params = []): void
     {
         if (isset($this->items[$name])) {
-            if (!isset($this->results[$name])) {
-                $this->results[$name] = [];
-            }
+            $this->results[$name] = [];
 
-            foreach ($this->items[$name] as $action) {
-                if (end($this->results[$name]) == self::STOP) {
+            // Iterate a clone, not $this->items[$name] itself - SplPriorityQueue
+            // iteration destructively dequeues, and an early return on STOP
+            // would otherwise leave undequeued listeners stuck in the original
+            // queue, permanently missing from every future trigger() call for
+            // this name (same technique off() already uses above).
+            $listeners = clone $this->items[$name];
+
+            foreach ($listeners as $action) {
+                if (end($this->results[$name]) === self::STOP) {
                     return;
                 }
 
@@ -193,7 +198,7 @@ class Manager extends AbstractManager
                 $result                 = $action->call($params);
                 $this->results[$name][] = $result;
 
-                if ($result == self::KILL) {
+                if ($result === self::KILL) {
                     $this->alive = false;
                 }
             }

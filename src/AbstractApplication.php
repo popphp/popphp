@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
@@ -22,18 +22,24 @@ use InvalidArgumentException;
  * @category   Pop
  * @package    Pop
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    4.4.0
+ * @version    5.0.0
  */
 abstract class AbstractApplication implements ApplicationInterface
 {
 
     /**
-     * Name
+     * Name (Slug, e.g. "my-app")
      * @var ?string
      */
     protected ?string $name = null;
+
+    /**
+     * Full Name (Human-readable, e.g., "My Application")
+     * @var ?string
+     */
+    protected ?string $fullName = null;
 
     /**
      * Version
@@ -77,6 +83,38 @@ abstract class AbstractApplication implements ApplicationInterface
     public function hasName(): bool
     {
         return ($this->name !== null);
+    }
+
+    /**
+     * Set full name
+     *
+     * @param  string $fullName
+     * @return static
+     */
+    public function setFullName(string $fullName): static
+    {
+        $this->fullName = $fullName;
+        return $this;
+    }
+
+    /**
+     * Get full name
+     *
+     * @return string
+     */
+    public function getFullName(): string
+    {
+        return $this->fullName;
+    }
+
+    /**
+     * Determine if the full name is set
+     *
+     * @return bool
+     */
+    public function hasFullName(): bool
+    {
+        return ($this->fullName !== null);
     }
 
     /**
@@ -200,11 +238,29 @@ abstract class AbstractApplication implements ApplicationInterface
      *
      * @param  mixed $config
      * @param  bool  $preserve
+     * @param  array $exclude
      * @throws Config\Exception
      * @return AbstractApplication
      */
-    public function mergeConfig(mixed $config, bool $preserve = false): AbstractApplication
+    public function mergeConfig(mixed $config, bool $preserve = false, array $exclude = []): AbstractApplication
     {
+        // Apply exclusions only to array-like config (Config\Config, array, ArrayAccess, ArrayObject)
+        if (!empty($exclude) && (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject) || ($config instanceof Config\Config))) {
+            // Materialize a plain-array COPY before stripping excluded keys, regardless of the
+            // original type, so the unset() below never mutates the caller's live config object
+            // (e.g. an ArrayObject or other ArrayAccess handle passed in by reference/identity).
+            if ($config instanceof Config\Config) {
+                $config = $config->toArray();
+            } else if ($config instanceof \ArrayObject) {
+                $config = $config->getArrayCopy();
+            } else if ($config instanceof \Traversable) {
+                $config = iterator_to_array($config);
+            }
+            foreach ($exclude as $key) {
+                unset($config[$key]);
+            }
+        }
+
         if ($this->config instanceof Config\Config) {
             $this->config->merge($config, $preserve);
         } else if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {

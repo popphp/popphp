@@ -14,14 +14,13 @@ popphp
   - [CLI Applications](#setting-up-a-cli-application)
   - [CLI Shortcut](#cli-shortcut)
   - [Flexible Constructor](#flexible-constructor)
+  - [Merging Application State](#merging-application-state)
 * [App Helper](#app-helper)
 * [Router](#router)
     - [HTTP Routes](#http-routes)
     - [CLI Routes](#cli-routes)
     - [Dynamic Routing](#dynamic-routing)
 * [Controllers](#controllers)
-* [Models](#models)
-    - [Data Models](#data-models)
 * [Modules](#modules)
     - [Custom Modules](#custom-modules)
     - [Module Manager](#module-manager)
@@ -39,9 +38,9 @@ and interface with the underlying core components:
 
 * Router
 * Controller
-* Model
 * Modules
 * Event Manager
+* Middleware Manager
 * Service Locator
 
 [Top](#popphp)
@@ -56,7 +55,7 @@ Install `popphp` using Composer.
 Or, require it in your composer.json file
 
     "require": {
-        "popphp/popphp" : "^4.4.0"
+        "popphp/popphp" : "^5.0.0"
     }
 
 [Top](#popphp)
@@ -272,6 +271,65 @@ $app = new Pop\Application(
 );
 ```
 
+#### Application Identity
+
+The application object can carry a name, a human-readable full name and a version, each with the usual
+`set`/`get`/`has` trio:
+
+```php
+$app->setName('my-app')                  // A short, slug-like identifier, e.g. for logging or CLI output
+    ->setFullName('My Application')      // A human-readable display name, e.g. for a CLI banner or UI header
+    ->setVersion('1.2.0');
+
+$app->hasName();      // true
+$app->getName();      // 'my-app'
+$app->hasFullName();  // true
+$app->getFullName();  // 'My Application'
+$app->hasVersion();   // true
+$app->getVersion();   // '1.2.0'
+```
+
+`name` and `version` can also be set via the application config, and are picked up automatically during
+bootstrap:
+
+```php
+$config = [
+    'name'    => 'my-app',
+    'version' => '1.2.0',
+];
+```
+
+If `name` isn't set in the config, it falls back to the `APP_NAME` environment variable (`App::name()`). There
+is no config key for `fullName` - it must be set explicitly with `setFullName()`.
+
+[Top](#popphp)
+
+#### Merging Application State
+
+An `Application` object can absorb another application's services, middleware, events and config — useful
+when one application boots and hands off to another already-configured one (for example, a CLI tool that
+dispatches into a separate, fully-configured application's own command):
+
+```php
+$app->mergeServices($otherApp->services());     // service definitions, overwritten by name on collision
+$app->mergeMiddleware($otherApp->middleware()); // middleware handlers, overwritten by name on collision
+$app->mergeEvents($otherApp->events());         // listeners combined per event name, not replaced
+$app->mergeConfig($otherApp->config());         // config values, overwritten by key on collision by default
+```
+
+`mergeConfig()` takes an optional `$exclude` array of top-level config keys to leave untouched, useful for
+protecting something like `routes` from being overwritten by the incoming config:
+
+```php
+$app->mergeConfig($otherApp->config(), false, ['routes']);
+```
+
+All four can be done in one call with `mergeApplication()`, which forwards `$preserveConfig`/`$configExclude`
+through to `mergeConfig()` and skips any piece the source application hasn't set up:
+
+```php
+$app->mergeApplication($otherApp, false, ['routes']);
+```
 
 [Top](#popphp)
 
@@ -333,6 +391,18 @@ if (App::isDown()) {
 }
 ```
 
+To let specific requests through while `MAINTENANCE_MODE` is on, set a `MAINTENANCE_MODE_SECRET` env value.
+Appending `?secret=<value>` to a request (once) sets a cookie with that value, and `App::isSecretRequest()`
+returns `true` for any subsequent request - from that client - whose secret (query param or cookie) matches:
+
+```php
+use Pop\App;
+
+if (App::isDown() && !App::isSecretRequest()) {
+    // Show the maintenance response
+}
+```
+
 The full API is:
 
 - `App::config(?string $key = null)`
@@ -347,8 +417,10 @@ The full API is:
 - `App::isProduction()`
 - `App::isDown()`
 - `App::isUp()`
+- `App::isSecretRequest()`
 
-And the above static methods are also available on the application object instance as well:
+And all of the above except `App::isSecretRequest()` are also available on the application object instance
+as well:
 
 - `$app->name()`
 - `$app->url()`
@@ -396,6 +468,77 @@ Here is a list of possible route syntax options for HTTP applications:
 |/foo/:bar/:baz*   |One required param, one required param that is a collection (array) |
 |/foo/:bar[/:baz*] |One required param, one optional param that is a collection (array) |
 
+#### HTTP Method Constraints
+
+An HTTP route's controller config can include an optional `method` key to constrain it to one or more HTTP
+methods. It accepts a single method string, a comma-separated string, or an array of methods. A route with no
+`method` key matches any HTTP method, exactly as before.
+
+```php
+'routes' => [
+    '/users' => [
+        'controller' => 'MyApp\Controller\UsersController',
+        'action'     => 'index',
+        'method'     => 'get',
+    ],
+],
+```
+
+The same path can be registered multiple times with different `method` constraints and different
+controllers/actions - the standard REST pattern of `GET /users` listing and `POST /users` creating both
+resolve correctly and independently.
+
+A fluent verb API is also available directly on the application, the router, or an `Http` match instance,
+matching the array-config `method` key equivalently:
+
+```php
+$app->get('/users', 'MyApp\Controller\UsersController')
+    ->post('/users', 'MyApp\Controller\UsersController');
+```
+
+`head`, `put`, `delete`, `trace`, `options`, `connect`, and `patch` are all available the same way. These verb
+methods are HTTP-only - calling them on an application or router that isn't routed for HTTP throws an
+exception, since the application object itself remains HTTP/CLI-agnostic.
+
+**Custom HTTP methods** (e.g. WebDAV verbs) can be registered via `addCustomMethod()`/`addCustomMethods()`
+before being used as a fluent method call:
+
+```php
+$app->addCustomMethod('propfind');
+$app->propfind('/dav', 'MyApp\Controller\DavController');
+```
+
+**404 vs. 405** - if no registered route's path matches the request URI at all, the response is a standard
+404 Not Found. If a route's path matches but none of its `method` constraints accept the request's HTTP
+method (and no wildcard/dynamic fallback is available), the response is `405 Method Not Allowed` with an
+`Allow` header listing the methods that do match that path.
+
+**Route matching order** - when more than one registered route could match a given request, the most specific
+one wins, regardless of the order routes were declared in. A fully literal route (no parameters) is more
+specific than one with required parameters, which is more specific than one with optional parameters, which
+is more specific than one with an array/wildcard parameter (`:param*`). Declaration order is only used as a
+tiebreaker between routes of equal specificity.
+
+**Popcorn-style method-grouped routes** are also supported, for apps migrating a `popphp/popcorn`-style routes
+config: a top-level key that's a bare, comma-separated list of HTTP methods (never a real route path, which
+always starts with `/`, is `*`, or contains `:controller`) wraps a nested array of routes, applying that
+method list to every route inside it:
+
+```php
+'routes' => [
+    'options,get' => [
+        '/users' => ['controller' => 'MyApp\Controller\UsersController', 'action' => 'index'],
+        '/roles' => ['controller' => 'MyApp\Controller\RolesController', 'action' => 'index'],
+    ],
+    'options,post' => [
+        '/users/create' => ['controller' => 'MyApp\Controller\UsersController', 'action' => 'create'],
+    ],
+],
+```
+
+This is equivalent to (and expands internally into) giving each nested route its own `method` key directly -
+if a nested route also sets its own `method` key, the group's method list wins. Both forms can be mixed freely
+in the same routes config.
 
 [Top](#popphp)
 
@@ -411,6 +554,9 @@ Here is a list of possible route syntax options for CLI applications:
 |foo \<name\> [\<email\>]     |First parameter required, 2nd parameter optional          |
 |foo --name=\|-n [-e\|--email=] |First option value required, 2nd option value is optional |
 |foo [--option\|-o]            |Option with both long and short formats                   |
+
+When more than one registered CLI route could match a given command, the most specific one wins regardless of
+declaration order, same as the HTTP route matching order described above.
 
 Options are passed as the last parameter injected into the route parameters of the route method or function.
 The `$options` parameter will be an array. When the options are simple flags, the values in the array are booleans:
@@ -528,11 +674,21 @@ $app->run();
 
 But, for most large-scale applications, it would be best to use a full controller object to manage the
 overall behavior or what is to happen for specific routes. The base controller object is an abstract
-controller class `Pop\Controller\AbstractController`, which implements `Pop\Controller\ControllerInterface`.
-The base functionality is fairly simple and allows you to build and structure your controller as needed.
-The only base functionality wired in is a `dispatch` method that handles the actual dispatching of
-the appropriate method and also the default action methods to set up what happens with a route/method
-isn't matched (typically used for error handling.)
+controller class `Pop\Controller\AbstractController`, which extends `Pop\Dispatch\AbstractDispatcher` and
+implements `Pop\Dispatch\DispatchableInterface`/`Pop\Dispatch\MaintenanceInterface` (the shared `Pop\Dispatch`
+namespace that backs any dispatchable, maintenance-aware object, not just controllers). The base functionality
+is fairly simple and allows you to build and structure your controller as needed. The only base functionality
+wired in is a `dispatch` method that handles the actual dispatching of the appropriate method and also the
+default action methods to set up what happens with a route/method isn't matched (typically used for error
+handling.)
+
+Maintenance mode (see [Maintenance Mode](#maintenance-mode) above) is handled automatically by
+`Application::run()` - as soon as `MAINTENANCE_MODE` is on, every matched route is redirected to the
+maintenance response, with no extra setup required. For a controller-based route, that means your own
+`maintenance()` action (below) runs instead of the normal action; closure and callable routes get a generic
+"Service Unavailable" response instead, since they have no action of their own to redirect to. Call
+`$controller->setBypassMaintenance(true)` (typically in your controller's constructor) to exempt a specific
+controller from maintenance mode entirely.
 
 Let's take a look at what the `MyApp\Controller\IndexController` class from the above web example
 might look like:
@@ -582,126 +738,65 @@ class IndexController extends AbstractController
 }
 ```
 
-[Top](#popphp)
+#### Getting the Application, Request/Response or Console in a Controller
 
-Models
-------
-
-The model object is the 'M' in the MVC design pattern and gives you the ability to map your data to
-an object that can be consumed and utilized by the other parts of you application. An abstract model
-class is provided, `Pop\Model\AbstractModel`, and it represents a basic data object the acts more or
-less like any array or value object. It has a single property `data`, implements `ArrayAccess`,
-`Countable` and `IteratorAggregate`. Once you extend the abstract model class, you build in the logic
-needed to handle the business logic in your application.
-
-### Data Models
-
-Going one level further, the abstract class `Pop\Model\AbstractDataModel` is also available, which provides
-a tightly integrated API which some common interactions with a database and its records. The basic requirements
-are that there is a model class that extends the abstract data model and a subsequent related table class
-(see the `pop-db` [documentation](https://github.com/popphp/pop-db#table-class) for more info.) In the example
-below, the classes `MyApp\Model\User` and `MyApp\Table\Users` are created, and by that naming convention, they
-are linked together. 
+`AbstractController` on its own takes no constructor arguments. To have the application object (and, for
+HTTP, the request/response objects; for CLI, the console object) automatically injected into your controller,
+use the matching trait:
 
 ```php
 <?php
 
-namespace MyApp\Table;
+namespace MyApp\Controller;
 
-use Pop\Db\Record;
+use Pop\Controller\AbstractController;
+use Pop\Controller\HttpControllerTrait;
 
-class Users extends Record
+class IndexController extends AbstractController
 {
+    use HttpControllerTrait;
 
+    public function index()
+    {
+        $name = $this->application()->getName();
+        $uri  = $this->request()->getUriString();
+        $this->response()->setBody('Hello from ' . $name . ' at ' . $uri);
+    }
 }
 ```
 
-```php
-<?php
+`Pop\Controller\ConsoleControllerTrait` is the CLI equivalent - it injects `$application` and a `Console`
+object instead, accessible via `$this->application()` and `$this->console()`.
 
-namespace MyApp\Model;
+The router detects these traits automatically - it walks up the controller's entire parent class chain
+looking for `HttpControllerTrait`/`ConsoleControllerTrait`, so a shared base controller can declare the trait
+once and every subclass picks it up. If neither trait is found anywhere in the hierarchy, the controller is
+instantiated with no constructor arguments at all.
 
-use Pop\Model\AbstractModel;
-
-class User extends AbstractDataModel
-{
-
-}
-```
-
-The available API in the data model object is:
-
-**Static Methods**
-
-- `fetchAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection`
-- `fetch(mixed $id, bool $asArray = true): array|Record`
-- `createNew(array $data, bool $asArray = true): array|Record`
-- `filterBy(mixed $filters = null, mixed $select = null): static`
-
-**Instance Methods**
-
-- `getAll(?string $sort = null, mixed $limit = null, mixed $page = null, bool $asArray = true): array|Collection`
-- `getById(mixed $id, bool $asArray = true): array|Record`
-- `create(array $data, bool $asArray = true): array|Record`
-- `update(mixed $id, array $data, bool $asArray = true): array|Record`
-- `replace(mixed $id, array $data, bool $asArray = true): array|Record`
-- `delete(mixed $id): int`
-- `remove(array $ids): int`
-- `count(): int`
-- `describe(bool $native = false, bool $full = false): array`
-- `hasRequirements(): bool`
-- `validate(array $data): bool|array`
-- `filter(mixed $filters = null, mixed $select = null): AbstractDataModel`
-- `select(mixed $select = null): AbstractDataModel`
-
-**Create new**
+If a controller needs custom constructor arguments instead (for either a dependency that isn't the
+application/request/response/console, or a controller that doesn't use either trait), bypass the trait
+detection entirely with the route's `params` key:
 
 ```php
-use MyApp\Model\User;
-
-$user = User::createNew($userData);
+'routes' => [
+    '/users' => [
+        'controller' => 'MyApp\Controller\UsersController',
+        'action'     => 'index',
+        'params'     => [$userService, $logger],
+    ],
+],
 ```
 
-**Update**
+or via `addControllerParams()` directly on the router:
 
 ```php
-use MyApp\Model\User;
-
-$userModel = new User();
-$user = $userModel->update(1, $userData);
+$app->router()->addControllerParams('MyApp\Controller\UsersController', [$userService, $logger]);
 ```
 
-The `update()` method acts like a `PATCH` call and `replace()` acts like a `PUT` call and will replace and reset all model data.
-
-**Delete**
-
-```php
-use MyApp\Model\User;
-
-$userModel = new User();
-$userModel->delete(1);
-$userModel->remove([2, 3, 4]);
-```
-
-**Fetch**
-
-```php
-use MyApp\Model\User;
-
-$users = User::fetchAll();
-$user  = User::fetch(1);
-```
-
-**Filter and sort**
-
-```php
-use MyApp\Model\User;
-
-$users = User::filter('username LIKE myuser%')->getAll('-id', '10', 2);
-```
-
-The above call filters the search by the filter string and sorts by `ID DESC` (`-id`). Also, it sets the limit to `10`
-and starts the page offset on the second page.
+`addControllerParams('*', [...])` registers a default parameter set that applies to any controller that
+doesn't have its own explicit entry - it's only settable this way, not via the route array's `params` key.
+When explicit params (or the `'*'` default) are present for a controller, they always take priority over
+trait-based injection.
 
 [Top](#popphp)
 
@@ -733,7 +828,7 @@ $moduleConfig = [
     'prefix' => 'MyModule\\'
 ];
 
-$application->register('my-module', $moduleConfig);
+$application->register($moduleConfig, 'my-module');
 ```
 
 **Module Instance**
@@ -753,7 +848,7 @@ $myModule = new Pop\Module\Module([
         ]
     ],
     'prefix' => 'MyModule\\'
-];
+]);
 
 $application->register($myModule);
 ```
@@ -782,7 +877,7 @@ $myModule = new MyModule\Module([
     ]
 ]);
 
-$application->register('myModule', $myModule);
+$application->register($myModule, 'myModule');
 ```
 
 [Top](#popphp)
@@ -832,6 +927,45 @@ $app->on('app.route.pre', function($application) {
     // Do some pre-route stuff
 });
 ```
+
+**`app.error` does not suppress the exception.** If anything throws during routing or dispatch,
+`Application::run()` catches it, fires `app.error` (and the PSR-14 `ErrorEvent` below) with the exception
+available to your listeners, and then rethrows the same exception - it does not swallow it. `app.error` is a
+place to react (log it, send a notification, etc.), not a place to handle it and move on. Wrap your own
+`$app->run()` call in a `try`/`catch` if you want the exception to stop there instead of propagating to your
+calling script:
+
+```php
+$app->on('app.error', function($exception, $application) {
+    // Log it, notify someone, etc. - the exception still propagates after this runs.
+});
+
+try {
+    $app->run();
+} catch (\Throwable $exception) {
+    // Handle it here if you don't want it to escape further.
+}
+```
+
+#### PSR-14 Compatibility
+
+In addition to the event manager above, `Pop\Application` exposes a genuine, spec-compliant
+[PSR-14](https://www.php-fig.org/psr/psr-14/) `Psr\EventDispatcher\EventDispatcherInterface` via
+`$app->dispatcher()`, firing alongside (not instead of) the event manager's `app.*` hook points. This is purely
+additive - the `on()`/`trigger()` API above is completely unaffected, and nothing is required to touch the
+PSR-14 side to keep using it exactly as documented above.
+
+```php
+use Pop\Event\Psr14\RoutePreEvent;
+
+$app->dispatcher()->listeners()->listen(RoutePreEvent::class, function(RoutePreEvent $event) {
+    // Do some pre-route stuff - $event->application() is the Pop\Application instance
+});
+```
+
+There is one dispatchable event class per existing `app.*` hook point (`InitEvent`, `RoutePreEvent`,
+`DispatchPreEvent`, `DispatchPostEvent`, `ErrorEvent` - the last of which also exposes `exception()`), all
+under `Pop\Event\Psr14\`. Listener resolution is by exact event class only.
 
 [Top](#popphp)
 
@@ -930,6 +1064,27 @@ $app = new Pop\Application($config);
 $app->run();
 ```
 
+#### PSR-15 Compatibility
+
+`Pop\Middleware\Psr15\MiddlewareAdapter` lets a real [PSR-15](https://www.php-fig.org/psr/psr-15/)
+`Psr\Http\Server\MiddlewareInterface` handler run inside the native middleware queue above, alongside ordinary
+Pop middleware:
+
+```php
+use Pop\Middleware\Psr15\MiddlewareAdapter;
+
+$app->middleware->addHandler(new MiddlewareAdapter(new SomeThirdPartyPsr15Middleware()));
+```
+
+**This does not mean HTTP requests handled by `Application::run()` are PSR-7 objects.** PSR-15 requires
+`Psr\Http\Message\ServerRequestInterface`/`ResponseInterface` (PSR-7) objects; `Pop\Http\Server\Request`/
+`Response` do not implement PSR-7 today. A PSR-15 middleware registered this way only receives a genuine
+`ServerRequestInterface` if *your application* supplies one - e.g. by constructing `Middleware\Manager::process()`'s
+call yourself with a PSR-7 request from a library like `nyholm/psr7`, rather than relying on `Application::run()`'s
+own (non-PSR-7) HTTP request construction. `Pop\Middleware\Psr15\RequestHandler` is the companion PSR-15
+`RequestHandlerInterface` implementation the adapter uses internally to expose Pop's own `$next` continuation
+to the wrapped PSR-15 middleware.
+
 [Top](#popphp)
 
 Service Locator
@@ -950,12 +1105,15 @@ From inside a controller object:
 namespace MyApp\Controller;
 
 use Pop\Controller\AbstractController;
+use Pop\Controller\HttpControllerTrait;
 
 class IndexController extends AbstractController
 {
+    use HttpControllerTrait;
+
     public function index()
     {
-        $foo = $this->application->services['foo'];
+        $foo = $this->application()->getService('foo');
         // Do something with the 'foo' service
     }
 }
@@ -983,6 +1141,15 @@ class IndexController extends AbstractController
     }
 }
 ```
+
+#### PSR-11 Compatibility
+
+`Pop\Service\Locator` implements [PSR-11](https://www.php-fig.org/psr/psr-11/)'s `Psr\Container\ContainerInterface`,
+so it can be type-hinted and passed anywhere a PSR-11 container is expected. `get()` throws
+`Pop\Service\NotFoundException` (which implements `Psr\Container\NotFoundExceptionInterface`) for an
+unregistered service name, and `Pop\Service\Exception` (which implements `Psr\Container\ContainerExceptionInterface`)
+for other retrieval errors - both are still catchable as their existing, non-PSR types, so this is not a
+breaking change.
 
 [Top](#popphp)
 

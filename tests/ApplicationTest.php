@@ -14,6 +14,14 @@ use PHPUnit\Framework\TestCase;
 class ApplicationTest extends TestCase
 {
 
+    public function tearDown(): void
+    {
+        // Always reset - maintenance-mode tests below set this directly on
+        // $_ENV (App::env() reads $_ENV directly), and it must never leak
+        // into unrelated tests elsewhere in the suite that call run().
+        unset($_ENV['MAINTENANCE_MODE']);
+    }
+
     public function testConstructor()
     {
         $application = new Application(
@@ -51,6 +59,17 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('Composer\Autoload\ClassLoader', $application->autoloader);
         $this->assertNull($application->foo);
         $this->assertEquals($application->config['foo'], 'bar');
+    }
+
+    public function testFullName()
+    {
+        $application = new Application();
+
+        $this->assertFalse($application->hasFullName());
+
+        $this->assertInstanceOf('Pop\Application', $application->setFullName('My Application'));
+        $this->assertTrue($application->hasFullName());
+        $this->assertEquals('My Application', $application->getFullName());
     }
 
     public function testMagicMethods()
@@ -181,6 +200,54 @@ class ApplicationTest extends TestCase
         $application->mergeConfig(new Config(['foo' => 'bar'], true));
         $this->assertEquals($application->config()['test'], 123);
         $this->assertEquals($application->config()['foo'], 'bar');
+    }
+
+    public function testMergeConfigWithExcludePreservesArrayKey()
+    {
+        $application = new Application(['protected' => 'kettle-value', 'foo' => 'bar']);
+
+        $application->mergeConfig(['protected' => 'incoming-value', 'foo' => 'baz'], false, ['protected']);
+
+        $this->assertEquals('kettle-value', $application->config()['protected']);
+        $this->assertEquals('baz', $application->config()['foo']);
+    }
+
+    public function testMergeConfigWithExcludePreservesConfigObjectKey()
+    {
+        $application = new Application(new Config(['protected' => 'kettle-value', 'foo' => 'bar'], true));
+
+        $application->mergeConfig(new Config(['protected' => 'incoming-value', 'foo' => 'baz'], true), false, ['protected']);
+
+        $this->assertEquals('kettle-value', $application->config()['protected']);
+        $this->assertEquals('baz', $application->config()['foo']);
+    }
+
+    public function testMergeConfigWithExcludeDoesNotMutateSourceArrayObject()
+    {
+        $application  = new Application(['protected' => 'kettle-value', 'foo' => 'bar']);
+        $sourceConfig = new \ArrayObject(['protected' => 'source-value', 'foo' => 'baz']);
+
+        $application->mergeConfig($sourceConfig, false, ['protected']);
+
+        // The target should have merged the non-excluded key and kept its own protected value
+        $this->assertEquals('kettle-value', $application->config()['protected']);
+        $this->assertEquals('baz', $application->config()['foo']);
+
+        // The source ArrayObject passed in must remain untouched
+        $this->assertEquals('source-value', $sourceConfig['protected']);
+        $this->assertEquals('baz', $sourceConfig['foo']);
+    }
+
+    public function testMergeConfigWithExcludeAndNonArrayConfigDoesNotThrow()
+    {
+        $application = new Application(['foo' => 'bar']);
+        $originalConfig = $application->config();
+
+        // Passing a non-array-like config (string) with $exclude should not throw
+        $application->mergeConfig('invalid-config', false, ['some-key']);
+
+        // Config should remain unchanged since string is not a mergeable type
+        $this->assertEquals($originalConfig, $application->config());
     }
 
     public function testRegisterConfig()
@@ -336,6 +403,104 @@ class ApplicationTest extends TestCase
         $this->assertInstanceOf('Pop\Application', $application);
     }
 
+    public function testMergeEventsAddsListenersForNewEventName()
+    {
+        $application = new Application();
+
+        $other = new Event\Manager();
+        $other->on('app.custom', function() {
+            return 'from-custom-app';
+        }, 100);
+
+        $application->mergeEvents($other);
+        $application->trigger('app.custom');
+
+        $this->assertContains('from-custom-app', $application->events()->getResults('app.custom'));
+    }
+
+    public function testMergeEventsCombinesListenersForSharedEventName()
+    {
+        $application = new Application();
+        $application->events()->on('app.dispatch.pre', function() {
+            return 'from-kettle';
+        }, 100);
+
+        $other = new Event\Manager();
+        $other->on('app.dispatch.pre', function() {
+            return 'from-custom-app';
+        }, 200);
+
+        $application->mergeEvents($other);
+        $application->trigger('app.dispatch.pre');
+
+        $results = $application->events()->getResults('app.dispatch.pre');
+        $this->assertContains('from-kettle', $results);
+        $this->assertContains('from-custom-app', $results);
+    }
+
+    public function testMergeApplicationMergesAllPieces()
+    {
+        $application = new Application(['foo' => 'bar']);
+
+        $other = new Application(['foo' => 'baz', 'other' => 'value']);
+        $other->services()->set('greeting', ['call' => function() {
+            return 'hello';
+        }]);
+        $other->middleware()->addHandler('Pop\Test\TestAsset\TestMiddleware', 'incoming');
+        $other->events()->on('app.custom', function() {
+            return 'from-other';
+        }, 100);
+
+        $application->mergeApplication($other);
+
+        $this->assertEquals('hello', $application->services()->get('greeting'));
+        $this->assertEquals('Pop\Test\TestAsset\TestMiddleware', $application->getMiddleware('incoming'));
+
+        $application->trigger('app.custom');
+        $this->assertContains('from-other', $application->events()->getResults('app.custom'));
+
+        $this->assertEquals('baz', $application->config()['foo']);
+        $this->assertEquals('value', $application->config()['other']);
+    }
+
+    public function testMergeApplicationToleratesMissingConfig()
+    {
+        $application = new Application(['foo' => 'bar']);
+        $other       = new Application();
+
+        $application->mergeApplication($other);
+
+        $this->assertEquals('bar', $application->config()['foo']);
+    }
+
+    public function testMergeApplicationForwardsConfigExclude()
+    {
+        $application = new Application(['protected' => 'kettle-value', 'foo' => 'bar']);
+        $other       = new Application(['protected' => 'incoming-value', 'foo' => 'baz']);
+
+        $application->mergeApplication($other, false, ['protected']);
+
+        $this->assertEquals('kettle-value', $application->config()['protected']);
+        $this->assertEquals('baz', $application->config()['foo']);
+    }
+
+    public function testMergeApplicationToleratesNulledServices()
+    {
+        $application = new Application(['foo' => 'bar']);
+
+        $other = new Application(['baz' => 'qux']);
+        $other->events()->on('app.custom', function() {
+            return 'custom-event';
+        }, 100);
+        unset($other->services);
+
+        $application->mergeApplication($other);
+
+        $this->assertEquals('qux', $application->config()['baz']);
+        $application->trigger('app.custom');
+        $this->assertContains('custom-event', $application->events()->getResults('app.custom'));
+    }
+
     public function testRegisterConfigException()
     {
         $this->expectException('InvalidArgumentException');
@@ -343,11 +508,25 @@ class ApplicationTest extends TestCase
         $application->registerConfig('bad');
     }
 
-    public function testRegisterAutoloaderException()
+    public function testRegisterAutoloaderTypeError()
     {
-        $this->expectException('Pop\Exception');
+        $this->expectException(\TypeError::class);
         $application = new Application();
         $application->registerAutoloader(new \StdClass());
+    }
+
+    public function testConstructorIgnoresNonClassLoaderAutoloaderLookalike()
+    {
+        // FakeAutoloader has 'Autoload' in its class name and duck-types
+        // add()/addPsr4(), which used to be enough to get mistaken for the
+        // autoloader by the old class-name-substring heuristic. Confirms the
+        // constructor now detects it by instanceof Composer\Autoload\ClassLoader
+        // instead, so this decoy is correctly ignored rather than being (wrongly)
+        // registered as the application's autoloader.
+        $application = new Application(new TestAsset\FakeAutoloader(), ['foo' => 'bar']);
+
+        $this->assertNull($application->autoloader());
+        $this->assertEquals('bar', $application->config()['foo']);
     }
 
     public function testGetService()
@@ -380,6 +559,27 @@ class ApplicationTest extends TestCase
         $application = new Application($config);
         $application->removeService('foo');
         $this->assertEquals($application->getService('foo'), 123);
+    }
+
+    public function testMergeServices()
+    {
+        $application = new Application();
+        $application->services()->set('foo', ['call' => function() {
+            return 'kettle-foo';
+        }]);
+
+        $other = new Locator();
+        $other->set('bar', ['call' => function() {
+            return 'custom-bar';
+        }]);
+        $other->set('foo', ['call' => function() {
+            return 'custom-foo';
+        }]);
+
+        $application->mergeServices($other);
+
+        $this->assertEquals('custom-bar', $application->services()->get('bar'));
+        $this->assertEquals('custom-foo', $application->services()->get('foo'));
     }
 
     public function testRegisterModule1()
@@ -503,6 +703,82 @@ class ApplicationTest extends TestCase
         $this->assertNotEquals('Pop\Test\TestAsset\TestMiddleware', $application->getMiddleware('test'));
     }
 
+    public function testMiddlewareManagerProcessIsReentrantSafe()
+    {
+        $log = new \ArrayObject();
+
+        // Triggers a *nested* process() call on a separate Manager instance
+        // from mid-chain, before continuing the outer chain below it - the
+        // pre-fix implementation shared a single class-wide static handler
+        // queue across every Manager instance, so this alone was enough to
+        // wipe out the outer chain's remaining queue and silently skip
+        // whatever came after this handler.
+        $reentrant = new class($log) implements Middleware\MiddlewareInterface {
+            public function __construct(protected \ArrayObject $log)
+            {
+            }
+
+            public function handle(mixed $request, \Closure $next): mixed
+            {
+                $this->log[] = 'outer-a';
+
+                $inner = new Middleware\Manager();
+                $inner->addHandler(new class($this->log) implements Middleware\MiddlewareInterface {
+                    public function __construct(protected \ArrayObject $log)
+                    {
+                    }
+
+                    public function handle(mixed $request, \Closure $next): mixed
+                    {
+                        $this->log[] = 'inner';
+                        return $next($request);
+                    }
+                });
+                $inner->process('inner-request', function () {
+                    return 'inner-response';
+                });
+
+                return $next($request);
+            }
+        };
+
+        $second = new class($log) implements Middleware\MiddlewareInterface {
+            public function __construct(protected \ArrayObject $log)
+            {
+            }
+
+            public function handle(mixed $request, \Closure $next): mixed
+            {
+                $this->log[] = 'outer-b';
+                return $next($request);
+            }
+        };
+
+        $manager = new Middleware\Manager();
+        $manager->addHandler($reentrant);
+        $manager->addHandler($second);
+
+        $manager->process('outer-request', function () {
+            return 'outer-response';
+        });
+
+        $this->assertEquals(['outer-a', 'inner', 'outer-b'], $log->getArrayCopy());
+    }
+
+    public function testMergeMiddleware()
+    {
+        $application = new Application();
+        $application->addMiddleware('Pop\Test\TestAsset\TestMiddleware', 'existing');
+
+        $other = new Middleware\Manager();
+        $other->addHandler('Pop\Test\TestAsset\TestMiddleware', 'incoming');
+
+        $application->mergeMiddleware($other);
+
+        $this->assertEquals('Pop\Test\TestAsset\TestMiddleware', $application->getMiddleware('existing'));
+        $this->assertEquals('Pop\Test\TestAsset\TestMiddleware', $application->getMiddleware('incoming'));
+    }
+
     public function testRunClosureController()
     {
         $_SERVER['argv'] = [
@@ -609,14 +885,14 @@ class ApplicationTest extends TestCase
     public function testNoRouteFound()
     {
         $_SERVER['argv'] = [
-            'myscript.php', 'bad'
+            'myscript.php', 'unknown'
         ];
 
         $config = [
             'routes' => [
                 'bad' => [
-                    'controller' => 'Pop\Test\TestAsset\BadController',
-                    'action'     => 'bad'
+                    'controller' => 'Pop\Test\TestAsset\TestController',
+                    'action'     => 'help'
                 ]
             ]
         ];
@@ -647,13 +923,398 @@ class ApplicationTest extends TestCase
 
         $this->assertInstanceOf('Pop\Application', $application);
 
+        $this->expectException(\Pop\Exception::class);
+        $this->expectExceptionMessage('Whoops!');
+
         try {
             $application->run(false, 'bad');
-        } catch (\Pop\Exception $e) {
-
+        } finally {
+            $this->assertTrue(str_contains(file_get_contents(__DIR__ . '/tmp/error.log'), 'Whoops!'));
+            unlink(__DIR__ . '/tmp/error.log');
         }
-        $this->assertTrue(str_contains(file_get_contents(__DIR__ . '/tmp/error.log'), 'Whoops!'));
-        unlink(__DIR__ . '/tmp/error.log');
+    }
+
+    public function testApplicationVerbProxiesChain()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/b';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/a', function() { echo 'A'; })
+            ->post('/b', function() { echo 'B'; });
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertTrue($app->router()->hasRoute());
+    }
+
+    public function testApplicationVerbProxyThrowsWhenNotHttp()
+    {
+        $this->expectException('Pop\Exception');
+
+        $_SERVER['argv'] = ['myscript.php', 'help'];
+
+        $app = new Application();
+        $app->get('/a', function() {});
+    }
+
+    public function testApplicationRemainingVerbProxiesRegisterAndMatch()
+    {
+        foreach (['head', 'put', 'delete', 'trace', 'options', 'connect', 'patch'] as $verb) {
+            $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+            $_SERVER['REQUEST_URI']    = '/resource';
+            $_SERVER['REQUEST_METHOD'] = strtoupper($verb);
+
+            $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+            $app->$verb('/resource', function() {});
+
+            ob_start();
+            $app->run(false);
+            ob_get_clean();
+
+            $this->assertTrue($app->router()->hasRoute(), "Failed to match verb: $verb");
+        }
+    }
+
+    public function testApplicationCustomMethodProxies()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/dav';
+        $_SERVER['REQUEST_METHOD'] = 'PROPFIND';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->addCustomMethod('propfind');
+        $app->addCustomMethods(['proppatch']);
+
+        $this->assertTrue($app->hasCustomMethod('propfind'));
+        $this->assertTrue($app->hasCustomMethod('proppatch'));
+
+        $app->propfind('/dav', function() { echo 'Dav'; });
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertTrue($app->router()->hasRoute());
+    }
+
+    public function testApplicationMethodNotAllowedResponse()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/users';
+        $_SERVER['REQUEST_METHOD'] = 'DELETE';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/users', function() {});
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('Method Not Allowed', $result);
+    }
+
+    public function testApplicationNoRouteFoundStaysNotFound()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/does-not-exist';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/users', function() {});
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('Page Not Found', $result);
+    }
+
+    public function testPsr14DispatcherFiresAlongsideLegacyEventsOnRun()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $calls = [];
+        $app   = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/', function() { echo 'Index'; });
+
+        $app->dispatcher()->listeners()->listen(
+            \Pop\Event\Psr14\RoutePreEvent::class,
+            function($event) use (&$calls, $app) {
+                $calls[] = ($event->application() === $app);
+            }
+        );
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertEquals([true], $calls);
+    }
+
+    public function testPsr14ErrorEventCarriesTheThrownException()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/', function() {
+            throw new \Pop\Exception('boom');
+        });
+
+        $caught = null;
+        $app->dispatcher()->listeners()->listen(
+            \Pop\Event\Psr14\ErrorEvent::class,
+            function($event) use (&$caught) { $caught = $event->exception(); }
+        );
+
+        $this->expectException(\Pop\Exception::class);
+        $this->expectExceptionMessage('boom');
+
+        ob_start();
+        try {
+            $app->run(false);
+        } finally {
+            ob_get_clean();
+            $this->assertInstanceOf('Pop\Exception', $caught);
+            $this->assertEquals('boom', $caught->getMessage());
+        }
+    }
+
+    public function testMaintenanceModeRunsControllersOwnMaintenanceAction()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->router()->addRoute('/', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help',
+        ]);
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        // TestController::help() echoes 'help'; TestController::maintenance()
+        // echoes nothing - proving the real action did NOT run.
+        $this->assertStringNotContainsString('help', $result);
+    }
+
+    public function testMaintenanceModeBypassStillRunsTheRealAction()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->router()->addRoute('/', [
+            'controller' => 'Pop\Test\TestAsset\TestBypassMaintenanceController',
+            'action'     => 'help',
+        ]);
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('help', $result);
+    }
+
+    public function testMaintenanceModeRendersDefaultResponseForClosureRoutes()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $closureCalled = false;
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/', function() use (&$closureCalled) {
+            $closureCalled = true;
+            echo 'Index';
+        });
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertFalse($closureCalled);
+        $this->assertStringContainsString('Service Unavailable', $result);
+    }
+
+    public function testMaintenanceModeExceptionSurfacesViaAppError()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->router()->addRoute('/', [
+            'controller' => 'Pop\Test\TestAsset\TestController2',
+            'action'     => 'help',
+        ]);
+
+        $caught = null;
+        $app->on('app.error', function($exception) use (&$caught) {
+            $caught = $exception;
+        });
+
+        $this->expectException(\Pop\Dispatch\Exception::class);
+
+        ob_start();
+        try {
+            $app->run(false);
+        } finally {
+            ob_get_clean();
+            $this->assertInstanceOf('Pop\Dispatch\Exception', $caught);
+        }
+    }
+
+    public function testCallableObjectRouteWithMiddleware()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $config = [
+            'routes' => [
+                '/' => [
+                    'controller' => 'Pop\Test\TestAsset\TestService::baz',
+                    'middleware' => 'Pop\Test\TestAsset\TestMiddleware',
+                ],
+            ],
+        ];
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()), $config);
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('Entering Test Middleware', $result);
+    }
+
+    public function testCallableObjectRouteWithoutMiddleware()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->router()->addRoute('/', [
+            'controller' => 'Pop\Test\TestAsset\TestService::baz',
+        ]);
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertTrue($app->router()->hasRoute());
+    }
+
+    public function testHttpControllerTraitRequestRetrievalWithMiddleware()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $config = [
+            'routes' => [
+                '/' => [
+                    'controller' => 'Pop\Test\TestAsset\TestHttpController',
+                    'action'     => 'help',
+                    'middleware' => 'Pop\Test\TestAsset\TestMiddleware',
+                ],
+            ],
+        ];
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()), $config);
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('help', $result);
+    }
+
+    public function testConsoleControllerTraitRequestRetrievalWithMiddleware()
+    {
+        $_SERVER['argv'] = ['myscript.php', 'help'];
+
+        $config = [
+            'routes' => [
+                'help' => [
+                    'controller' => 'Pop\Test\TestAsset\TestConsoleController',
+                    'action'     => 'help',
+                    'middleware' => 'Pop\Test\TestAsset\TestMiddleware',
+                ],
+            ],
+        ];
+        $app = new Application($config);
+
+        ob_start();
+        $app->run();
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('help', $result);
+    }
+
+    public function testMaintenanceModeRendersDefaultResponseForClosureRoutesInCliMode()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+        $_SERVER['argv']          = ['myscript.php', 'help'];
+
+        $closureCalled = false;
+        $app = new Application();
+        $app->router()->addRoute('help', function() use (&$closureCalled) {
+            $closureCalled = true;
+        });
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertFalse($closureCalled);
+        $this->assertStringContainsString('Service Unavailable', $result);
+    }
+
+    public function testPopcornStyleMethodGroupConfig()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/users';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $config = [
+            'routes' => [
+                'options,get' => [
+                    '/users' => ['controller' => function() { echo 'Users List'; }],
+                    '/roles' => ['controller' => function() { echo 'Roles List'; }],
+                ],
+                'options,post' => [
+                    '/users/create' => ['controller' => function() { echo 'Create User'; }],
+                ],
+            ],
+        ];
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()), $config);
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertTrue($app->router()->hasRoute());
+        $this->assertStringContainsString('Users List', $result);
     }
 
 }

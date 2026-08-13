@@ -4,23 +4,23 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
 /**
  * @namespace
  */
-namespace Pop\Model;
+namespace Pop\Event\Psr14;
 
 /**
- * Pop model exception class
+ * PSR-14 dispatch pre event class
  *
  * @category   Pop
- * @package    Pop\Model
+ * @package    Pop\Event
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    4.4.0
+ * @version    5.0.0
  */
-class Exception extends \Exception {}
+class DispatchPreEvent extends AbstractApplicationEvent {}

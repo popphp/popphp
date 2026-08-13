@@ -25,6 +25,11 @@ class RealAppTest extends TestCase
         ]);
     }
 
+    public function tearDown(): void
+    {
+        unset($_ENV['MAINTENANCE_MODE']);
+    }
+
     public function testHasApp()
     {
         $this->assertTrue(App::has());
@@ -75,6 +80,12 @@ class RealAppTest extends TestCase
 
     public function testMaintenanceMode()
     {
+        // Set explicitly rather than relying on tests/.env's MAINTENANCE_MODE=false
+        // being overridden by another test file's leaked value - Dotenv's immutable
+        // loader never overwrites an already-set var, so this must be self-contained
+        // and not depend on run order relative to other test classes.
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+
         $this->assertEquals('local', App::environment());
         $this->assertFalse(App::isUp());
         $this->assertTrue(App::isDown());

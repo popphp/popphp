@@ -3,6 +3,7 @@
 namespace Pop\Test;
 
 use Pop\Router;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase
@@ -152,6 +153,32 @@ class RouterTest extends TestCase
         ]);
         $router->route();
         $this->assertInstanceOf('Pop\Router\Match\AbstractMatch', $router->getRouteMatch());
+        $this->assertEquals('edit', $router->getRouteMatch()->getSegment(0));
+    }
+
+    #[RunInSeparateProcess]
+    public function testRouteWithMiddlewareDoesNotRequireBootstrappedApplication()
+    {
+        // Runs in a separate process so Pop\App's static instance is
+        // guaranteed to still be null - reproduces route() being called
+        // on a bare Router before any Application has ever been constructed
+        // anywhere in the process.
+        $this->assertFalse(\Pop\App::has());
+
+        $_SERVER['argv'] = [
+            'myscript.php', 'edit'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('edit', [
+            'controller' => function () {
+                echo 'edit';
+            },
+            'middleware' => 'Pop\Test\TestAsset\TestMiddleware'
+        ]);
+        $router->route();
+
+        $this->assertTrue($router->hasRoute());
         $this->assertEquals('edit', $router->getRouteMatch()->getSegment(0));
     }
 
@@ -557,20 +584,135 @@ class RouterTest extends TestCase
         $this->assertFalse(ctype_print($result));
     }
 
-    public function testNotController()
+    public function testCliSpecificityOrderIndependentOfDeclarationOrderLiteralFirst()
     {
-        $this->expectException('Pop\Router\Exception');
+        $_SERVER['argv'] = ['myscript.php', 'users', 'new'];
+
+        $router = new Router\Router();
+        $router->addRoute('users new', [
+            'controller' => function() { echo 'New'; },
+        ]);
+        $router->addRoute('users <id>', [
+            'controller' => function($id) { echo 'Show'; },
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertStringContainsString('users new', $router->getRouteMatch()->getOriginalRoute());
+    }
+
+    public function testCliSpecificityOrderIndependentOfDeclarationOrderParamFirst()
+    {
+        $_SERVER['argv'] = ['myscript.php', 'users', 'new'];
+
+        $router = new Router\Router();
+        $router->addRoute('users <id>', [
+            'controller' => function($id) { echo 'Show'; },
+        ]);
+        $router->addRoute('users new', [
+            'controller' => function() { echo 'New'; },
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertStringContainsString('users new', $router->getRouteMatch()->getOriginalRoute());
+    }
+
+    public function testCliSingleCharShortOption()
+    {
         $_SERVER['argv'] = [
-            'myscript.php', 'help'
+            'myscript.php', 'help', '-o'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('help [-o]', [
+            'controller' => function() {}
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals(1, count($router->getRouteMatch()->getOptions()));
+    }
+
+    public function testCliArrayOptionLongFormOnly()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help', '--id=1', '--id=2'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('help [--id=*]', [
+            'controller' => function() {}
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals(2, count($router->getRouteMatch()->getOption('id')));
+    }
+
+    public function testCliArrayOptionDashPrefixWithoutEquals()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help', '-i1', '-i2'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('help [-i|--id=*]', [
+            'controller' => function() {}
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals(2, count($router->getRouteMatch()->getOption('id')));
+    }
+
+    public function testCliRouteWithOnlyOptionalParameter()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help', 'world'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('help [<name>]', [
+            'controller' => function() {}
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals(1, count($router->getRouteMatch()->getParameters()));
+    }
+
+    public function testCliDynamicRouteWithParamCollection()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'users', 'edit', 'a', 'b', 'c'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('<controller> <action> <param*>', [
+            'prefix' => 'Pop\Test\TestAsset\\'
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertTrue($router->hasRouteParams());
+        $this->assertEquals(['a', 'b', 'c'], $router->getRouteParams()[0]);
+    }
+
+    public function testCliDefaultRouteConfigKey()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'anything'
         ];
 
         $router = new Router\Router();
         $router->addRoute('help', [
-            'controller' => 'Pop\Test\TestAsset\TestNotController',
-            'action'     => 'help'
+            'controller' => function() { echo 'Help'; },
+            'default'    => true,
         ]);
         $router->route();
-    }
 
+        $this->assertTrue($router->getRouteMatch()->hasDefaultRoute());
+    }
 
 }

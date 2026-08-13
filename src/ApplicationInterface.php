@@ -4,7 +4,7 @@
  *
  * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  */
 
@@ -21,9 +21,9 @@ use InvalidArgumentException;
  * @category   Pop
  * @package    Pop
  * @author     Nick Sagona, III <dev@noladev.com>
- * @copyright  Copyright (c) 2009-2026 NOLA Interactive, LLC.
+ * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
- * @version    4.4.0
+ * @version    5.0.0
  */
 interface ApplicationInterface
 {
@@ -49,6 +49,28 @@ interface ApplicationInterface
      * @return bool
      */
     public function hasName(): bool;
+
+    /**
+     * Set full name
+     *
+     * @param  string $fullName
+     * @return static
+     */
+    public function setFullName(string $fullName) : static;
+
+    /**
+     * Get full name
+     *
+     * @return string
+     */
+    public function getFullName(): string;
+
+    /**
+     * Determine if full name is set
+     *
+     * @return bool
+     */
+    public function hasFullName(): bool;
 
     /**
      * Set version
@@ -126,8 +148,9 @@ interface ApplicationInterface
      *
      * @param  mixed $config
      * @param  bool  $preserve
+     * @param  array $exclude
      * @return ApplicationInterface
      */
-    public function mergeConfig(mixed $config, bool $preserve = false): ApplicationInterface;
+    public function mergeConfig(mixed $config, bool $preserve = false, array $exclude = []): ApplicationInterface;
 
 }

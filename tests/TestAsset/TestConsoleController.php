@@ -10,4 +10,9 @@ class TestConsoleController extends AbstractController
 
     use ConsoleControllerTrait;
 
+    public function help()
+    {
+        echo 'help';
+    }
+
 }
