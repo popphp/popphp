@@ -1271,6 +1271,26 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('help', $result);
     }
 
+    public function testConsoleCommandGetsApplicationInjectedByRouter()
+    {
+        $_SERVER['argv'] = ['myscript.php', 'handle'];
+
+        $config = [
+            'routes' => [
+                'handle' => [
+                    'controller' => 'Pop\Test\TestAsset\TestCommand',
+                ],
+            ],
+        ];
+        $app = new Application($config);
+
+        ob_start();
+        $app->run();
+        $result = ob_get_clean();
+
+        $this->assertStringContainsString('command-with-app', $result);
+    }
+
     public function testMaintenanceModeRendersDefaultResponseForClosureRoutesInCliMode()
     {
         $_ENV['MAINTENANCE_MODE'] = 'true';

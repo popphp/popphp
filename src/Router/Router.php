@@ -603,12 +603,13 @@ class Router
                         $controllerParams = $this->routeMatch->getControllerParams('*');
                     }
 
+                    // Use user pre-defined controller parameters
                     if ($controllerParams !== null) {
                         $this->controller = (new \ReflectionClass($controller))->newInstanceArgs($controllerParams);
+                    // Else, write in the controller parameters
                     } else {
                         $controllerTraits = class_uses($controller);
                         $parentClass      = get_parent_class($controller);
-                        $isCommand        = is_subclass_of($controller, 'Pop\Console\Command\AbstractCommand');
 
                         while ($parentClass !== false) {
                             $controllerTraits = array_merge($controllerTraits, class_uses($parentClass));
@@ -618,8 +619,6 @@ class Router
                         if (in_array('Pop\Dispatch\HttpTrait', $controllerTraits) ||
                             in_array('Pop\Dispatch\ConsoleTrait', $controllerTraits)) {
                             $this->controller = new $controller($application);
-                        } else if ($isCommand) {
-                            $this->controller = $controller::loadForApplication($application);
                         } else {
                             $this->controller = new $controller();
                         }
