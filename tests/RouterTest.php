@@ -915,4 +915,14 @@ class RouterTest extends TestCase
         $this->assertFalse($router->hasAction());
     }
 
+    public function testUndefinedMethodCallInCliModeReportsUndefinedMethodNotHttpMismatch()
+    {
+        $router = new Router\Router();
+
+        $this->expectException('Pop\Router\Exception');
+        $this->expectExceptionMessage('Call to undefined method Pop\Router\Router::hasController()');
+
+        $router->hasController();
+    }
+
 }
