@@ -81,10 +81,10 @@ abstract class AbstractMatch implements MatchInterface
     protected array $preparedRoutes = [];
 
     /**
-     * Controller parameters
+     * Dispatchable parameters
      * @var array
      */
-    protected array $controllerParams = [];
+    protected array $dispatchableParams = [];
 
     /**
      * Route parameters
@@ -145,7 +145,7 @@ abstract class AbstractMatch implements MatchInterface
         }
 
         if (isset($controller['params'])) {
-            $this->addControllerParams($controller['controller'], $controller['params']);
+            $this->addDispatchableParams($controller['controller'], $controller['params']);
         }
 
         return $this;
@@ -195,72 +195,72 @@ abstract class AbstractMatch implements MatchInterface
     }
 
     /**
-     * Add controller params to be passed into a new controller instance
+     * Add dispatchable params to be passed into a new dispatchable instance
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @param  mixed  $params
      * @return AbstractMatch
      */
-    public function addControllerParams(string $controller, mixed $params): AbstractMatch
+    public function addDispatchableParams(string $dispatchable, mixed $params): AbstractMatch
     {
         if (!is_array($params)) {
             $params = [$params];
         }
-        $this->controllerParams[$controller] = $params;
+        $this->dispatchableParams[$dispatchable] = $params;
 
         return $this;
     }
 
     /**
-     * Append controller params to be passed into a new controller instance
+     * Append dispatchable params to be passed into a new dispatchable instance
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @param  mixed  $params
      * @return AbstractMatch
      */
-    public function appendControllerParams(string $controller, mixed $params): AbstractMatch
+    public function appendDispatchableParams(string $dispatchable, mixed $params): AbstractMatch
     {
         if (!is_array($params)) {
             $params = [$params];
         }
-        $this->controllerParams[$controller] = (isset($this->controllerParams[$controller])) ?
-            array_merge($this->controllerParams[$controller], $params) : $params;
+        $this->dispatchableParams[$dispatchable] = (isset($this->dispatchableParams[$dispatchable])) ?
+            array_merge($this->dispatchableParams[$dispatchable], $params) : $params;
 
         return $this;
     }
 
     /**
-     * Get the params assigned to the controller
+     * Get the params assigned to the dispatchable
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @return mixed
      */
-    public function getControllerParams(string $controller): mixed
+    public function getDispatchableParams(string $dispatchable): mixed
     {
-        return $this->controllerParams[$controller] ?? null;
+        return $this->dispatchableParams[$dispatchable] ?? null;
     }
 
     /**
-     * Determine if the controller has params
+     * Determine if the dispatchable has params
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @return bool
      */
-    public function hasControllerParams(string $controller): bool
+    public function hasDispatchableParams(string $dispatchable): bool
     {
-        return (isset($this->controllerParams[$controller]));
+        return (isset($this->dispatchableParams[$dispatchable]));
     }
 
     /**
-     * Remove controller params
+     * Remove dispatchable params
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @return AbstractMatch
      */
-    public function removeControllerParams(string $controller): AbstractMatch
+    public function removeDispatchableParams(string $dispatchable): AbstractMatch
     {
-        if (isset($this->controllerParams[$controller])) {
-            unset($this->controllerParams[$controller]);
+        if (isset($this->dispatchableParams[$dispatchable])) {
+            unset($this->dispatchableParams[$dispatchable]);
         }
         return $this;
     }
@@ -469,59 +469,59 @@ abstract class AbstractMatch implements MatchInterface
     }
 
     /**
-     * Get the controller
+     * Get the dispatchable
      *
      * @return mixed
      */
-    public function getController(): mixed
+    public function getDispatchable(): mixed
     {
-        $routeController = null;
+        $routeDispatchable = null;
 
         if (($this->route !== null) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['controller'])) {
-            $routeController = $this->preparedRoutes[$this->route]['controller'];
+            $routeDispatchable = $this->preparedRoutes[$this->route]['controller'];
         } else {
             if (($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) && (count($this->segments) >= 1)) {
-                $routeController = $this->dynamicRoutePrefix . ucfirst(strtolower($this->segments[0])) . 'Controller';
-                if (!class_exists($routeController)) {
-                    $routeController      = null;
+                $routeDispatchable = $this->dynamicRoutePrefix . ucfirst(strtolower($this->segments[0])) . 'Controller';
+                if (!class_exists($routeDispatchable)) {
+                    $routeDispatchable    = null;
                     $this->isDynamicRoute = false;
                 } else {
                     $this->isDynamicRoute = true;
                 }
             }
-            if (($routeController === null) && !empty($this->defaultRoute)) {
+            if (($routeDispatchable === null) && !empty($this->defaultRoute)) {
                 foreach ($this->defaultRoute as $routeKey => $controller) {
                     if ($routeKey != '*') {
                         if (str_starts_with($this->routeString, $routeKey) && isset($controller['controller'])) {
-                            $routeController = $controller['controller'];
+                            $routeDispatchable = $controller['controller'];
                         }
                     }
                 }
-                if (($routeController === null) && isset($this->defaultRoute['*']) && isset($this->defaultRoute['*']['controller'])) {
-                    $routeController = $this->defaultRoute['*']['controller'];
+                if (($routeDispatchable === null) && isset($this->defaultRoute['*']) && isset($this->defaultRoute['*']['controller'])) {
+                    $routeDispatchable = $this->defaultRoute['*']['controller'];
                 }
             }
         }
 
-        return $routeController;
+        return $routeDispatchable;
     }
 
     /**
-     * Determine if there is a controller
+     * Determine if there is a dispatchable
      *
      * @return bool
      */
-    public function hasController(): bool
+    public function hasDispatchable(): bool
     {
         $result = false;
 
         if (($this->route !== null) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['controller'])) {
             $result = true;
-        } else if (($this->dynamicRoute !== null) && ($this->getController() !== null) &&
+        } else if (($this->dynamicRoute !== null) && ($this->getDispatchable() !== null) &&
             ($this->dynamicRoutePrefix !== null) && (count($this->segments) >= 1)) {
-            $result = class_exists($this->getController());
+            $result = class_exists($this->getDispatchable());
         } else if (!empty($this->defaultRoute)) {
             foreach ($this->defaultRoute as $routeKey => $controller) {
                 if (($routeKey != '*') && str_starts_with($this->routeString, $routeKey) && isset($controller['controller'])) {
@@ -574,7 +574,7 @@ abstract class AbstractMatch implements MatchInterface
         } else {
             if (($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) &&
                 (count($this->segments) >= 2)) {
-                $result = method_exists($this->getController(), $this->getAction());
+                $result = method_exists($this->getDispatchable(), $this->getAction());
             }
             if (!($result) && ($this->defaultRoute !== null) && isset($this->defaultRoute['action'])) {
                 $result = true;

@@ -38,10 +38,10 @@ class Router
     protected ?Match\MatchInterface $routeMatch = null;
 
     /**
-     * Controller object
+     * Dispatchable object
      * @var mixed
      */
-    protected mixed $controller = null;
+    protected mixed $dispatchable = null;
 
     /**
      * Action
@@ -50,10 +50,10 @@ class Router
     protected mixed $action = null;
 
     /**
-     * Controller class
+     * Dispatchable class
      * @var ?string
      */
-    protected ?string $controllerClass = null;
+    protected ?string $dispatchableClass = null;
 
     /**
      * Constructor
@@ -144,62 +144,62 @@ class Router
     }
 
     /**
-     * Add controller params to be passed into a new controller instance
+     * Add dispatchable params to be passed into a new dispatchable instance
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @param  mixed  $params
      * @return static
      */
-    public function addControllerParams(string $controller, mixed $params): static
+    public function addDispatchableParams(string $dispatchable, mixed $params): static
     {
-        $this->routeMatch->addControllerParams($controller, $params);
+        $this->routeMatch->addDispatchableParams($dispatchable, $params);
         return $this;
     }
 
     /**
-     * Append controller params to be passed into a new controller instance
+     * Append dispatchable params to be passed into a new dispatchable instance
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @param  mixed  $params
      * @return static
      */
-    public function appendControllerParams(string $controller, mixed $params): static
+    public function appendDispatchableParams(string $dispatchable, mixed $params): static
     {
-        $this->routeMatch->appendControllerParams($controller, $params);
+        $this->routeMatch->appendDispatchableParams($dispatchable, $params);
         return $this;
     }
 
     /**
-     * Get the params assigned to the controller
+     * Get the params assigned to the dispatchable
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @return mixed
      */
-    public function getControllerParams(string $controller): mixed
+    public function getDispatchableParams(string $dispatchable): mixed
     {
-        return $this->routeMatch->getControllerParams($controller);
+        return $this->routeMatch->getDispatchableParams($dispatchable);
     }
 
     /**
-     * Determine if the controller has params
+     * Determine if the dispatchable has params
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @return bool
      */
-    public function hasControllerParams(string $controller): bool
+    public function hasDispatchableParams(string $dispatchable): bool
     {
-        return $this->routeMatch->hasControllerParams($controller);
+        return $this->routeMatch->hasDispatchableParams($dispatchable);
     }
 
     /**
-     * Remove controller params
+     * Remove dispatchable params
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @return static
      */
-    public function removeControllerParams(string $controller): static
+    public function removeDispatchableParams(string $dispatchable): static
     {
-        $this->routeMatch->removeControllerParams($controller);
+        $this->routeMatch->removeDispatchableParams($dispatchable);
         return $this;
     }
 
@@ -254,23 +254,23 @@ class Router
     }
 
     /**
-     * Get the current controller object
+     * Get the current dispatchable object
      *
      * @return mixed
      */
-    public function getController(): mixed
+    public function getDispatchable(): mixed
     {
-        return $this->controller;
+        return $this->dispatchable;
     }
 
     /**
-     * Determine if the router has a controller
+     * Determine if the router has a dispatchable
      *
      * @return bool
      */
-    public function hasController(): bool
+    public function hasDispatchable(): bool
     {
-        return ($this->controller !== null);
+        return ($this->dispatchable !== null);
     }
 
     /**
@@ -294,13 +294,13 @@ class Router
     }
 
     /**
-     * Get the current controller class name
+     * Get the current dispatchable class name
      *
      * @return string
      */
-    public function getControllerClass(): string
+    public function getDispatchableClass(): string
     {
-        return $this->controllerClass;
+        return $this->dispatchableClass;
     }
 
     /**
@@ -568,13 +568,13 @@ class Router
      */
     public function route(string|array|null $forceRoute = null): void
     {
-        $this->controller      = null;
-        $this->controllerClass = null;
-        $this->action          = null;
+        $this->dispatchable      = null;
+        $this->dispatchableClass = null;
+        $this->action            = null;
 
         if ($this->routeMatch->match($forceRoute)) {
-            if ($this->routeMatch->hasController()) {
-                $controller         = $this->routeMatch->getController();
+            if ($this->routeMatch->hasDispatchable()) {
+                $dispatchable       = $this->routeMatch->getDispatchable();
                 $application        = App::get();
                 $middlewareDisabled = App::env('MIDDLEWARE_DISABLED');
 
@@ -584,48 +584,45 @@ class Router
                     $application->middleware->addItems(Arr::make($routeConfig['middleware']));
                 }
 
-                // If controller is a plain closure
-                if ($controller instanceof Closure) {
-                    $this->controllerClass = 'Closure';
-                    $this->controller      = $controller;
-                // Else, if a controller is a plain callable object
-                } else if (is_string($controller) && !is_subclass_of($controller, 'Pop\Dispatch\AbstractDispatcher', true)) {
-                    $this->controllerClass = 'Pop\Utils\CallableObject';
-                    $this->controller      = $controller;
-                // Else, if the controller is a dispatchable controller
-                } else if (class_exists($controller) && is_subclass_of($controller, 'Pop\Dispatch\AbstractDispatcher', true)) {
-                    $this->controllerClass = $controller;
-                    $controllerParams      = null;
+                // If the dispatchable is a plain closure
+                if ($dispatchable instanceof Closure) {
+                    $this->dispatchableClass = 'Closure';
+                    $this->dispatchable      = $dispatchable;
+                // Else, if the dispatchable is a plain callable object
+                } else if (is_string($dispatchable) && !is_subclass_of($dispatchable, 'Pop\Dispatch\AbstractDispatcher', true)) {
+                    $this->dispatchableClass = 'Pop\Utils\CallableObject';
+                    $this->dispatchable      = $dispatchable;
+                // Else, if the dispatchable is a Dispatch\AbstractDispatcher subclass
+                } else if (class_exists($dispatchable) && is_subclass_of($dispatchable, 'Pop\Dispatch\AbstractDispatcher', true)) {
+                    $this->dispatchableClass = $dispatchable;
+                    $dispatchableParams      = null;
 
-                    if ($this->routeMatch->hasControllerParams($controller)) {
-                        $controllerParams = $this->routeMatch->getControllerParams($controller);
-                    } else if ($this->routeMatch->hasControllerParams('*')) {
-                        $controllerParams = $this->routeMatch->getControllerParams('*');
+                    if ($this->routeMatch->hasDispatchableParams($dispatchable)) {
+                        $dispatchableParams = $this->routeMatch->getDispatchableParams($dispatchable);
+                    } else if ($this->routeMatch->hasDispatchableParams('*')) {
+                        $dispatchableParams = $this->routeMatch->getDispatchableParams('*');
                     }
 
-                    // Use user pre-defined controller parameters
-                    if ($controllerParams !== null) {
-                        $this->controller = (new \ReflectionClass($controller))->newInstanceArgs($controllerParams);
-                    // Else, write in the controller parameters
+                    // Use user pre-defined dispatchable parameters
+                    if ($dispatchableParams !== null) {
+                        $this->dispatchable = (new \ReflectionClass($dispatchable))->newInstanceArgs($dispatchableParams);
+                    // Else, write in the dispatchable parameters
                     } else {
-                        $controllerTraits = class_uses($controller);
-                        $parentClass      = get_parent_class($controller);
+                        $dispatchableTraits = class_uses($dispatchable);
+                        $parentClass        = get_parent_class($dispatchable);
 
                         while ($parentClass !== false) {
-                            $controllerTraits = array_merge($controllerTraits, class_uses($parentClass));
-                            $parentClass      = get_parent_class($parentClass);
+                            $dispatchableTraits = array_merge($dispatchableTraits, class_uses($parentClass));
+                            $parentClass        = get_parent_class($parentClass);
                         }
 
-                        if (in_array('Pop\Dispatch\HttpTrait', $controllerTraits) ||
-                            in_array('Pop\Dispatch\ConsoleTrait', $controllerTraits)) {
-                            $this->controller = new $controller($application);
-                        } else {
-                            $this->controller = new $controller();
-                        }
+                        $this->dispatchable = (in_array('Pop\Dispatch\HttpTrait', $dispatchableTraits) ||
+                            in_array('Pop\Dispatch\ConsoleTrait', $dispatchableTraits)) ?
+                            new $dispatchable($application) : new $dispatchable();
                     }
 
-                    if (!($this->controller instanceof \Pop\Dispatch\DispatchableInterface)) {
-                        throw new Exception('Error: The controller must be an instance of Pop\Controller\Interface');
+                    if (!($this->dispatchable instanceof \Pop\Dispatch\DispatchableInterface)) {
+                        throw new Exception('Error: The dispatchable must be an instance of Pop\Dispatch\DispatchableInterface');
                     }
 
                     $action       = $this->routeMatch->getAction();

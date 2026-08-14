@@ -23,8 +23,8 @@ class RouterTest extends TestCase
         ]);
         $this->assertInstanceOf('Pop\Router\Router', $router);
         $this->assertInstanceOf('Closure', $router->getRouteMatch()->getDefaultRoute()['*']['controller']);
-        $this->assertInstanceOf('Closure', $router->getRouteMatch()->getController());
-        $this->assertTrue($router->getRouteMatch()->hasController());
+        $this->assertInstanceOf('Closure', $router->getRouteMatch()->getDispatchable());
+        $this->assertTrue($router->getRouteMatch()->hasDispatchable());
         $this->assertTrue($router->getRouteMatch()->hasDefaultRoute());
         $this->assertNull($router->getRouteMatch()->getDynamicRoute());
         $this->assertNull($router->getRouteMatch()->getDynamicRoutePrefix());
@@ -74,7 +74,7 @@ class RouterTest extends TestCase
         $this->assertTrue($router->getRouteMatch()->hasAction());
     }
 
-    public function testAddControllerParams()
+    public function testAddDispatchableParams()
     {
         $router = new Router\Router();
         $router->addRoute('/user', [
@@ -83,16 +83,16 @@ class RouterTest extends TestCase
             }
         ]);
 
-        $router->addControllerParams('/user', [1000, 'append' => true]);
-        $router->appendControllerParams('/user', [2000, 'append' => true]);
-        $this->assertContains(1000, $router->getControllerParams('/user'));
-        $this->assertContains(2000, $router->getControllerParams('/user'));
-        $this->assertTrue($router->hasControllerParams('/user'));
-        $router->removeControllerParams('/user');
-        $this->assertFalse($router->hasControllerParams('/user'));
+        $router->addDispatchableParams('/user', [1000, 'append' => true]);
+        $router->appendDispatchableParams('/user', [2000, 'append' => true]);
+        $this->assertContains(1000, $router->getDispatchableParams('/user'));
+        $this->assertContains(2000, $router->getDispatchableParams('/user'));
+        $this->assertTrue($router->hasDispatchableParams('/user'));
+        $router->removeDispatchableParams('/user');
+        $this->assertFalse($router->hasDispatchableParams('/user'));
     }
 
-    public function testAppendControllerParams()
+    public function testAppendDispatchableParams()
     {
         $router = new Router\Router();
         $router->addRoute('/user', [
@@ -101,11 +101,11 @@ class RouterTest extends TestCase
             }
         ]);
 
-        $router->appendControllerParams('/user', 1000);
-        $this->assertContains(1000, $router->getControllerParams('/user'));
+        $router->appendDispatchableParams('/user', 1000);
+        $this->assertContains(1000, $router->getDispatchableParams('/user'));
     }
 
-    public function testAddControllerParamsNoAppend()
+    public function testAddDispatchableParamsNoAppend()
     {
         $router = new Router\Router();
         $router->addRoute('/user', [
@@ -114,11 +114,11 @@ class RouterTest extends TestCase
             }
         ]);
 
-        $router->addControllerParams('/user', 1000);
-        $this->assertContains(1000, $router->getControllerParams('/user'));
+        $router->addDispatchableParams('/user', 1000);
+        $this->assertContains(1000, $router->getDispatchableParams('/user'));
     }
 
-    public function testAddControllerParamsNull()
+    public function testAddDispatchableParamsNull()
     {
         $router = new Router\Router();
         $router->addRoute('/user', [
@@ -127,8 +127,8 @@ class RouterTest extends TestCase
             }
         ]);
 
-        $router->addControllerParams('/user', 1000);
-        $this->assertEquals(1, count($router->getControllerParams('/user')));
+        $router->addDispatchableParams('/user', 1000);
+        $this->assertEquals(1, count($router->getDispatchableParams('/user')));
     }
 
     public function testIsCli()
@@ -216,7 +216,7 @@ class RouterTest extends TestCase
         $this->assertFalse($router->hasRoute());
     }
 
-    public function testGetControllerClass()
+    public function testGetDispatchableClass()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'help'
@@ -231,8 +231,8 @@ class RouterTest extends TestCase
 
         $router->prepare();
         $router->route();
-        $this->assertEquals('Pop\Test\TestAsset\TestController', $router->getControllerClass());
-        $this->assertEquals(123, $router->getController()->foo);
+        $this->assertEquals('Pop\Test\TestAsset\TestController', $router->getDispatchableClass());
+        $this->assertEquals(123, $router->getDispatchable()->foo);
         $this->assertTrue($router->hasAction());
     }
 
@@ -342,7 +342,7 @@ class RouterTest extends TestCase
         $this->assertEquals('help', $router->getRouteMatch()->getRouteConfig('action'));
     }
 
-    public function testControllerParams()
+    public function testDispatchableParams()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'help'
@@ -355,12 +355,12 @@ class RouterTest extends TestCase
             'params' => [123]
         ]);
 
-        $router->addControllerParams('*', ['foo' => 123]);
+        $router->addDispatchableParams('*', ['foo' => 123]);
         $router->route();
-        $this->assertEquals(123, $router->getController()->foo);
+        $this->assertEquals(123, $router->getDispatchable()->foo);
     }
 
-    public function testWildcardControllerParams()
+    public function testWildcardDispatchableParams()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'help'
@@ -372,9 +372,9 @@ class RouterTest extends TestCase
             'action'      => 'help'
         ]);
 
-        $router->addControllerParams('*', ['foo' => 123]);
+        $router->addDispatchableParams('*', ['foo' => 123]);
         $router->route();
-        $this->assertEquals(123, $router->getController()->foo);
+        $this->assertEquals(123, $router->getDispatchable()->foo);
     }
 
     public function testCliMatch()
@@ -421,8 +421,8 @@ class RouterTest extends TestCase
 
         $router->route();
         $this->assertTrue($router->hasRoute());
-        $this->assertEquals('Pop\Test\TestAsset\TestController', $router->getControllerClass());
-        $this->assertInstanceOf('Pop\Test\TestAsset\TestController', $router->getController());
+        $this->assertEquals('Pop\Test\TestAsset\TestController', $router->getDispatchableClass());
+        $this->assertInstanceOf('Pop\Test\TestAsset\TestController', $router->getDispatchable());
     }
 
     public function testCliDynamicMatch()
@@ -895,7 +895,7 @@ class RouterTest extends TestCase
         $this->assertEquals('Sagona', $router->getRouteMatch()->getParameter('last'));
     }
 
-    public function testRouterRouteResetsStaleControllerAfterFailedMatch()
+    public function testRouterRouteResetsStaleDispatchableAfterFailedMatch()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'help'
@@ -908,10 +908,10 @@ class RouterTest extends TestCase
         ]);
 
         $router->route();
-        $this->assertTrue($router->hasController());
+        $this->assertTrue($router->hasDispatchable());
 
         $router->route('nonexistent command');
-        $this->assertFalse($router->hasController());
+        $this->assertFalse($router->hasDispatchable());
         $this->assertFalse($router->hasAction());
     }
 

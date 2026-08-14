@@ -44,46 +44,46 @@ interface MatchInterface
     public function addRoutes(array $routes): MatchInterface;
 
     /**
-     * Add controller params to be passed into a new controller instance
+     * Add dispatchable params to be passed into a new dispatchable instance
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @param  mixed  $params
      * @return MatchInterface
      */
-    public function addControllerParams(string $controller, mixed $params): MatchInterface;
+    public function addDispatchableParams(string $dispatchable, mixed $params): MatchInterface;
 
     /**
-     * Append controller params to be passed into a new controller instance
+     * Append dispatchable params to be passed into a new dispatchable instance
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @param  mixed  $params
      * @return MatchInterface
      */
-    public function appendControllerParams(string $controller, mixed $params): MatchInterface;
+    public function appendDispatchableParams(string $dispatchable, mixed $params): MatchInterface;
 
     /**
-     * Get the params assigned to the controller
+     * Get the params assigned to the dispatchable
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @return mixed
      */
-    public function getControllerParams(string $controller): mixed;
+    public function getDispatchableParams(string $dispatchable): mixed;
 
     /**
-     * Determine if the controller has params
+     * Determine if the dispatchable has params
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @return bool
      */
-    public function hasControllerParams(string $controller): bool;
+    public function hasDispatchableParams(string $dispatchable): bool;
 
     /**
-     * Remove controller params
+     * Remove dispatchable params
      *
-     * @param  string $controller
+     * @param  string $dispatchable
      * @return MatchInterface
      */
-    public function removeControllerParams(string $controller): MatchInterface;
+    public function removeDispatchableParams(string $dispatchable): MatchInterface;
 
     /**
      * Get the route string
@@ -206,18 +206,18 @@ interface MatchInterface
     public function isDynamicRoute(): bool;
 
     /**
-     * Get the controller
+     * Get the dispatchable
      *
      * @return mixed
      */
-    public function getController(): mixed;
+    public function getDispatchable(): mixed;
 
     /**
-     * Determine if there is a controller
+     * Determine if there is a dispatchable
      *
      * @return bool
      */
-    public function hasController(): bool;
+    public function hasDispatchable(): bool;
 
     /**
      * Get the action

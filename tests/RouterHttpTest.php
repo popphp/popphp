@@ -328,7 +328,7 @@ class RouterHttpTest extends TestCase
         ]);
 
         $http->match();
-        $this->assertFalse($http->hasController());
+        $this->assertFalse($http->hasDispatchable());
         $this->assertTrue($http->hasMethodMismatch());
         $this->assertEquals(['get', 'post'], $http->getAllowedMethods());
     }
@@ -351,7 +351,7 @@ class RouterHttpTest extends TestCase
         ]);
 
         $http->match();
-        $this->assertTrue($http->hasController());
+        $this->assertTrue($http->hasDispatchable());
     }
 
     public function testMethodNotAllowedSendsAllowHeader()
@@ -597,7 +597,7 @@ class RouterHttpTest extends TestCase
         $http->match();
 
         $this->assertTrue($http->hasDynamicRoute());
-        $this->assertNull($http->getController());
+        $this->assertNull($http->getDispatchable());
         $this->assertFalse($http->isDynamicRoute());
     }
 
@@ -613,8 +613,8 @@ class RouterHttpTest extends TestCase
         $http->match();
 
         $this->assertTrue($http->hasRoute());
-        $this->assertTrue($http->hasController());
-        $this->assertInstanceOf('Closure', $http->getController());
+        $this->assertTrue($http->hasDispatchable());
+        $this->assertInstanceOf('Closure', $http->getDispatchable());
     }
 
     public function testDirectMatchSkipsUnrelatedLiteralRoutes()

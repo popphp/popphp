@@ -824,13 +824,13 @@ detection entirely with the route's `params` key:
 ],
 ```
 
-or via `addControllerParams()` directly on the router:
+or via `addDispatchableParams()` directly on the router:
 
 ```php
-$app->router()->addControllerParams('MyApp\Controller\UsersController', [$userService, $logger]);
+$app->router()->addDispatchableParams('MyApp\Controller\UsersController', [$userService, $logger]);
 ```
 
-`addControllerParams('*', [...])` registers a default parameter set that applies to any controller that
+`addDispatchableParams('*', [...])` registers a default parameter set that applies to any controller that
 doesn't have its own explicit entry - it's only settable this way, not via the route array's `params` key.
 When explicit params (or the `'*'` default) are present for a controller, they always take priority over
 trait-based injection.

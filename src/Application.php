@@ -981,14 +981,14 @@ class Application extends AbstractApplication implements \ArrayAccess
                 $this->psr14Dispatcher?->dispatch(new Event\Psr14\DispatchPreEvent($this));
 
                 // Dispatch
-                if ($this->router->hasController()) {
-                    $controller = $this->router->getController();
+                if ($this->router->hasDispatchable()) {
+                    $dispatchable = $this->router->getDispatchable();
 
                     // Handle maintenance mode uniformly, regardless of route target shape
                     if (App::isDown() && !App::isSecretRequest() &&
-                        !(($controller instanceof Dispatch\MaintenanceInterface) && $controller->bypassMaintenance())) {
-                        if ($controller instanceof Dispatch\MaintenanceInterface) {
-                            $controller->dispatchMaintenance();
+                        !(($dispatchable instanceof Dispatch\MaintenanceInterface) && $dispatchable->bypassMaintenance())) {
+                        if ($dispatchable instanceof Dispatch\MaintenanceInterface) {
+                            $dispatchable->dispatchMaintenance();
                         } else {
                             $this->renderMaintenanceResponse($exit);
                         }
@@ -996,27 +996,27 @@ class Application extends AbstractApplication implements \ArrayAccess
                     } else if (($this->middleware !== null) && ($this->middleware->hasHandlers())) {
                         $request        = null;
                         $dispatchParams = null;
-                        if ($this->router->getControllerClass() == 'Closure') {
-                            $dispatch       = $controller;
+                        if ($this->router->getDispatchableClass() == 'Closure') {
+                            $dispatch       = $dispatchable;
                             $dispatchParams = ($this->router->hasRouteParams()) ? array_values($this->router->getRouteParams()) : null;
-                        } else if ($this->router->getControllerClass() == 'Pop\Utils\CallableObject') {
+                        } else if ($this->router->getDispatchableClass() == 'Pop\Utils\CallableObject') {
                             $params   = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-                            $dispatch = function() use ($controller, $params) {
-                                $callableObject = new \Pop\Utils\CallableObject($controller, $params);
+                            $dispatch = function() use ($dispatchable, $params) {
+                                $callableObject = new \Pop\Utils\CallableObject($dispatchable, $params);
                                 $callableObject->call();
                             };
                         } else {
                             $params   = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-                            $dispatch = function() use ($controller, $params) {
-                                $controller->dispatch($this->router->getAction(), $params);
+                            $dispatch = function() use ($dispatchable, $params) {
+                                $dispatchable->dispatch($this->router->getAction(), $params);
                             };
                         }
 
                         // Retrieve request object, or create one
-                        if (is_object($controller) && in_array('Pop\Dispatch\HttpTrait', class_uses($controller))) {
-                            $request = $controller->request();
-                        } else if (is_object($controller) && in_array('Pop\Dispatch\ConsoleTrait', class_uses($controller))) {
-                            $request = $controller->console();
+                        if (is_object($dispatchable) && in_array('Pop\Dispatch\HttpTrait', class_uses($dispatchable))) {
+                            $request = $dispatchable->request();
+                        } else if (is_object($dispatchable) && in_array('Pop\Dispatch\ConsoleTrait', class_uses($dispatchable))) {
+                            $request = $dispatchable->console();
                         } else if ($this->router->isHttp()) {
                             $request = new Request(new Uri());
                         } else if ($this->router->isCli()) {
@@ -1030,19 +1030,19 @@ class Application extends AbstractApplication implements \ArrayAccess
                         $this->middleware->process($request, $dispatch, $dispatchParams);
                     // Skip middleware or process as normal
                     } else {
-                        if ($this->router->getControllerClass() == 'Closure') {
+                        if ($this->router->getDispatchableClass() == 'Closure') {
                             if ($this->router->hasRouteParams()) {
-                                call_user_func_array($controller, array_values($this->router->getRouteParams()));
+                                call_user_func_array($dispatchable, array_values($this->router->getRouteParams()));
                             } else {
-                                $controller();
+                                $dispatchable();
                             }
-                        } else if ($this->router->getControllerClass() == 'Pop\Utils\CallableObject') {
+                        } else if ($this->router->getDispatchableClass() == 'Pop\Utils\CallableObject') {
                             $params         = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-                            $callableObject = new \Pop\Utils\CallableObject($controller, $params);
+                            $callableObject = new \Pop\Utils\CallableObject($dispatchable, $params);
                             $callableObject->call();
                         } else {
                             $params = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-                            $controller->dispatch($this->router->getAction(), $params);
+                            $dispatchable->dispatch($this->router->getAction(), $params);
                         }
                     }
                 // Else, no route found

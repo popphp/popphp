@@ -861,7 +861,7 @@ class ApplicationTest extends TestCase
         ];
         $application = new Application($config);
         $application->run();
-        $this->assertEquals(1002, $application->router()->getController()->id);
+        $this->assertEquals(1002, $application->router()->getDispatchable()->id);
     }
 
     public function testLoad()
