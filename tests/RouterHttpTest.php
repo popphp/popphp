@@ -785,4 +785,25 @@ class RouterHttpTest extends TestCase
         $this->assertEquals(['hello-world'], array_values($router->getRouteParams()));
     }
 
+    public function testHttpRepeatedForceRouteDoesNotLeakParamsIntoNextMatch()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/unrelated';
+
+        $router = new Router(null, new Http());
+        $router->addRoute('/user/:id', function($id) {
+            echo 'User: ' . $id;
+        });
+        $router->addRoute('/post/:slug', function($slug) {
+            echo 'Post: ' . $slug;
+        });
+
+        $router->route('/user/42');
+        $this->assertEquals(['42'], array_values($router->getRouteParams()));
+
+        $router->route('/post/hello-world');
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals(['hello-world'], array_values($router->getRouteParams()));
+    }
+
 }

@@ -748,7 +748,7 @@ class RouterTest extends TestCase
         $this->assertTrue($router->getRouteMatch()->getOption('force'));
     }
 
-    public function testCliForceRouteCarriesLongOptionValue()
+    public function testCliForceRouteCarriesLongOptionFlag()
     {
         $_SERVER['argv'] = [
             'myscript.php', 'unrelated'
@@ -796,6 +796,84 @@ class RouterTest extends TestCase
 
         $this->assertFalse($match->match('nonexistent command'));
         $this->assertNull($match->getOriginalRoute());
+    }
+
+    public function testCliForceRouteCarriesOptionValue()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'unrelated'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('help [--name=] [--email=]', [
+            'controller' => function() { echo 'Help'; },
+        ]);
+
+        $router->route('help --name=test --email=test@test.com');
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals('test', $router->getRouteMatch()->getOption('name'));
+        $this->assertEquals('test@test.com', $router->getRouteMatch()->getOption('email'));
+    }
+
+    public function testCliForceRouteCarriesArrayOption()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'unrelated'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('help [-i|--id=*]', [
+            'controller' => function() { echo 'Help'; },
+        ]);
+
+        $router->route('help --id=1 --id=2');
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals(2, count($router->getRouteMatch()->getOption('id')));
+    }
+
+    public function testCliRepeatedForceRouteDoesNotLeakParamsIntoNextMatch()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'unrelated'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('send:email <email>', [
+            'controller' => function($email) { echo 'Send'; },
+        ]);
+        $router->addRoute('greet <name>', [
+            'controller' => function($name) { echo 'Greet'; },
+        ]);
+
+        $router->route('send:email a@b.com');
+        $this->assertEquals('a@b.com', $router->getRouteMatch()->getParameter('email'));
+
+        $router->route('greet Nick');
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals(['name' => 'Nick'], $router->getRouteMatch()->getParameters());
+        $this->assertEquals(['Nick'], array_values($router->getRouteParams()));
+    }
+
+    public function testCliRepeatedForceRouteDoesNotLeakOptionsIntoNextMatch()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'unrelated'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('tag <id> [--force]', [
+            'controller' => function($id) { echo 'Tag'; },
+        ]);
+        $router->addRoute('greet <name>', [
+            'controller' => function($name) { echo 'Greet'; },
+        ]);
+
+        $router->route('tag 42 --force');
+        $this->assertTrue($router->getRouteMatch()->getOption('force'));
+
+        $router->route('greet Nick');
+        $this->assertTrue($router->hasRoute());
+        $this->assertNull($router->getRouteMatch()->getOption('force'));
     }
 
     public function testCliMatchResetsHasAllRequiredAfterMissingParam()

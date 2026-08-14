@@ -275,6 +275,7 @@ class Http extends AbstractMatch
         $this->route          = null;
         $this->methodMismatch = false;
         $this->allowedMethods = [];
+        $this->routeParams    = [];
 
         if ($forceRoute !== null) {
             $this->seed($forceRoute);

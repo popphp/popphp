@@ -139,6 +139,7 @@ class Cli extends AbstractMatch
 
         $this->route          = null;
         $this->hasAllRequired = true;
+        $this->routeParams    = [];
 
         if ($forceRoute !== null) {
             $this->seed($forceRoute);

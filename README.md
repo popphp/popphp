@@ -667,10 +667,11 @@ The array form takes pre-split segments (exactly like real `argv`), and is the o
 containing spaces - the string form is split on whitespace, so it has no quoting support
 (`'send:email -q "John Smith"'` will not work; pass `['send:email', '-q', 'John Smith']` instead).
 
-Each call to `route()`/`match()` re-parses its params/options fresh and clears any controller/action left over
-from a previous call, so it's safe to call `run()` repeatedly against the same `Application` instance (e.g. one
-job worker dispatching many commands) without a failed or different route on one call leaking state into the
-next.
+Each call to `route()`/`match()` re-parses its params/options fresh and clears any controller/action/params left
+over from a previous call, so it's safe to call `run()` repeatedly against the same `Application` instance (e.g.
+one job worker dispatching many commands) without a failed or different route on one call leaking state into the
+next. This covers routing state only - per-route `middleware` config is still added to the application's shared
+middleware manager on every match and isn't cleared between calls.
 
 [Top](#popphp)
 
