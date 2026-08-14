@@ -503,6 +503,19 @@ class RouterHttpTest extends TestCase
         $this->assertTrue($router->hasCustomMethod('propfind'));
     }
 
+    public function testUndefinedMethodCallInHttpModeReportsUndefinedMethodNotUnallowedCustomVerb()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/foo';
+
+        $router = new Router(null, new Http());
+
+        $this->expectException('Pop\Router\Exception');
+        $this->expectExceptionMessage('Call to undefined method Pop\Router\Router::hasController()');
+
+        $router->hasController();
+    }
+
     public function testRouterVerbProxyThrowsWhenNotHttp()
     {
         $this->expectException('Pop\Router\Exception');

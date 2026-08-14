@@ -537,11 +537,14 @@ class Router
     /**
      * Magic method to register a route for a whitelisted custom HTTP method
      *
-     * Only ever forwards to the HTTP match object - if the router isn't in
-     * HTTP mode, that's not "the route is not HTTP" (this isn't one of the
-     * explicit HTTP-only proxy methods like get()/post()/addCustomMethod()),
-     * it's that $name isn't a real method on Router at all, so it's reported
-     * as such rather than misdiagnosed as an HTTP/CLI mode mismatch.
+     * Only forwards to the HTTP match object when $name is either a real
+     * method there or a whitelisted custom verb - not in HTTP mode at all, or
+     * in HTTP mode but neither of those, both mean $name isn't a real method
+     * on Router, so it's reported as such rather than misdiagnosed as an
+     * HTTP/CLI mode mismatch or an unregistered custom HTTP verb (the
+     * explicit HTTP-only proxy methods like get()/post()/addCustomMethod()
+     * are unaffected - they call httpMatch() directly and still correctly
+     * throw "not HTTP" when called against a CLI-mode router).
      *
      * @param  string $name
      * @param  array  $arguments
@@ -550,7 +553,8 @@ class Router
      */
     public function __call(string $name, array $arguments): static
     {
-        if (!$this->isHttp()) {
+        if (!$this->isHttp() ||
+            (!method_exists($this->routeMatch, $name) && !$this->routeMatch->hasCustomMethod($name))) {
             throw new Exception('Error: Call to undefined method ' . static::class . '::' . $name . '()');
         }
 
