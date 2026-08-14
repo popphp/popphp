@@ -608,15 +608,21 @@ class Router
                     } else {
                         $controllerTraits = class_uses($controller);
                         $parentClass      = get_parent_class($controller);
+                        $isCommand        = is_subclass_of($controller, 'Pop\Console\Command\AbstractCommand');
 
                         while ($parentClass !== false) {
                             $controllerTraits = array_merge($controllerTraits, class_uses($parentClass));
                             $parentClass      = get_parent_class($parentClass);
                         }
 
-                        $this->controller = (in_array('Pop\Controller\HttpControllerTrait', $controllerTraits) ||
-                            in_array('Pop\Controller\ConsoleControllerTrait', $controllerTraits)) ?
-                            new $controller($application) : new $controller();
+                        if (in_array('Pop\Controller\HttpControllerTrait', $controllerTraits) ||
+                            in_array('Pop\Controller\ConsoleControllerTrait', $controllerTraits)) {
+                            $this->controller = new $controller($application);
+                        } else if ($isCommand) {
+                            $this->controller = $controller::loadForApplication($application);
+                        } else {
+                            $this->controller = new $controller();
+                        }
                     }
 
                     if (!($this->controller instanceof \Pop\Dispatch\DispatchableInterface)) {
