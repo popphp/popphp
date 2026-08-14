@@ -3,12 +3,12 @@
 namespace Pop\Test\TestAsset;
 
 use Pop\Controller\AbstractController;
-use Pop\Controller\ConsoleControllerTrait;
+use Pop\Dispatch\ConsoleTrait;
 
 class TestConsoleController extends AbstractController
 {
 
-    use ConsoleControllerTrait;
+    use ConsoleTrait;
 
     public function help()
     {

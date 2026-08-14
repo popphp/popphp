@@ -3,12 +3,12 @@
 namespace Pop\Test\TestAsset;
 
 use Pop\Controller\AbstractController;
-use Pop\Controller\HttpControllerTrait;
+use Pop\Dispatch\HttpTrait;
 
 class TestHttpController extends AbstractController
 {
 
-    use HttpControllerTrait;
+    use HttpTrait;
 
     public function help()
     {

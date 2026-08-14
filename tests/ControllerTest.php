@@ -85,7 +85,7 @@ class ControllerTest extends TestCase
         $controller->dispatchMaintenance();
     }
 
-    public function testHttpControllerTrait()
+    public function testHttpTrait()
     {
         $httpController = new TestHttpController(new Application());
         $this->assertInstanceOf('Pop\Application', $httpController->application());
@@ -93,11 +93,59 @@ class ControllerTest extends TestCase
         $this->assertInstanceOf('Pop\Http\Server\Response', $httpController->response());
     }
 
-    public function testConsoleControllerTrait()
+    public function testConsoleTrait()
     {
         $consoleController = new TestConsoleController(new Application());
         $this->assertInstanceOf('Pop\Application', $consoleController->application());
         $this->assertInstanceOf('Pop\Console\Console', $consoleController->console());
+    }
+
+    public function testHttpTraitWithoutApplicationDoesNotThrow()
+    {
+        $httpController = new TestHttpController();
+        $this->assertFalse($httpController->hasApplication());
+        $this->assertNull($httpController->application());
+        $this->assertNull($httpController->getApplication());
+        $this->assertTrue($httpController->hasRequest());
+        $this->assertTrue($httpController->hasResponse());
+    }
+
+    public function testHttpTraitSetters()
+    {
+        $httpController = new TestHttpController();
+        $application     = new Application();
+        $request         = new \Pop\Http\Server\Request(new \Pop\Http\Uri());
+        $response        = new \Pop\Http\Server\Response();
+
+        $httpController->setApplication($application);
+        $httpController->setRequest($request);
+        $httpController->setResponse($response);
+
+        $this->assertSame($application, $httpController->getApplication());
+        $this->assertSame($request, $httpController->request());
+        $this->assertSame($response, $httpController->response());
+    }
+
+    public function testConsoleTraitWithoutApplicationDoesNotThrow()
+    {
+        $consoleController = new TestConsoleController();
+        $this->assertFalse($consoleController->hasApplication());
+        $this->assertNull($consoleController->application());
+        $this->assertNull($consoleController->getApplication());
+        $this->assertTrue($consoleController->hasConsole());
+    }
+
+    public function testConsoleTraitSetters()
+    {
+        $consoleController = new TestConsoleController();
+        $application       = new Application();
+        $console           = new \Pop\Console\Console(120);
+
+        $consoleController->setApplication($application);
+        $consoleController->setConsole($console);
+
+        $this->assertSame($application, $consoleController->getApplication());
+        $this->assertSame($console, $consoleController->getConsole());
     }
 
 }

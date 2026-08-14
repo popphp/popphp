@@ -615,8 +615,8 @@ class Router
                             $parentClass      = get_parent_class($parentClass);
                         }
 
-                        if (in_array('Pop\Controller\HttpControllerTrait', $controllerTraits) ||
-                            in_array('Pop\Controller\ConsoleControllerTrait', $controllerTraits)) {
+                        if (in_array('Pop\Dispatch\HttpTrait', $controllerTraits) ||
+                            in_array('Pop\Dispatch\ConsoleTrait', $controllerTraits)) {
                             $this->controller = new $controller($application);
                         } else if ($isCommand) {
                             $this->controller = $controller::loadForApplication($application);

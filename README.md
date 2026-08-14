@@ -786,11 +786,11 @@ use the matching trait:
 namespace MyApp\Controller;
 
 use Pop\Controller\AbstractController;
-use Pop\Controller\HttpControllerTrait;
+use Pop\Dispatch\HttpTrait;
 
 class IndexController extends AbstractController
 {
-    use HttpControllerTrait;
+    use HttpTrait;
 
     public function index()
     {
@@ -801,11 +801,12 @@ class IndexController extends AbstractController
 }
 ```
 
-`Pop\Controller\ConsoleControllerTrait` is the CLI equivalent - it injects `$application` and a `Console`
-object instead, accessible via `$this->application()` and `$this->console()`.
+`Pop\Dispatch\ConsoleTrait` is the CLI equivalent - it injects `$application` and a `Console`
+object instead, accessible via `$this->application()` and `$this->console()`. Both traits live under
+`Pop\Dispatch\` (not `Pop\Controller\`) so they can be reused by any dispatchable class, not just controllers.
 
 The router detects these traits automatically - it walks up the controller's entire parent class chain
-looking for `HttpControllerTrait`/`ConsoleControllerTrait`, so a shared base controller can declare the trait
+looking for `HttpTrait`/`ConsoleTrait`, so a shared base controller can declare the trait
 once and every subclass picks it up. If neither trait is found anywhere in the hierarchy, the controller is
 instantiated with no constructor arguments at all.
 
@@ -1141,11 +1142,11 @@ From inside a controller object:
 namespace MyApp\Controller;
 
 use Pop\Controller\AbstractController;
-use Pop\Controller\HttpControllerTrait;
+use Pop\Dispatch\HttpTrait;
 
 class IndexController extends AbstractController
 {
-    use HttpControllerTrait;
+    use HttpTrait;
 
     public function index()
     {

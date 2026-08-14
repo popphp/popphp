@@ -1013,9 +1013,9 @@ class Application extends AbstractApplication implements \ArrayAccess
                         }
 
                         // Retrieve request object, or create one
-                        if (is_object($controller) && in_array('Pop\Controller\HttpControllerTrait', class_uses($controller))) {
+                        if (is_object($controller) && in_array('Pop\Dispatch\HttpTrait', class_uses($controller))) {
                             $request = $controller->request();
-                        } else if (is_object($controller) && in_array('Pop\Controller\ConsoleControllerTrait', class_uses($controller))) {
+                        } else if (is_object($controller) && in_array('Pop\Dispatch\ConsoleTrait', class_uses($controller))) {
                             $request = $controller->console();
                         } else if ($this->router->isHttp()) {
                             $request = new Request(new Uri());
