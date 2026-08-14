@@ -394,7 +394,7 @@ class RouterTest extends TestCase
             'myscript.php', 'help'
         ];
         $match = new Router\Match\Cli();
-        $this->assertFalse($match->match(['foo' => ['controller' => function() {}]]));
+        $this->assertFalse($match->match('foo'));
         ob_start();
         $match->noRouteFound(false);
         $result = ob_get_clean();
@@ -713,6 +713,128 @@ class RouterTest extends TestCase
         $router->route();
 
         $this->assertTrue($router->getRouteMatch()->hasDefaultRoute());
+    }
+
+    public function testCliForceRouteCarriesRequiredParam()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'unrelated'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('greet <name>', [
+            'controller' => function($name) { echo 'Greet'; },
+        ]);
+
+        $router->route('greet Nick');
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals('Nick', $router->getRouteMatch()->getParameter('name'));
+    }
+
+    public function testCliForceRouteCarriesShortOptionFlag()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'unrelated'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('tag <id> [--force]', [
+            'controller' => function($id) { echo 'Tag'; },
+        ]);
+
+        $router->route('tag 42 --force');
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals('42', $router->getRouteMatch()->getParameter('id'));
+        $this->assertTrue($router->getRouteMatch()->getOption('force'));
+    }
+
+    public function testCliForceRouteCarriesLongOptionValue()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'unrelated'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('send:email [-q|--quiet] <email>', [
+            'controller' => function($email) { echo 'Send'; },
+        ]);
+
+        $router->route('send:email --quiet test@test.com');
+        $this->assertTrue($router->hasRoute());
+        $this->assertTrue($router->getRouteMatch()->getOption('quiet'));
+        $this->assertEquals('test@test.com', $router->getRouteMatch()->getParameter('email'));
+    }
+
+    public function testCliForceRouteArrayFormPreservesValueWithSpaces()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'unrelated'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('send:email [-q|--quiet] <name>', [
+            'controller' => function($name) { echo 'Send'; },
+        ]);
+
+        $router->route(['send:email', '-q', 'John Smith']);
+        $this->assertTrue($router->hasRoute());
+        $this->assertTrue($router->getRouteMatch()->getOption('quiet'));
+        $this->assertEquals('John Smith', $router->getRouteMatch()->getParameter('name'));
+    }
+
+    public function testCliMatchResetsStaleRouteAfterFailedForceRoute()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('help', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match());
+        $this->assertNotNull($match->getOriginalRoute());
+
+        $this->assertFalse($match->match('nonexistent command'));
+        $this->assertNull($match->getOriginalRoute());
+    }
+
+    public function testCliMatchResetsHasAllRequiredAfterMissingParam()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'unrelated'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('greet <first> <last>', [
+            'controller' => function($first, $last) { echo 'Greet'; },
+        ]);
+
+        $router->route('greet Nick');
+        $this->assertFalse($router->hasRoute());
+
+        $router->route('greet Nick Sagona');
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals('Sagona', $router->getRouteMatch()->getParameter('last'));
+    }
+
+    public function testRouterRouteResetsStaleControllerAfterFailedMatch()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help',
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasController());
+
+        $router->route('nonexistent command');
+        $this->assertFalse($router->hasController());
+        $this->assertFalse($router->hasAction());
     }
 
 }

@@ -562,12 +562,16 @@ class Router
     /**
      * Route to the correct controller
      *
-     * @param  ?string $forceRoute
+     * @param  string|array|null $forceRoute
      * @throws Exception|ReflectionException
      * @return void
      */
-    public function route(?string $forceRoute = null): void
+    public function route(string|array|null $forceRoute = null): void
     {
+        $this->controller      = null;
+        $this->controllerClass = null;
+        $this->action          = null;
+
         if ($this->routeMatch->match($forceRoute)) {
             if ($this->routeMatch->hasController()) {
                 $controller         = $this->routeMatch->getController();

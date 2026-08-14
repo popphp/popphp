@@ -85,10 +85,26 @@ class Cli extends AbstractMatch
         // Trim the script name out of the arguments array
         array_shift($argv);
 
-        $this->segments    = $argv;
-        $this->routeString = implode(' ', $argv);
+        $this->seed($argv);
 
         return $this;
+    }
+
+    /**
+     * Seed the parsing inputs (segments and route string) from either
+     * pre-split argv-style segments or a raw command string
+     *
+     * @param  string|array $input
+     * @return void
+     */
+    protected function seed(string|array $input): void
+    {
+        $segments = is_array($input)
+            ? array_values($input)
+            : preg_split('/\s+/', trim($input), -1, PREG_SPLIT_NO_EMPTY);
+
+        $this->segments    = $segments;
+        $this->routeString = implode(' ', $segments);
     }
 
     /**
@@ -121,7 +137,14 @@ class Cli extends AbstractMatch
             $this->prepare();
         }
 
-        $routeToMatch = ($forceRoute !== null) ? $forceRoute : $this->routeString;
+        $this->route          = null;
+        $this->hasAllRequired = true;
+
+        if ($forceRoute !== null) {
+            $this->seed($forceRoute);
+        }
+
+        $routeToMatch = $this->routeString;
 
         foreach ($this->preparedRoutes as $regex => $controller) {
             if (preg_match($regex, $routeToMatch) != 0) {

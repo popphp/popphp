@@ -959,12 +959,12 @@ class Application extends AbstractApplication implements \ArrayAccess
     /**
      * Run the application
      *
-     * @param  bool    $exit
-     * @param  ?string $forceRoute
+     * @param  bool              $exit
+     * @param  string|array|null $forceRoute
      * @throws \Throwable
      * @return void
      */
-    public function run(bool $exit = true, ?string $forceRoute = null): void
+    public function run(bool $exit = true, string|array|null $forceRoute = null): void
     {
         try {
             $this->init();

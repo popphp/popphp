@@ -20,6 +20,7 @@ popphp
     - [HTTP Routes](#http-routes)
     - [CLI Routes](#cli-routes)
     - [Dynamic Routing](#dynamic-routing)
+    - [Forcing a Route](#forcing-a-route)
 * [Controllers](#controllers)
 * [Modules](#modules)
     - [Custom Modules](#custom-modules)
@@ -640,6 +641,36 @@ which will map a route like
 ./foo users edit 1001
 MyApp\Controller\UsersController->edit($id)
 ```
+
+#### Forcing a Route
+
+`Application::run(bool $exit = true, string|array|null $forceRoute = null)` and `Router::route(string|array|null $forceRoute = null)`
+both accept an optional route to match instead of the real request (`$_SERVER['argv']` for CLI, `$_SERVER['REQUEST_URI']`
+for HTTP). This is useful for dispatching a route programmatically - for example, running a CLI command from a
+queued job against an existing `Application` instance, outside of a real console invocation.
+
+A forced route carries its own params and options exactly like a real request does - a forced CLI command is
+parsed for its `<param>`s and `[--option]`s, and a forced HTTP path is parsed for its `:param`s, the same way
+the real, unforced route would be:
+
+```php
+$app->run(false, 'send:email --quiet 1001');   // string form
+$app->run(false, ['send:email', '-q', '1001']); // array form
+```
+
+```php
+$app->run(false, '/user/42');       // string form
+$app->run(false, ['user', '42']);   // array form
+```
+
+The array form takes pre-split segments (exactly like real `argv`), and is the only way to pass a value
+containing spaces - the string form is split on whitespace, so it has no quoting support
+(`'send:email -q "John Smith"'` will not work; pass `['send:email', '-q', 'John Smith']` instead).
+
+Each call to `route()`/`match()` re-parses its params/options fresh and clears any controller/action left over
+from a previous call, so it's safe to call `run()` repeatedly against the same `Application` instance (e.g. one
+job worker dispatching many commands) without a failed or different route on one call leaking state into the
+next.
 
 [Top](#popphp)
 

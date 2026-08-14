@@ -78,28 +78,49 @@ class Http extends AbstractMatch
     {
         $basePath       = str_replace([realpath($_SERVER['DOCUMENT_ROOT']), '\\'], ['', '/'], realpath(getcwd()));
         $this->basePath = !empty($basePath) ? $basePath : '';
-        $trailingSlash  = null;
 
         $path = ($this->basePath != '') ?
             substr($_SERVER['REQUEST_URI'], strlen($this->basePath)) : $_SERVER['REQUEST_URI'];
 
-        // Trim query string, if present
-        if (strpos($path, '?')) {
-            $path = substr($path, 0, strpos($path, '?'));
+        $this->seed($path);
+    }
+
+    /**
+     * Seed the parsing inputs (segments and route string) from either
+     * pre-split path segments or a raw path string
+     *
+     * @param  string|array $input
+     * @return void
+     */
+    protected function seed(string|array $input): void
+    {
+        $trailingSlash = null;
+
+        if (is_array($input)) {
+            $segments = array_values($input);
+        } else {
+            $path = $input;
+
+            // Trim query string, if present
+            if (strpos($path, '?')) {
+                $path = substr($path, 0, strpos($path, '?'));
+            }
+
+            // Trim trailing slash, if present
+            if (str_ends_with($path, '/')) {
+                $path          = substr($path, 0, -1);
+                $trailingSlash = '/';
+            }
+
+            $segments = ($path == '') ? [] : explode('/', substr($path, 1));
         }
 
-        // Trim trailing slash, if present
-        if (str_ends_with($path, '/')) {
-            $path          = substr($path, 0, -1);
-            $trailingSlash = '/';
-        }
-
-        if ($path == '') {
+        if (count($segments) === 0) {
             $this->segments    = ['index'];
             $this->routeString = '/';
         } else {
-            $this->segments    = explode('/', substr($path, 1));
-            $this->routeString = '/' . implode('/', $this->segments) . $trailingSlash;
+            $this->segments    = $segments;
+            $this->routeString = '/' . implode('/', $segments) . $trailingSlash;
         }
     }
 
@@ -255,7 +276,11 @@ class Http extends AbstractMatch
         $this->methodMismatch = false;
         $this->allowedMethods = [];
 
-        $routeToMatch  = $forceRoute ?? $this->routeString;
+        if ($forceRoute !== null) {
+            $this->seed($forceRoute);
+        }
+
+        $routeToMatch  = $this->routeString;
         $requestMethod = strtolower((string)($_SERVER['REQUEST_METHOD'] ?? 'get'));
         $pathMatched   = false;
         $directMatch   = null;
