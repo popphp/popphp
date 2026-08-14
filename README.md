@@ -667,6 +667,10 @@ The array form takes pre-split segments (exactly like real `argv`), and is the o
 containing spaces - the string form is split on whitespace, so it has no quoting support
 (`'send:email -q "John Smith"'` will not work; pass `['send:email', '-q', 'John Smith']` instead).
 
+A forced HTTP route is matched as-is - unlike the real `REQUEST_URI`, it is not stripped of the app's
+`basePath` first. If the app is deployed under a subdirectory, pass the path relative to that subdirectory
+(`'/user/42'`, not `'/subdir/user/42'`).
+
 Each call to `route()`/`match()` re-parses its params/options fresh and clears any controller/action/params left
 over from a previous call, so it's safe to call `run()` repeatedly against the same `Application` instance (e.g.
 one job worker dispatching many commands) without a failed or different route on one call leaking state into the

@@ -263,7 +263,7 @@ class Http extends AbstractMatch
     /**
      * Match the route
      *
-     * @param  mixed $forceRoute
+     * @param  string|array|null $forceRoute
      * @return bool
      */
     public function match(mixed $forceRoute = null): bool

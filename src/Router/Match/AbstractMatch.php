@@ -601,7 +601,7 @@ abstract class AbstractMatch implements MatchInterface
     /**
      * Match the route
      *
-     * @param  mixed $forceRoute
+     * @param  string|array|null $forceRoute
      * @return bool
      */
     abstract public function match(mixed $forceRoute = null): bool;
