@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -211,7 +213,7 @@ class Http extends AbstractMatch
         $method = array_unique(array_map('strtolower', (array)$method));
         sort($method);
 
-        return array_values($method);
+        return $method;
     }
 
     /**

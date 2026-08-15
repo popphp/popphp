@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -107,7 +109,7 @@ class Router
      * Add a route name
      *
      * @param  string $routeName
-     * @return Router
+     * @return static
      */
     public function name(string $routeName): static
     {
@@ -316,6 +318,7 @@ class Router
     /**
      * Determine if the route is HTTP
      *
+     * @phpstan-assert-if-true Match\Http $this->routeMatch
      * @return bool
      */
     public function isHttp(): bool
@@ -633,10 +636,6 @@ class Router
                         $this->dispatchable = (in_array('Pop\Dispatch\HttpTrait', $dispatchableTraits) ||
                             in_array('Pop\Dispatch\ConsoleTrait', $dispatchableTraits)) ?
                             new $dispatchable($application) : new $dispatchable();
-                    }
-
-                    if (!($this->dispatchable instanceof \Pop\Dispatch\DispatchableInterface)) {
-                        throw new Exception('Error: The dispatchable must be an instance of Pop\Dispatch\DispatchableInterface');
                     }
 
                     $action       = $this->routeMatch->getAction();

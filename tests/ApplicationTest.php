@@ -804,7 +804,7 @@ class ApplicationTest extends TestCase
     public function testRunClosureControllerWithParam()
     {
         $_SERVER['argv'] = [
-            'myscript.php', 'edit', 1001
+            'myscript.php', 'edit', '1001'
         ];
 
         $config = [
@@ -848,7 +848,7 @@ class ApplicationTest extends TestCase
     public function testRunClassControllerWithParam()
     {
         $_SERVER['argv'] = [
-            'myscript.php', 'edit', 1002
+            'myscript.php', 'edit', '1002'
         ];
 
         $config = [

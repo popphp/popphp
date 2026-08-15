@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -84,6 +86,30 @@ interface MatchInterface
      * @return MatchInterface
      */
     public function removeDispatchableParams(string $dispatchable): MatchInterface;
+
+    /**
+     * Add a route name
+     *
+     * @param  string $routeName
+     * @return MatchInterface
+     */
+    public function name(string $routeName): MatchInterface;
+
+    /**
+     * Has a route name
+     *
+     * @param  string $routeName
+     * @return bool
+     */
+    public function hasName(string $routeName): bool;
+
+    /**
+     * Get route config
+     *
+     * @param  ?string $key
+     * @return mixed
+     */
+    public function getRouteConfig(?string $key = null): mixed;
 
     /**
      * Get the route string

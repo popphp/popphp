@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -30,7 +32,7 @@ class ListenerProvider implements ListenerProviderInterface
 
     /**
      * Listeners, keyed by exact event class name
-     * @var array
+     * @var array<string, \SplPriorityQueue>
      */
     protected array $listeners = [];
 

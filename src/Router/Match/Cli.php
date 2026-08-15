@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -86,8 +88,6 @@ class Cli extends AbstractMatch
         array_shift($argv);
 
         $this->seed($argv);
-
-        return $this;
     }
 
     /**
@@ -172,7 +172,7 @@ class Cli extends AbstractMatch
             return false;
         }
 
-        return ((($this->route !== null) && ($this->hasAllRequired)) || (($this->dynamicRoute !== null) || ($this->defaultRoute !== null)));
+        return (($this->route !== null) || ($this->dynamicRoute !== null) || ($this->defaultRoute !== null));
     }
 
     /**
@@ -373,7 +373,7 @@ class Cli extends AbstractMatch
         // Get route optional parameters [<param>]
         preg_match_all('/\[<[a-zA-Z0-9-_:|]*>\]/', $route, $optionalParameters, PREG_OFFSET_CAPTURE);
 
-        $routeRegex .= (isset($requiredParameters[0]) && isset($requiredParameters[0][0])) ? ' (.*)$' : '(.*)$';
+        $routeRegex .= (isset($requiredParameters[0][0])) ? ' (.*)$' : '(.*)$';
 
         foreach ($options[0] as $option) {
             if (str_contains($option[0], '--')) {

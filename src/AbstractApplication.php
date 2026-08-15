@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -245,7 +247,7 @@ abstract class AbstractApplication implements ApplicationInterface
     public function mergeConfig(mixed $config, bool $preserve = false, array $exclude = []): AbstractApplication
     {
         // Apply exclusions only to array-like config (Config\Config, array, ArrayAccess, ArrayObject)
-        if (!empty($exclude) && (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject) || ($config instanceof Config\Config))) {
+        if (!empty($exclude) && (is_array($config) || ($config instanceof \ArrayAccess))) {
             // Materialize a plain-array COPY before stripping excluded keys, regardless of the
             // original type, so the unset() below never mutates the caller's live config object
             // (e.g. an ArrayObject or other ArrayAccess handle passed in by reference/identity).
@@ -263,7 +265,7 @@ abstract class AbstractApplication implements ApplicationInterface
 
         if ($this->config instanceof Config\Config) {
             $this->config->merge($config, $preserve);
-        } else if (is_array($config) || ($config instanceof \ArrayAccess) || ($config instanceof \ArrayObject)) {
+        } else if (is_array($config) || ($config instanceof \ArrayAccess)) {
             if ($config instanceof Config\Config) {
                 $config = $config->toArray();
             }

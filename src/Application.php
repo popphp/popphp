@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -29,7 +31,13 @@ use ReflectionException;
  * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  * @version    5.0.0
- * @property   $config mixed
+ * @property   mixed                              $config
+ * @property   ?Router\Router                     $router
+ * @property   ?Service\Locator                   $services
+ * @property   ?Event\Manager                     $events
+ * @property   ?Middleware\Manager                $middleware
+ * @property   ?Module\Manager                    $modules
+ * @property   ?\Composer\Autoload\ClassLoader     $autoloader
  */
 class Application extends AbstractApplication implements \ArrayAccess
 {
@@ -193,7 +201,7 @@ class Application extends AbstractApplication implements \ArrayAccess
         if (isset($this->config['events']) && ($this->events !== null)) {
             foreach ($this->config['events'] as $event) {
                 if (isset($event['name']) && isset($event['action'])) {
-                    $this->on($event['name'], $event['action'], ((int)$event['priority'] ?? 0));
+                    $this->on($event['name'], $event['action'], ((int)($event['priority'] ?? 0)));
                 }
             }
         }

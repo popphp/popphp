@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -240,7 +242,7 @@ class Locator extends AbstractManager implements ContainerInterface
     {
         if (isset($this->items[$name])) {
             if ($key !== null) {
-                $this->items[$name]->addNamedParameter($key, $param);
+                $this->items[$name]->addNamedParameter((string)$key, $param);
             } else {
                 $this->items[$name]->addParameter($param);
             }
@@ -261,11 +263,11 @@ class Locator extends AbstractManager implements ContainerInterface
     {
         if ($this->hasParameter($name)) {
             if ($key !== null) {
-                $this->items[$name]->removeParameter($key);
+                $this->items[$name]->removeParameter((string)$key);
             } else {
                 foreach ($this->items[$name]->getParameters() as $key => $value) {
                     if ($value == $param) {
-                        $this->items[$name]->removeParameter($key);
+                        $this->items[$name]->removeParameter((string)$key);
                         break;
                     }
                 }

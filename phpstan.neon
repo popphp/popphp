@@ -1,0 +1,10 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    ignoreErrors:
+        -
+            # Only consumed outside src/ (pop-console, application controllers), so
+            # PHPStan can't see any usage within the analysed paths.
+            identifier: trait.unused
+            path: src/Dispatch/*.php

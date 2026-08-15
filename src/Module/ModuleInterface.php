@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -27,6 +29,21 @@ use Pop\Application;
  */
 interface ModuleInterface
 {
+
+    /**
+     * Set name
+     *
+     * @param  string $name
+     * @return static
+     */
+    public function setName(string $name): static;
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName(): string;
 
     /**
      * Get application

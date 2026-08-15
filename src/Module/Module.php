@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -27,7 +29,7 @@ use Pop\Utils\Helper;
  * @copyright  Copyright (c) 2009-2027 NOLA Interactive, LLC.
  * @license    https://www.popphp.org/license     New BSD License
  * @version    5.0.0
- * @property   $config mixed
+ * @property   mixed $config
  */
 class Module extends AbstractModule implements \ArrayAccess
 {
@@ -50,7 +52,7 @@ class Module extends AbstractModule implements \ArrayAccess
         foreach ($args as $arg) {
             if ($arg instanceof Application) {
                 $application = $arg;
-            } else if (is_array($arg) || ($arg instanceof \ArrayAccess) || ($arg instanceof \ArrayObject)) {
+            } else if (is_array($arg) || ($arg instanceof \ArrayAccess)) {
                 $config = $arg;
             } else if (preg_match('/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$/', $arg)) {
                 $version = $arg;
@@ -102,7 +104,7 @@ class Module extends AbstractModule implements \ArrayAccess
 
             // If the autoloader is set and the module config has a
             // defined prefix and src, register the module with the autoloader
-            if (($this->application !== null) && ($this->application->autoloader() !== null) &&
+            if (($this->application->autoloader() !== null) &&
                 isset($this->config['prefix']) && isset($this->config['src']) && file_exists($this->config['src'])
             ) {
                 // Register as PSR-0
@@ -115,19 +117,19 @@ class Module extends AbstractModule implements \ArrayAccess
             }
 
             // If routes are set in the module config, register them with the application
-            if (isset($this->config['routes']) && ($this->application !== null) && ($this->application->router() !== null)) {
+            if (isset($this->config['routes']) && ($this->application->router() !== null)) {
                 $this->application->router()->addRoutes($this->config['routes']);
             }
 
             // If services are set in the module config, register them with the application
-            if (isset($this->config['services']) && ($this->application !== null) && ($this->application->services() !== null)) {
+            if (isset($this->config['services']) && ($this->application->services() !== null)) {
                 foreach ($this->config['services'] as $name => $service) {
                     $this->application->setService($name, $service);
                 }
             }
 
             // If events are set in the module config, register them with the application
-            if (isset($this->config['events']) && ($this->application !== null) && ($this->application->events() !== null)) {
+            if (isset($this->config['events']) && ($this->application->events() !== null)) {
                 foreach ($this->config['events'] as $event) {
                     if (isset($event['name']) && isset($event['action'])) {
                         $this->application->on(

@@ -2,9 +2,9 @@ name: phpunit
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dev ]
 
 env:
   XDEBUG_MODE: debug,coverage
@@ -16,7 +16,6 @@ jobs:
     strategy:
       matrix:
         php-versions: [ '8.4', '8.5' ]
-        phpunit-versions: ['12.5.0']
 
     steps:
       - uses: actions/checkout@v6
@@ -25,7 +24,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          tools: phpunit:${{ matrix.phpunit-versions }}
 
       #- name: Validate composer.json and composer.lock
       #  run: composer validate
@@ -41,3 +39,6 @@ jobs:
 
       - name: Run test suite
         run: composer run-script test
+
+      - name: Run analyse suite
+        run: composer run-script analyse

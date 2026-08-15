@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Pop PHP Framework (https://www.popphp.org/)
  *
@@ -83,7 +85,7 @@ class Manager extends AbstractManager
      * @param  string $name
      * @param  mixed  $action
      * @param  int    $priority
-     * @return Manager
+     * @return static
      */
     public function on(string $name, mixed $action, int $priority = 0): static
     {
@@ -103,7 +105,7 @@ class Manager extends AbstractManager
      *
      * @param  string $name
      * @param  mixed  $action
-     * @return Manager
+     * @return static
      */
     public function off(string $name, mixed $action): static
     {
