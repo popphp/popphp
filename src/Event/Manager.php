@@ -34,18 +34,6 @@ class Manager extends AbstractManager implements EventDispatcherInterface, Liste
 {
 
     /**
-     * Constant to stop the event manager
-     * @var string
-     */
-    const STOP = 'Pop\Event\Manager::STOP';
-
-    /**
-     * Constant to send a kill signal to the application
-     * @var string
-     */
-    const KILL = 'Pop\Event\Manager::KILL';
-
-    /**
      * Event results
      * @var array
      */
@@ -56,12 +44,6 @@ class Manager extends AbstractManager implements EventDispatcherInterface, Liste
      * @var array<string, \SplPriorityQueue>
      */
     protected array $classListeners = [];
-
-    /**
-     * Event 'alive' tracking flag
-     * @var bool
-     */
-    protected bool $alive = true;
 
     /**
      * Constructor
@@ -170,16 +152,6 @@ class Manager extends AbstractManager implements EventDispatcherInterface, Liste
     }
 
     /**
-     * Determine if the project application is still alive or has been killed
-     *
-     * @return bool
-     */
-    public function alive(): bool
-    {
-        return $this->alive;
-    }
-
-    /**
      * Register a listener for an event class - called with the raw event object as its sole argument
      *
      * @param  string   $eventClass
@@ -226,9 +198,17 @@ class Manager extends AbstractManager implements EventDispatcherInterface, Liste
     {
         foreach ($this->getListenersForEvent($event) as $listener) {
             if (($event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
-                break;
+                return $event;
             }
             $listener($event);
+        }
+
+        if (($event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
+            return $event;
+        }
+
+        if (($event instanceof AbstractEvent) && isset($this->items[$event->getName()])) {
+            $this->dispatchNamed($event->getName(), $event);
         }
 
         return $event;
@@ -243,29 +223,44 @@ class Manager extends AbstractManager implements EventDispatcherInterface, Liste
      */
     public function trigger(string $name, array $params = []): void
     {
-        if (isset($this->items[$name])) {
-            $this->results[$name] = [];
+        $this->dispatch(new Event($name, $params));
+    }
 
-            // Iterate a clone, not $this->items[$name] itself - SplPriorityQueue
-            // iteration destructively dequeues, and an early return on STOP
-            // would otherwise leave undequeued listeners stuck in the original
-            // queue, permanently missing from every future trigger() call for
-            // this name (same technique off() already uses above).
-            $listeners = clone $this->items[$name];
+    /**
+     * Dispatch a name-indexed event's listeners - always called positionally,
+     * sourced from $event->toParams() plus an appended 'result' (previous
+     * listener's return value, same chaining as before this event object
+     * existed) and 'event' (the event object itself, appended last so it
+     * never shifts the positional index of a key an existing listener
+     * already reads - a listener that wants stopPropagation() declares one
+     * extra trailing parameter to receive it, everyone else is unaffected).
+     *
+     * @param  string       $name
+     * @param  AbstractEvent $event
+     * @return void
+     */
+    protected function dispatchNamed(string $name, AbstractEvent $event): void
+    {
+        $this->results[$name] = [];
 
-            foreach ($listeners as $action) {
-                if (end($this->results[$name]) === self::STOP) {
-                    return;
-                }
+        // Iterate a clone, not $this->items[$name] itself - SplPriorityQueue
+        // iteration destructively dequeues, and an early return on a stopped
+        // event would otherwise leave undequeued listeners stuck in the
+        // original queue, permanently missing from every future trigger()
+        // call for this name (same technique off() already uses above).
+        $listeners = clone $this->items[$name];
 
-                $params['result']       = end($this->results[$name]);
-                $result                 = $action->call($params);
-                $this->results[$name][] = $result;
-
-                if ($result === self::KILL) {
-                    $this->alive = false;
-                }
+        foreach ($listeners as $action) {
+            if ($event->isPropagationStopped()) {
+                return;
             }
+
+            $params            = $event->toParams();
+            $params['result']  = end($this->results[$name]);
+            $params['event']   = $event;
+
+            $result                 = $action->call($params);
+            $this->results[$name][] = $result;
         }
     }
 

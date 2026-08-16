@@ -63,37 +63,6 @@ class EventTest extends TestCase
         $this->assertNotNull($events->get('hello'));
     }
 
-    public function testAlive()
-    {
-        $events = new Manager('foo', function(){
-            return Manager::KILL;
-        });
-        $events->trigger('foo');
-        $this->assertFalse($events->alive());
-    }
-
-    public function testBooleanTrueDoesNotFalselyTriggerKillOrStop()
-    {
-        // STOP/KILL are non-empty strings; loose == comparison casts a bool
-        // to true against any non-empty string, so a listener returning
-        // plain `true` (an extremely ordinary "handled successfully" return
-        // value) used to be indistinguishable from an explicit KILL/STOP
-        // signal. Strict === comparison fixes this without changing what a
-        // listener that deliberately returns Manager::STOP/KILL does.
-        $events = new Manager();
-        $events->on('foo', function() {
-            return true;
-        }, 2);
-        $events->on('foo', function() {
-            return 456;
-        }, 1);
-
-        $events->trigger('foo');
-
-        $this->assertTrue($events->alive());
-        $this->assertEquals([true, 456], $events->getResults('foo'));
-    }
-
     public function testCallable()
     {
         $events = new Manager();
@@ -126,8 +95,9 @@ class EventTest extends TestCase
         $events->on('foo', function(){
             return 123;
         }, 3);
-        $events->on('foo', function(){
-            return Manager::STOP;
+        $events->on('foo', function($result = null, $event = null){
+            $event->stopPropagation();
+            return 'stopped';
         }, 2);
         $events->on('foo', function(){
             return 456;
@@ -140,29 +110,31 @@ class EventTest extends TestCase
 
     public function testStopDoesNotPermanentlyDisableLaterTriggers()
     {
-        // Returns STOP only on the first call, so the two trigger() calls
-        // below can distinguish "a stale STOP leaked forward and disabled
-        // this event name" from "a listener that always returns STOP
-        // correctly halts every call" (which would still be correct
-        // behavior, not a bug, and isn't what this test is checking).
+        // Returns 'stopped' only on the first call, so the two trigger() calls
+        // below can distinguish "propagation stays stopped across separate
+        // trigger() calls" (a bug - Manager builds a fresh Event per call) from
+        // "the chain runs fully on the second call" (correct).
         $callCount = 0;
         $events    = new Manager();
-        $events->on('foo', function() use (&$callCount) {
+        $events->on('foo', function($result = null, $event = null) use (&$callCount) {
             $callCount++;
-            return ($callCount === 1) ? Manager::STOP : 'not-stop';
+            if ($callCount === 1) {
+                $event->stopPropagation();
+                return 'stopped';
+            }
+            return 'not-stop';
         }, 2);
         $events->on('foo', function() {
             return 456;
         }, 1);
 
-        // First call: STOP halts the second listener.
+        // First call: stopPropagation() halts the second listener.
         $events->trigger('foo');
-        $this->assertEquals([Manager::STOP], $events->getResults('foo'));
+        $this->assertEquals(['stopped'], $events->getResults('foo'));
 
-        // Second call, same event name, same instance: the first listener no
-        // longer returns STOP, so the chain must run fully - proving the
-        // previous call's STOP result doesn't leak forward and permanently
-        // disable this event name.
+        // Second call, same event name, same Manager instance: trigger() builds
+        // a fresh Event object every call, so propagation is never
+        // pre-stopped going in - the chain must run fully.
         $events->trigger('foo');
         $this->assertEquals(['not-stop', 456], $events->getResults('foo'));
     }
@@ -313,6 +285,41 @@ class EventTest extends TestCase
         $events->dispatch(new \Pop\Event\RoutePreEvent(new \Pop\Application()));
 
         $this->assertEquals(['first'], $calls);
+    }
+
+    public function testDispatchCallsBothClassIndexedAndNameIndexedListeners()
+    {
+        $events = new Manager();
+        $calls  = [];
+
+        $events->listen(\Pop\Event\RoutePreEvent::class, function() use (&$calls) {
+            $calls[] = 'class-indexed';
+        });
+        $events->on('app.route.pre', function() use (&$calls) {
+            $calls[] = 'name-indexed';
+        });
+
+        $events->dispatch(new \Pop\Event\RoutePreEvent(new \Pop\Application()));
+
+        $this->assertEquals(['class-indexed', 'name-indexed'], $calls);
+    }
+
+    public function testStopPropagationDuringClassIndexedListenersSkipsNameIndexedListeners()
+    {
+        $events = new Manager();
+        $calls  = [];
+
+        $events->listen(\Pop\Event\RoutePreEvent::class, function($event) use (&$calls) {
+            $calls[] = 'class-indexed';
+            $event->stopPropagation();
+        });
+        $events->on('app.route.pre', function() use (&$calls) {
+            $calls[] = 'name-indexed';
+        });
+
+        $events->dispatch(new \Pop\Event\RoutePreEvent(new \Pop\Application()));
+
+        $this->assertEquals(['class-indexed'], $calls);
     }
 
 }
