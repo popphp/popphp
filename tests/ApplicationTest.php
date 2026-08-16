@@ -1033,7 +1033,7 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Page Not Found', $result);
     }
 
-    public function testPsr14DispatcherFiresAlongsideLegacyEventsOnRun()
+    public function testListenFiresForTypedRoutePreEventOnRun()
     {
         $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
         $_SERVER['REQUEST_URI']    = '/';
@@ -1043,8 +1043,8 @@ class ApplicationTest extends TestCase
         $app   = new Application(new Router(null, new \Pop\Router\Match\Http()));
         $app->get('/', function() { echo 'Index'; });
 
-        $app->dispatcher()->listeners()->listen(
-            \Pop\Event\Psr14\RoutePreEvent::class,
+        $app->events()->listen(
+            \Pop\Event\RoutePreEvent::class,
             function($event) use (&$calls, $app) {
                 $calls[] = ($event->application() === $app);
             }
@@ -1057,7 +1057,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals([true], $calls);
     }
 
-    public function testPsr14ErrorEventCarriesTheThrownException()
+    public function testListenFiresForTypedErrorEventOnRun()
     {
         $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
         $_SERVER['REQUEST_URI']    = '/';
@@ -1069,8 +1069,8 @@ class ApplicationTest extends TestCase
         });
 
         $caught = null;
-        $app->dispatcher()->listeners()->listen(
-            \Pop\Event\Psr14\ErrorEvent::class,
+        $app->events()->listen(
+            \Pop\Event\ErrorEvent::class,
             function($event) use (&$caught) { $caught = $event->exception(); }
         );
 
@@ -1085,6 +1085,42 @@ class ApplicationTest extends TestCase
             $this->assertInstanceOf('Pop\Exception', $caught);
             $this->assertEquals('boom', $caught->getMessage());
         }
+    }
+
+    public function testAbortExceptionHaltsRunCleanlyWithoutFiringAppError()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/', function() { echo 'Index'; });
+
+        $errorFired = false;
+        $app->on('app.error', function() use (&$errorFired) {
+            $errorFired = true;
+        });
+        $app->on('app.route.pre', function() {
+            throw new \Pop\Event\AbortException('Aborting.');
+        });
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        $this->assertEquals('', $result);
+        $this->assertFalse($errorFired);
+    }
+
+    public function testAbortExceptionFromInitPropagatesWhenInitCalledStandalone()
+    {
+        $app = new Application();
+        $app->on('app.init', function() {
+            throw new \Pop\Event\AbortException('Aborting.');
+        });
+
+        $this->expectException(\Pop\Event\AbortException::class);
+        $app->init();
     }
 
     public function testMaintenanceModeRunsControllersOwnMaintenanceAction()
