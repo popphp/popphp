@@ -60,12 +60,6 @@ class Application extends AbstractApplication implements \ArrayAccess
     protected ?Event\Manager $events = null;
 
     /**
-     * PSR-14 event dispatcher (additive - does not replace the event manager above)
-     * @var ?Event\Psr14\Dispatcher
-     */
-    protected ?Event\Psr14\Dispatcher $psr14Dispatcher = null;
-
-    /**
      * Middleware manager
      * @var ?Middleware\Manager
      */
@@ -166,9 +160,6 @@ class Application extends AbstractApplication implements \ArrayAccess
         }
         if ($this->events === null) {
             $this->registerEvents(new Event\Manager());
-        }
-        if ($this->psr14Dispatcher === null) {
-            $this->psr14Dispatcher = new Event\Psr14\Dispatcher(new Event\Psr14\ListenerProvider());
         }
         if ($this->middleware === null) {
             $this->registerMiddleware(new Middleware\Manager());
@@ -294,8 +285,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      */
     public function init(): static
     {
-        $this->trigger('app.init');
-        $this->psr14Dispatcher?->dispatch(new Event\Psr14\InitEvent($this));
+        $this->events->dispatch(new Event\InitEvent($this));
         return $this;
     }
 
@@ -337,16 +327,6 @@ class Application extends AbstractApplication implements \ArrayAccess
     public function events(): ?Event\Manager
     {
         return $this->events;
-    }
-
-    /**
-     * Get the PSR-14 event dispatcher (additive - does not replace the event manager)
-     *
-     * @return ?Event\Psr14\Dispatcher
-     */
-    public function dispatcher(): ?Event\Psr14\Dispatcher
-    {
-        return $this->psr14Dispatcher;
     }
 
     /**
@@ -1044,16 +1024,14 @@ class Application extends AbstractApplication implements \ArrayAccess
         try {
             $this->init();
 
-            // Trigger any app.route.pre events
-            $this->trigger('app.route.pre');
-            $this->psr14Dispatcher?->dispatch(new Event\Psr14\RoutePreEvent($this));
+            // Fire any app.route.pre listeners
+            $this->events->dispatch(new Event\RoutePreEvent($this));
 
             if (($this->router !== null)) {
                 $this->router->route($forceRoute);
 
-                // Trigger any app.dispatch.post events
-                $this->trigger('app.dispatch.pre');
-                $this->psr14Dispatcher?->dispatch(new Event\Psr14\DispatchPreEvent($this));
+                // Fire any app.dispatch.pre listeners
+                $this->events->dispatch(new Event\DispatchPreEvent($this));
 
                 // Dispatch
                 if ($this->router->hasDispatchable()) {
@@ -1090,14 +1068,14 @@ class Application extends AbstractApplication implements \ArrayAccess
                     }
                 }
 
-                // Trigger any app.dispatch.post events
-                $this->trigger('app.dispatch.post');
-                $this->psr14Dispatcher?->dispatch(new Event\Psr14\DispatchPostEvent($this));
+                // Fire any app.dispatch.post listeners
+                $this->events->dispatch(new Event\DispatchPostEvent($this));
             }
+        } catch (Event\AbortException) {
+            return;
         } catch (\Throwable $exception) {
-            // Trigger any app.error events
-            $this->trigger('app.error', ['exception' => $exception]);
-            $this->psr14Dispatcher?->dispatch(new Event\Psr14\ErrorEvent($this, $exception));
+            // Fire any app.error listeners
+            $this->events->dispatch(new Event\ErrorEvent($this, $exception));
             throw $exception;
         }
     }
