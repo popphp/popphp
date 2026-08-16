@@ -243,4 +243,76 @@ class EventTest extends TestCase
         $this->assertEquals('Aborting.', $exception->getMessage());
     }
 
+    public function testListenRegistersListenerCalledWithTheEventObject()
+    {
+        $events   = new Manager();
+        $received = null;
+
+        $events->listen(\Pop\Event\RoutePreEvent::class, function($event) use (&$received) {
+            $received = $event;
+        });
+
+        $event = new \Pop\Event\RoutePreEvent(new \Pop\Application());
+        $events->dispatch($event);
+
+        $this->assertSame($event, $received);
+    }
+
+    public function testListenReturnsListenersForExactEventClassOnly()
+    {
+        $events = new Manager();
+        $calls  = [];
+
+        $events->listen(\Pop\Event\RoutePreEvent::class, function() use (&$calls) {
+            $calls[] = 'route-pre';
+        });
+
+        $app = new \Pop\Application();
+        $events->dispatch(new \Pop\Event\RoutePreEvent($app));
+        $events->dispatch(new \Pop\Event\DispatchPreEvent($app));
+
+        $this->assertEquals(['route-pre'], $calls);
+    }
+
+    public function testListenRespectsPriorityOrder()
+    {
+        $events = new Manager();
+        $order  = [];
+
+        $events->listen(\Pop\Event\RoutePreEvent::class, function() use (&$order) { $order[] = 'low'; }, 1);
+        $events->listen(\Pop\Event\RoutePreEvent::class, function() use (&$order) { $order[] = 'high'; }, 10);
+
+        $events->dispatch(new \Pop\Event\RoutePreEvent(new \Pop\Application()));
+
+        $this->assertEquals(['high', 'low'], $order);
+    }
+
+    public function testDispatchReturnsTheSameEventInstance()
+    {
+        $events = new Manager();
+        $event  = new \Pop\Event\RoutePreEvent(new \Pop\Application());
+
+        $result = $events->dispatch($event);
+
+        $this->assertSame($event, $result);
+    }
+
+    public function testClassIndexedStopPropagationHaltsRemainingClassIndexedListeners()
+    {
+        $events = new Manager();
+        $calls  = [];
+
+        $events->listen(\Pop\Event\RoutePreEvent::class, function($event) use (&$calls) {
+            $calls[] = 'first';
+            $event->stopPropagation();
+        }, 10);
+        $events->listen(\Pop\Event\RoutePreEvent::class, function() use (&$calls) {
+            $calls[] = 'second';
+        }, 1);
+
+        $events->dispatch(new \Pop\Event\RoutePreEvent(new \Pop\Application()));
+
+        $this->assertEquals(['first'], $calls);
+    }
+
 }
