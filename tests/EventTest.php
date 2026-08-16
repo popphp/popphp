@@ -236,4 +236,11 @@ class EventTest extends TestCase
         $this->assertNull($event->get('missing'));
     }
 
+    public function testAbortExceptionIsAnEventException()
+    {
+        $exception = new \Pop\Event\AbortException('Aborting.');
+        $this->assertInstanceOf(\Pop\Event\Exception::class, $exception);
+        $this->assertEquals('Aborting.', $exception->getMessage());
+    }
+
 }
