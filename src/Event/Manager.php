@@ -16,6 +16,9 @@ namespace Pop\Event;
 
 use Pop\AbstractManager;
 use Pop\Utils\CallableObject;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
+use Psr\EventDispatcher\StoppableEventInterface;
 
 /**
  * Event manager class
@@ -27,7 +30,7 @@ use Pop\Utils\CallableObject;
  * @license    https://www.popphp.org/license     New BSD License
  * @version    5.0.0
  */
-class Manager extends AbstractManager
+class Manager extends AbstractManager implements EventDispatcherInterface, ListenerProviderInterface
 {
 
     /**
@@ -47,6 +50,12 @@ class Manager extends AbstractManager
      * @var array
      */
     protected array $results = [];
+
+    /**
+     * Class-indexed listeners, keyed by exact event class name
+     * @var array<string, \SplPriorityQueue>
+     */
+    protected array $classListeners = [];
 
     /**
      * Event 'alive' tracking flag
@@ -168,6 +177,61 @@ class Manager extends AbstractManager
     public function alive(): bool
     {
         return $this->alive;
+    }
+
+    /**
+     * Register a listener for an event class - called with the raw event object as its sole argument
+     *
+     * @param  string   $eventClass
+     * @param  callable $listener
+     * @param  int      $priority
+     * @return static
+     */
+    public function listen(string $eventClass, callable $listener, int $priority = 0): static
+    {
+        if (!isset($this->classListeners[$eventClass])) {
+            $this->classListeners[$eventClass] = new \SplPriorityQueue();
+        }
+        $this->classListeners[$eventClass]->insert($listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Get the class-indexed listeners for an event, matched by exact event class only
+     *
+     * @param  object $event
+     * @return iterable
+     */
+    public function getListenersForEvent(object $event): iterable
+    {
+        $eventClass = $event::class;
+
+        if (!isset($this->classListeners[$eventClass])) {
+            return [];
+        }
+
+        // Clone before iterating - SplPriorityQueue iteration is destructive,
+        // same reasoning as trigger()'s existing clone below.
+        return clone $this->classListeners[$eventClass];
+    }
+
+    /**
+     * Dispatch an event to its class-indexed listeners
+     *
+     * @param  object $event
+     * @return object
+     */
+    public function dispatch(object $event): object
+    {
+        foreach ($this->getListenersForEvent($event) as $listener) {
+            if (($event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
+                break;
+            }
+            $listener($event);
+        }
+
+        return $event;
     }
 
     /**
