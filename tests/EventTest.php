@@ -187,4 +187,53 @@ class EventTest extends TestCase
         $this->assertEquals([null, null], $seenResults);
     }
 
+    public function testApplicationEventsCarryTheApplicationInstance()
+    {
+        $app = new \Pop\Application();
+
+        foreach ([
+            \Pop\Event\InitEvent::class,
+            \Pop\Event\RoutePreEvent::class,
+            \Pop\Event\DispatchPreEvent::class,
+            \Pop\Event\DispatchPostEvent::class,
+        ] as $class) {
+            $event = new $class($app);
+            $this->assertSame($app, $event->application());
+        }
+    }
+
+    public function testErrorEventCarriesTheExceptionAndTheApplication()
+    {
+        $app       = new \Pop\Application();
+        $exception = new \RuntimeException('boom');
+        $event     = new \Pop\Event\ErrorEvent($app, $exception);
+
+        $this->assertSame($app, $event->application());
+        $this->assertSame($exception, $event->exception());
+        $this->assertEquals(
+            ['exception' => $exception, 'application' => $app],
+            $event->toParams()
+        );
+    }
+
+    public function testEventsAreStoppable()
+    {
+        $event = new \Pop\Event\RoutePreEvent(new \Pop\Application());
+        $this->assertInstanceOf(\Psr\EventDispatcher\StoppableEventInterface::class, $event);
+        $this->assertFalse($event->isPropagationStopped());
+
+        $event->stopPropagation();
+        $this->assertTrue($event->isPropagationStopped());
+    }
+
+    public function testGenericEventExposesNameParamsAndGet()
+    {
+        $event = new \Pop\Event\Event('foo.bar', ['baz' => 123]);
+
+        $this->assertEquals('foo.bar', $event->getName());
+        $this->assertEquals(['baz' => 123], $event->toParams());
+        $this->assertEquals(123, $event->get('baz'));
+        $this->assertNull($event->get('missing'));
+    }
+
 }
