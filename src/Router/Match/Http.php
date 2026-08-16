@@ -378,18 +378,26 @@ class Http extends AbstractMatch
      */
     public function noRouteFound(bool $exit = true): void
     {
-        if (!headers_sent()) {
-            header('HTTP/1.1 404 Not Found');
+        if ($this->wantsJson()) {
+            if (!headers_sent()) {
+                header('HTTP/1.1 404 Not Found');
+                header('Content-Type: application/json');
+            }
+            echo json_encode(['error' => 'Not Found'], JSON_PRETTY_PRINT) . PHP_EOL;
+        } else {
+            if (!headers_sent()) {
+                header('HTTP/1.1 404 Not Found');
+            }
+            echo '<!DOCTYPE html>' . PHP_EOL;
+            echo '<html>' . PHP_EOL;
+            echo '    <head>' . PHP_EOL;
+            echo '        <title>Page Not Found</title>' . PHP_EOL;
+            echo '    </head>' . PHP_EOL;
+            echo '<body>' . PHP_EOL;
+            echo '    <h1>Page Not Found</h1>' . PHP_EOL;
+            echo '</body>' . PHP_EOL;
+            echo '</html>'. PHP_EOL;
         }
-        echo '<!DOCTYPE html>' . PHP_EOL;
-        echo '<html>' . PHP_EOL;
-        echo '    <head>' . PHP_EOL;
-        echo '        <title>Page Not Found</title>' . PHP_EOL;
-        echo '    </head>' . PHP_EOL;
-        echo '<body>' . PHP_EOL;
-        echo '    <h1>Page Not Found</h1>' . PHP_EOL;
-        echo '</body>' . PHP_EOL;
-        echo '</html>'. PHP_EOL;
 
         if ($exit) {
             exit();
@@ -405,23 +413,48 @@ class Http extends AbstractMatch
      */
     public function methodNotAllowed(array $allowedMethods, bool $exit = true): void
     {
-        if (!headers_sent()) {
-            header('HTTP/1.1 405 Method Not Allowed');
-            header('Allow: ' . implode(', ', array_map('strtoupper', $allowedMethods)));
+        $allowed = implode(', ', array_map('strtoupper', $allowedMethods));
+
+        if ($this->wantsJson()) {
+            if (!headers_sent()) {
+                header('HTTP/1.1 405 Method Not Allowed');
+                header('Allow: ' . $allowed);
+                header('Content-Type: application/json');
+            }
+            echo json_encode(['error' => 'Method Not Allowed', 'allowed' => array_map('strtoupper', $allowedMethods)], JSON_PRETTY_PRINT) . PHP_EOL;
+        } else {
+            if (!headers_sent()) {
+                header('HTTP/1.1 405 Method Not Allowed');
+                header('Allow: ' . $allowed);
+            }
+            echo '<!DOCTYPE html>' . PHP_EOL;
+            echo '<html>' . PHP_EOL;
+            echo '    <head>' . PHP_EOL;
+            echo '        <title>Method Not Allowed</title>' . PHP_EOL;
+            echo '    </head>' . PHP_EOL;
+            echo '<body>' . PHP_EOL;
+            echo '    <h1>Method Not Allowed</h1>' . PHP_EOL;
+            echo '</body>' . PHP_EOL;
+            echo '</html>'. PHP_EOL;
         }
-        echo '<!DOCTYPE html>' . PHP_EOL;
-        echo '<html>' . PHP_EOL;
-        echo '    <head>' . PHP_EOL;
-        echo '        <title>Method Not Allowed</title>' . PHP_EOL;
-        echo '    </head>' . PHP_EOL;
-        echo '<body>' . PHP_EOL;
-        echo '    <h1>Method Not Allowed</h1>' . PHP_EOL;
-        echo '</body>' . PHP_EOL;
-        echo '</html>'. PHP_EOL;
 
         if ($exit) {
             exit();
         }
+    }
+
+    /**
+     * Determine if the inbound request is expecting a JSON response, based on
+     * the Accept header (JSON-expecting if 'application/json' is present and
+     * 'text/html' is not, so a browser's typical text/html-inclusive Accept
+     * header isn't misclassified as an API request)
+     *
+     * @return bool
+     */
+    protected function wantsJson(): bool
+    {
+        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+        return (str_contains($accept, 'application/json') && !str_contains($accept, 'text/html'));
     }
 
     /**

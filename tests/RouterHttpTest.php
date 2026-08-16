@@ -377,6 +377,63 @@ class RouterHttpTest extends TestCase
         $this->assertStringContainsString('Method Not Allowed', $result);
     }
 
+    public function testHttpNoRouteFoundJson()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/foo';
+        $_SERVER['HTTP_ACCEPT']   = 'application/json';
+
+        $routes = [
+            '/bar' => [
+                'controller' => function() {
+                    echo 'Foo';
+                }
+            ]
+        ];
+        $http = new Http();
+        $http->addRoutes($routes);
+        $http->match();
+        $this->assertFalse($http->hasRoute());
+
+        ob_start();
+        $http->noRouteFound(false);
+        $result = ob_get_clean();
+
+        unset($_SERVER['HTTP_ACCEPT']);
+
+        $this->assertStringContainsString('"error": "Not Found"', $result);
+        $this->assertStringNotContainsString('<html>', $result);
+    }
+
+    public function testMethodNotAllowedJson()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/users';
+        $_SERVER['REQUEST_METHOD'] = 'DELETE';
+        $_SERVER['HTTP_ACCEPT']    = 'application/json';
+
+        $http = new Http();
+        $http->addRoutes([
+            '/users' => [
+                'controller' => function() {},
+                'method'     => 'get,post',
+            ],
+        ]);
+
+        $http->match();
+
+        ob_start();
+        $http->methodNotAllowed($http->getAllowedMethods(), false);
+        $result = ob_get_clean();
+
+        unset($_SERVER['HTTP_ACCEPT']);
+
+        $this->assertStringContainsString('"error": "Method Not Allowed"', $result);
+        $this->assertStringContainsString('"GET"', $result);
+        $this->assertStringContainsString('"POST"', $result);
+        $this->assertStringNotContainsString('<html>', $result);
+    }
+
     public function testNoMethodKeyMatchesAnyMethod()
     {
         $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
