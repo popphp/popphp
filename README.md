@@ -1030,8 +1030,8 @@ $app->on('app.route.pre', function($application) {
 `Pop\Event\Manager` is a genuine, spec-compliant [PSR-14](https://www.php-fig.org/psr/psr-14/)
 `Psr\EventDispatcher\EventDispatcherInterface` and `ListenerProviderInterface` implementation - not a second,
 parallel system. `on()`/`off()`/`trigger()` above and the typed-event API below both run through the same
-`dispatch()` call for each of the five built-in hook points, so a listener registered either way sees the same
-event firing:
+`dispatch()` call for each of the five built-in hook points **as fired by `Application`**, so a listener
+registered either way sees the same event firing:
 
 ```php
 use Pop\Event\RoutePreEvent;
@@ -1044,6 +1044,12 @@ $app->events()->listen(RoutePreEvent::class, function(RoutePreEvent $event) {
 There is one dispatchable event class per existing `app.*` hook point (`InitEvent`, `RoutePreEvent`,
 `DispatchPreEvent`, `DispatchPostEvent`, `ErrorEvent` - the last of which also exposes `exception()`), all
 under `Pop\Event\`. Listener resolution for `listen()` is by exact event class only.
+
+Note that calling `Manager::trigger($name, $params)` directly (i.e., not through `Application`) always builds
+a generic `Pop\Event\Event`, never one of the typed classes above - so `listen(SomeTypedEvent::class, ...)`
+only ever fires for events something actually constructs and dispatches as that typed class, which is what
+`Application` does for its five hooks. A same-named `trigger('app.dispatch.pre')` call made by other code
+will not reach a `listen(DispatchPreEvent::class, ...)` listener at all.
 
 [Top](#popphp)
 
