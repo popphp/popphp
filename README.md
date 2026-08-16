@@ -986,11 +986,10 @@ $app->on('app.route.pre', function($application) {
 ```
 
 **`app.error` does not suppress the exception.** If anything throws during routing or dispatch,
-`Application::run()` catches it, fires `app.error` (and the PSR-14 `ErrorEvent` below) with the exception
-available to your listeners, and then rethrows the same exception - it does not swallow it. `app.error` is a
-place to react (log it, send a notification, etc.), not a place to handle it and move on. Wrap your own
-`$app->run()` call in a `try`/`catch` if you want the exception to stop there instead of propagating to your
-calling script:
+`Application::run()` catches it, fires `app.error` with the exception available to your listeners, and then
+rethrows the same exception - it does not swallow it. `app.error` is a place to react (log it, send a
+notification, etc.), not a place to handle it and move on. Wrap your own `$app->run()` call in a `try`/`catch`
+if you want the exception to stop there instead of propagating to your calling script:
 
 ```php
 $app->on('app.error', function($exception, $application) {
@@ -1004,25 +1003,47 @@ try {
 }
 ```
 
-#### PSR-14 Compatibility
-
-In addition to the event manager above, `Pop\Application` exposes a genuine, spec-compliant
-[PSR-14](https://www.php-fig.org/psr/psr-14/) `Psr\EventDispatcher\EventDispatcherInterface` via
-`$app->dispatcher()`, firing alongside (not instead of) the event manager's `app.*` hook points. This is purely
-additive - the `on()`/`trigger()` API above is completely unaffected, and nothing is required to touch the
-PSR-14 side to keep using it exactly as documented above.
+**Stopping propagation.** A listener can halt any remaining listeners for the event currently firing by
+calling `stopPropagation()` on the event object, available as an extra parameter after `$result`:
 
 ```php
-use Pop\Event\Psr14\RoutePreEvent;
+$app->on('app.route.pre', function($application, $result, $event) {
+    $event->stopPropagation();
+});
+```
 
-$app->dispatcher()->listeners()->listen(RoutePreEvent::class, function(RoutePreEvent $event) {
+**Aborting the application.** A listener can throw `Pop\Event\AbortException` to halt `Application::run()`
+outright - routing/dispatch stops immediately, `run()` returns without throwing, and `app.error` does not fire:
+
+```php
+use Pop\Event\AbortException;
+
+$app->on('app.route.pre', function($application) {
+    if ($application->isDown()) {
+        throw new AbortException('Application is in maintenance mode.');
+    }
+});
+```
+
+#### PSR-14 Compatibility
+
+`Pop\Event\Manager` is a genuine, spec-compliant [PSR-14](https://www.php-fig.org/psr/psr-14/)
+`Psr\EventDispatcher\EventDispatcherInterface` and `ListenerProviderInterface` implementation - not a second,
+parallel system. `on()`/`off()`/`trigger()` above and the typed-event API below both run through the same
+`dispatch()` call for each of the five built-in hook points, so a listener registered either way sees the same
+event firing:
+
+```php
+use Pop\Event\RoutePreEvent;
+
+$app->events()->listen(RoutePreEvent::class, function(RoutePreEvent $event) {
     // Do some pre-route stuff - $event->application() is the Pop\Application instance
 });
 ```
 
 There is one dispatchable event class per existing `app.*` hook point (`InitEvent`, `RoutePreEvent`,
 `DispatchPreEvent`, `DispatchPostEvent`, `ErrorEvent` - the last of which also exposes `exception()`), all
-under `Pop\Event\Psr14\`. Listener resolution is by exact event class only.
+under `Pop\Event\`. Listener resolution for `listen()` is by exact event class only.
 
 [Top](#popphp)
 
