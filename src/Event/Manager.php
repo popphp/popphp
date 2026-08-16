@@ -115,8 +115,7 @@ class Manager extends AbstractManager
             $listeners = clone $this->items[$name];
             $listeners->setExtractFlags(\SplPriorityQueue::EXTR_BOTH);
 
-            foreach ($listeners as $value) {
-                $item = $listeners->current();
+            foreach ($listeners as $item) {
                 if ($action !== $item['data']) {
                     $newListeners->insert($item['data'], $item['priority']);
                 }

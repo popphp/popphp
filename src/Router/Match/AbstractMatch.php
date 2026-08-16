@@ -100,6 +100,18 @@ abstract class AbstractMatch implements MatchInterface
     protected array $routeNames = [];
 
     /**
+     * Whether the dispatchable has been resolved for the current match cycle
+     * @var bool
+     */
+    protected bool $dispatchableResolved = false;
+
+    /**
+     * Cached dispatchable resolution for the current match cycle
+     * @var mixed
+     */
+    protected mixed $dispatchableCache = null;
+
+    /**
      * Add a route
      *
      * @param  string $route
@@ -108,37 +120,12 @@ abstract class AbstractMatch implements MatchInterface
      */
     public function addRoute(string $route, mixed $controller): AbstractMatch
     {
-        // If is dynamic route
-        if ((($this instanceof Http) && (str_contains($route, ':controller'))) ||
-            (($this instanceof Cli) && (str_contains($route, '<controller')))) {
-            $this->dynamicRoute = $route;
-            if (isset($controller['prefix'])) {
-                $this->dynamicRoutePrefix = $controller['prefix'];
-            }
-        // Else, if wildcard route
+        if ($this->isDynamicRouteDeclaration($route)) {
+            $this->registerDynamicRoute($route, $controller);
         } else if (($route == '*') || (str_ends_with($route, '/*'))) {
-            $routeKey = (str_ends_with($route, '/*')) ? substr($route, 0, -2) : $route;
-            if (is_callable($controller)) {
-                $controller = ['controller' => $controller];
-            }
-            $this->defaultRoute[$routeKey] = $controller;
-        // Else, regular route
+            $controller = $this->registerWildcardRoute($route, $controller);
         } else {
-            $this->routeString = urldecode($this->routeString);
-            // Handle nested routes
-            if (is_array($controller) && !isset($controller['controller'])) {
-                foreach ($controller as $r => $c) {
-                    $fullRoute = ($r == '*') ? $route . '/*' : $route . $r;
-                    $this->addRoute($fullRoute, $c);
-                }
-            } else {
-                if (is_callable($controller)) {
-                    $controller = ['controller' => $controller];
-                }
-
-                $this->routes[$route] = (isset($this->routes[$route])) ?
-                    array_merge($this->routes[$route], $controller) : $controller;
-            }
+            $controller = $this->registerRegularRoute($route, $controller);
         }
 
         if (isset($controller['name'])) {
@@ -150,6 +137,80 @@ abstract class AbstractMatch implements MatchInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Determine if a route declaration is the dynamic-route (":controller"/"<controller") pattern
+     *
+     * @param  string $route
+     * @return bool
+     */
+    protected function isDynamicRouteDeclaration(string $route): bool
+    {
+        return (($this instanceof Http) && str_contains($route, ':controller')) ||
+            (($this instanceof Cli) && str_contains($route, '<controller'));
+    }
+
+    /**
+     * Register a dynamic route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @return void
+     */
+    protected function registerDynamicRoute(string $route, mixed $controller): void
+    {
+        $this->dynamicRoute = $route;
+        if (isset($controller['prefix'])) {
+            $this->dynamicRoutePrefix = $controller['prefix'];
+        }
+    }
+
+    /**
+     * Register a wildcard/default route
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @return mixed  the normalized controller config
+     */
+    protected function registerWildcardRoute(string $route, mixed $controller): mixed
+    {
+        $routeKey = (str_ends_with($route, '/*')) ? substr($route, 0, -2) : $route;
+        if (is_callable($controller)) {
+            $controller = ['controller' => $controller];
+        }
+        $this->defaultRoute[$routeKey] = $controller;
+
+        return $controller;
+    }
+
+    /**
+     * Register a regular (literal or param-bearing) route, recursing for nested route configs
+     *
+     * @param  string $route
+     * @param  mixed  $controller
+     * @return mixed  the normalized controller config
+     */
+    protected function registerRegularRoute(string $route, mixed $controller): mixed
+    {
+        $this->routeString = urldecode($this->routeString);
+
+        // Handle nested routes
+        if (is_array($controller) && !isset($controller['controller'])) {
+            foreach ($controller as $r => $c) {
+                $fullRoute = ($r == '*') ? $route . '/*' : $route . $r;
+                $this->addRoute($fullRoute, $c);
+            }
+        } else {
+            if (is_callable($controller)) {
+                $controller = ['controller' => $controller];
+            }
+
+            $this->routes[$route] = (isset($this->routes[$route])) ?
+                array_merge($this->routes[$route], $controller) : $controller;
+        }
+
+        return $controller;
     }
 
     /**
@@ -476,6 +537,10 @@ abstract class AbstractMatch implements MatchInterface
      */
     public function getDispatchable(): mixed
     {
+        if ($this->dispatchableResolved) {
+            return $this->dispatchableCache;
+        }
+
         $routeDispatchable = null;
 
         if (($this->route !== null) && isset($this->preparedRoutes[$this->route]) &&
@@ -505,6 +570,9 @@ abstract class AbstractMatch implements MatchInterface
             }
         }
 
+        $this->dispatchableResolved = true;
+        $this->dispatchableCache    = $routeDispatchable;
+
         return $routeDispatchable;
     }
 
@@ -520,9 +588,10 @@ abstract class AbstractMatch implements MatchInterface
         if (($this->route !== null) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['controller'])) {
             $result = true;
-        } else if (($this->dynamicRoute !== null) && ($this->getDispatchable() !== null) &&
-            ($this->dynamicRoutePrefix !== null) && (count($this->segments) >= 1)) {
-            $result = class_exists($this->getDispatchable());
+        } else if (($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) && (count($this->segments) >= 1)) {
+            // getDispatchable() already runs class_exists() internally and nulls out the
+            // result if the class doesn't exist, so a non-null return here already implies it exists.
+            $result = ($this->getDispatchable() !== null);
         } else if (!empty($this->defaultRoute)) {
             foreach ($this->defaultRoute as $routeKey => $controller) {
                 if (($routeKey != '*') && str_starts_with($this->routeString, $routeKey) && isset($controller['controller'])) {

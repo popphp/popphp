@@ -135,6 +135,29 @@ class Application extends AbstractApplication implements \ArrayAccess
         if ($autoloader !== null) {
             $this->registerAutoloader($autoloader);
         }
+
+        $this->initializeDefaultManagers();
+        $this->registerConfiguredAutoloaderPrefix();
+        $this->applyConfigMetadata();
+        $this->loadHelperFunctions();
+        $this->applyConfigRoutes();
+        $this->applyConfigServices();
+        $this->applyConfigEvents();
+        $this->applyConfigMiddleware();
+
+        // Register application object with App helper class
+        App::set($this);
+
+        return $this;
+    }
+
+    /**
+     * Instantiate and register any manager objects not already set
+     *
+     * @return void
+     */
+    protected function initializeDefaultManagers(): void
+    {
         if ($this->router === null) {
             $this->registerRouter(new Router\Router());
         }
@@ -153,9 +176,16 @@ class Application extends AbstractApplication implements \ArrayAccess
         if ($this->modules === null) {
             $this->registerModules(new Module\Manager());
         }
+    }
 
-        // If the autoloader is set and the application config has a
-        // defined prefix and src, register with the autoloader
+    /**
+     * If the autoloader is set and the application config has a defined
+     * prefix and src, register with the autoloader
+     *
+     * @return void
+     */
+    protected function registerConfiguredAutoloaderPrefix(): void
+    {
         if (($this->autoloader !== null) && isset($this->config['prefix']) &&
             isset($this->config['src']) && file_exists($this->config['src'])) {
             // Register as PSR-0
@@ -166,7 +196,15 @@ class Application extends AbstractApplication implements \ArrayAccess
                 $this->autoloader->addPsr4($this->config['prefix'], $this->config['src']);
             }
         }
+    }
 
+    /**
+     * Set the app name and version from config, if present
+     *
+     * @return void
+     */
+    protected function applyConfigMetadata(): void
+    {
         // Set the app name
         if (!empty($this->config['name'])) {
             $this->setName($this->config['name']);
@@ -178,25 +216,53 @@ class Application extends AbstractApplication implements \ArrayAccess
         if (!empty($this->config['version'])) {
             $this->setVersion($this->config['version']);
         }
+    }
 
-        // Load helper functions
+    /**
+     * Load helper functions, unless disabled by config
+     *
+     * @return void
+     */
+    protected function loadHelperFunctions(): void
+    {
         if ((!isset($this->config['helper_functions']) || ($this->config['helper_functions'] === true)) && (!Helper::isLoaded())) {
             Helper::loadFunctions();
         }
+    }
 
-        // If routes are set in the app config, register them with the application
+    /**
+     * If routes are set in the app config, register them with the application
+     *
+     * @return void
+     */
+    protected function applyConfigRoutes(): void
+    {
         if (isset($this->config['routes']) && ($this->router !== null)) {
             $this->router->addRoutes($this->config['routes']);
         }
+    }
 
-        // If services are set in the app config, register them with the application
+    /**
+     * If services are set in the app config, register them with the application
+     *
+     * @return void
+     */
+    protected function applyConfigServices(): void
+    {
         if (isset($this->config['services']) && ($this->services !== null)) {
             foreach ($this->config['services'] as $name => $service) {
                 $this->setService($name, $service);
             }
         }
+    }
 
-        // If events are set in the app config, register them with the application
+    /**
+     * If events are set in the app config, register them with the application
+     *
+     * @return void
+     */
+    protected function applyConfigEvents(): void
+    {
         if (isset($this->config['events']) && ($this->events !== null)) {
             foreach ($this->config['events'] as $event) {
                 if (isset($event['name']) && isset($event['action'])) {
@@ -204,19 +270,21 @@ class Application extends AbstractApplication implements \ArrayAccess
                 }
             }
         }
+    }
 
+    /**
+     * If middleware is defined in the app config, register them with the application
+     *
+     * @return void
+     */
+    protected function applyConfigMiddleware(): void
+    {
         $middlewareDisabled = $this->env('MIDDLEWARE_DISABLED');
 
-        // If middleware is defined in the app config, register them with the application
         if (isset($this->config['middleware']) && ($this->middleware !== null) &&
             (empty($middlewareDisabled) || ($middlewareDisabled == 'route'))) {
             $this->middleware->addItems(Arr::make($this->config['middleware']));
         }
-
-        // Register application object with App helper class
-        App::set($this);
-
-        return $this;
     }
 
     /**
@@ -1001,34 +1069,8 @@ class Application extends AbstractApplication implements \ArrayAccess
                         }
                     // Process middleware
                     } else if (($this->middleware !== null) && ($this->middleware->hasHandlers())) {
-                        $request        = null;
-                        $dispatchParams = null;
-                        if ($this->router->getDispatchableClass() == 'Closure') {
-                            $dispatch       = $dispatchable;
-                            $dispatchParams = ($this->router->hasRouteParams()) ? array_values($this->router->getRouteParams()) : null;
-                        } else if ($this->router->getDispatchableClass() == 'Pop\Utils\CallableObject') {
-                            $params   = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-                            $dispatch = function() use ($dispatchable, $params) {
-                                $callableObject = new \Pop\Utils\CallableObject($dispatchable, $params);
-                                $callableObject->call();
-                            };
-                        } else {
-                            $params   = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-                            $dispatch = function() use ($dispatchable, $params) {
-                                $dispatchable->dispatch($this->router->getAction(), $params);
-                            };
-                        }
-
-                        // Retrieve request object, or create one
-                        if (is_object($dispatchable) && in_array('Pop\Dispatch\HttpTrait', class_uses($dispatchable))) {
-                            $request = $dispatchable->request();
-                        } else if (is_object($dispatchable) && in_array('Pop\Dispatch\ConsoleTrait', class_uses($dispatchable))) {
-                            $request = $dispatchable->console();
-                        } else if ($this->router->isHttp()) {
-                            $request = new Request(new Uri());
-                        } else if ($this->router->isCli()) {
-                            $request = new Console(120);
-                        }
+                        [$dispatch, $dispatchParams] = $this->buildMiddlewareDispatch($dispatchable);
+                        $request = $this->resolveMiddlewareRequest($dispatchable);
 
                         if ($request === null) {
                             throw new Exception('Error: Unable to retrieve the request object for the middleware.');
@@ -1037,20 +1079,7 @@ class Application extends AbstractApplication implements \ArrayAccess
                         $this->middleware->process($request, $dispatch, $dispatchParams);
                     // Skip middleware or process as normal
                     } else {
-                        if ($this->router->getDispatchableClass() == 'Closure') {
-                            if ($this->router->hasRouteParams()) {
-                                call_user_func_array($dispatchable, array_values($this->router->getRouteParams()));
-                            } else {
-                                $dispatchable();
-                            }
-                        } else if ($this->router->getDispatchableClass() == 'Pop\Utils\CallableObject') {
-                            $params         = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-                            $callableObject = new \Pop\Utils\CallableObject($dispatchable, $params);
-                            $callableObject->call();
-                        } else {
-                            $params = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-                            $dispatchable->dispatch($this->router->getAction(), $params);
-                        }
+                        $this->invokeDispatchable($dispatchable);
                     }
                 // Else, no route found
                 } else {
@@ -1070,6 +1099,81 @@ class Application extends AbstractApplication implements \ArrayAccess
             $this->trigger('app.error', ['exception' => $exception]);
             $this->psr14Dispatcher?->dispatch(new Event\Psr14\ErrorEvent($this, $exception));
             throw $exception;
+        }
+    }
+
+    /**
+     * Build the deferred dispatch closure and its params for the middleware
+     * pipeline to invoke once the handler chain completes
+     *
+     * @param  mixed $dispatchable
+     * @return array
+     */
+    protected function buildMiddlewareDispatch(mixed $dispatchable): array
+    {
+        if ($this->router->getDispatchableClass() == 'Closure') {
+            $dispatch       = $dispatchable;
+            $dispatchParams = ($this->router->hasRouteParams()) ? array_values($this->router->getRouteParams()) : null;
+        } else if ($this->router->getDispatchableClass() == 'Pop\Utils\CallableObject') {
+            $params         = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
+            $dispatch       = function() use ($dispatchable, $params) {
+                $callableObject = new \Pop\Utils\CallableObject($dispatchable, $params);
+                $callableObject->call();
+            };
+            $dispatchParams = null;
+        } else {
+            $params         = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
+            $dispatch       = function() use ($dispatchable, $params) {
+                $dispatchable->dispatch($this->router->getAction(), $params);
+            };
+            $dispatchParams = null;
+        }
+
+        return [$dispatch, $dispatchParams];
+    }
+
+    /**
+     * Resolve the request object to pass into the middleware pipeline
+     *
+     * @param  mixed $dispatchable
+     * @return mixed
+     */
+    protected function resolveMiddlewareRequest(mixed $dispatchable): mixed
+    {
+        if (is_object($dispatchable) && in_array('Pop\Dispatch\HttpTrait', class_uses($dispatchable))) {
+            return $dispatchable->request();
+        } else if (is_object($dispatchable) && in_array('Pop\Dispatch\ConsoleTrait', class_uses($dispatchable))) {
+            return $dispatchable->console();
+        } else if ($this->router->isHttp()) {
+            return new Request(new Uri());
+        } else if ($this->router->isCli()) {
+            return new Console(120);
+        }
+
+        return null;
+    }
+
+    /**
+     * Invoke the dispatchable directly, bypassing the middleware pipeline
+     *
+     * @param  mixed $dispatchable
+     * @return void
+     */
+    protected function invokeDispatchable(mixed $dispatchable): void
+    {
+        if ($this->router->getDispatchableClass() == 'Closure') {
+            if ($this->router->hasRouteParams()) {
+                call_user_func_array($dispatchable, array_values($this->router->getRouteParams()));
+            } else {
+                $dispatchable();
+            }
+        } else if ($this->router->getDispatchableClass() == 'Pop\Utils\CallableObject') {
+            $params         = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
+            $callableObject = new \Pop\Utils\CallableObject($dispatchable, $params);
+            $callableObject->call();
+        } else {
+            $params = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
+            $dispatchable->dispatch($this->router->getAction(), $params);
         }
     }
 

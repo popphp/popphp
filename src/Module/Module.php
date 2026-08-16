@@ -91,67 +91,114 @@ class Module extends AbstractModule implements \ArrayAccess
         $this->application = $application;
 
         if ($this->config !== null) {
-            // Set the name, if available
-            if (isset($this->config['name'])) {
-                $this->setName($this->config['name']);
-            }
-
-            // Set the version, if available
-            if (!empty($this->config['version'])) {
-                $this->setVersion($this->config['version']);
-            }
-
-            // If the autoloader is set and the module config has a
-            // defined prefix and src, register the module with the autoloader
-            if (($this->application->autoloader() !== null) &&
-                isset($this->config['prefix']) && isset($this->config['src']) && file_exists($this->config['src'])
-            ) {
-                // Register as PSR-0
-                if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
-                    $this->application->autoloader()->add($this->config['prefix'], $this->config['src']);
-                // Else, default to PSR-4
-                } else {
-                    $this->application->autoloader()->addPsr4($this->config['prefix'], $this->config['src']);
-                }
-            }
-
-            // If routes are set in the module config, register them with the application
-            if (isset($this->config['routes']) && ($this->application->router() !== null)) {
-                $this->application->router()->addRoutes($this->config['routes']);
-            }
-
-            // If services are set in the module config, register them with the application
-            if (isset($this->config['services']) && ($this->application->services() !== null)) {
-                foreach ($this->config['services'] as $name => $service) {
-                    $this->application->setService($name, $service);
-                }
-            }
-
-            // If events are set in the module config, register them with the application
-            if (isset($this->config['events']) && ($this->application->events() !== null)) {
-                foreach ($this->config['events'] as $event) {
-                    if (isset($event['name']) && isset($event['action'])) {
-                        $this->application->on(
-                            $event['name'],
-                            $event['action'],
-                            ((isset($event['priority'])) ? $event['priority'] : 0)
-                        );
-                    }
-                }
-            }
-
-            $middlewareDisabled = App::env('MIDDLEWARE_DISABLED');
-
-            // If middleware is defined in the module  config, register them with the application
-            if (isset($this->config['middleware']) && ($this->application->middleware() !== null) &&
-                (empty($middlewareDisabled) || ($middlewareDisabled == 'route'))) {
-                $this->application->middleware()->addItems(Arr::make($this->config['middleware']));
-            }
+            $this->applyConfigMetadata();
+            $this->registerConfiguredAutoloaderPrefix();
+            $this->applyConfigRoutes();
+            $this->applyConfigServices();
+            $this->applyConfigEvents();
+            $this->applyConfigMiddleware();
         }
 
         $this->application->modules->register($this);
 
         return $this;
+    }
+
+    /**
+     * Set the module name and version from config, if available
+     *
+     * @return void
+     */
+    protected function applyConfigMetadata(): void
+    {
+        if (isset($this->config['name'])) {
+            $this->setName($this->config['name']);
+        }
+        if (!empty($this->config['version'])) {
+            $this->setVersion($this->config['version']);
+        }
+    }
+
+    /**
+     * If the autoloader is set and the module config has a defined prefix
+     * and src, register the module with the autoloader
+     *
+     * @return void
+     */
+    protected function registerConfiguredAutoloaderPrefix(): void
+    {
+        if (($this->application->autoloader() !== null) &&
+            isset($this->config['prefix']) && isset($this->config['src']) && file_exists($this->config['src'])
+        ) {
+            // Register as PSR-0
+            if (isset($this->config['psr-0']) && ($this->config['psr-0'])) {
+                $this->application->autoloader()->add($this->config['prefix'], $this->config['src']);
+            // Else, default to PSR-4
+            } else {
+                $this->application->autoloader()->addPsr4($this->config['prefix'], $this->config['src']);
+            }
+        }
+    }
+
+    /**
+     * If routes are set in the module config, register them with the application
+     *
+     * @return void
+     */
+    protected function applyConfigRoutes(): void
+    {
+        if (isset($this->config['routes']) && ($this->application->router() !== null)) {
+            $this->application->router()->addRoutes($this->config['routes']);
+        }
+    }
+
+    /**
+     * If services are set in the module config, register them with the application
+     *
+     * @return void
+     */
+    protected function applyConfigServices(): void
+    {
+        if (isset($this->config['services']) && ($this->application->services() !== null)) {
+            foreach ($this->config['services'] as $name => $service) {
+                $this->application->setService($name, $service);
+            }
+        }
+    }
+
+    /**
+     * If events are set in the module config, register them with the application
+     *
+     * @return void
+     */
+    protected function applyConfigEvents(): void
+    {
+        if (isset($this->config['events']) && ($this->application->events() !== null)) {
+            foreach ($this->config['events'] as $event) {
+                if (isset($event['name']) && isset($event['action'])) {
+                    $this->application->on(
+                        $event['name'],
+                        $event['action'],
+                        ((isset($event['priority'])) ? $event['priority'] : 0)
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * If middleware is defined in the module config, register them with the application
+     *
+     * @return void
+     */
+    protected function applyConfigMiddleware(): void
+    {
+        $middlewareDisabled = App::env('MIDDLEWARE_DISABLED');
+
+        if (isset($this->config['middleware']) && ($this->application->middleware() !== null) &&
+            (empty($middlewareDisabled) || ($middlewareDisabled == 'route'))) {
+            $this->application->middleware()->addItems(Arr::make($this->config['middleware']));
+        }
     }
 
     /**

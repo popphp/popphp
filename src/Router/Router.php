@@ -57,6 +57,14 @@ class Router
     protected ?string $dispatchableClass = null;
 
     /**
+     * Cache of resolved trait names (own + inherited) per dispatchable class name.
+     * A class's trait/inheritance shape never changes at runtime, so this is safe
+     * to share across all Router instances for the life of the process.
+     * @var array<string, array<string>>
+     */
+    protected static array $dispatchableTraitsCache = [];
+
+    /**
      * Constructor
      *
      * Instantiate the router object
@@ -624,13 +632,19 @@ class Router
                         $this->dispatchable = (new \ReflectionClass($dispatchable))->newInstanceArgs($dispatchableParams);
                     // Else, write in the dispatchable parameters
                     } else {
-                        $dispatchableTraits = class_uses($dispatchable);
-                        $parentClass        = get_parent_class($dispatchable);
+                        if (!isset(self::$dispatchableTraitsCache[$dispatchable])) {
+                            $dispatchableTraits = class_uses($dispatchable);
+                            $parentClass        = get_parent_class($dispatchable);
 
-                        while ($parentClass !== false) {
-                            $dispatchableTraits = array_merge($dispatchableTraits, class_uses($parentClass));
-                            $parentClass        = get_parent_class($parentClass);
+                            while ($parentClass !== false) {
+                                $dispatchableTraits = array_merge($dispatchableTraits, class_uses($parentClass));
+                                $parentClass        = get_parent_class($parentClass);
+                            }
+
+                            self::$dispatchableTraitsCache[$dispatchable] = $dispatchableTraits;
                         }
+
+                        $dispatchableTraits = self::$dispatchableTraitsCache[$dispatchable];
 
                         $this->dispatchable = (in_array('Pop\Dispatch\HttpTrait', $dispatchableTraits) ||
                             in_array('Pop\Dispatch\ConsoleTrait', $dispatchableTraits)) ?

@@ -90,7 +90,7 @@ class Manager extends AbstractManager
     {
         $result = false;
 
-        foreach ($this->items as $name => $mod) {
+        foreach ($this->items as $mod) {
             if ($mod === $module) {
                 $result = true;
                 break;

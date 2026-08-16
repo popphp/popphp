@@ -56,6 +56,14 @@ class Http extends AbstractMatch
     protected array $routeSpecificity = [];
 
     /**
+     * Prepared route keys grouped by their literal route path, so a direct
+     * (literal, non-regex) match only has to scan that path's method
+     * variants instead of every prepared route.
+     * @var array
+     */
+    protected array $preparedRoutesByLiteral = [];
+
+    /**
      * Flag set by match(): true when the request path matched at least one
      * route whose method constraint rejected the request, and nothing else
      * (no wildcard/dynamic fallback) ended up handling it
@@ -273,10 +281,11 @@ class Http extends AbstractMatch
             $this->prepare();
         }
 
-        $this->route          = null;
-        $this->methodMismatch = false;
-        $this->allowedMethods = [];
-        $this->routeParams    = [];
+        $this->route                = null;
+        $this->methodMismatch       = false;
+        $this->allowedMethods       = [];
+        $this->routeParams          = [];
+        $this->dispatchableResolved = false;
 
         if ($forceRoute !== null) {
             $this->seed($forceRoute);
@@ -296,10 +305,8 @@ class Http extends AbstractMatch
         }
 
         if ($directMatch !== null) {
-            foreach ($this->preparedRoutes as $key => $controller) {
-                if ($directMatch !== $controller['route']) {
-                    continue;
-                }
+            foreach (($this->preparedRoutesByLiteral[$directMatch] ?? []) as $key) {
+                $controller  = $this->preparedRoutes[$key];
                 $pathMatched = true;
                 if (($controller['method'] === null) || in_array($requestMethod, $controller['method'])) {
                     $this->route = $key;
@@ -641,6 +648,7 @@ class Http extends AbstractMatch
                     'method' => $methods,
                 ]);
                 $this->routeSpecificity[$key] = $routeRegex['specificity'];
+                $this->preparedRoutesByLiteral[$realRoute][] = $key;
 
                 if (isset($controller['default']) && ($controller['default'])) {
                     if (isset($controller['action'])) {
@@ -743,7 +751,7 @@ class Http extends AbstractMatch
         if (($this->route !== null) && isset($this->preparedRoutes[$this->route]['params']) &&
             (count($this->preparedRoutes[$this->route]['params']) > 0)) {
             $offset = 0;
-            foreach ($this->preparedRoutes[$this->route]['params'] as $i => $param) {
+            foreach ($this->preparedRoutes[$this->route]['params'] as $param) {
                 $value = substr($this->routeString, ($param['offset'] + $offset + 1));
                 if ($param['array']) {
                     if (!$value) {
@@ -808,26 +816,19 @@ class Http extends AbstractMatch
 
             if (!empty($params) && !empty($preparedRoute['params'])) {
                 foreach ($preparedRoute['params'] as $param) {
-                    $paramName    = $param['name'];
-                    $paramString  = null;
-                    $paramUrlName = null;
+                    $paramValue = $this->resolveNamedParamValue($params, $param['name']);
 
-                    if (is_object($params) && isset($params->{$paramName})) {
-                        if (is_array($params->{$paramName})) {
-                            $paramString  = implode('/', $params->{$paramName});
+                    if ($paramValue !== null) {
+                        if (is_array($paramValue)) {
+                            $paramString  = implode('/', $paramValue);
                             $paramUrlName = $param['param'] . '*';
                         } else {
-                            $paramString  = $params->{$paramName};
+                            $paramString  = $paramValue;
                             $paramUrlName = $param['param'];
                         }
-                    } else if (is_array($params) && isset($params[$paramName])) {
-                        if (is_array($params[$paramName])) {
-                            $paramString  = implode('/', $params[$paramName]);
-                            $paramUrlName = $param['param'] . '*';
-                        } else {
-                            $paramString  = $params[$paramName];
-                            $paramUrlName = $param['param'];
-                        }
+                    } else {
+                        $paramString  = null;
+                        $paramUrlName = null;
                     }
 
                     $route = $baseUrl . str_replace($paramUrlName, '/' . $paramString, $route);
@@ -838,6 +839,24 @@ class Http extends AbstractMatch
         }
 
         return $url;
+    }
+
+    /**
+     * Resolve a named param's raw value from either an object or an array of params
+     *
+     * @param  mixed  $params
+     * @param  string $paramName
+     * @return mixed
+     */
+    protected function resolveNamedParamValue(mixed $params, string $paramName): mixed
+    {
+        if (is_object($params) && isset($params->{$paramName})) {
+            return $params->{$paramName};
+        } else if (is_array($params) && isset($params[$paramName])) {
+            return $params[$paramName];
+        }
+
+        return null;
     }
 
 }
