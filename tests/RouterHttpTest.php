@@ -825,6 +825,84 @@ class RouterHttpTest extends TestCase
         $this->assertEquals(['get', 'options'], $http->getRouteConfig('method'));
     }
 
+    public function testPopcornStyleMethodGroupSupportsFurtherNestedRoutes()
+    {
+        $routes = [
+            'get,options' => [
+                '/users' => [
+                    '[/]'    => ['controller' => function() {}, 'action' => 'index'],
+                    '/count' => ['controller' => function() {}, 'action' => 'count'],
+                ],
+            ],
+            'post,options' => [
+                '/users' => [
+                    '/create' => ['controller' => function() {}, 'action' => 'create'],
+                    '/update' => ['controller' => function() {}, 'action' => 'update'],
+                ],
+            ],
+        ];
+
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $_SERVER['REQUEST_URI'] = '/users';
+        $http = new Http();
+        $http->addRoutes($routes);
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('index', $http->getAction());
+        $this->assertEquals(['get', 'options'], $http->getRouteConfig('method'));
+
+        $_SERVER['REQUEST_URI'] = '/users/count';
+        $http = new Http();
+        $http->addRoutes($routes);
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('count', $http->getAction());
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['REQUEST_URI']    = '/users/create';
+        $http = new Http();
+        $http->addRoutes($routes);
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('create', $http->getAction());
+        $this->assertEquals(['options', 'post'], $http->getRouteConfig('method'));
+
+        // A path that only matches inside the GET group should 405, not silently match, when requested via POST.
+        $_SERVER['REQUEST_URI'] = '/users/count';
+        $http = new Http();
+        $http->addRoutes($routes);
+        $http->match();
+        $this->assertFalse($http->hasRoute());
+        $this->assertTrue($http->hasMethodMismatch());
+    }
+
+    public function testPopcornStyleMethodGroupSupportsArbitrarilyDeepNesting()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/users/foo/bar';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $http = new Http();
+        $http->addRoutes([
+            'get,options' => [
+                '/users' => [
+                    '/foo' => [
+                        '/bar' => ['controller' => function() {}, 'action' => 'bar'],
+                    ],
+                ],
+            ],
+            '/' => ['controller' => function() {}, 'action' => 'index'],
+            '*' => ['controller' => function() {}, 'action' => 'error'],
+        ]);
+        $http->match();
+
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('bar', $http->getAction());
+        $this->assertEquals(['get', 'options'], $http->getRouteConfig('method'));
+    }
+
     public function testHttpForceRouteCarriesDynamicParam()
     {
         $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());

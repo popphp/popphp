@@ -541,6 +541,26 @@ This is equivalent to (and expands internally into) giving each nested route its
 if a nested route also sets its own `method` key, the group's method list wins. Both forms can be mixed freely
 in the same routes config.
 
+The routes under a method group can themselves be further nested, the same way ordinary (non-method-grouped)
+routes can - the method list is applied to every leaf config found at any depth:
+
+```php
+'routes' => [
+    'get,options' => [
+        '/users' => [
+            '[/]'    => ['controller' => 'MyApp\Controller\UsersController', 'action' => 'index'],
+            '/count' => ['controller' => 'MyApp\Controller\UsersController', 'action' => 'count'],
+        ],
+    ],
+    'post,options' => [
+        '/users' => [
+            '/create' => ['controller' => 'MyApp\Controller\UsersController', 'action' => 'create'],
+            '/update' => ['controller' => 'MyApp\Controller\UsersController', 'action' => 'update'],
+        ],
+    ],
+],
+```
+
 [Top](#popphp)
 
 ### CLI Routes

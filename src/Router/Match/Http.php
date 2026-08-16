@@ -166,16 +166,16 @@ class Http extends AbstractMatch
         // Popcorn-style method-grouped nested routes, e.g.:
         //   'options,get' => ['/users' => [...], '/roles' => [...]]
         // Each nested route is re-registered under its own key with the group's
-        // method list injected - overriding any 'method' key the nested route
-        // config already has, since the group is authoritative (matches
-        // Popcorn's original grouping semantics).
+        // method list injected at every leaf config underneath it - overriding
+        // any 'method' key a leaf already carries, since the group is
+        // authoritative (matches Popcorn's original grouping semantics). The
+        // injection recurses through arbitrarily-nested route sub-trees (e.g.
+        // '/users' => ['[/]' => [...], '/count' => [...]]) rather than only the
+        // group's immediate children, since a shallow injection would plant
+        // 'method' as a sibling key indistinguishable from a route segment.
         if ($this->isMethodGroupKey($route) && is_array($controller) && !isset($controller['controller'])) {
             foreach ($controller as $nestedRoute => $nestedController) {
-                if (is_callable($nestedController)) {
-                    $nestedController = ['controller' => $nestedController];
-                }
-                $nestedController['method'] = $route;
-                $this->addRoute($nestedRoute, $nestedController);
+                $this->addRoute($nestedRoute, $this->applyMethodToNestedRoutes($nestedController, $route));
             }
 
             return $this;
@@ -197,6 +197,33 @@ class Http extends AbstractMatch
         }
 
         return parent::addRoute($route, $controller);
+    }
+
+    /**
+     * Recursively apply a method-group's method list to every leaf config in a
+     * (possibly further-nested) route sub-tree, without disturbing the
+     * sub-tree's own nested route keys
+     *
+     * @param  mixed  $controller
+     * @param  string $method
+     * @return mixed
+     */
+    protected function applyMethodToNestedRoutes(mixed $controller, string $method): mixed
+    {
+        if (is_callable($controller)) {
+            $controller = ['controller' => $controller];
+        }
+
+        if (is_array($controller) && !isset($controller['controller'])) {
+            foreach ($controller as $key => $value) {
+                $controller[$key] = $this->applyMethodToNestedRoutes($value, $method);
+            }
+            return $controller;
+        }
+
+        $controller['method'] = $method;
+
+        return $controller;
     }
 
     /**
