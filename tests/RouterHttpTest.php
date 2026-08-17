@@ -762,7 +762,6 @@ class RouterHttpTest extends TestCase
     {
         $http = new Http();
         $ref  = new \ReflectionMethod($http, 'normalizeMethods');
-        $ref->setAccessible(true);
 
         $this->assertNull($ref->invoke($http, ''));
         $this->assertNull($ref->invoke($http, []));
