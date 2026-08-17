@@ -17,7 +17,6 @@ class AppTest extends TestCase
         // declaration order (App::set() has no counterpart to undo it).
         $reflection = new \ReflectionClass(App::class);
         $property   = $reflection->getProperty('application');
-        $property->setAccessible(true);
         $property->setValue(null, null);
     }
 

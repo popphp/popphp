@@ -447,8 +447,6 @@ class ServiceTest extends TestCase
         $reflection   = new \ReflectionClass(Locator::class);
         $depthProp    = $reflection->getProperty('depth');
         $calledProp   = $reflection->getProperty('called');
-        $depthProp->setAccessible(true);
-        $calledProp->setAccessible(true);
 
         return [$depthProp->getValue(), $calledProp->getValue()];
     }
