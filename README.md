@@ -17,6 +17,7 @@ popphp
   - [Merging Application State](#merging-application-state)
 * [App Helper](#app-helper)
 * [Router](#router)
+    - [Route Target Shorthand Strings](#route-target-shorthand-strings)
     - [HTTP Routes](#http-routes)
     - [CLI Routes](#cli-routes)
     - [Dynamic Routing](#dynamic-routing)
@@ -100,9 +101,9 @@ the request `/`:
 $ curl -i -X GET http://localhost/
 ```
 
-would route to and execute the `MyApp\Controller\IndexController->index` method.
+would route to `MyApp\Controller\IndexController` and execute its `index()` method.
 
-Any invalid request would route to the `MyApp\Controller\IndexController->error` method. 
+Any invalid request would route to the same controller's `error()` method. 
 
 [Top](#popphp)
 
@@ -456,24 +457,45 @@ Failure to have the ID segment of the URL will result in a non-match, or invalid
 If you don't want to be so strict about the parameters passed into a method or function, you can make
 the parameter optional like this: `/edit[/:id]`. The respective method signature would be `edit($id = null)`.
 
-### Controller Shorthand Strings
+### Route Target Shorthand Strings
 
-A route's controller doesn't have to be split into separate `controller`/`action` keys. Anywhere a route
-accepts a controller value - array config, wildcard/default routes, and the fluent verb methods - a single
-string in one of these shorthand forms works too, resolved via `Pop\Utils\CallableObject`:
+A route's target doesn't have to be split into separate `controller`/`action` keys. Anywhere a route accepts
+a target value - array configs, wildcard/default routes, the fluent verb methods, and method-group nested
+routes - a single string in one of these shorthand forms works too, resolved via `Pop\Utils\CallableObject`:
 
-|Shorthand         |Resolves to                                        |
-|------------------|----------------------------------------------------|
-|`'Class->method'` |Instantiate `Class`, then call `method()` on it     |
-|`'Class::method'` |Call the static method `Class::method()`            |
+|Shorthand         |Resolves to                                                                                  |
+|------------------|---------------------------------------------------------------------------------------------|
+|`'Class->method'` |`new Class()`, then `method()` on that instance. Route params are passed to **the method**.    |
+|`'Class::method'` |`Class::method()`. Route params are passed to **the method**. The method must really be static.|
+|`'Class'`         |`new Class()`. Route params are passed to **the constructor**; no method is called.            |
+|`'new Class'`     |`new Class()`. No method is called, and route params are **ignored**.                          |
 
 ```php
 'routes' => [
-    '/users' => 'MyApp\Controller\UsersController->index',
+    '/users' => 'MyApp\Handler->listUsers',
 ],
 ```
 
-is equivalent to:
+This also works with the fluent verb API, wildcard/default routes, and method-group configs, and it applies
+to both HTTP and CLI routes:
+
+```php
+$app->get('/users', 'MyApp\Handler->listUsers');
+$app->addRoute('/users/*', 'MyApp\Handler->listUsers');
+$app->addRoutes(['get,post' => ['/users' => 'MyApp\Handler->listUsers']]);
+```
+
+A malformed shorthand string throws a `Pop\Utils\Exception` at route-registration time, naming the missing
+class or method, rather than failing silently or crashing later at dispatch. That check is `method_exists()`
+only - it does not check that the method is static, so `'Class::method'` naming an instance method registers
+cleanly and then fails at dispatch.
+
+#### Shorthand strings are not the same as controller routes
+
+Shorthand strings are dispatched through `Pop\Utils\CallableObject`, which is a different path than the one
+a controller route takes. A class that extends `Pop\Dispatch\AbstractDispatcher` - which every
+`Pop\Controller\AbstractController` subclass does - is only routed through that dispatcher path when it is
+named by the `controller` key, and it still requires an explicit `action` key:
 
 ```php
 'routes' => [
@@ -484,19 +506,16 @@ is equivalent to:
 ],
 ```
 
-This also works with the fluent verb API and wildcard/default routes:
+Writing `'MyApp\Controller\UsersController->index'` instead is **not** equivalent. The shorthand builds the
+object with `new Class()` and calls the method directly, so the controller never has the application injected
+into it - `$this->application()`, and with it `$this->request`, `$this->response`, services, config and
+events, are all unavailable. Maintenance mode differs too: a `controller` route runs the controller's own
+`dispatchMaintenance()`, while a shorthand target falls back to the generic 503 / `Service Unavailable.`
+response.
 
-```php
-$app->get('/users', 'MyApp\Controller\UsersController->index');
-```
-
-A malformed shorthand string (naming a class or method that doesn't exist) throws a `Pop\Utils\Exception`
-at route-registration time, rather than failing silently or crashing later at dispatch.
-
-This applies to both HTTP and CLI routes. It does not apply to a bare class name with no `->method` or
-`::method` (e.g. `'MyApp\Controller\UsersController'` on its own) - a class that extends
-`Pop\Controller\AbstractController` is dispatched through the normal controller/action mechanism, which
-still requires an explicit `action` key.
+Use shorthand strings for plain handlers and invokables. Use the `controller`/`action` keys for anything that
+extends `AbstractController` and expects the framework wiring described in
+[Getting the Application, Request/Response or Console in a Controller](#getting-the-application-requestresponse-or-console-in-a-controller).
 
 [Top](#popphp)
 
