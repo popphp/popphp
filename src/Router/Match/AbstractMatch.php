@@ -14,6 +14,8 @@ declare(strict_types=1);
  */
 namespace Pop\Router\Match;
 
+use Pop\Utils\CallableObject;
+
 /**
  * Pop router match abstract class
  *
@@ -175,11 +177,32 @@ abstract class AbstractMatch implements MatchInterface
      */
     protected function registerWildcardRoute(string $route, mixed $controller): mixed
     {
-        $routeKey = (str_ends_with($route, '/*')) ? substr($route, 0, -2) : $route;
-        if (is_callable($controller)) {
+        $routeKey   = (str_ends_with($route, '/*')) ? substr($route, 0, -2) : $route;
+        $controller = $this->normalizeController($controller);
+        $this->defaultRoute[$routeKey] = $controller;
+
+        return $controller;
+    }
+
+    /**
+     * Normalize a raw dispatchable value (closure, native callable, or a
+     * pop-utils pseudo-callable string such as 'Class->method',
+     * 'Class::method', 'Class', or 'new Class') into a
+     * ['controller' => $controller] config array. Already-formed config
+     * arrays (and nested-route sub-arrays) are returned unchanged.
+     *
+     * @param  mixed $controller
+     * @return mixed
+     */
+    protected function normalizeController(mixed $controller): mixed
+    {
+        if (is_array($controller)) {
+            return $controller;
+        }
+
+        if ((new CallableObject($controller))->isCallable()) {
             $controller = ['controller' => $controller];
         }
-        $this->defaultRoute[$routeKey] = $controller;
 
         return $controller;
     }
@@ -202,9 +225,7 @@ abstract class AbstractMatch implements MatchInterface
                 $this->addRoute($fullRoute, $c);
             }
         } else {
-            if (is_callable($controller)) {
-                $controller = ['controller' => $controller];
-            }
+            $controller = $this->normalizeController($controller);
 
             $this->routes[$route] = (isset($this->routes[$route])) ?
                 array_merge($this->routes[$route], $controller) : $controller;

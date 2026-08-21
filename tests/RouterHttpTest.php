@@ -953,4 +953,74 @@ class RouterHttpTest extends TestCase
         $this->assertEquals(['hello-world'], array_values($router->getRouteParams()));
     }
 
+    public function testAddRouteAcceptsArrowNotationControllerString()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/foo';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $router = new Router(null, new Http());
+        $router->addRoute('/foo', 'Pop\Test\TestAsset\UsersController->help');
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals('Pop\Utils\CallableObject', $router->getDispatchableClass());
+        $this->assertEquals('Pop\Test\TestAsset\UsersController->help', $router->getDispatchable());
+    }
+
+    public function testWildcardRouteAcceptsArrowNotationControllerString()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/foo/bar';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $router = new Router(null, new Http());
+        $router->addRoute('/foo/*', 'Pop\Test\TestAsset\UsersController->help');
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals('Pop\Utils\CallableObject', $router->getDispatchableClass());
+        $this->assertEquals('Pop\Test\TestAsset\UsersController->help', $router->getDispatchable());
+    }
+
+    public function testVerbRouteAcceptsArrowNotationControllerString()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/foo';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $http = new Http();
+        $http->get('/foo', 'Pop\Test\TestAsset\UsersController->help');
+        $http->match();
+
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('Pop\Test\TestAsset\UsersController->help', $http->getDispatchable());
+    }
+
+    public function testMethodGroupNestedRouteAcceptsArrowNotationControllerString()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/foo';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $http = new Http();
+        $http->addRoutes([
+            'get,post' => [
+                '/foo' => 'Pop\Test\TestAsset\UsersController->help',
+            ],
+        ]);
+        $http->match();
+
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('Pop\Test\TestAsset\UsersController->help', $http->getDispatchable());
+    }
+
+    public function testVerbRouteWithMalformedArrowNotationThrowsAtRegistration()
+    {
+        $this->expectException('Pop\Utils\Exception');
+
+        $http = new Http();
+        $http->get('/foo', 'Pop\Test\TestAsset\NoSuchController->noSuchAction');
+    }
+
 }

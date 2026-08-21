@@ -181,9 +181,7 @@ class Http extends AbstractMatch
             return $this;
         }
 
-        if (is_callable($controller)) {
-            $controller = ['controller' => $controller];
-        }
+        $controller = $this->normalizeController($controller);
 
         if (!empty($controller['method']) && isset($controller['controller']) && ($route !== '*') &&
             !str_ends_with($route, '/*') && !str_contains($route, ':controller')) {
@@ -210,9 +208,7 @@ class Http extends AbstractMatch
      */
     protected function applyMethodToNestedRoutes(mixed $controller, string $method): mixed
     {
-        if (is_callable($controller)) {
-            $controller = ['controller' => $controller];
-        }
+        $controller = $this->normalizeController($controller);
 
         if (is_array($controller) && !isset($controller['controller'])) {
             foreach ($controller as $key => $value) {
@@ -602,9 +598,7 @@ class Http extends AbstractMatch
      */
     protected function addVerbRoute(string $method, string $route, mixed $controller): static
     {
-        if (is_callable($controller)) {
-            $controller = ['controller' => $controller];
-        }
+        $controller = $this->normalizeController($controller);
         $controller['method'] = $method;
 
         $this->addRoute($route, $controller);

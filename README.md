@@ -456,6 +456,48 @@ Failure to have the ID segment of the URL will result in a non-match, or invalid
 If you don't want to be so strict about the parameters passed into a method or function, you can make
 the parameter optional like this: `/edit[/:id]`. The respective method signature would be `edit($id = null)`.
 
+### Controller Shorthand Strings
+
+A route's controller doesn't have to be split into separate `controller`/`action` keys. Anywhere a route
+accepts a controller value - array config, wildcard/default routes, and the fluent verb methods - a single
+string in one of these shorthand forms works too, resolved via `Pop\Utils\CallableObject`:
+
+|Shorthand         |Resolves to                                        |
+|------------------|----------------------------------------------------|
+|`'Class->method'` |Instantiate `Class`, then call `method()` on it     |
+|`'Class::method'` |Call the static method `Class::method()`            |
+
+```php
+'routes' => [
+    '/users' => 'MyApp\Controller\UsersController->index',
+],
+```
+
+is equivalent to:
+
+```php
+'routes' => [
+    '/users' => [
+        'controller' => 'MyApp\Controller\UsersController',
+        'action'     => 'index',
+    ],
+],
+```
+
+This also works with the fluent verb API and wildcard/default routes:
+
+```php
+$app->get('/users', 'MyApp\Controller\UsersController->index');
+```
+
+A malformed shorthand string (naming a class or method that doesn't exist) throws a `Pop\Utils\Exception`
+at route-registration time, rather than failing silently or crashing later at dispatch.
+
+This applies to both HTTP and CLI routes. It does not apply to a bare class name with no `->method` or
+`::method` (e.g. `'MyApp\Controller\UsersController'` on its own) - a class that extends
+`Pop\Controller\AbstractController` is dispatched through the normal controller/action mechanism, which
+still requires an explicit `action` key.
+
 [Top](#popphp)
 
 ### HTTP Routes
@@ -493,8 +535,8 @@ A fluent verb API is also available directly on the application, the router, or 
 matching the array-config `method` key equivalently:
 
 ```php
-$app->get('/users', 'MyApp\Controller\UsersController')
-    ->post('/users', 'MyApp\Controller\UsersController');
+$app->get('/users', ['controller' => 'MyApp\Controller\UsersController', 'action' => 'index'])
+    ->post('/users', ['controller' => 'MyApp\Controller\UsersController', 'action' => 'create']);
 ```
 
 `head`, `put`, `delete`, `trace`, `options`, `connect`, and `patch` are all available the same way. These verb
@@ -506,7 +548,7 @@ before being used as a fluent method call:
 
 ```php
 $app->addCustomMethod('propfind');
-$app->propfind('/dav', 'MyApp\Controller\DavController');
+$app->propfind('/dav', ['controller' => 'MyApp\Controller\DavController', 'action' => 'index']);
 ```
 
 **404 vs. 405** - if no registered route's path matches the request URI at all, the response is a standard

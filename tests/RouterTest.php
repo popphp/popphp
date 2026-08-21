@@ -236,6 +236,21 @@ class RouterTest extends TestCase
         $this->assertTrue($router->hasAction());
     }
 
+    public function testCliAddRouteAcceptsArrowNotationControllerString()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('help', 'Pop\Test\TestAsset\TestController->help');
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals('Pop\Utils\CallableObject', $router->getDispatchableClass());
+        $this->assertEquals('Pop\Test\TestAsset\TestController->help', $router->getDispatchable());
+    }
+
     public function testRouteMatch()
     {
         $_SERVER['argv'] = [
