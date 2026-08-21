@@ -468,7 +468,7 @@ routes - a single string in one of these shorthand forms works too, resolved via
 |`'Class->method'` |`new Class()`, then `method()` on that instance. Route params are passed to **the method**.    |
 |`'Class::method'` |`Class::method()`. Route params are passed to **the method**. The method must really be static.|
 |`'Class'`         |`new Class()`. Route params are passed to **the constructor**; no method is called.            |
-|`'new Class'`     |`new Class()`. No method is called, and route params are **ignored**.                          |
+|`'new Class'`     |Equivalent to a bare `'Class'` - an alternate spelling of the same construction.               |
 
 ```php
 'routes' => [
