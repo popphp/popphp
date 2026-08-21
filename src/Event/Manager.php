@@ -259,7 +259,13 @@ class Manager extends AbstractManager implements EventDispatcherInterface, Liste
             $params['result']  = end($this->results[$name]);
             $params['event']   = $event;
 
-            $result                 = $action->call($params);
+            // Positional, not associative - CallableObject's constructor-invoking
+            // call types (e.g. a 'new Class' listener) route a string-keyed
+            // array into ReflectionClass::newInstanceArgs() as PHP named
+            // arguments, which throws for any key that isn't a declared
+            // parameter name. array_values() keeps every listener type on the
+            // positional contract this method documents above.
+            $result                 = $action->call(array_values($params));
             $this->results[$name][] = $result;
         }
     }

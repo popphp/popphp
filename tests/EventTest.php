@@ -77,6 +77,7 @@ class EventTest extends TestCase
         $events->trigger('test', ['param' => 789]);
         $this->assertContains(123, $events->getResults('foo'));
         $this->assertContains(456, $events->getResults('foo'));
+        $this->assertInstanceOf(TestAsset\TestEvent::class, $events->getResults('bar')[0]);
         $this->assertContains(456, $events->getResults('test'));
         $this->assertContains(789, $events->getResults('test'));
     }
