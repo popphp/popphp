@@ -545,6 +545,17 @@ class Router
     }
 
     /**
+     * Determine if the inbound request has a real preference for an HTML response
+     *
+     * @throws Exception
+     * @return bool
+     */
+    public function acceptsHtml(): bool
+    {
+        return $this->httpMatch()->acceptsHtml();
+    }
+
+    /**
      * Magic method to register a route for a whitelisted custom HTTP method
      *
      * Only forwards to the HTTP match object when $name is either a real

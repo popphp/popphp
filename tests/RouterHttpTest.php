@@ -112,7 +112,7 @@ class RouterHttpTest extends TestCase
         $this->assertTrue($http->hasRoute());
     }
 
-    public function testHttpNoRouteFound()
+    public function testHttpNoRouteFoundDefaultsToJsonWhenNoAcceptHeaderIsSet()
     {
         $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
         $_SERVER['REQUEST_URI']   = '/foo';
@@ -132,7 +132,8 @@ class RouterHttpTest extends TestCase
         $http->noRouteFound(false);
         $result = ob_get_clean();
 
-        $this->assertStringContainsString('Page Not Found', $result);
+        $this->assertStringContainsString('"error": "Not Found"', $result);
+        $this->assertStringNotContainsString('<html>', $result);
     }
 
     public function testHttpNoRouteFoundDoesNotEmitNullOffsetDeprecation()
@@ -260,6 +261,26 @@ class RouterHttpTest extends TestCase
 
         Route::setRouter($router);
         $this->assertEquals('/user', $router->getUrl('user'));
+    }
+
+    public function testRouterAcceptsHtmlProxiesToHttpMatch()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/foo';
+        $_SERVER['HTTP_ACCEPT']   = 'text/html';
+
+        $router = new Router(null, new Http());
+        $this->assertTrue($router->acceptsHtml());
+
+        unset($_SERVER['HTTP_ACCEPT']);
+    }
+
+    public function testRouterAcceptsHtmlNotHttpException()
+    {
+        $this->expectException('Pop\Router\Exception');
+
+        $router = new Router(null, new \Pop\Router\Match\Cli());
+        $router->acceptsHtml();
     }
 
     public function testMethodRouteMatchesCorrectController()
@@ -432,6 +453,68 @@ class RouterHttpTest extends TestCase
         $this->assertStringContainsString('"GET"', $result);
         $this->assertStringContainsString('"POST"', $result);
         $this->assertStringNotContainsString('<html>', $result);
+    }
+
+    public function testHttpNoRouteFoundRendersJsonForCurlStyleBareWildcardAccept()
+    {
+        // curl (and many non-browser HTTP clients) send a literal 'Accept: */*'
+        // rather than a real preference - that must not be mistaken for "wants
+        // HTML", since a bare wildcard carries no real type preference at all.
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/foo';
+        $_SERVER['HTTP_ACCEPT']   = '*/*';
+
+        $routes = [
+            '/bar' => [
+                'controller' => function() {
+                    echo 'Foo';
+                }
+            ]
+        ];
+        $http = new Http();
+        $http->addRoutes($routes);
+        $http->match();
+        $this->assertFalse($http->hasRoute());
+
+        ob_start();
+        $http->noRouteFound(false);
+        $result = ob_get_clean();
+
+        unset($_SERVER['HTTP_ACCEPT']);
+
+        $this->assertStringContainsString('"error": "Not Found"', $result);
+        $this->assertStringNotContainsString('<html>', $result);
+    }
+
+    public function testHttpNoRouteFoundRendersHtmlWhenAcceptDeclaresRealHtmlPreference()
+    {
+        // A real browser's Accept header, which always states 'text/html'
+        // explicitly (even alongside a trailing */* catch-all) - this is the
+        // one case that should win HTML over the JSON default.
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/foo';
+        $_SERVER['HTTP_ACCEPT']   = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+
+        $routes = [
+            '/bar' => [
+                'controller' => function() {
+                    echo 'Foo';
+                }
+            ]
+        ];
+        $http = new Http();
+        $http->addRoutes($routes);
+        $http->match();
+        $this->assertFalse($http->hasRoute());
+
+        ob_start();
+        $http->noRouteFound(false);
+        $result = ob_get_clean();
+
+        unset($_SERVER['HTTP_ACCEPT']);
+
+        $this->assertStringContainsString('Page Not Found', $result);
+        $this->assertStringNotContainsString('"error"', $result);
     }
 
     public function testNoMethodKeyMatchesAnyMethod()

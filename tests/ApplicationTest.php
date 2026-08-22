@@ -1030,7 +1030,8 @@ class ApplicationTest extends TestCase
         $app->run(false);
         $result = ob_get_clean();
 
-        $this->assertStringContainsString('Page Not Found', $result);
+        $this->assertStringContainsString('"error": "Not Found"', $result);
+        $this->assertStringNotContainsString('Method Not Allowed', $result);
     }
 
     public function testListenFiresForTypedRoutePreEventOnRun()
@@ -1188,6 +1189,33 @@ class ApplicationTest extends TestCase
 
         $this->assertFalse($closureCalled);
         $this->assertStringContainsString('Service Unavailable', $result);
+    }
+
+    public function testMaintenanceModeRendersJsonResponseWhenJsonIsPreferred()
+    {
+        $_ENV['MAINTENANCE_MODE'] = 'true';
+
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['HTTP_ACCEPT']    = 'application/json';
+
+        $closureCalled = false;
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/', function() use (&$closureCalled) {
+            $closureCalled = true;
+            echo 'Index';
+        });
+
+        ob_start();
+        $app->run(false);
+        $result = ob_get_clean();
+
+        unset($_SERVER['HTTP_ACCEPT']);
+
+        $this->assertFalse($closureCalled);
+        $this->assertStringContainsString('"error": "Service Unavailable"', $result);
+        $this->assertStringNotContainsString('<html>', $result);
     }
 
     public function testMaintenanceModeExceptionSurfacesViaAppError()

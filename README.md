@@ -510,8 +510,8 @@ Writing `'MyApp\Controller\UsersController->index'` instead is **not** equivalen
 object with `new Class()` and calls the method directly, so the controller never has the application injected
 into it - `$this->application()`, and with it `$this->request`, `$this->response`, services, config and
 events, are all unavailable. Maintenance mode differs too: a `controller` route runs the controller's own
-`dispatchMaintenance()`, while a shorthand target falls back to the generic 503 / `Service Unavailable.`
-response.
+`dispatchMaintenance()`, while a shorthand target falls back to the generic 503 `Service Unavailable` response
+(negotiated between HTML and JSON the same way as the 404/405 fallbacks described below).
 
 Use shorthand strings for plain handlers and invokables. Use the `controller`/`action` keys for anything that
 extends `AbstractController` and expects the framework wiring described in
@@ -574,6 +574,16 @@ $app->propfind('/dav', ['controller' => 'MyApp\Controller\DavController', 'actio
 404 Not Found. If a route's path matches but none of its `method` constraints accept the request's HTTP
 method (and no wildcard/dynamic fallback is available), the response is `405 Method Not Allowed` with an
 `Allow` header listing the methods that do match that path.
+
+**Content negotiation** - every one of these framework-level fallback responses (404, 405, and the 503
+maintenance-mode response above) renders as HTML only when the request's `Accept` header states a real
+preference for `text/html`, and as JSON otherwise - JSON is the default, not HTML. This is deliberately the
+opposite of "look for an explicit JSON preference": real browsers always state `text/html` explicitly in
+their `Accept` header, while non-browser HTTP clients (`curl`, most API callers) are inconsistent about
+declaring `application/json` and commonly send a bare `*/*` or no `Accept` header at all - treating that as
+"wants HTML" would silently serve API callers an HTML error page. The check is resolved via
+`Pop\Http\Server\AcceptHeader`, using `AcceptSpecificity::Loose` so a bare `*/*` doesn't count as a real HTML
+preference (an explicit `text/html`, or `text/*`, does).
 
 **Route matching order** - when more than one registered route could match a given request, the most specific
 one wins, regardless of the order routes were declared in. A fully literal route (no parameters) is more
@@ -803,7 +813,8 @@ Maintenance mode (see [Maintenance Mode](#maintenance-mode) above) is handled au
 `Application::run()` - as soon as `MAINTENANCE_MODE` is on, every matched route is redirected to the
 maintenance response, with no extra setup required. For a controller-based route, that means your own
 `maintenance()` action (below) runs instead of the normal action; closure and callable routes get a generic
-"Service Unavailable" response instead, since they have no action of their own to redirect to. Call
+"Service Unavailable" response instead (negotiated between HTML and JSON per the request's `Accept` header,
+same as the router's 404/405 fallbacks), since they have no action of their own to redirect to. Call
 `$controller->setBypassMaintenance(true)` (typically in your controller's constructor) to exempt a specific
 controller from maintenance mode entirely.
 
