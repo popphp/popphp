@@ -19,7 +19,6 @@ use Pop\Http\Server\Request;
 use Pop\Http\Uri;
 use Pop\Utils\Arr;
 use Pop\Utils\Helper;
-use ReflectionException;
 
 /**
  * Application class
@@ -36,7 +35,7 @@ use ReflectionException;
  * @property   ?Event\Manager                     $events
  * @property   ?Middleware\Manager                $middleware
  * @property   ?Module\Manager                    $modules
- * @property   ?\Composer\Autoload\ClassLoader     $autoloader
+ * @property   ?\Composer\Autoload\ClassLoader    $autoloader
  */
 class Application extends AbstractApplication implements \ArrayAccess
 {
@@ -1047,7 +1046,7 @@ class Application extends AbstractApplication implements \ArrayAccess
                         }
                     // Process middleware
                     } else if (($this->middleware !== null) && ($this->middleware->hasHandlers())) {
-                        [$dispatch, $dispatchParams] = $this->buildMiddlewareDispatch($dispatchable);
+                        [$dispatch, $dispatchParams] = $this->buildDispatch($dispatchable);
                         $request = $this->resolveMiddlewareRequest($dispatchable);
 
                         if ($request === null) {
@@ -1081,13 +1080,32 @@ class Application extends AbstractApplication implements \ArrayAccess
     }
 
     /**
-     * Build the deferred dispatch closure and its params for the middleware
-     * pipeline to invoke once the handler chain completes
+     * Invoke the dispatchable directly, bypassing the middleware pipeline
+     *
+     * @param  mixed $dispatchable
+     * @return void
+     */
+    protected function invokeDispatchable(mixed $dispatchable): void
+    {
+        [$dispatch, $dispatchParams] = $this->buildDispatch($dispatchable);
+
+        if ($dispatchParams !== null) {
+            call_user_func_array($dispatch, $dispatchParams);
+        } else {
+            $dispatch();
+        }
+    }
+
+    /**
+     * Build the dispatch closure and its params for the given dispatchable -
+     * used both as the deferred callable the middleware pipeline invokes once
+     * its handler chain completes, and by invokeDispatchable() to call the
+     * same logic immediately when there's no middleware to defer to
      *
      * @param  mixed $dispatchable
      * @return array
      */
-    protected function buildMiddlewareDispatch(mixed $dispatchable): array
+    protected function buildDispatch(mixed $dispatchable): array
     {
         if ($this->router->getDispatchableClass() == 'Closure') {
             $dispatch       = $dispatchable;
@@ -1132,30 +1150,6 @@ class Application extends AbstractApplication implements \ArrayAccess
     }
 
     /**
-     * Invoke the dispatchable directly, bypassing the middleware pipeline
-     *
-     * @param  mixed $dispatchable
-     * @return void
-     */
-    protected function invokeDispatchable(mixed $dispatchable): void
-    {
-        if ($this->router->getDispatchableClass() == 'Closure') {
-            if ($this->router->hasRouteParams()) {
-                call_user_func_array($dispatchable, array_values($this->router->getRouteParams()));
-            } else {
-                $dispatchable();
-            }
-        } else if ($this->router->getDispatchableClass() == 'Pop\Utils\CallableObject') {
-            $params         = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-            $callableObject = new \Pop\Utils\CallableObject($dispatchable, $params);
-            $callableObject->call();
-        } else {
-            $params = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
-            $dispatchable->dispatch($this->router->getAction(), $params);
-        }
-    }
-
-    /**
      * Render a default maintenance-mode response for route targets that
      * aren't a Dispatch\MaintenanceInterface (closures, callables) and so
      * have no custom maintenance action of their own to run
@@ -1165,7 +1159,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      */
     protected function renderMaintenanceResponse(bool $exit): void
     {
-        if ($this->router->isHttp()) {
+        if ($this->router->isHttp() && $this->router->acceptsHtml()) {
             if (!headers_sent()) {
                 header('HTTP/1.1 503 Service Unavailable');
             }
@@ -1178,6 +1172,12 @@ class Application extends AbstractApplication implements \ArrayAccess
             echo '    <h1>Service Unavailable</h1>' . PHP_EOL;
             echo '</body>' . PHP_EOL;
             echo '</html>' . PHP_EOL;
+        } else if ($this->router->isHttp()) {
+            if (!headers_sent()) {
+                header('HTTP/1.1 503 Service Unavailable');
+                header('Content-Type: application/json');
+            }
+            echo json_encode(['error' => 'Service Unavailable'], JSON_PRETTY_PRINT) . PHP_EOL;
         } else {
             echo PHP_EOL . 'Service Unavailable.' . PHP_EOL . PHP_EOL;
         }

@@ -14,6 +14,9 @@ declare(strict_types=1);
  */
 namespace Pop\Router\Match;
 
+use Pop\Http\Server\AcceptHeader;
+use Pop\Http\Server\AcceptSpecificity;
+
 /**
  * Pop router HTTP match class
  *
@@ -401,13 +404,7 @@ class Http extends AbstractMatch
      */
     public function noRouteFound(bool $exit = true): void
     {
-        if ($this->wantsJson()) {
-            if (!headers_sent()) {
-                header('HTTP/1.1 404 Not Found');
-                header('Content-Type: application/json');
-            }
-            echo json_encode(['error' => 'Not Found'], JSON_PRETTY_PRINT) . PHP_EOL;
-        } else {
+        if ($this->acceptsHtml()) {
             if (!headers_sent()) {
                 header('HTTP/1.1 404 Not Found');
             }
@@ -420,6 +417,12 @@ class Http extends AbstractMatch
             echo '    <h1>Page Not Found</h1>' . PHP_EOL;
             echo '</body>' . PHP_EOL;
             echo '</html>'. PHP_EOL;
+        } else {
+            if (!headers_sent()) {
+                header('HTTP/1.1 404 Not Found');
+                header('Content-Type: application/json');
+            }
+            echo json_encode(['error' => 'Not Found'], JSON_PRETTY_PRINT) . PHP_EOL;
         }
 
         if ($exit) {
@@ -438,14 +441,7 @@ class Http extends AbstractMatch
     {
         $allowed = implode(', ', array_map('strtoupper', $allowedMethods));
 
-        if ($this->wantsJson()) {
-            if (!headers_sent()) {
-                header('HTTP/1.1 405 Method Not Allowed');
-                header('Allow: ' . $allowed);
-                header('Content-Type: application/json');
-            }
-            echo json_encode(['error' => 'Method Not Allowed', 'allowed' => array_map('strtoupper', $allowedMethods)], JSON_PRETTY_PRINT) . PHP_EOL;
-        } else {
+        if ($this->acceptsHtml()) {
             if (!headers_sent()) {
                 header('HTTP/1.1 405 Method Not Allowed');
                 header('Allow: ' . $allowed);
@@ -459,6 +455,13 @@ class Http extends AbstractMatch
             echo '    <h1>Method Not Allowed</h1>' . PHP_EOL;
             echo '</body>' . PHP_EOL;
             echo '</html>'. PHP_EOL;
+        } else {
+            if (!headers_sent()) {
+                header('HTTP/1.1 405 Method Not Allowed');
+                header('Allow: ' . $allowed);
+                header('Content-Type: application/json');
+            }
+            echo json_encode(['error' => 'Method Not Allowed', 'allowed' => array_map('strtoupper', $allowedMethods)], JSON_PRETTY_PRINT) . PHP_EOL;
         }
 
         if ($exit) {
@@ -467,17 +470,21 @@ class Http extends AbstractMatch
     }
 
     /**
-     * Determine if the inbound request is expecting a JSON response, based on
-     * the Accept header (JSON-expecting if 'application/json' is present and
-     * 'text/html' is not, so a browser's typical text/html-inclusive Accept
-     * header isn't misclassified as an API request)
+     * Determine if the inbound request has a real preference for an HTML response
+     *
+     * HTML only wins on a real preference (AcceptSpecificity::Loose - a bare '*\/*'
+     * doesn't count); everything else falls back to JSON. That's the opposite of
+     * checking for an explicit JSON preference - a real browser always states
+     * 'text/html' explicitly in its Accept header, while non-browser HTTP clients
+     * (curl, most API callers) are wildly inconsistent about declaring
+     * 'application/json' and commonly send a bare '*\/*' or no Accept header at all.
      *
      * @return bool
      */
-    protected function wantsJson(): bool
+    public function acceptsHtml(): bool
     {
-        $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
-        return (str_contains($accept, 'application/json') && !str_contains($accept, 'text/html'));
+        $accept = new AcceptHeader($_SERVER['HTTP_ACCEPT'] ?? null);
+        return $accept->accepts('text/html', AcceptSpecificity::Loose);
     }
 
     /**
