@@ -1165,7 +1165,7 @@ $config = [
             }
         ],
     ]
-]
+];
 $app = new Pop\Application($config);
 $app->run();
 ```
@@ -1204,7 +1204,7 @@ $config = [
             }
         ],
     ]
-]
+];
 $app = new Pop\Application($config);
 $app->run();
 ```
