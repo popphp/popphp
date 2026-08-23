@@ -729,9 +729,15 @@ return [
 which will map a route like
 
 ```text
-./foo users edit 1001
+./app foo users edit 1001
 MyApp\Controller\UsersController->edit($id)
 ```
+
+Any literal segment declared in a dynamic route - the `/admin` in `/admin/:controller/:action` or the `foo`
+above - has to be present in the request for that route to apply, and the controller and action are read from
+the positions where `:controller`/`<controller>` and `:action`/`<action>` are declared, not from the first two
+segments of the request. So `/admin/:controller/:action` maps `/admin/users/edit` to
+`MyApp\Controller\UsersController->edit()` and does not match `/users/edit` at all.
 
 #### Forcing a Route
 

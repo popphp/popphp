@@ -714,6 +714,63 @@ class RouterTest extends TestCase
         $this->assertEquals(['a', 'b', 'c'], $router->getRouteParams()[0]);
     }
 
+    public function testCliDynamicRouteWithCommandUsesDeclaredTokenPositions()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'admin', 'users', 'edit', '1001'
+        ];
+
+        $router = new Router\Router(null, new Router\Match\Cli());
+        $router->addRoute('admin <controller> <action> [<param>]', [
+            'prefix' => 'Pop\Test\TestAsset\\'
+        ]);
+        $router->route();
+
+        $this->assertTrue($router->hasRoute());
+        $this->assertEquals('Pop\Test\TestAsset\UsersController', $router->getDispatchableClass());
+        $this->assertEquals('edit', $router->getRouteMatch()->getAction());
+        $this->assertTrue($router->getRouteMatch()->hasAction());
+        $this->assertEquals(['1001'], array_values($router->getRouteParams()));
+    }
+
+    public function testCliDynamicRouteWithCommandDoesNotMatchWithoutTheCommand()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'users', 'edit', '1001'
+        ];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('admin <controller> <action> [<param>]', [
+            'prefix' => 'Pop\Test\TestAsset\\'
+        ]);
+        $match->match();
+
+        $this->assertTrue($match->hasDynamicRoute());
+        $this->assertFalse($match->hasRoute());
+        $this->assertFalse($match->hasDispatchable());
+        $this->assertNull($match->getDispatchable());
+        $this->assertNull($match->getAction());
+        $this->assertFalse($match->hasRouteParams());
+    }
+
+    public function testCliDynamicRouteWithNoCommandIsUnchanged()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'users', 'edit', '1001'
+        ];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('<controller> <action> <param>', [
+            'prefix' => 'Pop\Test\TestAsset\\'
+        ]);
+        $match->match();
+
+        $this->assertTrue($match->hasRoute());
+        $this->assertEquals('Pop\Test\TestAsset\UsersController', $match->getDispatchable());
+        $this->assertEquals('edit', $match->getAction());
+        $this->assertEquals(['1001'], array_values($match->getRouteParams()));
+    }
+
     public function testCliDefaultRouteConfigKey()
     {
         $_SERVER['argv'] = [
