@@ -2,7 +2,7 @@ popphp
 ======
 
 [![Build Status](https://github.com/popphp/popphp/workflows/phpunit/badge.svg)](https://github.com/popphp/popphp/actions)
-[![Coverage Status](http://cc.popphp.org/coverage.php?comp=popphp)](http://cc.popphp.org/popphp/)
+[![Coverage Status](https://cc.popphp.org/coverage.php?comp=popphp)](https://cc.popphp.org/popphp/)
 
 [![Join the chat at https://discord.gg/TZjgT74U7E](https://media.popphp.org/img/discord.svg)](https://discord.gg/TZjgT74U7E)
 
