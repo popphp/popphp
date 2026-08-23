@@ -181,4 +181,15 @@ class MiddlewarePsr15Test extends TestCase
 
         $this->assertInstanceOf(ResponseInterface::class, $capturedResponse);
     }
+
+    public function testPopsOwnHttpRequestAndResponseAreBothPsr7()
+    {
+        // Pins the README's PSR-15 compatibility claim: an HTTP application needs
+        // no PSR-7 shim, because Pop's own server request/response pair already
+        // satisfies the interfaces PSR-15 is declared against.
+        $this->assertInstanceOf(
+            \Psr\Http\Message\ServerRequestInterface::class, new \Pop\Http\Server\Request(new \Pop\Http\Uri())
+        );
+        $this->assertInstanceOf(ResponseInterface::class, new \Pop\Http\Server\Response());
+    }
 }

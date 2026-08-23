@@ -1238,14 +1238,19 @@ use Pop\Middleware\Psr15\MiddlewareAdapter;
 $app->middleware->addHandler(new MiddlewareAdapter(new SomeThirdPartyPsr15Middleware()));
 ```
 
-**This does not mean HTTP requests handled by `Application::run()` are PSR-7 objects.** PSR-15 requires
-`Psr\Http\Message\ServerRequestInterface`/`ResponseInterface` (PSR-7) objects; `Pop\Http\Server\Request`/
-`Response` do not implement PSR-7 today. A PSR-15 middleware registered this way only receives a genuine
-`ServerRequestInterface` if *your application* supplies one - e.g. by constructing `Middleware\Manager::process()`'s
-call yourself with a PSR-7 request from a library like `nyholm/psr7`, rather than relying on `Application::run()`'s
-own (non-PSR-7) HTTP request construction. `Pop\Middleware\Psr15\RequestHandler` is the companion PSR-15
-`RequestHandlerInterface` implementation the adapter uses internally to expose Pop's own `$next` continuation
-to the wrapped PSR-15 middleware.
+**On an HTTP request, the objects `Application::run()` supplies are already PSR-7.** PSR-15 requires
+`Psr\Http\Message\ServerRequestInterface`/`ResponseInterface` (PSR-7) objects, and Pop's own HTTP pair
+implements both: `Pop\Http\Server\Request` implements `ServerRequestInterface`, and `Pop\Http\Server\Response`
+implements `ResponseInterface`. So a PSR-15 middleware registered this way receives a genuine
+`ServerRequestInterface` from `Application::run()` itself, with no shim needed - though a request or response
+from a library like `nyholm/psr7` works equally well, since only the interface is ever checked.
+
+**This does not carry over to the CLI.** `Application::run()` resolves the middleware request from the matched
+dispatchable, and a console route supplies a `Pop\Console\Console`, which is not a `ServerRequestInterface` -
+the wrapped PSR-15 middleware will reject it on its own parameter type declaration. Register PSR-15 middleware
+in HTTP applications only, or drive `Middleware\Manager::process()` yourself with a request object you supply.
+`Pop\Middleware\Psr15\RequestHandler` is the companion PSR-15 `RequestHandlerInterface` implementation the
+adapter uses internally to expose Pop's own `$next` continuation to the wrapped PSR-15 middleware.
 
 **The route target itself must return a PSR-7 response when PSR-15 middleware is registered.**
 `RequestHandlerInterface::handle()` is contractually required to return a `Psr\Http\Message\ResponseInterface`,
@@ -1254,15 +1259,20 @@ a `void` method and can never produce one. `Application::run()` detects this com
 `MiddlewareAdapter` registered alongside a controller-class route target - and throws a `Pop\Middleware\Exception`
 before the route is dispatched at all, rather than letting the controller run and then fail with a PHP `TypeError`
 partway through the middleware stack unwinding. Use a closure (or a callable-string) route target that returns
-a real `ResponseInterface` instead:
+a real `ResponseInterface` instead - `Pop\Http\Server\Response` is one:
 
 ```php
 $app->middleware->addHandler(new MiddlewareAdapter(new SomeThirdPartyPsr15Middleware()));
 
 $app->get('/', function() {
-    return new SomePsr7Response(200);
+    return new Pop\Http\Server\Response(['code' => 200, 'body' => 'OK']);
 });
 ```
+
+Only the controller-class combination is detected ahead of time. A closure route target that returns nothing
+still fails on the way back out, after the closure has run, with `TypeError:
+Pop\Middleware\Psr15\RequestHandler::handle(): Return value must be of type
+Psr\Http\Message\ResponseInterface, null returned` - so return a response from every path.
 
 [Top](#popphp)
 
