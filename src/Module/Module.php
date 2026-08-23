@@ -193,7 +193,7 @@ class Module extends AbstractModule implements \ArrayAccess
      */
     protected function applyConfigMiddleware(): void
     {
-        $middlewareDisabled = App::env('MIDDLEWARE_DISABLED');
+        $middlewareDisabled = App::middlewareDisabled();
 
         if (isset($this->config['middleware']) && ($this->application->middleware() !== null) &&
             (empty($middlewareDisabled) || ($middlewareDisabled == 'route'))) {

@@ -56,6 +56,27 @@ class ModuleTest extends TestCase
         $this->assertInstanceOf('Pop\Application', $module->application());
     }
 
+    public function testModuleMiddlewareDisabledByBooleanTrueEnvValue()
+    {
+        // App::env() coerces the literal 'true' env string into a real bool -
+        // before the fix, this loosely matched 'route' instead of 'all',
+        // leaving the module's own middleware registered.
+        $_ENV['MIDDLEWARE_DISABLED'] = 'true';
+
+        $config = [
+            'name'       => 'foo',
+            'middleware' => 'TestMiddleware'
+        ];
+
+        $application = new Application(include __DIR__ . '/../vendor/autoload.php');
+        $module = new Module($config, 'foo');
+        $application->register($module);
+
+        unset($_ENV['MIDDLEWARE_DISABLED']);
+
+        $this->assertFalse($application->middleware()->hasHandlers());
+    }
+
     public function testSetAndGet()
     {
         $config = [

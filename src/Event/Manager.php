@@ -103,11 +103,17 @@ class Manager extends AbstractManager implements EventDispatcherInterface, Liste
         if (isset($this->items[$name])) {
             $newListeners = new \SplPriorityQueue();
 
+            // Normalize the same way on() does, so a raw closure/string/etc.
+            // can be compared against the CallableObject wrappers on() stored.
+            if (!($action instanceof CallableObject)) {
+                $action = new CallableObject($action);
+            }
+
             $listeners = clone $this->items[$name];
             $listeners->setExtractFlags(\SplPriorityQueue::EXTR_BOTH);
 
             foreach ($listeners as $item) {
-                if ($action !== $item['data']) {
+                if ($action->getCallable() !== $item['data']->getCallable()) {
                     $newListeners->insert($item['data'], $item['priority']);
                 }
             }

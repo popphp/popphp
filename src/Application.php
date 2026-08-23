@@ -269,7 +269,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      */
     protected function applyConfigMiddleware(): void
     {
-        $middlewareDisabled = $this->env('MIDDLEWARE_DISABLED');
+        $middlewareDisabled = App::middlewareDisabled();
 
         if (isset($this->config['middleware']) && ($this->middleware !== null) &&
             (empty($middlewareDisabled) || ($middlewareDisabled == 'route'))) {
@@ -512,7 +512,11 @@ class Application extends AbstractApplication implements \ArrayAccess
     public function register(mixed $module, ?string $name = null): static
     {
         if (!($module instanceof Module\ModuleInterface)) {
-            $module = new Module\Module($module, $this);
+            // Deliberately not passed $this - Module's constructor
+            // self-registers immediately when given an application, which
+            // would lock in its default/config name before setName() below
+            // gets a chance to override it.
+            $module = new Module\Module($module);
         }
 
         if ($name !== null) {
@@ -1046,6 +1050,15 @@ class Application extends AbstractApplication implements \ArrayAccess
                         }
                     // Process middleware
                     } else if (($this->middleware !== null) && ($this->middleware->hasHandlers())) {
+                        if ($this->hasPsr15Middleware() &&
+                            is_subclass_of((string)$this->router->getDispatchableClass(), Dispatch\AbstractDispatcher::class)) {
+                            throw new Middleware\Exception(
+                                'Error: A PSR-15 middleware adapter is registered, but the matched route target ' .
+                                'is a controller class whose dispatch() method never produces a PSR-7 response. ' .
+                                'Use a closure route that returns a Psr\Http\Message\ResponseInterface instead.'
+                            );
+                        }
+
                         [$dispatch, $dispatchParams] = $this->buildDispatch($dispatchable);
                         $request = $this->resolveMiddlewareRequest($dispatchable);
 
@@ -1114,7 +1127,7 @@ class Application extends AbstractApplication implements \ArrayAccess
             $params         = ($this->router->hasRouteParams()) ? $this->router->getRouteParams() : null;
             $dispatch       = function() use ($dispatchable, $params) {
                 $callableObject = new \Pop\Utils\CallableObject($dispatchable, $params);
-                $callableObject->call();
+                return $callableObject->call();
             };
             $dispatchParams = null;
         } else {
@@ -1147,6 +1160,26 @@ class Application extends AbstractApplication implements \ArrayAccess
         }
 
         return null;
+    }
+
+    /**
+     * Determine whether a PSR-15 middleware adapter is registered in the middleware stack
+     *
+     * @return bool
+     */
+    protected function hasPsr15Middleware(): bool
+    {
+        if ($this->middleware === null) {
+            return false;
+        }
+
+        foreach ($this->middleware->getHandlers() as $handler) {
+            if ($handler instanceof Middleware\Psr15\MiddlewareAdapter) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -240,6 +240,28 @@ class App
     }
 
     /**
+     * Get the normalized MIDDLEWARE_DISABLED value
+     *
+     * Guards two failure modes of comparing the raw env value directly: env()
+     * coercing a literal 'true' value into a real bool, which then loosely
+     * equals every non-empty string (silently matching 'route' as well as
+     * 'all'), and any value outside the recognized set ('all', 'route')
+     * otherwise being compared as-is instead of being treated as not set.
+     *
+     * @return string
+     */
+    public static function middlewareDisabled(): string
+    {
+        $value = self::env('MIDDLEWARE_DISABLED');
+
+        if ($value === true) {
+            return 'all';
+        }
+
+        return in_array($value, ['all', 'route'], true) ? $value : '';
+    }
+
+    /**
      * Check if application environment is local
      *
      * @return bool

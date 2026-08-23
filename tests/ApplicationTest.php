@@ -20,6 +20,7 @@ class ApplicationTest extends TestCase
         // $_ENV (App::env() reads $_ENV directly), and it must never leak
         // into unrelated tests elsewhere in the suite that call run().
         unset($_ENV['MAINTENANCE_MODE']);
+        unset($_ENV['MIDDLEWARE_DISABLED']);
     }
 
     public function testConstructor()
@@ -598,6 +599,15 @@ class ApplicationTest extends TestCase
         $this->assertTrue($application->isRegistered('test'));
     }
 
+    public function testRegisterModuleWithNameArgumentRegistersUnderThatName()
+    {
+        $application = new Application();
+        $application->register(['foo' => 'bar'], 'my-module');
+
+        $this->assertTrue($application->isRegistered('my-module'));
+        $this->assertFalse($application->isRegistered('pop_module_module'));
+    }
+
     public function testUnregisterModule()
     {
         $application = new Application();
@@ -681,6 +691,56 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Entering Test Middleware.', $result);
         $this->assertStringContainsString('Exiting Test Middleware.', $result);
         $this->assertStringContainsString('Executing terminate method for test middleware.', $result);
+    }
+
+    public function testMiddlewareDisabledBooleanTrueStopsGlobalMiddleware()
+    {
+        // App::env() coerces the literal 'true' env string into a real bool -
+        // the classic MIDDLEWARE_DISABLED=true .env idiom. Before the fix,
+        // this loosely matched 'route' instead of 'all', leaving global
+        // middleware running.
+        $_ENV['MIDDLEWARE_DISABLED'] = 'true';
+
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+        $config = [
+            'routes' => [
+                'help' => function() {
+                    return 'help';
+                }
+            ],
+            'middleware' => 'Pop\Test\TestAsset\TestMiddleware'
+        ];
+        $application = new Application($config);
+        ob_start();
+        $application->run();
+        $result = ob_get_clean();
+        $this->assertStringNotContainsString('Entering Test Middleware.', $result);
+    }
+
+    public function testMiddlewareDisabledUnrecognizedValueDoesNotStopGlobalMiddleware()
+    {
+        // A stray/typo'd value used to silently disable global middleware
+        // registration - only 'all' and 'route' are meaningful values.
+        $_ENV['MIDDLEWARE_DISABLED'] = 'foo';
+
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+        $config = [
+            'routes' => [
+                'help' => function() {
+                    return 'help';
+                }
+            ],
+            'middleware' => 'Pop\Test\TestAsset\TestMiddleware'
+        ];
+        $application = new Application($config);
+        ob_start();
+        $application->run();
+        $result = ob_get_clean();
+        $this->assertStringContainsString('Entering Test Middleware.', $result);
     }
 
     public function testAddMiddleware()

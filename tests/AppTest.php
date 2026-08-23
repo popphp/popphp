@@ -94,4 +94,47 @@ class AppTest extends TestCase
         $this->assertNull(App::autoloader());
     }
 
+    public function testMiddlewareDisabledDefaultsToEmptyStringWhenUnset()
+    {
+        unset($_ENV['MIDDLEWARE_DISABLED']);
+        $this->assertSame('', App::middlewareDisabled());
+    }
+
+    public function testMiddlewareDisabledReturnsAllForAllValue()
+    {
+        $_ENV['MIDDLEWARE_DISABLED'] = 'all';
+        $this->assertSame('all', App::middlewareDisabled());
+        unset($_ENV['MIDDLEWARE_DISABLED']);
+    }
+
+    public function testMiddlewareDisabledReturnsRouteForRouteValue()
+    {
+        $_ENV['MIDDLEWARE_DISABLED'] = 'route';
+        $this->assertSame('route', App::middlewareDisabled());
+        unset($_ENV['MIDDLEWARE_DISABLED']);
+    }
+
+    public function testMiddlewareDisabledNormalizesUnrecognizedStringToEmpty()
+    {
+        $_ENV['MIDDLEWARE_DISABLED'] = 'foo';
+        $this->assertSame('', App::middlewareDisabled());
+        unset($_ENV['MIDDLEWARE_DISABLED']);
+    }
+
+    public function testMiddlewareDisabledNormalizesBooleanTrueToAll()
+    {
+        // App::env() coerces the literal string 'true' into a real bool -
+        // the classic MIDDLEWARE_DISABLED=true .env idiom.
+        $_ENV['MIDDLEWARE_DISABLED'] = 'true';
+        $this->assertSame('all', App::middlewareDisabled());
+        unset($_ENV['MIDDLEWARE_DISABLED']);
+    }
+
+    public function testMiddlewareDisabledNormalizesBooleanFalseToEmpty()
+    {
+        $_ENV['MIDDLEWARE_DISABLED'] = 'false';
+        $this->assertSame('', App::middlewareDisabled());
+        unset($_ENV['MIDDLEWARE_DISABLED']);
+    }
+
 }
