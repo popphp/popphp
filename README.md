@@ -1247,6 +1247,23 @@ own (non-PSR-7) HTTP request construction. `Pop\Middleware\Psr15\RequestHandler`
 `RequestHandlerInterface` implementation the adapter uses internally to expose Pop's own `$next` continuation
 to the wrapped PSR-15 middleware.
 
+**The route target itself must return a PSR-7 response when PSR-15 middleware is registered.**
+`RequestHandlerInterface::handle()` is contractually required to return a `Psr\Http\Message\ResponseInterface`,
+but a controller-class route target (an `AbstractController`/`AbstractDispatcher` subclass) dispatches through
+a `void` method and can never produce one. `Application::run()` detects this combination - a PSR-15
+`MiddlewareAdapter` registered alongside a controller-class route target - and throws a `Pop\Middleware\Exception`
+before the route is dispatched at all, rather than letting the controller run and then fail with a PHP `TypeError`
+partway through the middleware stack unwinding. Use a closure (or a callable-string) route target that returns
+a real `ResponseInterface` instead:
+
+```php
+$app->middleware->addHandler(new MiddlewareAdapter(new SomeThirdPartyPsr15Middleware()));
+
+$app->get('/', function() {
+    return new SomePsr7Response(200);
+});
+```
+
 [Top](#popphp)
 
 Service Locator

@@ -2,7 +2,9 @@
 
 namespace Pop\Test;
 
+use Pop\Application;
 use Pop\Middleware\Psr15\RequestHandler;
+use Pop\Router\Router;
 use Pop\Test\TestAsset\FakeResponse;
 use Pop\Test\TestAsset\FakeServerRequest;
 use PHPUnit\Framework\TestCase;
@@ -110,5 +112,73 @@ class MiddlewarePsr15Test extends TestCase
             ['psr15-before', 'native-before', 'dispatch', 'native-after', 'psr15-after'],
             $order
         );
+    }
+
+    public function testPsr15MiddlewareInFrontOfControllerRouteThrowsBeforeDispatching()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $psr15Middleware = new class implements \Psr\Http\Server\MiddlewareInterface {
+            public function process($request, $handler): ResponseInterface
+            {
+                return $handler->handle($request);
+            }
+        };
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->router()->addRoute('/', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help',
+        ]);
+        $app->addMiddleware(new \Pop\Middleware\Psr15\MiddlewareAdapter($psr15Middleware));
+
+        $this->expectException(\Pop\Middleware\Exception::class);
+
+        ob_start();
+        try {
+            $app->run(false);
+        } finally {
+            $result = ob_get_clean();
+            // TestController::help() echoes 'help' - confirms it never ran.
+            $this->assertStringNotContainsString('help', $result);
+        }
+    }
+
+    public function testCallableObjectRouteResponseFlowsThroughPsr15MiddlewareChain()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $capturedResponse = null;
+        $capture = function($response) use (&$capturedResponse) {
+            $capturedResponse = $response;
+        };
+
+        $psr15Middleware = new class($capture) implements \Psr\Http\Server\MiddlewareInterface {
+            protected \Closure $capture;
+            public function __construct(\Closure $capture)
+            {
+                $this->capture = $capture;
+            }
+            public function process($request, $handler): ResponseInterface
+            {
+                $response = $handler->handle($request);
+                ($this->capture)($response);
+                return $response;
+            }
+        };
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->router()->addRoute('/', [
+            'controller' => 'Pop\Test\TestAsset\TestPsr7Callable::respond',
+        ]);
+        $app->addMiddleware(new \Pop\Middleware\Psr15\MiddlewareAdapter($psr15Middleware));
+
+        $app->run(false);
+
+        $this->assertInstanceOf(ResponseInterface::class, $capturedResponse);
     }
 }

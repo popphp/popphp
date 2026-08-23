@@ -611,7 +611,7 @@ class Router
             if ($this->routeMatch->hasDispatchable()) {
                 $dispatchable       = $this->routeMatch->getDispatchable();
                 $application        = App::get();
-                $middlewareDisabled = App::env('MIDDLEWARE_DISABLED');
+                $middlewareDisabled = App::middlewareDisabled();
 
                 $routeConfig = $this->routeMatch->getRouteConfig();
                 if (!empty($routeConfig['middleware']) && ($middlewareDisabled != 'route') && ($middlewareDisabled != 'all') &&

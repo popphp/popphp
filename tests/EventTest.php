@@ -63,6 +63,33 @@ class EventTest extends TestCase
         $this->assertNotNull($events->get('hello'));
     }
 
+    public function testOffRemovesAClosureListenerRegisteredViaOn()
+    {
+        $events   = new Manager();
+        $listener = function() {
+            return 'called';
+        };
+
+        $events->on('foo', $listener, 1000);
+        $events->trigger('foo');
+        $this->assertContains('called', $events->getResults('foo'));
+
+        $events->off('foo', $listener);
+        $events->trigger('foo');
+        $this->assertEquals([], $events->getResults('foo'));
+    }
+
+    public function testOffRemovesAStringCallableListenerRegisteredViaOn()
+    {
+        $events = new Manager();
+        $events->on('foo', 'Pop\Test\TestAsset\TestEvent::foo', 1000);
+
+        $events->off('foo', 'Pop\Test\TestAsset\TestEvent::foo');
+        $events->trigger('foo');
+
+        $this->assertEquals([], $events->getResults('foo'));
+    }
+
     public function testCallable()
     {
         $events = new Manager();
