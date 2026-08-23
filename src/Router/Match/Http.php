@@ -371,7 +371,7 @@ class Http extends AbstractMatch
      */
     public function hasRoute(): bool
     {
-        return ($this->route !== null) || ($this->dynamicRoute !== null) || ($this->defaultRoute !== null);
+        return ($this->route !== null) || $this->matchesDynamicRoute() || ($this->defaultRoute !== null);
     }
 
     /**
@@ -832,9 +832,12 @@ class Http extends AbstractMatch
                     $this->routeParams[$param['name']] = $value;
                 }
             }
-        } else if (($this->dynamicRoute !== null) && (count($this->segments) >= 3)) {
-            $this->routeParams = (str_contains($this->dynamicRoute, '/:param*')) ?
-                [array_slice($this->segments, 2)] : array_slice($this->segments, 2);
+        } else if ($this->matchesDynamicRoute()) {
+            $offset = $this->getDynamicRouteParamOffset();
+            if (count($this->segments) > $offset) {
+                $this->routeParams = (str_contains((string)$this->dynamicRoute, '/:param*')) ?
+                    [array_slice($this->segments, $offset)] : array_slice($this->segments, $offset);
+            }
         }
     }
 

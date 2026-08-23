@@ -66,6 +66,25 @@ abstract class AbstractMatch implements MatchInterface
     protected mixed $dynamicRoutePrefix = null;
 
     /**
+     * Literal segments of the dynamic route declaration, keyed by their
+     * position within that declaration
+     * @var array
+     */
+    protected array $dynamicRouteLiterals = [];
+
+    /**
+     * Position of the ':controller'/'<controller>' token within the dynamic route declaration
+     * @var ?int
+     */
+    protected ?int $dynamicRouteControllerIndex = null;
+
+    /**
+     * Position of the ':action'/'<action>' token within the dynamic route declaration
+     * @var ?int
+     */
+    protected ?int $dynamicRouteActionIndex = null;
+
+    /**
      * Flag for dynamic route
      * @var bool
      */
@@ -163,9 +182,105 @@ abstract class AbstractMatch implements MatchInterface
     protected function registerDynamicRoute(string $route, mixed $controller): void
     {
         $this->dynamicRoute = $route;
+        $this->parseDynamicRoute($route);
         if (isset($controller['prefix'])) {
             $this->dynamicRoutePrefix = $controller['prefix'];
         }
+    }
+
+    /**
+     * Parse a dynamic route declaration, recording where its
+     * ':controller'/':action' (HTTP) or '<controller>'/'<action>' (CLI) tokens
+     * sit within the declaration, along with any literal segments the request
+     * has to match for the route to apply
+     *
+     * @param  string $route
+     * @return void
+     */
+    protected function parseDynamicRoute(string $route): void
+    {
+        $this->dynamicRouteLiterals        = [];
+        $this->dynamicRouteControllerIndex = null;
+        $this->dynamicRouteActionIndex     = null;
+
+        $tokens = ($this instanceof Http) ?
+            explode('/', trim($route, '/')) : preg_split('/\s+/', trim($route), -1, PREG_SPLIT_NO_EMPTY);
+
+        foreach ($tokens as $i => $token) {
+            $name = trim($token, '[]<>:*/ ');
+            if (($name == 'controller') && ($this->dynamicRouteControllerIndex === null)) {
+                $this->dynamicRouteControllerIndex = $i;
+            } else if (($name == 'action') && ($this->dynamicRouteActionIndex === null)) {
+                $this->dynamicRouteActionIndex = $i;
+            } else if ($this->isDynamicRouteLiteral($token)) {
+                $this->dynamicRouteLiterals[$i] = $token;
+            }
+        }
+
+        // A declaration with no explicit action token keeps the historical behavior
+        // of taking the action from the segment right after the controller
+        if (($this->dynamicRouteActionIndex === null) && ($this->dynamicRouteControllerIndex !== null)) {
+            $this->dynamicRouteActionIndex = $this->dynamicRouteControllerIndex + 1;
+        }
+    }
+
+    /**
+     * Determine if a dynamic route declaration token is a literal segment,
+     * i.e. neither a param token nor an option
+     *
+     * @param  string $token
+     * @return bool
+     */
+    protected function isDynamicRouteLiteral(string $token): bool
+    {
+        if ($token == '') {
+            return false;
+        }
+
+        return ($this instanceof Http) ?
+            !str_contains($token, ':') : (!str_contains($token, '<') && !str_starts_with($token, '-') &&
+                !str_starts_with($token, '['));
+    }
+
+    /**
+     * Determine if the current request matches the dynamic route declaration:
+     * every literal segment of the declaration has to line up with the
+     * request's segment in that same position, and the request has to carry a
+     * segment where the declaration puts its controller token
+     *
+     * @return bool
+     */
+    protected function matchesDynamicRoute(): bool
+    {
+        if (($this->dynamicRoute === null) || ($this->dynamicRouteControllerIndex === null) ||
+            !isset($this->segments[$this->dynamicRouteControllerIndex])) {
+            return false;
+        }
+
+        foreach ($this->dynamicRouteLiterals as $i => $literal) {
+            if (!isset($this->segments[$i]) || !in_array($this->segments[$i], explode('|', $literal), true)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the segment offset at which the dynamic route's params start,
+     * i.e. the segment right after the action token
+     *
+     * @return int
+     */
+    protected function getDynamicRouteParamOffset(): int
+    {
+        if ($this->dynamicRouteActionIndex !== null) {
+            return $this->dynamicRouteActionIndex + 1;
+        } else if ($this->dynamicRouteControllerIndex !== null) {
+            return $this->dynamicRouteControllerIndex + 1;
+        }
+
+        return 2;
     }
 
     /**
@@ -568,8 +683,10 @@ abstract class AbstractMatch implements MatchInterface
             isset($this->preparedRoutes[$this->route]['controller'])) {
             $routeDispatchable = $this->preparedRoutes[$this->route]['controller'];
         } else {
-            if (($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) && (count($this->segments) >= 1)) {
-                $routeDispatchable = $this->dynamicRoutePrefix . ucfirst(strtolower($this->segments[0])) . 'Controller';
+            $controllerIndex = $this->dynamicRouteControllerIndex;
+            if (($this->dynamicRoutePrefix !== null) && ($controllerIndex !== null) && $this->matchesDynamicRoute()) {
+                $routeDispatchable = $this->dynamicRoutePrefix .
+                    ucfirst(strtolower($this->segments[$controllerIndex])) . 'Controller';
                 if (!class_exists($routeDispatchable)) {
                     $routeDispatchable    = null;
                     $this->isDynamicRoute = false;
@@ -609,7 +726,7 @@ abstract class AbstractMatch implements MatchInterface
         if (($this->route !== null) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['controller'])) {
             $result = true;
-        } else if (($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) && (count($this->segments) >= 1)) {
+        } else if (($this->dynamicRoutePrefix !== null) && $this->matchesDynamicRoute()) {
             // getDispatchable() already runs class_exists() internally and nulls out the
             // result if the class doesn't exist, so a non-null return here already implies it exists.
             $result = ($this->getDispatchable() !== null);
@@ -640,9 +757,9 @@ abstract class AbstractMatch implements MatchInterface
         if (($this->route !== null) && isset($this->preparedRoutes[$this->route]) &&
             isset($this->preparedRoutes[$this->route]['action'])) {
             $action = $this->preparedRoutes[$this->route]['action'];
-        } else if (($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) &&
-            (count($this->segments) >= 1)) {
-            $action = (isset($this->segments[1])) ? $this->segments[1] : null;
+        } else if (($this->dynamicRoutePrefix !== null) && ($this->dynamicRouteActionIndex !== null) &&
+            $this->matchesDynamicRoute()) {
+            $action = $this->segments[$this->dynamicRouteActionIndex] ?? null;
         } else if (($this->defaultRoute !== null) && isset($this->defaultRoute['action'])) {
             $action = $this->defaultRoute['action'];
         }
@@ -663,9 +780,11 @@ abstract class AbstractMatch implements MatchInterface
             isset($this->preparedRoutes[$this->route]['action'])) {
             $result = true;
         } else {
-            if (($this->dynamicRoute !== null) && ($this->dynamicRoutePrefix !== null) &&
-                (count($this->segments) >= 2)) {
-                $result = method_exists($this->getDispatchable(), $this->getAction());
+            if (($this->dynamicRoutePrefix !== null) && $this->matchesDynamicRoute()) {
+                $dispatchable = $this->getDispatchable();
+                $action       = $this->getAction();
+                $result       = (is_string($dispatchable) || is_object($dispatchable)) && is_string($action) &&
+                    method_exists($dispatchable, $action);
             }
             if (!($result) && ($this->defaultRoute !== null) && isset($this->defaultRoute['action'])) {
                 $result = true;

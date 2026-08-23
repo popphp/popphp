@@ -754,6 +754,78 @@ class RouterHttpTest extends TestCase
         $this->assertFalse($http->isDynamicRoute());
     }
 
+    public function testDynamicRouteWithLiteralPrefixUsesDeclaredTokenPositions()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/admin/users/edit/1001';
+
+        $http = new Http();
+        $http->addRoute('/admin/:controller/:action/:param', [
+            'prefix' => 'Pop\Test\TestAsset\\'
+        ]);
+        $http->match();
+
+        $this->assertTrue($http->hasRoute());
+        $this->assertTrue($http->hasDispatchable());
+        $this->assertEquals('Pop\Test\TestAsset\UsersController', $http->getDispatchable());
+        $this->assertEquals('edit', $http->getAction());
+        $this->assertTrue($http->hasAction());
+        $this->assertEquals(['1001'], array_values($http->getRouteParams()));
+    }
+
+    public function testDynamicRouteWithLiteralPrefixDoesNotMatchUnrelatedPath()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/users/edit/1001';
+
+        $http = new Http();
+        $http->addRoute('/admin/:controller/:action/:param', [
+            'prefix' => 'Pop\Test\TestAsset\\'
+        ]);
+        $http->match();
+
+        $this->assertTrue($http->hasDynamicRoute());
+        $this->assertFalse($http->hasRoute());
+        $this->assertFalse($http->hasDispatchable());
+        $this->assertNull($http->getDispatchable());
+        $this->assertNull($http->getAction());
+        $this->assertFalse($http->hasRouteParams());
+    }
+
+    public function testDynamicRouteWithNoLiteralPrefixIsUnchanged()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/users/edit/1001';
+
+        $http = new Http();
+        $http->addRoute('/:controller/:action/:param', [
+            'prefix' => 'Pop\Test\TestAsset\\'
+        ]);
+        $http->match();
+
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('Pop\Test\TestAsset\UsersController', $http->getDispatchable());
+        $this->assertEquals('edit', $http->getAction());
+        $this->assertEquals(['1001'], array_values($http->getRouteParams()));
+    }
+
+    public function testDynamicRouteWithLiteralPrefixAndParamCollection()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/admin/users/edit/a/b/c';
+
+        $http = new Http();
+        $http->addRoute('/admin/:controller/:action/:param*', [
+            'prefix' => 'Pop\Test\TestAsset\\'
+        ]);
+        $http->match();
+
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('Pop\Test\TestAsset\UsersController', $http->getDispatchable());
+        $this->assertEquals('edit', $http->getAction());
+        $this->assertEquals(['a', 'b', 'c'], $http->getRouteParams()[0]);
+    }
+
     public function testNonWildcardDefaultRouteMatchesByPrefix()
     {
         $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
