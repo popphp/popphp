@@ -816,6 +816,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      *   app.dispatch.pre
      *   app.dispatch.post
      *   app.error
+     *   app.shutdown
      *
      * @param  string $name
      * @param  mixed  $action
@@ -836,6 +837,7 @@ class Application extends AbstractApplication implements \ArrayAccess
      *   app.dispatch.pre
      *   app.dispatch.post
      *   app.error
+     *   app.shutdown
      *
      * @param  string $name
      * @param  mixed  $action
@@ -1089,6 +1091,11 @@ class Application extends AbstractApplication implements \ArrayAccess
             // Fire any app.error listeners
             $this->events->dispatch(new Event\ErrorEvent($this, $exception));
             throw $exception;
+        } finally {
+            // Fire any app.shutdown listeners, guaranteed to run regardless of
+            // how the request above ended (normal completion, an aborted
+            // listener, or a rethrown error)
+            $this->events->dispatch(new Event\ShutdownEvent($this));
         }
     }
 

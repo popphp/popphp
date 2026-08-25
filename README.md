@@ -1053,6 +1053,7 @@ application's life cycle. The default hook points with the application object ar
 * app.dispatch.pre
 * app.dispatch.post
 * app.error
+* app.shutdown
 
 You can simply register callable objects with the event manager to have them be called at that time
 in the application's life cycle:
@@ -1103,12 +1104,23 @@ $app->on('app.route.pre', function($application) {
 });
 ```
 
+**Guaranteed teardown.** `app.shutdown` fires exactly once at the end of every `run()` call, regardless of how
+it ended - normal completion, an `AbortException`, or a rethrown error from `app.error`. Use it for cleanup that
+must always happen (closing connections, flushing logs), not for anything that depends on the request having
+succeeded:
+
+```php
+$app->on('app.shutdown', function($application) {
+    // Runs no matter what happened above - success, abort, or error.
+});
+```
+
 #### PSR-14 Compatibility
 
 `Pop\Event\Manager` is a genuine, spec-compliant [PSR-14](https://www.php-fig.org/psr/psr-14/)
 `Psr\EventDispatcher\EventDispatcherInterface` and `ListenerProviderInterface` implementation - not a second,
 parallel system. `on()`/`off()`/`trigger()` above and the typed-event API below both run through the same
-`dispatch()` call for each of the five built-in hook points **as fired by `Application`**, so a listener
+`dispatch()` call for each of the six built-in hook points **as fired by `Application`**, so a listener
 registered either way sees the same event firing:
 
 ```php
@@ -1120,13 +1132,13 @@ $app->events()->listen(RoutePreEvent::class, function(RoutePreEvent $event) {
 ```
 
 There is one dispatchable event class per existing `app.*` hook point (`InitEvent`, `RoutePreEvent`,
-`DispatchPreEvent`, `DispatchPostEvent`, `ErrorEvent` - the last of which also exposes `exception()`), all
-under `Pop\Event\`. Listener resolution for `listen()` is by exact event class only.
+`DispatchPreEvent`, `DispatchPostEvent`, `ErrorEvent` - the last of which also exposes `exception()` -
+and `ShutdownEvent`), all under `Pop\Event\`. Listener resolution for `listen()` is by exact event class only.
 
 Note that calling `Manager::trigger($name, $params)` directly (i.e., not through `Application`) always builds
 a generic `Pop\Event\Event`, never one of the typed classes above - so `listen(SomeTypedEvent::class, ...)`
 only ever fires for events something actually constructs and dispatches as that typed class, which is what
-`Application` does for its five hooks. A same-named `trigger('app.dispatch.pre')` call made by other code
+`Application` does for its six hooks. A same-named `trigger('app.dispatch.pre')` call made by other code
 will not reach a `listen(DispatchPreEvent::class, ...)` listener at all.
 
 [Top](#popphp)

@@ -659,6 +659,13 @@ class ApplicationTest extends TestCase
                         return 'app.dispatch.post';
                     },
                     'priority' => 1000
+                ],
+                [
+                    'name'   => 'app.shutdown',
+                    'action' => function() {
+                        return 'app.shutdown';
+                    },
+                    'priority' => 1000
                 ]
             ]
         ];
@@ -668,6 +675,7 @@ class ApplicationTest extends TestCase
         $this->assertContains('app.route.pre', $application->events()->getResults('app.route.pre'));
         $this->assertContains('app.dispatch.pre', $application->events()->getResults('app.dispatch.pre'));
         $this->assertContains('app.dispatch.post', $application->events()->getResults('app.dispatch.post'));
+        $this->assertContains('app.shutdown', $application->events()->getResults('app.shutdown'));
     }
 
     public function testMiddlewareOnRun()
@@ -1171,6 +1179,82 @@ class ApplicationTest extends TestCase
 
         $this->assertEquals('', $result);
         $this->assertFalse($errorFired);
+    }
+
+    public function testShutdownEventFiresAfterAbortException()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $app = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/', function() { echo 'Index'; });
+
+        $shutdownFired = false;
+        $app->on('app.shutdown', function() use (&$shutdownFired) {
+            $shutdownFired = true;
+        });
+        $app->on('app.route.pre', function() {
+            throw new \Pop\Event\AbortException('Aborting.');
+        });
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertTrue($shutdownFired);
+    }
+
+    public function testShutdownEventFiresAfterRunException()
+    {
+        $config = [
+            'routes' => [
+                'bad' => [
+                    'controller' => function () {
+                        throw new \Pop\Exception('Whoops!');
+                    }
+                ]
+            ]
+        ];
+        $application = new Application($config);
+
+        $shutdownFired = false;
+        $application->on('app.shutdown', function() use (&$shutdownFired) {
+            $shutdownFired = true;
+        });
+
+        $this->expectException(\Pop\Exception::class);
+        $this->expectExceptionMessage('Whoops!');
+
+        try {
+            $application->run(false, 'bad');
+        } finally {
+            $this->assertTrue($shutdownFired);
+        }
+    }
+
+    public function testListenFiresForTypedShutdownEventOnRun()
+    {
+        $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
+        $_SERVER['REQUEST_URI']    = '/';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $calls = [];
+        $app   = new Application(new Router(null, new \Pop\Router\Match\Http()));
+        $app->get('/', function() { echo 'Index'; });
+
+        $app->events()->listen(
+            \Pop\Event\ShutdownEvent::class,
+            function($event) use (&$calls, $app) {
+                $calls[] = ($event->application() === $app);
+            }
+        );
+
+        ob_start();
+        $app->run(false);
+        ob_get_clean();
+
+        $this->assertEquals([true], $calls);
     }
 
     public function testAbortExceptionFromInitPropagatesWhenInitCalledStandalone()
