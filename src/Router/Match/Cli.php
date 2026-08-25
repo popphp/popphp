@@ -357,7 +357,7 @@ class Cli extends AbstractMatch
         $this->indexRouteParameters($route, $requiredParameters[0], $optionalParameters[0]);
 
         return [
-            'regex' => '/' . $routeRegex . '/'
+            'regex' => '/' . str_replace('/', '\/', $routeRegex) . '/'
         ];
     }
 

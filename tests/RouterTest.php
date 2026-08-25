@@ -476,6 +476,38 @@ class RouterTest extends TestCase
         $this->assertTrue($router->hasRoute());
     }
 
+    public function testCliRouteWithSlashDoesNotThrowRegexWarning()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('/nope', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help'
+        ]);
+
+        $router->route();
+        $this->assertFalse($router->hasRoute());
+    }
+
+    public function testCliRouteWithLiteralSlashMatches()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', '/nope'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('/nope', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help'
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+    }
+
     public function testCliOptionsRoute()
     {
         $_SERVER['argv'] = [
