@@ -14,7 +14,6 @@ declare(strict_types=1);
  */
 namespace Pop;
 
-use Pop\Cookie\Cookie;
 use Pop\Router\Router;
 
 /**
@@ -340,11 +339,9 @@ class App
     {
         if (isset($_GET['secret'])) {
             $secret = $_GET['secret'];
-            $cookie = Cookie::getInstance();
-            $cookie->set('pop_mm_secret', $_GET['secret']);
+            setcookie('pop_mm_secret', $secret);
         } else {
-            $cookie = Cookie::getInstance();
-            $secret = $cookie['pop_mm_secret'];
+            $secret = $_COOKIE['pop_mm_secret'] ?? null;
         }
 
         return (!empty($secret) && ($secret == App::env('MAINTENANCE_MODE_SECRET')));
