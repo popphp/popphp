@@ -14,6 +14,8 @@ declare(strict_types=1);
  */
 namespace Pop\Dispatch;
 
+use Pop\Application;
+
 /**
  * Abstract dispatcher class
  *
@@ -28,10 +30,68 @@ abstract class AbstractDispatcher implements DispatchableInterface
 {
 
     /**
+     * Application object
+     * @var ?Application
+     */
+    protected ?Application $application = null;
+
+    /**
      * Default action
      * @var string
      */
     protected string $defaultAction = 'error';
+
+    /**
+     * Dispatchable constructor
+     *
+     * @param  ?Application $application
+     */
+    public function __construct(?Application $application = null)
+    {
+        $this->application = $application;
+    }
+
+    /**
+     * Get application object (alias)
+     *
+     * @return ?Application
+     */
+    public function application(): ?Application
+    {
+        return $this->application;
+    }
+
+    /**
+     * Get application object
+     *
+     * @return ?Application
+     */
+    public function getApplication(): ?Application
+    {
+        return $this->application;
+    }
+
+    /**
+     * Set application object
+     *
+     * @param  Application $application
+     * @return static
+     */
+    public function setApplication(Application $application): static
+    {
+        $this->application = $application;
+        return $this;
+    }
+
+    /**
+     * Has application object
+     *
+     * @return bool
+     */
+    public function hasApplication(): bool
+    {
+        return !empty($this->application);
+    }
 
     /**
      * Set the default action

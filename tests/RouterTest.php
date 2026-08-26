@@ -236,6 +236,82 @@ class RouterTest extends TestCase
         $this->assertTrue($router->hasAction());
     }
 
+    public function testDispatchableWithNoConstructorReceivesApplication()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $application = new \Pop\Application();
+
+        $router = new Router\Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestPlainDispatchable',
+            'action'     => 'index'
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->getDispatchable()->hasApplication());
+        $this->assertSame($application, $router->getDispatchable()->getApplication());
+    }
+
+    public function testDispatchableWithApplicationTypedCustomConstructorReceivesApplication()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $application = new \Pop\Application();
+
+        $router = new Router\Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestCustomConstructorDispatchable',
+            'action'     => 'index'
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->getDispatchable()->hasApplication());
+        $this->assertSame($application, $router->getDispatchable()->getApplication());
+        $this->assertEquals('default', $router->getDispatchable()->label);
+    }
+
+    public function testDispatchableWithIncompatibleCustomConstructorDoesNotReceiveApplication()
+    {
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        new \Pop\Application();
+
+        $router = new Router\Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestController',
+            'action'     => 'help'
+        ]);
+
+        $router->route();
+        $this->assertFalse($router->getDispatchable()->hasApplication());
+    }
+
+    #[RunInSeparateProcess]
+    public function testDispatchableWithNoConstructorAndNoBootstrappedApplicationFallsBackGracefully()
+    {
+        $this->assertFalse(\Pop\App::has());
+
+        $_SERVER['argv'] = [
+            'myscript.php', 'help'
+        ];
+
+        $router = new Router\Router();
+        $router->addRoute('help', [
+            'controller' => 'Pop\Test\TestAsset\TestPlainDispatchable',
+            'action'     => 'index'
+        ]);
+
+        $router->route();
+        $this->assertFalse($router->getDispatchable()->hasApplication());
+    }
+
     public function testCliAddRouteAcceptsArrowNotationControllerString()
     {
         $_SERVER['argv'] = [

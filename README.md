@@ -874,9 +874,10 @@ class IndexController extends AbstractController
 
 #### Getting the Application, Request/Response or Console in a Controller
 
-`AbstractController` on its own takes no constructor arguments. To have the application object (and, for
-HTTP, the request/response objects; for CLI, the console object) automatically injected into your controller,
-use the matching trait:
+`AbstractController` (via `Dispatch\AbstractDispatcher`) takes an optional `?Application $application` as its
+constructor's only argument by default, so `$this->application()`/`$this->getApplication()` work even on a
+plain controller with no trait. To additionally get the request/response objects (HTTP) or the console object
+(CLI) injected, use the matching trait:
 
 ```php
 <?php
@@ -903,14 +904,14 @@ class IndexController extends AbstractController
 object instead, accessible via `$this->application()` and `$this->console()`. Both traits live under
 `Pop\Dispatch\` (not `Pop\Controller\`) so they can be reused by any dispatchable class, not just controllers.
 
-The router detects these traits automatically - it walks up the controller's entire parent class chain
-looking for `HttpTrait`/`ConsoleTrait`, so a shared base controller can declare the trait
-once and every subclass picks it up. If neither trait is found anywhere in the hierarchy, the controller is
-instantiated with no constructor arguments at all.
+The router detects whether to inject `$application` by reflecting on the dispatchable's actual constructor -
+if its first parameter accepts an `Application` instance (whether that's the inherited `AbstractDispatcher`
+default, `HttpTrait`/`ConsoleTrait`'s constructor, or a fully custom constructor typed the same way), it's
+passed in; otherwise the controller is instantiated with no constructor arguments at all.
 
-If a controller needs custom constructor arguments instead (for either a dependency that isn't the
-application/request/response/console, or a controller that doesn't use either trait), bypass the trait
-detection entirely with the route's `params` key:
+If a controller needs custom constructor arguments instead (for a dependency that isn't the
+application/request/response/console, or one whose constructor doesn't accept `Application` as its first
+parameter), bypass the detection entirely with the route's `params` key:
 
 ```php
 'routes' => [
@@ -931,7 +932,7 @@ $app->router()->addDispatchableParams('MyApp\Controller\UsersController', [$user
 `addDispatchableParams('*', [...])` registers a default parameter set that applies to any controller that
 doesn't have its own explicit entry - it's only settable this way, not via the route array's `params` key.
 When explicit params (or the `'*'` default) are present for a controller, they always take priority over
-trait-based injection.
+the automatic `Application` injection.
 
 [Top](#popphp)
 
