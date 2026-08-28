@@ -741,6 +741,57 @@ class RouterTest extends TestCase
         $this->assertStringContainsString('users new', $router->getRouteMatch()->getOriginalRoute());
     }
 
+    public function testCliLiteralWithOptionalParamBeatsRequiredParamRouteForBareLiteral()
+    {
+        $_SERVER['argv'] = ['myscript.php', 'x', 'trash'];
+
+        $router = new Router\Router();
+        $router->addRoute('x <oid>', [
+            'controller' => function($oid) { echo 'Show'; },
+        ]);
+        $router->addRoute('x trash [<id>]', [
+            'controller' => function($id = null) { echo 'Trash'; },
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertStringContainsString('x trash [<id>]', $router->getRouteMatch()->getOriginalRoute());
+    }
+
+    public function testCliLiteralWithOptionalParamBeatsRequiredParamRouteWhenIdProvided()
+    {
+        $_SERVER['argv'] = ['myscript.php', 'x', 'trash', '1'];
+
+        $router = new Router\Router();
+        $router->addRoute('x <oid>', [
+            'controller' => function($oid) { echo 'Show'; },
+        ]);
+        $router->addRoute('x trash [<id>]', [
+            'controller' => function($id = null) { echo 'Trash'; },
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertStringContainsString('x trash [<id>]', $router->getRouteMatch()->getOriginalRoute());
+    }
+
+    public function testCliRequiredParamRouteStillMatchesNonLiteralValue()
+    {
+        $_SERVER['argv'] = ['myscript.php', 'x', '12345'];
+
+        $router = new Router\Router();
+        $router->addRoute('x <oid>', [
+            'controller' => function($oid) { echo 'Show'; },
+        ]);
+        $router->addRoute('x trash [<id>]', [
+            'controller' => function($id = null) { echo 'Trash'; },
+        ]);
+
+        $router->route();
+        $this->assertTrue($router->hasRoute());
+        $this->assertStringContainsString('x <oid>', $router->getRouteMatch()->getOriginalRoute());
+    }
+
     public function testCliSingleCharShortOption()
     {
         $_SERVER['argv'] = [

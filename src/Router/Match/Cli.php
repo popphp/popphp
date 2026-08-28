@@ -116,9 +116,9 @@ class Cli extends AbstractMatch
         $this->flattenRoutes($this->routes);
 
         uksort($this->preparedRoutes, function($keyA, $keyB) {
-            $scoreA = $this->routeSpecificity[$keyA] ?? 0;
-            $scoreB = $this->routeSpecificity[$keyB] ?? 0;
-            return $scoreB <=> $scoreA;
+            $scoreA = $this->routeSpecificity[$keyA] ?? '';
+            $scoreB = $this->routeSpecificity[$keyB] ?? '';
+            return strcmp($scoreB, $scoreA);
         });
 
         return $this;
@@ -293,12 +293,7 @@ class Cli extends AbstractMatch
             } else {
                 $routeRegex = $this->getRouteRegex($route);
 
-                $requiredCount = 0;
-                $optionalCount = 0;
-                foreach ($this->parameters[$route] ?? [] as $parameter) {
-                    $parameter['required'] ? $requiredCount++ : $optionalCount++;
-                }
-                $this->routeSpecificity[$routeRegex['regex']] = 1000 - ($requiredCount * 5) - ($optionalCount * 10);
+                $this->routeSpecificity[$routeRegex['regex']] = $this->getRouteSpecificity($route);
 
                 if (isset($controller['default']) && ($controller['default'])) {
                     $this->defaultRoute['*'] = $controller;
@@ -359,6 +354,35 @@ class Cli extends AbstractMatch
         return [
             'regex' => '/' . str_replace('/', '\/', $routeRegex) . '/'
         ];
+    }
+
+    /**
+     * Score a route's specificity for match-order sorting
+     *
+     * Ranks each whitespace-separated token left to right - a literal command
+     * beats a required <param> beats an optional [<param>] - as digits in a
+     * fixed-width string, so a plain string comparison gives leftmost-token
+     * precedence. Option tokens ([-o], [--option], [--option=], [--option=*])
+     * don't affect positional specificity, so they're skipped.
+     *
+     * @param  string $route
+     * @return string
+     */
+    protected function getRouteSpecificity(string $route): string
+    {
+        $digits = '';
+
+        foreach (preg_split('/\s+/', trim($route), -1, PREG_SPLIT_NO_EMPTY) as $segment) {
+            if (str_starts_with($segment, '[<') && str_ends_with($segment, '>]')) {
+                $digits .= '1';
+            } elseif (str_starts_with($segment, '<') && str_ends_with($segment, '>')) {
+                $digits .= '2';
+            } elseif (!str_starts_with($segment, '[')) {
+                $digits .= '3';
+            }
+        }
+
+        return str_pad($digits, 24, '0');
     }
 
     /**

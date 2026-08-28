@@ -287,9 +287,9 @@ class Http extends AbstractMatch
         $this->flattenRoutes($this->routes);
 
         uksort($this->preparedRoutes, function($keyA, $keyB) {
-            $scoreA = $this->routeSpecificity[$keyA] ?? 0;
-            $scoreB = $this->routeSpecificity[$keyB] ?? 0;
-            return $scoreB <=> $scoreA;
+            $scoreA = $this->routeSpecificity[$keyA] ?? '';
+            $scoreB = $this->routeSpecificity[$keyB] ?? '';
+            return strcmp($scoreB, $scoreA);
         });
 
         return $this;
@@ -729,6 +729,8 @@ class Http extends AbstractMatch
      */
     protected function getRouteRegex(string $route): array
     {
+        $specificity = $this->getRouteSpecificity($route);
+
         $required   = [];
         $optional   = [];
         $params     = [];
@@ -781,25 +783,37 @@ class Http extends AbstractMatch
             $route = str_replace('$', '.*', $route);
         }
 
-        $requiredCount = 0;
-        $optionalCount = 0;
-        $hasArrayParam = false;
-        foreach ($params as $param) {
-            if ($param['array']) {
-                $hasArrayParam = true;
-            } elseif ($param['required']) {
-                $requiredCount++;
-            } else {
-                $optionalCount++;
-            }
-        }
-        $specificity = 1000 - ($requiredCount * 5) - ($optionalCount * 10) - ($hasArrayParam ? 500 : 0);
-
         return [
             'regex'       => '/' . $route . '/u',
             'params'      => $params,
             'specificity' => $specificity,
         ];
+    }
+
+    /**
+     * Score a route's specificity for match-order sorting
+     *
+     * Ranks each segment left to right - a static segment beats a required
+     * param beats an optional param beats an array/wildcard param - as digits
+     * in a fixed-width string, so a plain string comparison gives leftmost-
+     * segment precedence. Catch-all/array-param routes sort below everything
+     * else, matching their existing last-resort role.
+     *
+     * @param  string $route
+     * @return string
+     */
+    protected function getRouteSpecificity(string $route): string
+    {
+        $catchAll = str_contains($route, '*');
+        $route    = str_replace(['*', '[/]'], '', $route);
+        $route    = preg_replace('/\[\/\:[^\[\]]+\]/', "/\x01", $route);
+
+        $digits = '';
+        foreach (array_filter(explode('/', $route), fn($segment) => $segment !== '') as $segment) {
+            $digits .= ($segment === "\x01") ? '1' : (str_starts_with($segment, ':') ? '2' : '3');
+        }
+
+        return ($catchAll ? '0' : '1') . str_pad($digits, 24, '0');
     }
 
     /**

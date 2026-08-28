@@ -586,10 +586,13 @@ declaring `application/json` and commonly send a bare `*/*` or no `Accept` heade
 preference (an explicit `text/html`, or `text/*`, does).
 
 **Route matching order** - when more than one registered route could match a given request, the most specific
-one wins, regardless of the order routes were declared in. A fully literal route (no parameters) is more
-specific than one with required parameters, which is more specific than one with optional parameters, which
-is more specific than one with an array/wildcard parameter (`:param*`). Declaration order is only used as a
-tiebreaker between routes of equal specificity.
+one wins, regardless of the order routes were declared in. Specificity is decided by walking each route's
+path segments left to right: a static segment beats a required parameter, which beats an optional parameter,
+which beats an array/wildcard parameter (`:param*`) - whichever route has the more specific segment at the
+first point the two routes differ wins, not whichever has more or fewer parameters overall. For example,
+`/orders/:id` and `/orders/trash[/:id]` both have one parameter, but `/orders/trash[/:id]` wins for
+`/orders/trash` because its first segment (`trash`) is static where the other route's is a parameter (`:id`).
+Declaration order is only used as a tiebreaker between routes of identical segment-by-segment specificity.
 
 **Popcorn-style method-grouped routes** are also supported, for apps migrating a `popphp/popcorn`-style routes
 config: a top-level key that's a bare, comma-separated list of HTTP methods (never a real route path, which

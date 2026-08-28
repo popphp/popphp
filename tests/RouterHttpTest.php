@@ -575,6 +575,122 @@ class RouterHttpTest extends TestCase
         $this->assertEquals('/users/new', $http->getRouteConfig('route'));
     }
 
+    public function testLiteralWithOptionalParamBeatsRequiredParamRouteForBareLiteral()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/x/trash';
+
+        $http = new Http();
+        $http->addRoutes([
+            '/x/:oid'          => ['controller' => function($oid) { echo 'Show'; }],
+            '/x/trash[/:id]'   => ['controller' => function($id = null) { echo 'Trash'; }],
+        ]);
+
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('/x/trash[/:id]', $http->getRouteConfig('route'));
+    }
+
+    public function testLiteralWithOptionalParamBeatsRequiredParamRouteWhenIdProvided()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/x/trash/1';
+
+        $http = new Http();
+        $http->addRoutes([
+            '/x/:oid'          => ['controller' => function($oid) { echo 'Show'; }],
+            '/x/:oid/:id'      => ['controller' => function($oid, $id) { echo 'ShowChild'; }],
+            '/x/trash[/:id]'   => ['controller' => function($id = null) { echo 'Trash'; }],
+        ]);
+
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('/x/trash[/:id]', $http->getRouteConfig('route'));
+        $this->assertEquals('1', $http->getRouteParams()['id']);
+    }
+
+    public function testRequiredParamRouteStillMatchesNonLiteralValue()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/x/12345';
+
+        $http = new Http();
+        $http->addRoutes([
+            '/x/:oid'          => ['controller' => function($oid) { echo 'Show'; }],
+            '/x/:oid/:id'      => ['controller' => function($oid, $id) { echo 'ShowChild'; }],
+            '/x/trash[/:id]'   => ['controller' => function($id = null) { echo 'Trash'; }],
+        ]);
+
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('/x/:oid', $http->getRouteConfig('route'));
+    }
+
+    public function testStaticSegmentsBeatSingleParamRoutesRegardlessOfDeclarationOrder()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/x/a/b';
+
+        $http = new Http();
+        $http->addRoutes([
+            '/x/:p/b' => ['controller' => function($p) { echo 'ParamFirst'; }],
+            '/x/a/:p' => ['controller' => function($p) { echo 'ParamSecond'; }],
+            '/x/a/b'  => ['controller' => function() { echo 'Literal'; }],
+        ]);
+
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('/x/a/b', $http->getRouteConfig('route'));
+    }
+
+    public function testLeftmostStaticSegmentDecidesSpecificity()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/x/a/b';
+
+        $http = new Http();
+        $http->addRoutes([
+            '/x/:p/b' => ['controller' => function($p) { echo 'ParamFirst'; }],
+            '/x/a/:p' => ['controller' => function($p) { echo 'ParamSecond'; }],
+        ]);
+
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('/x/a/:p', $http->getRouteConfig('route'));
+    }
+
+    public function testLiteralRouteBeatsRouteWithTwoOptionalParams()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/x/literal';
+
+        $http = new Http();
+        $http->addRoutes([
+            '/x[/:a][/:b]' => ['controller' => function($a = null, $b = null) { echo 'Optional'; }],
+            '/x/literal'   => ['controller' => function() { echo 'Literal'; }],
+        ]);
+
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('/x/literal', $http->getRouteConfig('route'));
+    }
+
+    public function testArrayParamRouteOnlyMatchesWhenNoMoreSpecificRouteExists()
+    {
+        $_SERVER['DOCUMENT_ROOT'] = realpath(getcwd());
+        $_SERVER['REQUEST_URI']   = '/x/5';
+
+        $http = new Http();
+        $http->addRoutes([
+            '/x/*'   => ['controller' => function() { echo 'CatchAll'; }],
+            '/x/:id' => ['controller' => function($id) { echo 'Show'; }],
+        ]);
+
+        $http->match();
+        $this->assertTrue($http->hasRoute());
+        $this->assertEquals('/x/:id', $http->getRouteConfig('route'));
+    }
+
     public function testFluentVerbMethodsRegisterAndChain()
     {
         $_SERVER['DOCUMENT_ROOT']  = realpath(getcwd());
