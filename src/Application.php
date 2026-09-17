@@ -19,6 +19,7 @@ use Pop\Http\Server\Request;
 use Pop\Http\Uri;
 use Pop\Utils\Arr;
 use Pop\Utils\Helper;
+use Pop\Utils\Str;
 
 /**
  * Application class
@@ -189,22 +190,39 @@ class Application extends AbstractApplication implements \ArrayAccess
     }
 
     /**
-     * Set the app name and version from config, if present
+     * Set the app name, full name and version from config, if present
+     *
+     * Config always wins. Anything already set - e.g. a subclass's own
+     * property default - is left alone. Only once both of those have had
+     * their say does the APP_NAME env var fall back in, and only for
+     * whichever of name/fullName is still unset, deriving the other form
+     * from whichever shape (slug or human-readable) the env value has.
      *
      * @return void
      */
     protected function applyConfigMetadata(): void
     {
-        // Set the app name
         if (!empty($this->config['name'])) {
             $this->setName($this->config['name']);
-        } else if (!empty(App::name())) {
-            $this->setName(App::name());
         }
-
-        // Set the app version
+        if (!empty($this->config['fullName'])) {
+            $this->setFullName($this->config['fullName']);
+        }
         if (!empty($this->config['version'])) {
             $this->setVersion($this->config['version']);
+        }
+
+        $appName = App::name();
+
+        if (!empty($appName) && (!$this->hasName() || !$this->hasFullName())) {
+            $isSlug = !str_contains($appName, ' ');
+
+            if (!$this->hasName()) {
+                $this->setName($isSlug ? $appName : Str::createSlug($appName));
+            }
+            if (!$this->hasFullName()) {
+                $this->setFullName($isSlug ? ucwords(str_replace(['-', '_'], ' ', $appName)) : $appName);
+            }
         }
     }
 

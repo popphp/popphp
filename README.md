@@ -291,18 +291,26 @@ $app->hasVersion();   // true
 $app->getVersion();   // '1.2.0'
 ```
 
-`name` and `version` can also be set via the application config, and are picked up automatically during
-bootstrap:
+`name`, `fullName` and `version` can also be set via the application config, and are picked up automatically
+during bootstrap:
 
 ```php
 $config = [
-    'name'    => 'my-app',
-    'version' => '1.2.0',
+    'name'     => 'my-app',
+    'fullName' => 'My Application',
+    'version'  => '1.2.0',
 ];
 ```
 
-If `name` isn't set in the config, it falls back to the `APP_NAME` environment variable (`App::name()`). There
-is no config key for `fullName` - it must be set explicitly with `setFullName()`.
+Config always wins over anything already set on the object - including a subclass's own property default for
+`$name`/`$fullName`/`$version`, which is otherwise left alone rather than overwritten.
+
+If, after that, `name` and/or `fullName` are *still* unset, both fall back to the `APP_NAME` environment
+variable (`App::name()`) - deriving whichever one is missing from whichever shape `APP_NAME` already has: a
+value with no space in it (e.g. `my-app`, or a single word like `Pop`) is used as-is for `name`, with `fullName`
+title-cased from it (`My App`, `Pop`); a value with a space in it (e.g. `My App`) is used as-is for `fullName`,
+with `name` slugified from it (`my-app`). This fallback only fills in whichever of the two is still missing -
+it never overwrites one that config or a subclass default already set.
 
 [Top](#popphp)
 

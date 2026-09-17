@@ -21,6 +21,7 @@ class ApplicationTest extends TestCase
         // into unrelated tests elsewhere in the suite that call run().
         unset($_ENV['MAINTENANCE_MODE']);
         unset($_ENV['MIDDLEWARE_DISABLED']);
+        unset($_ENV['APP_NAME']);
     }
 
     public function testConstructor()
@@ -301,6 +302,76 @@ class ApplicationTest extends TestCase
         $this->assertEquals($application->getName(), 'Test App');
         $this->assertTrue($application->hasVersion());
         $this->assertEquals($application->getVersion(), '1.0.0');
+    }
+
+    public function testApplyConfigMetadataFullNameFromConfig()
+    {
+        $application = new Application(['fullName' => 'Test Full Name']);
+        $this->assertTrue($application->hasFullName());
+        $this->assertEquals('Test Full Name', $application->getFullName());
+    }
+
+    public function testApplyConfigMetadataAppNameFallbackSplitsHumanReadableValue()
+    {
+        $_ENV['APP_NAME'] = 'My App';
+        $application = new Application();
+        $this->assertEquals('my-app', $application->getName());
+        $this->assertEquals('My App', $application->getFullName());
+    }
+
+    public function testApplyConfigMetadataAppNameFallbackSplitsSlugValue()
+    {
+        $_ENV['APP_NAME'] = 'my-app';
+        $application = new Application();
+        $this->assertEquals('my-app', $application->getName());
+        $this->assertEquals('My App', $application->getFullName());
+    }
+
+    public function testApplyConfigMetadataAppNameFallbackTreatsSingleWordAsAlreadySlug()
+    {
+        $_ENV['APP_NAME'] = 'Pop';
+        $application = new Application();
+        $this->assertEquals('Pop', $application->getName());
+        $this->assertEquals('Pop', $application->getFullName());
+    }
+
+    public function testApplyConfigMetadataAppNameFallbackDoesNotOverwritePresetName()
+    {
+        $_ENV['APP_NAME'] = 'env-name';
+        $application = new class() extends Application {
+            protected ?string $name = 'preset-name';
+        };
+        $this->assertEquals('preset-name', $application->getName());
+        $this->assertEquals('Env Name', $application->getFullName());
+    }
+
+    public function testApplyConfigMetadataAppNameFallbackDoesNotOverwritePresetFullName()
+    {
+        $_ENV['APP_NAME'] = 'env-name';
+        $application = new class() extends Application {
+            protected ?string $fullName = 'Preset Full Name';
+        };
+        $this->assertEquals('env-name', $application->getName());
+        $this->assertEquals('Preset Full Name', $application->getFullName());
+    }
+
+    public function testApplyConfigMetadataConfigNameOverridesPresetProperty()
+    {
+        $application = new class(['name' => 'config-name']) extends Application {
+            protected ?string $name = 'preset-name';
+        };
+        $this->assertEquals('config-name', $application->getName());
+    }
+
+    public function testApplyConfigMetadataAppNameFallbackSkippedWhenBothAlreadySet()
+    {
+        $_ENV['APP_NAME'] = 'env-name';
+        $application = new class() extends Application {
+            protected ?string $name     = 'preset-name';
+            protected ?string $fullName = 'Preset Full Name';
+        };
+        $this->assertEquals('preset-name', $application->getName());
+        $this->assertEquals('Preset Full Name', $application->getFullName());
     }
 
     public function testRegisterConfig2()
