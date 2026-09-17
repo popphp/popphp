@@ -40,9 +40,9 @@ interface ModuleInterface
     /**
      * Get name
      *
-     * @return string
+     * @return ?string
      */
-    public function getName(): string;
+    public function getName(): ?string;
 
     /**
      * Get application

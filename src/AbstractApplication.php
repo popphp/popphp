@@ -69,9 +69,9 @@ abstract class AbstractApplication implements ApplicationInterface
     /**
      * Get name
      *
-     * @return string
+     * @return ?string
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -101,9 +101,9 @@ abstract class AbstractApplication implements ApplicationInterface
     /**
      * Get full name
      *
-     * @return string
+     * @return ?string
      */
-    public function getFullName(): string
+    public function getFullName(): ?string
     {
         return $this->fullName;
     }
@@ -133,9 +133,9 @@ abstract class AbstractApplication implements ApplicationInterface
     /**
      * Get version
      *
-     * @return string
+     * @return ?string
      */
-    public function getVersion(): string
+    public function getVersion(): ?string
     {
         return $this->version;
     }

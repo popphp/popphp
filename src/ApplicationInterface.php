@@ -40,9 +40,9 @@ interface ApplicationInterface
     /**
      * Get name
      *
-     * @return string
+     * @return ?string
      */
-    public function getName(): string;
+    public function getName(): ?string;
 
     /**
      * Determine if name is set
@@ -62,9 +62,9 @@ interface ApplicationInterface
     /**
      * Get full name
      *
-     * @return string
+     * @return ?string
      */
-    public function getFullName(): string;
+    public function getFullName(): ?string;
 
     /**
      * Determine if full name is set
@@ -84,9 +84,9 @@ interface ApplicationInterface
     /**
      * Get version
      *
-     * @return string
+     * @return ?string
      */
-    public function getVersion(): string;
+    public function getVersion(): ?string;
 
     /**
      * Determine if version is set
