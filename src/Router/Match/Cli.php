@@ -98,12 +98,47 @@ class Cli extends AbstractMatch
      */
     protected function seed(string|array $input): void
     {
-        $segments = is_array($input)
-            ? array_values($input)
-            : preg_split('/\s+/', trim($input), -1, PREG_SPLIT_NO_EMPTY);
+        $segments = is_array($input) ? array_values($input) : $this->splitCommandString($input);
 
         $this->segments    = $segments;
         $this->routeString = implode(' ', $segments);
+    }
+
+    /**
+     * Split a raw command string into segments the way a shell would -
+     * whitespace separates segments, except inside double or single quotes,
+     * which group text (including mid-segment, e.g. --comment="a b") and are
+     * removed. Inside one quote type, the other is a literal character
+     *
+     * @param  string $input
+     * @return array
+     */
+    protected function splitCommandString(string $input): array
+    {
+        $segments = [];
+        $current  = '';
+        $quote    = null;
+
+        foreach (str_split($input) as $char) {
+            if (($quote === null) && (($char == '"') || ($char == "'"))) {
+                $quote = $char;
+            } else if ($char === $quote) {
+                $quote = null;
+            } else if (($quote === null) && ctype_space($char)) {
+                if ($current !== '') {
+                    $segments[] = $current;
+                }
+                $current = '';
+            } else {
+                $current .= $char;
+            }
+        }
+
+        if ($current !== '') {
+            $segments[] = $current;
+        }
+
+        return $segments;
     }
 
     /**
@@ -435,7 +470,7 @@ class Cli extends AbstractMatch
             if (!isset($this->options['options'][$route])) {
                 $this->options['options'][$route] = [];
             }
-            $this->options['options'][$route][$name] = '/' . str_replace(['[', ']'], ['(', ')'], $option[0]) . '/';
+            $this->options['options'][$route][$name] = explode('|', str_replace(['[', ']'], ['', ''], $option[0]));
         }
     }
 
@@ -449,7 +484,6 @@ class Cli extends AbstractMatch
     protected function indexRouteOptionValues(string $route, array $optionValues): void
     {
         foreach ($optionValues as $option) {
-            $opt = str_replace(['[', ']'], ['', ''], $option[0]);
             if (str_contains($option[0], '--')) {
                 $name = substr($option[0], (strpos($option[0], '--') + 2));
                 $name = substr($name, 0, strpos($name, '='));
@@ -460,7 +494,7 @@ class Cli extends AbstractMatch
             if (!isset($this->options['values'][$route])) {
                 $this->options['values'][$route] = [];
             }
-            $this->options['values'][$route][$name] = '/' . $this->buildOptionValueRegex($opt) . '/';
+            $this->options['values'][$route][$name] = explode('|', str_replace(['[', ']', '='], ['', '', ''], $option[0]));
         }
     }
 
@@ -474,7 +508,6 @@ class Cli extends AbstractMatch
     protected function indexRouteOptionValueArrays(string $route, array $optionValueArray): void
     {
         foreach ($optionValueArray as $option) {
-            $opt = str_replace(['[', ']', '*'], ['', '', ''], $option[0]);
             if (str_contains($option[0], '--')) {
                 $name = substr($option[0], (strpos($option[0], '--') + 2));
                 $name = substr($name, 0, strpos($name, '='));
@@ -485,26 +518,37 @@ class Cli extends AbstractMatch
             if (!isset($this->options['arrays'][$route])) {
                 $this->options['arrays'][$route] = [];
             }
-            $this->options['arrays'][$route][$name] = '/' . $this->buildOptionValueRegex($opt) . '/';
+            $this->options['arrays'][$route][$name] = explode('|', str_replace(['[', ']', '=', '*'], ['', '', '', ''], $option[0]));
         }
     }
 
     /**
-     * Build the value-matching regex fragment shared by option-value and
-     * option-value-array matches
+     * Get the value a single segment gives a value option, if it is one of
+     * the option's spellings - everything after "--option=" for a long
+     * spelling, everything after "-o" for a short one
      *
-     * @param  string $opt
-     * @return string
+     * @param  string $segment
+     * @param  array  $spellings
+     * @return ?string
      */
-    protected function buildOptionValueRegex(string $opt): string
+    protected function parseOptionValue(string $segment, array $spellings): ?string
     {
-        if (str_contains($opt, '|')) {
-            [$opt1, $opt2] = explode('|', $opt);
-            return '(' . $opt1 . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt1 . '"(.*)"|' . $opt2 .
-                '[a-zA-Z0-9-_:|.@,\/]+|' . $opt2 . '"(.*)")';
+        foreach ($spellings as $spelling) {
+            if (str_starts_with($spelling, '--')) {
+                if (str_starts_with($segment, $spelling . '=')) {
+                    $value = substr($segment, strlen($spelling) + 1);
+                    return ($value !== '') ? $value : null;
+                }
+            } else if (str_starts_with($segment, $spelling) && !str_starts_with($segment, '--')) {
+                $value = substr($segment, strlen($spelling));
+                if (str_starts_with($value, '=')) {
+                    $value = substr($value, 1);
+                }
+                return ($value !== '') ? $value : null;
+            }
         }
 
-        return '(' . $opt . '[a-zA-Z0-9-_:|.@,\/]+|' . $opt . '"(.*)")';
+        return null;
     }
 
     /**
@@ -578,7 +622,7 @@ class Cli extends AbstractMatch
     }
 
     /**
-     * Parse [-o]/[--option] boolean flags present in the route string
+     * Parse [-o]/[--option] boolean flags present in the route segments
      *
      * @param  string $route
      * @return array
@@ -588,10 +632,8 @@ class Cli extends AbstractMatch
         $options = [];
 
         if (isset($this->options['options'][$route])) {
-            foreach ($this->options['options'][$route] as $option => $regex) {
-                $match = [];
-                preg_match($regex, $this->routeString, $match);
-                if (isset($match[0]) && !empty($match[0])) {
+            foreach ($this->options['options'][$route] as $option => $spellings) {
+                if (!empty(array_intersect($this->segments, $spellings))) {
                     $options[$option] = true;
                 }
             }
@@ -601,7 +643,7 @@ class Cli extends AbstractMatch
     }
 
     /**
-     * Parse [--option=]-style value options present in the route string
+     * Parse [--option=]-style value options present in the route segments
      *
      * @param  string $route
      * @return array
@@ -611,17 +653,13 @@ class Cli extends AbstractMatch
         $options = [];
 
         if (isset($this->options['values'][$route])) {
-            foreach ($this->options['values'][$route] as $option => $regex) {
-                $match = [];
-                $value = null;
-                preg_match($regex, $this->routeString, $match);
-                if (isset($match[0]) && !empty($match[0])) {
-                    if (str_contains($match[0], '=')) {
-                        $value = substr($match[0], (strpos($match[0], '=') + 1));
-                    } else if ((str_starts_with($match[0], '-')) && (substr($match[0], 1, 1) != '-') && !str_contains($match[0], $option)) {
-                        $value = substr($match[0], 2);
+            foreach ($this->options['values'][$route] as $option => $spellings) {
+                foreach ($this->segments as $segment) {
+                    $value = $this->parseOptionValue($segment, $spellings);
+                    if ($value !== null) {
+                        $options[$option] = $value;
+                        break;
                     }
-                    $options[$option] = $value;
                 }
             }
         }
@@ -630,7 +668,7 @@ class Cli extends AbstractMatch
     }
 
     /**
-     * Parse [--option=*]-style array-value options present in the route string
+     * Parse [--option=*]-style array-value options present in the route segments
      *
      * @param  string $route
      * @return array
@@ -640,18 +678,11 @@ class Cli extends AbstractMatch
         $options = [];
 
         if (isset($this->options['arrays'][$route])) {
-            foreach ($this->options['arrays'][$route] as $option => $regex) {
-                $matches = [];
-                $values  = [];
-                preg_match_all($regex, $this->routeString, $matches);
-                if (isset($matches[0]) && !empty($matches[0])) {
-                    foreach ($matches[0] as $match) {
-                        $value = null;
-                        if (str_contains($match, '=')) {
-                            $value = substr($match, (strpos($match, '=') + 1));
-                        } else if ((str_starts_with($match, '-')) && (substr($match, 1, 1) != '-') && !str_contains($match, $option)) {
-                            $value = substr($match, 2);
-                        }
+            foreach ($this->options['arrays'][$route] as $option => $spellings) {
+                $values = [];
+                foreach ($this->segments as $segment) {
+                    $value = $this->parseOptionValue($segment, $spellings);
+                    if ($value !== null) {
                         $values[] = $value;
                     }
                 }

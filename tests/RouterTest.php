@@ -687,6 +687,207 @@ class RouterTest extends TestCase
         $this->assertEquals(2, count($router->getRouteMatch()->getOption('id')));
     }
 
+    public function testCliOptionValueKeepsSpaces()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('fail:set [--force] [--comment=] [--code=] [<id>]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['fail:set', '--comment=Please cancel', '--code=7']));
+        $this->assertEquals(['comment' => 'Please cancel', 'code' => '7'], $match->getOptions());
+    }
+
+    public function testCliOptionValueKeepsSpecialCharacters()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('fail:set [--force] [--comment=] [--code=] [<id>]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['fail:set', '--comment=a+b#c!=d']));
+        $this->assertEquals(['comment' => 'a+b#c!=d'], $match->getOptions());
+    }
+
+    public function testCliOptionValueKeepsLiteralQuotes()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('fail:set [--force] [--comment=] [--code=] [<id>]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['fail:set', '--comment="Please cancel"']));
+        $this->assertEquals(['comment' => '"Please cancel"'], $match->getOptions());
+    }
+
+    public function testCliOptionTextInsideValueIsNotParsedAsOption()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('fail:set [-f|--force] [--comment=] [--code=] [<id>]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['fail:set', '--comment=do not --force it --code=9 or -f']));
+        $this->assertEquals(['comment' => 'do not --force it --code=9 or -f'], $match->getOptions());
+    }
+
+    public function testCliOptionFlagRequiresExactMatch()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('fail:set [-f|--force] [<id>]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['fail:set', '--force-all']));
+        $this->assertEquals([], $match->getOptions());
+    }
+
+    public function testCliShortOptionIsNotMatchedInsideLongOption()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('t [-f|--force] [-c|--code=] [--comment=]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['t', '--comment=a-fix']));
+        $this->assertEquals(['comment' => 'a-fix'], $match->getOptions());
+    }
+
+    public function testCliOptionFlagShortAndLongForms()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('t [-f|--force] [--o1|--options1]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['t', '-f', '--options1']));
+        $this->assertEquals(['force' => true, 'o1' => true], $match->getOptions());
+
+        $this->assertTrue($match->match(['t', '--force', '--o1']));
+        $this->assertEquals(['force' => true, 'o1' => true], $match->getOptions());
+    }
+
+    public function testCliOptionValueShortAndLongForms()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('t [-c|--code=]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['t', '-c7']));
+        $this->assertEquals(['code' => '7'], $match->getOptions());
+
+        $this->assertTrue($match->match(['t', '--code=7']));
+        $this->assertEquals(['code' => '7'], $match->getOptions());
+    }
+
+    public function testCliShortOptionValueStripsEquals()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('t [-c|--code=] [-i|--id=*]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['t', '-c=7', '-i=1', '-i2']));
+        $this->assertEquals(['code' => '7', 'id' => ['1', '2']], $match->getOptions());
+    }
+
+    public function testCliOptionValueEmptyIsAbsent()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('t [-c|--code=]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['t', '--code=', '-c']));
+        $this->assertEquals([], $match->getOptions());
+    }
+
+    public function testCliOptionValueArrayKeepsSpaces()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('t [-i|--id=*]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['t', '--id=a', '-i2', '--id=b c']));
+        $this->assertEquals(['id' => ['a', '2', 'b c']], $match->getOptions());
+    }
+
+    public function testCliOptionCollisionLaterCategoryWins()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('t [--name] [--name=]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match(['t', '--name', '--name=x']));
+        $this->assertEquals(['name' => 'x'], $match->getOptions());
+    }
+
+    public function testCliStringInputKeepsQuotedValueTogether()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('fail:set [--force] [--comment=] [<id>]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match('fail:set --comment="Please cancel"  42'));
+        $this->assertEquals(['comment' => 'Please cancel'], $match->getOptions());
+        $this->assertEquals('42', $match->getParameter('id'));
+    }
+
+    public function testCliStringInputQuotedPositionalParameter()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('say <message>', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match('say "hello there"'));
+        $this->assertEquals('hello there', $match->getParameter('message'));
+    }
+
+    public function testCliStringInputSingleQuotes()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('fail:set [--comment=] [<id>]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match("fail:set --comment='Please cancel' '4 2'"));
+        $this->assertEquals(['comment' => 'Please cancel'], $match->getOptions());
+        $this->assertEquals('4 2', $match->getParameter('id'));
+    }
+
+    public function testCliStringInputQuoteIsLiteralInsideOtherQuoteType()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $match = new Router\Match\Cli();
+        $match->addRoute('fail:set [--comment=] [<id>]', ['controller' => function() {}]);
+
+        $this->assertTrue($match->match('fail:set --comment=\'He said "hi"\' "it\'s"'));
+        $this->assertEquals(['comment' => 'He said "hi"'], $match->getOptions());
+        $this->assertEquals("it's", $match->getParameter('id'));
+    }
+
+    public function testCliCommandOptionsIndexListsSpellings()
+    {
+        $_SERVER['argv'] = ['myscript.php'];
+
+        $route = 't [-f|--force] [--o1|--options1] [-c|--code=] [--comment=] [-i|--id=*]';
+        $match = new Router\Match\Cli();
+        $match->addRoute($route, ['controller' => function() {}]);
+        $match->match(['t']);
+
+        $this->assertEquals([
+            'options' => [$route => ['force' => ['-f', '--force'], 'o1' => ['--o1', '--options1']]],
+            'values'  => [$route => ['code' => ['-c', '--code'], 'comment' => ['--comment']]],
+            'arrays'  => [$route => ['id' => ['-i', '--id']]],
+        ], $match->getCommandOptions());
+    }
+
     public function testNoRoute()
     {
         $_SERVER['argv'] = [
